@@ -10,7 +10,11 @@
 
 - Gestion des utilisateurs (M)
 - Connexion des utilisateurs à distance (M)
+
+### Gameplay
+
 - Joueurs à distance (M)
+- Multijoueur (2+)
 - Personnalisation (m)
 
 ### IA-Algo
