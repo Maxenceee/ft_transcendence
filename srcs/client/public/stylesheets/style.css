@@ -1,0 +1,193 @@
+article, aside, details, figcaption, figure, footer, header, hgroup, main, nav, section, summary {
+  display: block;
+}
+
+audio, canvas, video {
+  display: inline-block;
+}
+
+html {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+b, strong {
+  font-weight: bold;
+}
+
+hr {
+  height: 0;
+  margin: 15px 0;
+  overflow: hidden;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+}
+
+[type=checkbox], [type=radio] {
+  box-sizing: border-box;
+  padding: 0;
+  cursor: pointer;
+}
+
+[type=checkbox]:disabled {
+  cursor: not-allowed;
+}
+
+@font-face {
+  font-family: "Marianne-Medium";
+  src: url("/static/fonts/Marianne-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Marianne-Regular";
+  src: url("/static/fonts/Marianne-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Material Icons Extended";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url(//fonts.gstatic.com/s/materialiconsextended/v149/kJEjBvgX7BgnkSrUwT8UnLVc38YydejYY-oE_LvJHMXBBA.woff2) format("woff2");
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+*::after, *::before {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -webkit-scroll-behavior: smooth;
+  -moz-scroll-behavior: smooth;
+  -ms-scroll-behavior: smooth;
+  -o-scroll-behavior: smooth;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+::-moz-selection {
+  background: var(--selection-color);
+}
+
+::selection {
+  background: var(--selection-color);
+}
+
+::-moz-selection {
+  background: var(--selection-color);
+}
+
+body {
+  position: relative;
+  height: 100%;
+  width: 100vw;
+  line-height: 1.5;
+  font-family: "Marianne-Medium", sans-serif;
+  font-size: 14px;
+  background-color: var(--main-background);
+  color: var(--color-fg-default);
+}
+@media screen and (min-width: 1800px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+.cls-1 {
+  fill: var(--card-primary);
+}
+
+span,
+p,
+h1, h2, h3, h4, h5,
+a {
+  cursor: default;
+}
+
+span p,
+span a,
+span h1 {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+h1 {
+  text-decoration: none;
+  text-align: center;
+}
+
+a {
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button span {
+  cursor: pointer;
+}
+
+:root {
+  --flag-blue: #000091;
+  --flag-white: #FFFFFF;
+  --flag-blue: #E1000F;
+  --flag-text-gradient: linear-gradient(90deg, rgba(0,0,145,1) 0%, rgba(0,0,145,0.05) 50%, rgba(225,0,15,0.05) 50%, rgba(225,0,15,1) 100%);
+  --flag-gradient: linear-gradient(90deg, rgba(0,0,145,1) 0%, rgb(255, 255, 255) 50%, rgba(225,0,15,1) 100%);
+  --card-red: #ff463a;
+  --card-cyan: #40c8e0;
+  --card-blue: #0981fa;
+  --card-green: #35c759;
+  --card-orange: #ff9500;
+  --card-primary: #000;
+  --card-primary-inverted: #fff;
+  --card-secondary: #818185;
+  --connection-logo-color: var(--card-primary);
+  --color-fg-default: #24292f;
+  --color-fg-secondary: #818185;
+  --primary: #1b3a57;
+  --primary-dark: #2055EE;
+  --primary-darkest: #133FC0;
+  --input-placeholder: #A6ACCD;
+  --input-text: #646B8C;
+  --border-default: #E1E6F9;
+  --border-active: #275EFE;
+  --background: #fff;
+  --button-text: #FFFFFF;
+  --main-background: #f6f7f9;
+  --card-background: #f2f2f7;
+  --card-hover: #e3e3eb;
+  --separator-color: rgba(0, 0, 0, 0.1);
+  --selection-color: rgba(0, 0, 145, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --flag-text-gradient: linear-gradient(90deg, rgba(0,0,145,1) 0%, rgb(255, 255, 255) 50%, rgba(225,0,15,1) 100%);
+    --connection-logo-color: aliceblue;
+    --color-fg-default: #c9d1d9;
+    --primary-outline: rgb(5, 5, 5);
+    --main-background: rgb(5, 5, 5);
+    --card-background: #121212;
+    --card-hover: #1c1c1c;
+    --card-primary: rgb(231, 231, 231);
+    --separator-color: rgba(255, 255, 255, 0.1);
+    --selection-color: rgba(225, 0, 15, 0.3);
+  }
+}
