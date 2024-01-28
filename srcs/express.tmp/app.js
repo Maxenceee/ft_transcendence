@@ -69,7 +69,7 @@ app.use('/static', express.static(buildDashPath, {
  */
 
 let now = new Date();
-console.info("\x1b[1;36mBoot time %d - %dh%d(UTC+%d) - timezone %s\x1b[0m", Math.floor(Date.now() / 1000), now.getHours(), now.getMinutes(), now.getHours() - now.getUTCHours(), process.env.TZ);
+console.info("\x1b[1;36mBoot time %d - %dh%d(UTC+%d) - timezone %s\x1b[0m", Math.floor(Date.now() / 1000), now.getHours(), now.getMinutes(), now.getHours() - now.getUTCHours(), process.env.TZ || "Default");
 
 
 /* enable cors for developpement */

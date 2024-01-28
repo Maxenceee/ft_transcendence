@@ -1,5 +1,7 @@
 # ft_transcendence
 
+## Modules
+
 ### Web
 
 - Framework backend (M)
@@ -34,4 +36,4 @@
 - Multiples navigateurs (m)
 - Multiples langues (m)
 
-## Total: 9
+### Total: 9
