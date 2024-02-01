@@ -31,7 +31,8 @@ var app = express();
  */
 
 if (!process.env.CLIENT_BUILD_BIR) {
-	process.env["CLIENT_BUILD_BIR"] = path.resolve(__dirname, '.');
+	// process.env["CLIENT_BUILD_BIR"] = path.resolve(__dirname, '.');
+	process.env["CLIENT_BUILD_BIR"] = path.resolve(__dirname, '../client');
 }
 
 let buildDashPath = path.join(process.env.CLIENT_BUILD_BIR, 'public');
