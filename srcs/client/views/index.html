@@ -259,13 +259,6 @@
 				_.Ac = function(a) {
 					return a instanceof _.zc && a.constructor === _.zc ? a.j : "type_error:TrustedResourceUrl"
 				};
-				_.ce = function(a) {
-					var b;
-					if (Jda && !(_.mf && _.rf("9") && !_.rf("10") && _.ea.SVGElement && a instanceof _.ea.SVGElement) && (b = a.parentElement))
-						return b;
-					b = a.parentNode;
-					return _.ig(b) ? b : null
-				};
 				_.xj = function(a) {
 					var b,
 						c = (a.ownerDocument && a.ownerDocument.defaultView || window).document,
