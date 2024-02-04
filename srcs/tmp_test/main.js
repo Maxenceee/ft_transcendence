@@ -3,13 +3,22 @@
 // import * as THREE from './node_modules/three/build/three.module.js';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { TextureLoader } from 'three/addons/lights/SpotLight.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
+
+//
+renderer.setPixelRatio( window.devicePixelRatio );
+//
 
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
 camera.position.set( 15, 15, 20 );
@@ -46,10 +55,12 @@ scene.add( Alight );
 const kitten = new THREE.TextureLoader().load( "kitten.jpg" );
 const frieren = new THREE.TextureLoader().load( "smug_frieren.jpg" );
 const fire = new THREE.TextureLoader().load( "fire.jpg" );
+const sky = new THREE.TextureLoader().load( "sky3.jpg" );
+
 // frieren.
-// frieren.wrapS = THREE.RepeatWrapping;
-// frieren.wrapT = THREE.RepeatWrapping;
-// frieren.repeat.set( 4, 2 );
+// sky.wrapS = THREE.RepeatWrapping;
+// sky.wrapT = THREE.RepeatWrapping;
+// sky.repeat.set( 2, 2 );
 const geometryPlane = new THREE.PlaneGeometry( 30, 30 );
 const materialPlane = new THREE.MeshPhysicalMaterial( {color: 0xff00ff, side: THREE.DoubleSide, opacity:0.5, transparent : true} );
 const materialPlane2 = new THREE.MeshPhysicalMaterial( {color: 0xff0000, side: THREE.DoubleSide, opacity:0.5, transparent : true} );
@@ -81,6 +92,56 @@ const materialSphere = new THREE.MeshPhysicalMaterial( {
 const geometryCube = new THREE.SphereGeometry( 2 );
 // var cube = new THREE.Object3D;
 
+
+// try to add a skybox
+
+	
+const skyboxGeo = new THREE.BoxGeometry(500, 500, 500);
+
+const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
+const skybox = new THREE.Mesh(skyboxGeo, skyboxTex);
+
+// scene.add(skybox);
+// 
+//post processing
+// const test = new EffectComposer(UnrealBloomPass,FilmPass)
+const params = {
+	threshold: 0,
+	strength: 1,
+	radius: 0,
+	exposure: 1
+};
+const renderScene = new RenderPass( scene, camera );
+
+	const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+	bloomPass.threshold = params.threshold;
+	bloomPass.strength = params.strength;
+	bloomPass.radius = params.radius;
+
+	const outputPass = new OutputPass();
+let composer
+	composer = new EffectComposer( renderer );
+	composer.addPass( renderScene );
+	composer.addPass( bloomPass );
+	composer.addPass( outputPass );
+
+// new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
+
+// 		const model = gltf.scene;
+
+// 		scene.add( model );
+
+// 		mixer = new THREE.AnimationMixer( model );
+// 		const clip = gltf.animations[ 0 ];
+// 		mixer.clipAction( clip.optimize() ).play();
+
+// 		animate();
+
+// 	} );
+
+
+// end of post pros
+
 // const materialCube = new THREE.MeshBasicMaterial( {wireframe:true}, {texture:texture});
 // const materialCube = new THREE.MeshBasicMaterial( {wireframe:false, map: frieren});
 const materialCube = new THREE.MeshPhysicalMaterial( {
@@ -89,7 +150,7 @@ const materialCube = new THREE.MeshPhysicalMaterial( {
 	opacity: 1, 
 	iridescence :1,
 	map:fire});
-	// const materialCube = new THREE.MeshDepthMaterial({wireframe:false});
+	// const materialCube = new THREE.MeshDepthMateria 	l({wireframe:false});
 	
 const cube = new THREE.Mesh( geometryCube, materialCube );
 const sphere = new THREE.Mesh( geometrySphere, materialSphere );
@@ -197,10 +258,12 @@ function animate() {
 	scene.add(light);
 	// camera.lookAt( cube.position );
 	renderer.render( scene, camera );
+	
 	controls.update();
 	collide()
 	if(hit == true)
 		i *= -1;
+	// composer.render();
 
 }
 animate();
