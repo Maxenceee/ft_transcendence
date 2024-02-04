@@ -263,7 +263,7 @@ function animate() {
 	collide()
 	if(hit == true)
 		i *= -1;
-	// composer.render();
+	composer.render();
 
 }
 animate();
