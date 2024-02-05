@@ -386,6 +386,7 @@ const _1 = f1(z),
     L1 = R1.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactCurrentOwner,
     F1 = { key: !0, ref: !0, __self: !0, __source: !0 };
 function zs(e, t, n) {
+    // console.log(e, t, n);
     var r,
         l = {},
         o = null,
@@ -393,6 +394,7 @@ function zs(e, t, n) {
     n !== void 0 && (o = "" + n), t.key !== void 0 && (o = "" + t.key), t.ref !== void 0 && (i = t.ref);
     for (r in t) O1.call(t, r) && !F1.hasOwnProperty(r) && (l[r] = t[r]);
     if (e && e.defaultProps) for (r in ((t = e.defaultProps), t)) l[r] === void 0 && (l[r] = t[r]);
+    // console.log({ $$typeof: N1, type: e, key: o, ref: i, props: l, _owner: L1.current });
     return { $$typeof: N1, type: e, key: o, ref: i, props: l, _owner: L1.current };
 }
 Ol.Fragment = T1;
@@ -403,7 +405,7 @@ var Qi = vs.exports;
 const Ps = Qi.Fragment,
     p = Qi.jsx,
     jo = Qi.jsxs;
-console.log(Qi, p);
+// console.log(Qi, p);
 var Ao = {},
     _s = { exports: {} },
     xe = {},
@@ -6820,6 +6822,7 @@ xe.createPortal = function (e, t) {
     return L2(e, t, null, n);
 };
 xe.createRoot = function (e, t) {
+    console.log("root", e, t);
     if (!Du(e)) throw Error(k(299));
     var n = !1,
         r = "",
@@ -6863,6 +6866,7 @@ xe.hydrateRoot = function (e, t, n) {
     return new Ql(t);
 };
 xe.render = function (e, t, n) {
+    console.log("render", e, t, n);
     if (!Kl(t)) throw Error(k(200));
     return Jl(null, e, t, !1, n);
 };
@@ -9349,5 +9353,6 @@ l6.defaults.baseURL = "https://cdn.maxencegama.dev";
 function u6() {
     return p(Ps, { children: p(L0, { children: jo(P0, { children: [p(Li, { path: "/", element: p(i6, {}) }), p(Li, { path: "*", element: p(o6, {}) })] }) }) });
 }
+console.log(u6(), new o6());
 Ao.createRoot(document.getElementById("root")).render(p(u6, {}));
 // console.log(Ao);
