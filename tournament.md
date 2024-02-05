@@ -2,7 +2,7 @@
 
 # Lobby
 
-Different lobby en fonction du mode de jeu
+Differents lobbys en fonction du mode de jeu
 - Simple (2, 3, 4)
 - Tournois (voir ci-dessous)
 
@@ -12,8 +12,8 @@ Different lobby en fonction du mode de jeu
 
 - nombre de joueurs (2, 4, 8)
 - (optionel) privé/public
-- jouer par round (n-parities en simultanées)
-- un joueur peut etre dans un lobby à la fois
+- jouer par round (n-parties en simultanées)
+- un joueur ne peut jouer que dans un seul lobby à la fois
 
 ## Jeu
 
@@ -27,7 +27,7 @@ Different lobby en fonction du mode de jeu
 
 # Dashboard 
 
-- Partie jouées
+- Parties jouées
 	- Tournois
 		- Type
 		- Gagnées
@@ -40,5 +40,5 @@ Different lobby en fonction du mode de jeu
 
 - Gerer la 2FA
 - Modifier le mdp
-- Modifier les username
+- Modifier le username
 - Supprimer son compte
