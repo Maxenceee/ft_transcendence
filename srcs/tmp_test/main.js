@@ -10,7 +10,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { TextureLoader } from 'three/addons/lights/SpotLight.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-
+const PY = 3.14159265358979323846264338327950288419716939937510582;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -23,9 +23,9 @@ renderer.setPixelRatio( window.devicePixelRatio );
 const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
 camera.position.set( 15, 15, 20 );
 
-
 const controls = new OrbitControls( camera, renderer.domElement );
 const scene = new THREE.Scene();
+const scene2 = new THREE.Scene();
 controls.target.set( 0, 0, 20 );
 controls.update();
 // camera.position.z = 5;
@@ -42,7 +42,7 @@ controls.update();
 // light.shadow.camera.far = 500; // default
 // scene.add( light );
 
-const Alight = new THREE.AmbientLight(0xffffff);
+const Alight = new THREE.AmbientLight({color:0xffffff});
 scene.add( Alight );
 // const helper = new THREE.DirectionalLightHelper( light, 5 );
 // scene.add( helper );
@@ -61,23 +61,48 @@ const sky = new THREE.TextureLoader().load( "sky3.jpg" );
 // sky.wrapS = THREE.RepeatWrapping;
 // sky.wrapT = THREE.RepeatWrapping;
 // sky.repeat.set( 2, 2 );
-const geometryPlane = new THREE.PlaneGeometry( 30, 30 );
-const materialPlane = new THREE.MeshPhysicalMaterial( {color: 0xff00ff, side: THREE.DoubleSide, opacity:0.5, transparent : true} );
-const materialPlane2 = new THREE.MeshPhysicalMaterial( {color: 0xff0000, side: THREE.DoubleSide, opacity:0.5, transparent : true} );
-const materialPalette = new THREE.MeshPhysicalMaterial( {side: THREE.DoubleSide, opacity:1, transparent : true, map: kitten} );
-const materialPalette2 = new THREE.MeshPhysicalMaterial( {side: THREE.DoubleSide, opacity:1, transparent : true, map: frieren} );
+const geometryPlane = new THREE.PlaneGeometry( 50, 50 );
+const materialPlane = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff00ff, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
+const materialPlane2 = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff0000, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
+const materialPalette = new THREE.MeshPhysicalMaterial(  {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map: kitten} );
+const materialPalette2 = new THREE.MeshPhysicalMaterial( {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map:frieren} );
 // const geometryPlane = new THREE.Plane({normal:(30, 30, 30)})
 const plane = new THREE.Mesh( geometryPlane, materialPlane );
-const tmp = new THREE.BoxGeometry( 30, 30, 1 )
+// const tmp = new THREE.BoxGeometry( 30, 30, 1 )
 const tmp2 = new THREE.BoxGeometry( 6, 6, 1 )
-const plane2 = new THREE.Mesh( tmp, materialPlane2 );
+const plane2 = new THREE.Mesh( geometryPlane, materialPlane2 );
+const plane3 = new THREE.Mesh( geometryPlane, materialPlane2 );
+const plane4 = new THREE.Mesh( geometryPlane, materialPlane2 );
+const plane5 = new THREE.Mesh( geometryPlane, materialPlane2 );
+const plane6 = new THREE.Mesh( geometryPlane, materialPlane2 );
 const Pallet = new THREE.Mesh( tmp2, materialPalette );
 const Pallet2 = new THREE.Mesh( tmp2, materialPalette2 );
 plane2.position.z += 40
-Pallet.position.z += 38
-Pallet2.position.z += 2
+
+Pallet.position.z += 39.5
+Pallet2.position.z += 0.5
+
+plane3.position.z += 20
+plane3.position.x += 20
+plane3.rotation.x = PY/180*-90
+plane3.rotation.y = PY/180*-90
+
+plane4.position.z += 20
+plane4.position.x -= 20
+plane4.rotation.x = PY/180*-90
+plane4.rotation.y = PY/180*-90
+
+plane5.position.z += 20
+plane5.position.y -= 20
+plane5.rotation.x = PY/180*-90
+
+plane6.position.z += 20
+plane6.position.y += 20
+plane6.rotation.x = PY/180*-90
+// plane5.rotation.y = PY/180*-90
 // const planeBox = plane.geometry.boundingBox.containsBox();
-scene.add( plane , plane2, Pallet, Pallet2);
+// scene.add( plane , plane2,  plane3, plane4, plane5, plane6);
+scene.add( Pallet, Pallet2);
 //  IntersectionObserver()
 
 const geometrySphere = new THREE.SphereGeometry( 5 );
@@ -100,8 +125,8 @@ const skyboxGeo = new THREE.BoxGeometry(500, 500, 500);
 
 const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
 const skybox = new THREE.Mesh(skyboxGeo, skyboxTex);
+// scene2.add(skybox, Alight);
 
-// scene.add(skybox);
 // 
 //post processing
 // const test = new EffectComposer(UnrealBloomPass,FilmPass)
@@ -149,21 +174,56 @@ const materialCube = new THREE.MeshPhysicalMaterial( {
 	color:0xffffff, 
 	opacity: 1, 
 	iridescence :1,
+	side : THREE.DoubleSide,
 	map:fire});
 	// const materialCube = new THREE.MeshDepthMateria 	l({wireframe:false});
 	
 const cube = new THREE.Mesh( geometryCube, materialCube );
-const sphere = new THREE.Mesh( geometrySphere, materialSphere );
+const geometryCube2 = new THREE.BoxGeometry( 40, 40, 40);
+const materialSphere2 = new THREE.MeshPhysicalMaterial( {
+	wireframe:false, 
+	color:0xffffff, 
+	opacity: 1, 
+	iridescence :1,
+	side : THREE.BackSide,
+	map:sky});
+const cube2 = new THREE.Mesh( geometryCube2, materialSphere2 );
 
+const sphere = new THREE.Mesh( geometrySphere, materialSphere );
+cube2.position.z += 20;
 cube.position.z = 20;
-scene.add( cube);
+scene.add( cube, cube2);
 
 
 const light = new THREE.RectAreaLight( 0xffffff, 1, 30, 30);
 
 
-var i = -1
+var directionZ = -1
+var directionX = -1
+var directionY = -1
+var speedBall = 0.2
 var speedRotate =0.01
+
+
+
+function rebound(){
+	var ballBox = new THREE.Box3().setFromObject(cube);
+	var wallFront = new THREE.Box3().setFromObject(plane3);
+	var wallBack = new THREE.Box3().setFromObject(plane4);
+	var wallDown = new THREE.Box3().setFromObject(plane5);
+	var wallUp = new THREE.Box3().setFromObject(plane6);
+	if (ballBox.intersectsBox(wallBack) || ballBox.intersectsBox(wallFront))
+	{
+		directionY *= -1;
+		speedBall *= 1.1;
+	}
+	if (ballBox.intersectsBox(wallUp) || ballBox.intersectsBox(wallDown))
+	{
+		directionX *= -1;
+		speedBall *= 1.1;
+	}
+
+}
 
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -190,9 +250,10 @@ function onDocumentKeyDown(event) {
 	console.log(keyCode)
 };
 
+
 // cube.geometry = new THREE.BoxGeometry();
 var hit = false;
-var collidableMeshList = [sphere];
+// var collidableMeshList = [sphere];
 
 // collidableMeshList.push()
 var score = 0; 
@@ -212,6 +273,10 @@ function collide(){
 		score++;
 		console.log(score)
 		cube.position.z = 20
+		directionZ *= -1
+		directionX = -1
+		directionY = -1
+		speedBall = 0.2
 	}
 	// const helper = new THREE.Box3Helper( bbox, 0xffff00 );
 	// scene.add( helper );
@@ -238,7 +303,11 @@ function animate() {
 	cube.rotation.z += speedRotate;
 	// cube.rotation.y += speedRotate;
 	// cube.rotation.x += speedRotate;
-	cube.position.z +=( 0.2 * i);
+	cube.position.z +=( speedBall * directionZ);
+	cube.position.y +=( speedBall * directionY);
+	cube.position.x +=( speedBall * directionX);
+	// cube.position.y +=( 0.2 * i);
+	// cube.position.w +=( 0.2 * i);
 	// if (cube.position.z > 10 || cube.position.z < 0){
 		// i *= -1
 		// speedRotate *= -1.25
@@ -254,16 +323,18 @@ function animate() {
 	// light.target = cube.position ;
 	// scene.add( light);
 	// camera.lookAt( cub );
-	light.position.set(cube.position.x + 6, cube.position.y + 6, cube.position.z + 6);
-	scene.add(light);
+	// light.position.set(cube.position.x + 6, cube.position.y + 6, cube.position.z + 6);
+	// scene.add(light);
 	// camera.lookAt( cube.position );
-	renderer.render( scene, camera );
 	
 	controls.update();
 	collide()
+	rebound()
 	if(hit == true)
-		i *= -1;
-	composer.render();
+		directionZ *= -1;
+	renderer.render( scene, camera );
+	// composer.render();
+
 
 }
 animate();
