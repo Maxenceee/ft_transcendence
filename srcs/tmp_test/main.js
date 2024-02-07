@@ -9,6 +9,9 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { TextureLoader } from 'three/addons/lights/SpotLight.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+
 
 const PY = 3.14159265358979323846264338327950288419716939937510582;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -20,12 +23,13 @@ document.body.appendChild( renderer.domElement );
 renderer.setPixelRatio( window.devicePixelRatio );
 //
 
-const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
+
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 5000 );
 camera.position.set( 15, 15, 20 );
+
 
 const controls = new OrbitControls( camera, renderer.domElement );
 const scene = new THREE.Scene();
-const scene2 = new THREE.Scene();
 controls.target.set( 0, 0, 20 );
 controls.update();
 // camera.position.z = 5;
@@ -56,6 +60,7 @@ const kitten = new THREE.TextureLoader().load( "kitten.jpg" );
 const frieren = new THREE.TextureLoader().load( "smug_frieren.jpg" );
 const fire = new THREE.TextureLoader().load( "fire.jpg" );
 const sky = new THREE.TextureLoader().load( "sky3.jpg" );
+
 
 // frieren.
 // sky.wrapS = THREE.RepeatWrapping;
@@ -121,11 +126,11 @@ const geometryCube = new THREE.SphereGeometry( 2 );
 // try to add a skybox
 
 	
-const skyboxGeo = new THREE.BoxGeometry(500, 500, 500);
+const skyboxGeo = new THREE.SphereGeometry(500);
 
 const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
 const skybox = new THREE.Mesh(skyboxGeo, skyboxTex);
-// scene2.add(skybox, Alight);
+// scene.add(skybox);
 
 // 
 //post processing
@@ -179,7 +184,7 @@ const materialCube = new THREE.MeshPhysicalMaterial( {
 	// const materialCube = new THREE.MeshDepthMateria 	l({wireframe:false});
 	
 const cube = new THREE.Mesh( geometryCube, materialCube );
-const geometryCube2 = new THREE.BoxGeometry( 40, 40, 40);
+const geometryCube2 = new THREE.SphereGeometry( 30 );
 const materialSphere2 = new THREE.MeshPhysicalMaterial( {
 	wireframe:false, 
 	color:0xffffff, 
@@ -212,14 +217,32 @@ function rebound(){
 	var wallBack = new THREE.Box3().setFromObject(plane4);
 	var wallDown = new THREE.Box3().setFromObject(plane5);
 	var wallUp = new THREE.Box3().setFromObject(plane6);
-	if (ballBox.intersectsBox(wallBack) || ballBox.intersectsBox(wallFront))
+	// if (ballBox.intersectsBox(wallBack))
+	if  ( cube.position.y < -17.5)
 	{
-		directionY *= -1;
+		// directionY *= -1;
+		directionY = 1;
 		speedBall *= 1.1;
 	}
-	if (ballBox.intersectsBox(wallUp) || ballBox.intersectsBox(wallDown))
+	// else if (ballBox.intersectsBox(wallFront))
+	else if  ( cube.position.y > 17.5)
 	{
-		directionX *= -1;
+		// directionY *= -1;
+		directionY = -1;
+		speedBall *= 1.1;
+	}
+	// if (ballBox.intersectsBox(wallUp))
+	if  ( cube.position.x > 17.5)
+	{
+		// directionX *= -1;
+		directionX = -1;
+		speedBall *= 1.1;
+	}
+	// else if  ( ballBox.intersectsBox(wallDown))
+	else if  ( cube.position.x < -17.5)
+	{
+		// directionX *= -1;
+		directionX = 1;
 		speedBall *= 1.1;
 	}
 
@@ -251,12 +274,38 @@ function onDocumentKeyDown(event) {
 };
 
 
+const loader = new FontLoader();
+
+loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+	const text = new TextGeometry( 'Hello three.js!', {
+		font: font,
+		size: 80,
+		height: 5,
+		curveSegments: 12,
+		bevelEnabled: true,
+		bevelThickness: 10,
+		bevelSize: 8,
+		bevelOffset: 0,
+		bevelSegments: 5
+	} );
+	scene.add(text)
+} );
+
 // cube.geometry = new THREE.BoxGeometry();
 var hit = false;
 // var collidableMeshList = [sphere];
 
 // collidableMeshList.push()
-var score = 0; 
+var score = 0;
+ 
+
+
+cube.position.z = 20
+cube.position.y = 0
+cube.position.x = 0
+directionX = THREE.MathUtils.randFloat(0, 1)
+directionY = THREE.MathUtils.randFloat(0, 1)
 
 function collide(){
 	var ballBox = new THREE.Box3().setFromObject(cube);
@@ -268,15 +317,22 @@ function collide(){
 		hit = true;
 	else
 		hit = false;
-	if (ballBox.intersectsBox(wall2) || ballBox.intersectsBox(wall1))
+	if (cube.position.z < 2.5 || cube.position.z > 37.5)
 	{
-		score++;
+		if (cube.position.z < 2.5)
+			score++;
+		else
+			score--;
 		console.log(score)
 		cube.position.z = 20
+		cube.position.y = 0
+		cube.position.x = 0
 		directionZ *= -1
-		directionX = -1
-		directionY = -1
+		
+		directionX = THREE.MathUtils.randFloat(0, 1)
+		directionY = THREE.MathUtils.randFloat(0, 1)
 		speedBall = 0.2
+		// speedBall *= 1.1
 	}
 	// const helper = new THREE.Box3Helper( bbox, 0xffff00 );
 	// scene.add( helper );
@@ -294,6 +350,7 @@ function collide(){
 // 	// console.log(cube.geometry.getAttribute('position'))
 // }
 
+controls.maxDistance = 35
 // var w = 0;
 function animate() {
 	requestAnimationFrame( animate );
@@ -333,9 +390,11 @@ function animate() {
 	if(hit == true)
 		directionZ *= -1;
 	renderer.render( scene, camera );
+	console.log("Min"+ controls.minDistance)
+	console.log("Min="+controls.maxDistance)
 	// composer.render();
-
-
+	
+	
 }
 animate();
 
