@@ -4,6 +4,8 @@ var cors = require('cors');
 var path = require('path');
 var fs = require('fs');
 var morgan = require('morgan');
+var uuid = require('uuid');
+const expressWs = require('express-ws');
 require('dotenv').config();
 
 /**
@@ -30,8 +32,8 @@ var app = express();
  * 
  */
 
-if (!process.env.CLIENT_BUILD_BIR) {
-	process.env["CLIENT_BUILD_BIR"] = path.resolve(__dirname, '.');
+ if (!process.env.CLIENT_BUILD_BIR) {
+	process.env["CLIENT_BUILD_BIR"] = path.resolve(__dirname, '../client');
 }
 
 let buildDashPath = path.join(process.env.CLIENT_BUILD_BIR, 'public');
@@ -80,6 +82,26 @@ app.use(cors({
 	credentials: true,
 	origin: origin_list,
 }));
+
+
+/**
+ * Socket handler
+ */
+
+expressWs(app);
+
+app.ws('/socket', function(ws, req) {
+	ws.id = uuid.v4();
+	console.info("new connection", ws.id);
+
+	ws.on('message', function(msg) {
+		ws.send(msg);
+	});
+
+	ws.on('close', () => {
+		console.info("close connection", ws.id);
+	});
+});
 
 
 /**
