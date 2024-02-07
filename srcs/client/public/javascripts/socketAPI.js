@@ -177,3 +177,5 @@ socket.send({type: "message", data: "Hello World"});
 
 // close the connection
 socket.end();
+
+// oui j'ai tout ecrit en anglais, reflexe et j'ai eu la flemme de tout reecrire en francais
