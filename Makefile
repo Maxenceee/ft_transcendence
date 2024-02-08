@@ -25,8 +25,6 @@ BLUE			=	\033[1;34m
 RED				=	\033[1;31m
 YELLOW			=	\033[1;33m
 DEFAULT			=	\033[0m
-UP				=	"\033[A"
-CUT				=	"\033[K"
 
 all: up
 
