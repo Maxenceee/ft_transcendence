@@ -6,9 +6,11 @@ RUN pip install Django
 
 RUN mkdir /app
 
-WORKDIR /app
+COPY ./server/src /app/server
 
-COPY ./src /app
+WORKDIR /app/server
+
+COPY ./client /app/client
 
 EXPOSE 8000
 
