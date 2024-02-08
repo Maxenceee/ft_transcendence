@@ -17,6 +17,7 @@ up:
 	cd .. && \
 	docker compose up -d && \
 	cd ..
+	@printf "$(BLUE)The server is running on http://localhost:$(FORWARDPORT)\n"
 
 re: clean up
 
@@ -25,5 +26,6 @@ clean:
 	@cd $(SERVER_DIR) && \
 	docker compose down --rmi all && \
 	cd ..
+	@printf "$(GREEN)The container has been removed\n"
 
 .PHONY: all up re clean
