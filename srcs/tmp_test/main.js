@@ -8,9 +8,21 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { TextureLoader } from 'three/addons/lights/SpotLight.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+// import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+// import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+
+let socket = new Socket({path: "/socket", port:3000});
+socket.onconnection(() => {
+	console.info("Connection opened, yay");
+});
+socket.onclose(() => {
+	console.info("Bye bye madafaka");
+});
+
+
+
+
 
 
 const PY = 3.14159265358979323846264338327950288419716939937510582;
@@ -68,42 +80,42 @@ const sky = new THREE.TextureLoader().load( "sky3.jpg" );
 // sky.repeat.set( 2, 2 );
 const geometryPlane = new THREE.PlaneGeometry( 50, 50 );
 const materialPlane = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff00ff, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
-const materialPlane2 = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff0000, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
+// const materialPlane2 = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff0000, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
 const materialPalette = new THREE.MeshPhysicalMaterial(  {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map: kitten} );
 const materialPalette2 = new THREE.MeshPhysicalMaterial( {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map:frieren} );
 // const geometryPlane = new THREE.Plane({normal:(30, 30, 30)})
 const plane = new THREE.Mesh( geometryPlane, materialPlane );
 // const tmp = new THREE.BoxGeometry( 30, 30, 1 )
 const tmp2 = new THREE.BoxGeometry( 6, 6, 1 )
-const plane2 = new THREE.Mesh( geometryPlane, materialPlane2 );
-const plane3 = new THREE.Mesh( geometryPlane, materialPlane2 );
-const plane4 = new THREE.Mesh( geometryPlane, materialPlane2 );
-const plane5 = new THREE.Mesh( geometryPlane, materialPlane2 );
-const plane6 = new THREE.Mesh( geometryPlane, materialPlane2 );
+// const plane2 = new THREE.Mesh( geometryPlane, materialPlane2 );
+// const plane3 = new THREE.Mesh( geometryPlane, materialPlane2 );
+// const plane4 = new THREE.Mesh( geometryPlane, materialPlane2 );
+// const plane5 = new THREE.Mesh( geometryPlane, materialPlane2 );
+// const plane6 = new THREE.Mesh( geometryPlane, materialPlane2 );
 const Pallet = new THREE.Mesh( tmp2, materialPalette );
 const Pallet2 = new THREE.Mesh( tmp2, materialPalette2 );
-plane2.position.z += 40
+// plane2.position.z += 40
 
 Pallet.position.z += 39.5
 Pallet2.position.z += 0.5
 
-plane3.position.z += 20
-plane3.position.x += 20
-plane3.rotation.x = PY/180*-90
-plane3.rotation.y = PY/180*-90
+// plane3.position.z += 20
+// plane3.position.x += 20
+// plane3.rotation.x = PY/180*-90
+// plane3.rotation.y = PY/180*-90
 
-plane4.position.z += 20
-plane4.position.x -= 20
-plane4.rotation.x = PY/180*-90
-plane4.rotation.y = PY/180*-90
+// plane4.position.z += 20
+// plane4.position.x -= 20
+// plane4.rotation.x = PY/180*-90
+// plane4.rotation.y = PY/180*-90
 
-plane5.position.z += 20
-plane5.position.y -= 20
-plane5.rotation.x = PY/180*-90
+// plane5.position.z += 20
+// plane5.position.y -= 20
+// plane5.rotation.x = PY/180*-90
 
-plane6.position.z += 20
-plane6.position.y += 20
-plane6.rotation.x = PY/180*-90
+// plane6.position.z += 20
+// plane6.position.y += 20
+// plane6.rotation.x = PY/180*-90
 // plane5.rotation.y = PY/180*-90
 // const planeBox = plane.geometry.boundingBox.containsBox();
 // scene.add( plane , plane2,  plane3, plane4, plane5, plane6);
@@ -126,10 +138,10 @@ const geometryCube = new THREE.SphereGeometry( 2 );
 // try to add a skybox
 
 	
-const skyboxGeo = new THREE.SphereGeometry(500);
+// const skyboxGeo = new THREE.SphereGeometry(500);
 
-const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
-const skybox = new THREE.Mesh(skyboxGeo, skyboxTex);
+// const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
+// const skybox = new THREE.Mesh(skyboxGeo, skyboxTex);
 // scene.add(skybox);
 
 // 
@@ -200,97 +212,96 @@ cube.position.z = 20;
 scene.add( cube, cube2);
 
 
-const light = new THREE.RectAreaLight( 0xffffff, 1, 30, 30);
+// const light = new THREE.RectAreaLight( 0xffffff, 1, 30, 30);
 
 
-var directionZ = -1
-var directionX = -1
-var directionY = -1
-var speedBall = 0.2
-var speedRotate =0.01
+// var directionZ = -1
+// var directionBall.directionX = -1
+// var directionBall.directionY = -1
+const speedRotate =0.01
 
 
-
-function rebound(){
-	var ballBox = new THREE.Box3().setFromObject(cube);
-	var wallFront = new THREE.Box3().setFromObject(plane3);
-	var wallBack = new THREE.Box3().setFromObject(plane4);
-	var wallDown = new THREE.Box3().setFromObject(plane5);
-	var wallUp = new THREE.Box3().setFromObject(plane6);
-	// if (ballBox.intersectsBox(wallBack))
-	if  ( cube.position.y < -17.5)
-	{
-		// directionY *= -1;
-		directionY = 1;
-		speedBall *= 1.1;
-	}
-	// else if (ballBox.intersectsBox(wallFront))
-	else if  ( cube.position.y > 17.5)
-	{
-		// directionY *= -1;
-		directionY = -1;
-		speedBall *= 1.1;
-	}
-	// if (ballBox.intersectsBox(wallUp))
-	if  ( cube.position.x > 17.5)
-	{
-		// directionX *= -1;
-		directionX = -1;
-		speedBall *= 1.1;
-	}
-	// else if  ( ballBox.intersectsBox(wallDown))
-	else if  ( cube.position.x < -17.5)
-	{
-		// directionX *= -1;
-		directionX = 1;
-		speedBall *= 1.1;
-	}
-
+var directionBall = {
+	directionZ : -1,
+	directionX : -1,
+	directionY : -1,
+	speedBall : 0.2
 }
+
+// function rebound(){
+// 	// var ballBox = new THREE.Box3().setFromObject(cube);
+// 	// var wallFront = new THREE.Box3().setFromObject(plane3);
+// 	// var wallBack = new THREE.Box3().setFromObject(plane4);
+// 	// var wallDown = new THREE.Box3().setFromObject(plane5);
+// 	// var wallUp = new THREE.Box3().setFromObject(plane6);
+// 	// if (ballBox.intersectsBox(wallBack))
+// 	if  ( cube.position.y < -17.5)
+// 	{
+// 		// directionBall.directionY *= -1;
+// 		directionBall.directionY = 1;
+// 		speedBall *= 1.1;
+// 	}
+// 	// else if (ballBox.intersectsBox(wallFront))
+// 	else if  ( cube.position.y > 17.5)
+// 	{
+// 		// directionBall.directionY *= -1;
+// 		directionBall.directionY = -1;
+// 		speedBall *= 1.1;
+// 	}
+// 	// if (ballBox.intersectsBox(wallUp))
+// 	if  ( cube.position.x > 17.5)
+// 	{
+// 		// directionBall.directionX *= -1;
+// 		directionBall.directionX = -1;
+// 		speedBall *= 1.1;
+// 	}
+// 	// else if  ( ballBox.intersectsBox(wallDown))
+// 	else if  ( cube.position.x < -17.5)
+// 	{
+// 		// directionBall.directionX *= -1;
+// 		directionBall.directionX = 1;
+// 		speedBall *= 1.1;
+// 	}
+
+// }
 
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
-    if (keyCode == 39) {
-        Pallet.position.x -=0.3;
-    } else if (keyCode == 37) {
-        Pallet.position.x +=0.3;
-    } else if (keyCode == 40) {
-        Pallet.position.y -=0.3;
-	} else if (keyCode == 38) {
-        Pallet.position.y +=0.3;
-    }else if (keyCode == 82) {
-        cube.position.z = 20.0;
-    }else if (keyCode == 87) {
-		Pallet2.position.y+=0.3;
-	}else if (keyCode == 83) {
-		Pallet2.position.y-=0.3;
-	}else if (keyCode == 68) {
-		Pallet2.position.x -=0.3;
-	}else if (keyCode == 65) {
-		Pallet2.position.x += 0.3;
+
+    if (keyCode == 82) {
+	    cube.position.z = 20.0;
+    }
+	try {
+		Pallet.position = socket.keyDownP1(keyCode, Pallet.position)
+	} catch (error) {
 	}
-	console.log(keyCode)
+	try {
+		Pallet2.position = socket.keyDownP2(keyCode, Pallet2.position)
+	} catch (error) {
+		// 
+	}
+	// console.log(keyCode)
 };
 
 
-const loader = new FontLoader();
+// const loader = new FontLoader();
 
-loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+// loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
 
-	const text = new TextGeometry( 'Hello three.js!', {
-		font: font,
-		size: 80,
-		height: 5,
-		curveSegments: 12,
-		bevelEnabled: true,
-		bevelThickness: 10,
-		bevelSize: 8,
-		bevelOffset: 0,
-		bevelSegments: 5
-	} );
-	scene.add(text)
-} );
+// 	const text = new TextGeometry( 'Hello three.js!', {
+// 		font: font,
+// 		size: 80,
+// 		height: 5,
+// 		curveSegments: 12,
+// 		bevelEnabled: true,
+// 		bevelThickness: 10,
+// 		bevelSize: 8,
+// 		bevelOffset: 0,
+// 		bevelSegments: 5
+// 	} );
+// 	scene.add(text)
+// } );
 
 // cube.geometry = new THREE.BoxGeometry();
 var hit = false;
@@ -301,22 +312,34 @@ var score = 0;
  
 
 
+function reset_game()
+{
+	cube.position.z = 20
+	cube.position.y = 0
+	cube.position.x = 0
+	directionBall.directionZ *= -1
+	
+	directionBall.directionX = THREE.MathUtils.randFloat(0, 1)
+	directionBall.directionY = THREE.MathUtils.randFloat(0, 1)
+	directionBall.speedBall = 0.2
+	directionBall.speedBall *= 1.1
+}
+
 cube.position.z = 20
 cube.position.y = 0
 cube.position.x = 0
-directionX = THREE.MathUtils.randFloat(0, 1)
-directionY = THREE.MathUtils.randFloat(0, 1)
+directionBall.directionX = THREE.MathUtils.randFloat(0, 1)
+directionBall.directionY = THREE.MathUtils.randFloat(0, 1)
 
 function collide(){
 	var ballBox = new THREE.Box3().setFromObject(cube);
-	var wall1 = new THREE.Box3().setFromObject(plane);
-	var wall2 = new THREE.Box3().setFromObject(plane2);
 	var pallet1 = new THREE.Box3().setFromObject(Pallet);
 	var pallet2 = new THREE.Box3().setFromObject(Pallet2);
 	if (ballBox.intersectsBox(pallet2) || ballBox.intersectsBox(pallet1))
 		hit = true;
 	else
 		hit = false;
+	
 	if (cube.position.z < 2.5 || cube.position.z > 37.5)
 	{
 		if (cube.position.z < 2.5)
@@ -324,31 +347,9 @@ function collide(){
 		else
 			score--;
 		console.log(score)
-		cube.position.z = 20
-		cube.position.y = 0
-		cube.position.x = 0
-		directionZ *= -1
-		
-		directionX = THREE.MathUtils.randFloat(0, 1)
-		directionY = THREE.MathUtils.randFloat(0, 1)
-		speedBall = 0.2
-		// speedBall *= 1.1
+		reset_game()
 	}
-	// const helper = new THREE.Box3Helper( bbox, 0xffff00 );
-	// scene.add( helper );
 }
-// 	var originPoint = cube.position.clone();
-// 	for (var vertexIndex = 0;  1 < 0 ; vertexIndex++) // vertexIndex < cube.geometry.vertices[vertexIndex]
-// 	{   
-//         var ray = new THREE.Raycaster( cube.position, cube.geometry.vertices[vertexIndex] );
-//         var collisionResults = ray.intersectObjects( collidableMeshList );
-//         if ( collisionResults.length > 0)  
-//            hit = true;
-// 		else
-// 			hit = false;
-// 	}
-// 	// console.log(cube.geometry.getAttribute('position'))
-// }
 
 controls.maxDistance = 35
 // var w = 0;
@@ -360,43 +361,24 @@ function animate() {
 	cube.rotation.z += speedRotate;
 	// cube.rotation.y += speedRotate;
 	// cube.rotation.x += speedRotate;
-	cube.position.z +=( speedBall * directionZ);
-	cube.position.y +=( speedBall * directionY);
-	cube.position.x +=( speedBall * directionX);
-	// cube.position.y +=( 0.2 * i);
-	// cube.position.w +=( 0.2 * i);
-	// if (cube.position.z > 10 || cube.position.z < 0){
-		// i *= -1
-		// speedRotate *= -1.25
-// 
-		// }
-// 
-	// else if (cube.position.z < 5)
-		// cube.position.z += 0.1
-	// if(cube.position.z < 5)
-	// 	cube.translateX(0.1);
-	// else
-	// 	cube.translateX(-0.1);
-	// light.target = cube.position ;
-	// scene.add( light);
-	// camera.lookAt( cub );
-	// light.position.set(cube.position.x + 6, cube.position.y + 6, cube.position.z + 6);
-	// scene.add(light);
-	// camera.lookAt( cube.position );
+	cube.position.z +=( directionBall.speedBall * directionBall.directionZ);
+	cube.position.y +=( directionBall.speedBall * directionBall.directionY);
+	cube.position.x +=( directionBall.speedBall * directionBall.directionX);
+
 	
 	controls.update();
 	collide()
-	rebound()
+	// rebound()
+	directionBall = socket.rebound(cube.position, directionBall)
 	if(hit == true)
-		directionZ *= -1;
+		directionBall.directionZ *= -1;
 	renderer.render( scene, camera );
-	console.log("Min"+ controls.minDistance)
-	console.log("Min="+controls.maxDistance)
+	// console.log("Min"+ controls.minDistance)
+	// console.log("Min="+controls.maxDistance)
 	// composer.render();
-	
-	
 }
 animate();
+
 
 // const materialLine = new THREE.LineBasicMaterial( { color: 0xffffff } );
 // const points = [];
@@ -413,5 +395,9 @@ animate();
 
 // renderer.render( scene, camera );
 
+
+/////
+
+//////////
 
 console.log("cookie");

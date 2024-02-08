@@ -16,6 +16,12 @@
  * @author Maxence Gama, @maxencegama
  * @contact contact@maxencegama.dev
  */
+
+
+
+
+
+
 var CallBack = function() {}
 CallBack.prototype.on = function(t, e) {
 	this.listeners = this.listeners || {}
@@ -133,6 +139,109 @@ s.use = function(fn) {
 }
 
 
+
+
+
+// ///////////////////////////////////////////////////////////////////////////////////
+var posPlayer = {
+	z : 0,
+	x : 0,
+	y : 0,
+}
+
+
+var directionBall = {
+	directionZ : -1,
+	directionX : -1,
+	directionY : -1,
+	speedBall : 0.2
+}
+
+var data ={
+	positionP1 : posPlayer,
+	positionP2 : posPlayer,
+	directionBall : directionBall
+}
+
+
+
+
+s.test = function(fn) {
+	this.callBack = fn;
+}
+
+
+s.functionToCall = function(data) {
+	console.log(data);
+}
+
+s.pallet = function(){
+
+	var ballBox = 0;
+	// var ballBox = new THREE.Box3().setFromObject(cube);
+	return(ballBox);
+}
+
+s.rebound = function(position, directionBall) {
+
+	if  ( position.x > 17.5)
+	{
+		directionBall.directionX = -1;
+		directionBall.speedBall *= 1.1;
+	}
+	else if  ( position.x < -17.5)
+	{
+		directionBall.directionX = 1;
+		directionBall.speedBall *= 1.1;
+	}
+	if  ( position.x > 17.5)
+	{
+		directionBall.directionY = -1;
+		directionBall.speedBall *= 1.1;
+	}
+	else if  ( position.x < -17.5)
+	{
+		directionBall.directionY = 1;
+		directionBall.speedBall *= 1.1;
+	}
+	data.directionBall = directionBall
+	return directionBall
+}
+
+
+s.scorePoint = function(position, directionBall) {
+
+}
+
+
+s.keyDownP1 = function(keyCode, position) {
+	if (keyCode == 87) 
+		position.y+=0.3;
+	else if (keyCode == 83) 
+		position.y-=0.3;
+	else if (keyCode == 68) 
+		position.x -=0.3;
+	else if (keyCode == 65) 
+		position.x += 0.3;
+	data.positionP1 = position;
+	return data.positionP1
+	
+}
+
+s.keyDownP2 = function(keyCode, position) {
+	if (keyCode == 39) 
+		position.x -=0.3;
+	else if (keyCode == 37) 
+		position.x +=0.3;
+	else if (keyCode == 40) 
+		position.y -=0.3;
+	else if (keyCode == 38)
+		position.y +=0.3;
+	data.positionP2 = position
+	return data.positionP2
+}
+/////////////////////////////////////////////////////////////////////////
+
 /****************************************************************************************
  * 
  * SOCKET API
@@ -179,3 +288,4 @@ socket.send({type: "message", data: "Hello World"});
 socket.end();
 
 // oui j'ai tout ecrit en anglais, reflexe et j'ai eu la flemme de tout reecrire en francais
+socket.test(functionToCall);
