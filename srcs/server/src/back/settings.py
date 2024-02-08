@@ -116,8 +116,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-#I want ton setup my static files in the client folder, my static file are stored in the ../client/public folder
-
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
