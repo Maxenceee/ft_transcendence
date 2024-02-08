@@ -119,7 +119,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / "client/public"
+    BASE_DIR / "../client/public"
 ]
 
 # Default primary key field type
