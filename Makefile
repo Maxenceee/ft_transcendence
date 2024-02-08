@@ -17,6 +17,7 @@
 
 # .PHONY: all up re clean
 
+SERVER_DIR	=	srcs/server
 NAME		=	docker_django
 FORWARDPORT	=	8000
 
@@ -30,7 +31,7 @@ all: up
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
-	@cd django/django && \
+	@cd $(SERVER_DIR)/django && \
 	docker build -t $(NAME) . && \
 	cd .. && \
 	docker compose up -d && \
@@ -40,7 +41,7 @@ re: clean up
 
 clean:
 	@printf "$(RED)Stopping and removing the container...$(DEFAULT)\n"
-	@cd django && \
+	@cd $(SERVER_DIR) && \
 	docker compose down --rmi all && \
 	cd ..
 
