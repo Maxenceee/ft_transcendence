@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+    web:
+        container_name: docker_django
+        build: 
+            context: ./srcs/server
+        command: python manage.py runserver 0.0.0.0:8000
+        ports:
+            - 8000:8000
+        restart: always
+        image: docker_django
+
