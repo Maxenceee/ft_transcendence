@@ -101,7 +101,7 @@ function Rt(e) {
 Rt.prototype.render = function(elem) {
 	let t = this._internalRoot;
 	if (t === null) throw Error('Unable to find root node.');
-
+	
 };
 
 var _s = { exports: {} },
