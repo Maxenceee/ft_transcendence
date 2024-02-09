@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-    web:
+    transcendence:
         container_name: docker_django
         build: 
-            context: ./srcs/server
+            context: ./srcs/website
         command: python manage.py runserver 0.0.0.0:8000
         ports:
             - 8000:8000
