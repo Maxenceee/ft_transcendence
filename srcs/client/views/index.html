@@ -1,201 +1,23 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ft_transcendence</title>
-	<meta name="author" content="mgama,ngennaro,mbrement,elamadon" />
-</head>
-<body>
-	<h1>Hello from server</h1>
-	<script type="text/javascript">
-		this.gbar_ = {
-			CONFIG: [[[["style.css"], ["script.js"]], ["/static/stylesheets/", "/static/javascripts/"]]],
-		};
-		this.gbar_ = this.gbar_ || {};
-		(function(_) {
-			var window = this;
-			try {
-				_.tj = function(a, b, c) {
-					b = Kd[1][0] + b;
-					a.rel = c;
-					-1 != c.toLowerCase().indexOf("stylesheet") ? (a.href = _.Bc(b), (b = _.ad(a.ownerDocument && a.ownerDocument.defaultView)) && a.setAttribute("nonce", b)) : a.href = b instanceof _.zc ? _.Bc(b) : b instanceof _.Ec ? _.Fc(b) : _.Fc(_.Lc(b))
-				};
-	
-			} catch (e) {
-				console.info(e)
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>halp</title>
+		<style>
+			body { margin: 0; }
+		</style>
+		<script src="/static/javascripts/socketAPI.js"></script>
+		<script type="importmap">
+		{
+			"imports": {
+				"three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+				"three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
 			}
-	
-			try {
-				// _.loader = new Loader().create(document.body);
-				var Kd;
-				window.gbar_ && window.gbar_.CONFIG ? Kd = window.gbar_.CONFIG[0] || {} : Kd = [];
-	
-				_.n = this || self;
-				var yc;
-				_.zc = function(a, b) {
-					this.j = b === yc ? a : ""
-				};
-				_.da = function(a, b) {
-					if (Error.captureStackTrace)
-						Error.captureStackTrace(this, _.da);
-					else {
-						var c = Error().stack;
-						c && (this.stack = c)
-					}
-					a && (this.message = String(a));
-					void 0 !== b && (this.qR = b);
-					this.j = !0
-				};
-				_.E = function(a, b, c) {
-					return -1 === b ? null : b >= a.C ? a.o ? a.o[b] : void 0 : (void 0 === c ? 0 : c) && a.o && a.o[b] ? a.o[b] : a.A[b + a.B]
-				};
-				_.F = function(a, b) {
-					a = _.E(a, b);
-					return null == a ? a : !!a
-				};
-				_.Yg = function(a) {
-					return ":" + (a.j++).toString(36)
-				};
-				_.Id = function(a) {
-					this.j = !1;
-					this.status = a
-				};
-	
-				_.fk = function(e) {
-					this.files ? this.files.push(e) : this.files = [e]
-				};
-				_.gk = function(a) {
-					return this.progressedCount = 0, this.files.length ? (void this.files.forEach(function(e) {
-						_.bk(e);
-					})) : void _.cmp();
-				};
-				_.bk = function(a) {
-					a.addEventListener("load", function(evt) {
-						this.progressedCount++;
-						this.progressedCount == this.files.length && (this.fileLoaded = true, _.cmp())
-					}.bind(this));
-				};
-				_.cmp = function() {
-					if (this.fileLoaded) {
-						document.body.classList.remove('loading');
-						// _.loader.remove();
-					}
-				};
-	
-				var vj = function(a) {
-					this.src = a;
-					this.j = {};
-					this.o = 0
-				};
-				_.me = function(a) {
-					return _.je(document, a)
-				};
-				_.je = function(a, b) {
-					b = String(b);
-					"application/xhtml+xml" === a.contentType && (b = b.toLowerCase());
-					return a.createElement(b)
-				};
-				_.Bc = function(a) {
-					return a.toString()
-				};
-				_.Ac = function(a) {
-					return a instanceof _.zc && a.constructor === _.zc ? a.j : "type_error:TrustedResourceUrl"
-				};
-				_.ce = function(a) {
-					var b;
-					if (Jda && !(_.mf && _.rf("9") && !_.rf("10") && _.ea.SVGElement && a instanceof _.ea.SVGElement) && (b = a.parentElement))
-						return b;
-					b = a.parentNode;
-					return _.ig(b) ? b : null
-				};
-				_.xj = function(a) {
-					var b,
-						c = (a.ownerDocument && a.ownerDocument.defaultView || window).document,
-						d = null === (b = c.querySelector) || void 0 === b ? void 0 : b.call(c, "script[nonce]");
-					(b = d ? d.nonce || d.getAttribute("nonce") || "" : "") && a.setAttribute("nonce", b)
-				};
-				_.zj = function(a, b) {
-					b = Kd[1][1] + b;
-					b = "function" == typeof _.yj && b instanceof _.yj ? _.wj(b) : b;
-					a.src = b;
-					_.xj(a)
-				};
-				_.fe = function(a, b) {
-					return (b || document).getElementsByTagName(String(a))
-				};
-				_.ad = function(a) {
-					return _.$c('style[nonce],link[rel="stylesheet"][nonce]', a)
-				};
-				_.$c = function(a, b) {
-					b = (b || _.n).document;
-					return b.querySelector ? (a = b.querySelector(a)) && (a = a.nonce || a.getAttribute("nonce")) && bd.test(a) ? a : "" : ""
-				};
-				
-				var Aj = function(a, b, c) {
-					console.log(46, {
-						att: a,
-						max: b,
-						url: c
-					})
-				},
-				Cj = function(a, b, c) {
-					console.log(47, {
-						att: a,
-						max: b,
-						url: c
-					});
-					a < b ? Bj(a + 1, b) : console.log(Error("da`" + a + "`" + b), {
-						url: c
-					})
-				},
-				Bj = function(a, b) {
-					if (Dj) {
-						var c = _.me("SCRIPT");
-						c.defer = !0;
-						c.type = "text/javascript";
-						c.charset = "UTF-8";
-						_.zj(c, Dj);
-						c.onerror = () => Aj(a, b, c.src);
-						_.fe("BODY")[0].appendChild(c)
-						_.fk(c);
-					}
-				},
-				Jj = function() {
-					Bj(1, 2);
-					if (Ij) {
-						var a = _.me("LINK");
-						a.setAttribute("type", "text/css");
-						_.tj(a, Ij, "stylesheet");
-						var b = _.ad();
-						b && a.setAttribute("nonce", b);
-						_.fe("HEAD")[0].appendChild(a);
-						_.fk(a);
-					}
-				},
-				Dj,
-				Ij,
-				Ej = function(a) {
-					a = a || []
-					a.forEach((e, i) => {
-						e.forEach(u => {
-							Dj = Ij = null;
-							i === 0 ? Ij = u : Dj = u;
-							Jj();
-						})
-					});
-					_.gk();
-				};
-					
-				(function() {
-					window.addEventListener("DOMContentLoaded", function() {
-						window.setTimeout(Ej(Kd[0]), 0);
-					})
-				})();
-			} catch (e) {
-				console.info(e);
-			}
-		})(this.gbar_);
-	</script>
-</body>
+		}
+		</script>
+	</head>
+	<body>
+		<script type="module" src="/static/javascripts/tmp_test/game.js"></script>
+	</body>
 </html>

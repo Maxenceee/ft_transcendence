@@ -1,3 +1,4 @@
+
 // import * as THREE from 'three';
 // import { randInt } from './node_modules/three/src/math/MathUtils.js';
 // import * as THREE from './node_modules/three/build/three.module.js';
@@ -7,14 +8,17 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
+import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 // import { TextureLoader } from 'three/addons/lights/SpotLight.js';
 // import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 // import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
-let socket = new Socket({path: "/socket", port:3000});
+let socket = new Socket({path: "/socket"});
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
+	socket.send({type: "data"});
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
@@ -22,10 +26,6 @@ socket.onclose(() => {
 
 
 
-
-
-
-const PY = 3.14159265358979323846264338327950288419716939937510582;
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -68,10 +68,10 @@ scene.add( Alight );
 // const renderer = new THREE.WebGLRenderer();
 // renderer.setSize( window.innerWidth, window.innerHeight );
 // document.body.appendChild( renderer.domElement );
-const kitten = new THREE.TextureLoader().load( "kitten.jpg" );
-const frieren = new THREE.TextureLoader().load( "smug_frieren.jpg" );
-const fire = new THREE.TextureLoader().load( "fire.jpg" );
-const sky = new THREE.TextureLoader().load( "sky3.jpg" );
+const kitten = new THREE.TextureLoader().load( "/static/javascripts/tmp_test/kitten.jpg" );
+const frieren = new THREE.TextureLoader().load( "/static/javascripts/tmp_test/smug_frieren.jpg" );
+const fire = new THREE.TextureLoader().load( "/static/javascripts/tmp_test/fire.jpg" );
+const sky = new THREE.TextureLoader().load( "/static/javascripts/tmp_test/sky3.jpg" );
 
 
 // frieren.
@@ -101,22 +101,22 @@ Pallet2.position.z += 0.5
 
 // plane3.position.z += 20
 // plane3.position.x += 20
-// plane3.rotation.x = PY/180*-90
-// plane3.rotation.y = PY/180*-90
+// plane3.rotation.x = Math.PI/180*-90
+// plane3.rotation.y = Math.PI/180*-90
 
 // plane4.position.z += 20
 // plane4.position.x -= 20
-// plane4.rotation.x = PY/180*-90
-// plane4.rotation.y = PY/180*-90
+// plane4.rotation.x = Math.PI/180*-90
+// plane4.rotation.y = Math.PI/180*-90
 
 // plane5.position.z += 20
 // plane5.position.y -= 20
-// plane5.rotation.x = PY/180*-90
+// plane5.rotation.x = Math.PI/180*-90
 
 // plane6.position.z += 20
 // plane6.position.y += 20
-// plane6.rotation.x = PY/180*-90
-// plane5.rotation.y = PY/180*-90
+// plane6.rotation.x = Math.PI/180*-90
+// plane5.rotation.y = Math.PI/180*-90
 // const planeBox = plane.geometry.boundingBox.containsBox();
 // scene.add( plane , plane2,  plane3, plane4, plane5, plane6);
 scene.add( Pallet, Pallet2);
@@ -130,14 +130,14 @@ const materialSphere = new THREE.MeshPhysicalMaterial( {
 	iridescence :1,
 	map:frieren});
 	
-// const geometryCube = new THREE.BoxGeometry( 5, 5, 5 );
-const geometryCube = new THREE.SphereGeometry( 2 );
+const geometryCube = new THREE.SphereGeometry( 5 );
+
+
 // var cube = new THREE.Object3D;
 
 
 // try to add a skybox
 
-	
 // const skyboxGeo = new THREE.SphereGeometry(500);
 
 // const skyboxTex = new THREE.MeshBasicMaterial({map:sky, side: THREE.BackSide})
@@ -148,24 +148,83 @@ const geometryCube = new THREE.SphereGeometry( 2 );
 //post processing
 // const test = new EffectComposer(UnrealBloomPass,FilmPass)
 const params = {
-	threshold: 0,
-	strength: 1,
-	radius: 0,
-	exposure: 1
+	threshold: 0.8,
+	knee: 0.5,
+	radius: 6.5,
+	exposure: 0.1,
+	intensity:0.05,
+	strength:0.05
 };
+
 const renderScene = new RenderPass( scene, camera );
 
 	const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 	bloomPass.threshold = params.threshold;
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
+	bloomPass.knee = params.knee;
+	// bloomPass.intensity = params.intensity;
+	bloomPass.exposure = params.exposure;
+
+	
+const planeGeo = new THREE.PlaneGeometry(50, 50); 
+
+
 
 	const outputPass = new OutputPass();
+	const groundReflectorForSSRPass = new ReflectorForSSRPass(
+		planeGeo, {
+			clipBias:0.003,
+			textureWidth:window.innerWidth,
+			textureHeight:window.innerHeight,
+			color : 0x888888,
+			useDepthTexture:true
+		});
+		groundReflectorForSSRPass.material.depthWrite=false;
+		groundReflectorForSSRPass.rotation.x = -Math.PI/2
+		groundReflectorForSSRPass.position.x = 10;
+		groundReflectorForSSRPass.visible = false;
+		scene.add(groundReflectorForSSRPass);
+const outputSSRPass = new SSRPass(
+{
+
+	scene,
+	camera,
+	width:innerWidth,
+	height:innerHeight,
+	groundReflector:params.groundReflector ? groundReflector : null,
+	selects:params.groundReflector ? selects : null
+});
+
 let composer
-	composer = new EffectComposer( renderer );
-	composer.addPass( renderScene );
-	composer.addPass( bloomPass );
-	composer.addPass( outputPass );
+composer = new EffectComposer( renderer );
+composer.addPass( renderScene );
+composer.addPass( bloomPass );
+composer.addPass( outputPass );
+composer.addPass(outputSSRPass)
+
+
+
+
+
+// const planeGeo9 = new THREE.PlaneGeometry(50, 50); 
+
+
+// 		const materialPlane3 = new THREE.MeshStandardMaterial( {
+// 			wireframe:false, 
+// 			color:0xffffff, 
+// 			opacity: 1, 
+// 			// iridescence :1,
+// 			emissive:0x000000,
+// 			side : THREE.DoubleSide,
+// 			});
+		
+// 		const plane9 = new THREE.Mesh(planeGeo9, materialPlane3)
+// 		plane9.rotation.x = Math.PI/180*-90;
+// 		plane9.position.x -= 10;
+// 		// scene.add(plane9)
+
+
 
 // new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
@@ -265,25 +324,115 @@ var directionBall = {
 
 // }
 
+let data = {
+	positionP1 : {
+		z : 0,
+		x : 0,
+		y : 0,
+	},
+	positionP2 : {
+		z : 0,
+		x : 0,
+		y : 0,
+	},
+	directionBall :  {
+		directionZ : -1,
+		directionX : -1,
+		directionY : -1,
+		speedBall : 0.2
+	}
+}
+
+let getData = function() {
+	return(data);
+}
+
+// socket.use(functionToCall);
+let rebound = function(position, directionBall) {
+
+	if  ( position.x > 17.5)
+	{
+		directionBall.directionX = -1;
+		directionBall.speedBall *= 1.1;
+	}
+	else if  ( position.x < -17.5)
+	{
+		directionBall.directionX = 1;
+		directionBall.speedBall *= 1.1;
+	}
+	if  ( position.x > 17.5)
+	{
+		directionBall.directionY = -1;
+		directionBall.speedBall *= 1.1;
+	}
+	else if  ( position.x < -17.5)
+	{
+		directionBall.directionY = 1;
+		directionBall.speedBall *= 1.1;
+	}
+	data.directionBall = directionBall
+	return directionBall
+}
+
+
+let scorePoint = function(position, directionBall) {
+
+}
+
+let keyDownP1 = function(keyCode, position) {
+	if (keyCode == 87) 
+		position.y += 0.3;
+	else if (keyCode == 83) 
+		position.y-=0.3;
+	else if (keyCode == 68) 
+		position.x -=0.3;
+	else if (keyCode == 65) 
+		position.x += 0.3;
+	data.positionP1.x = position.x;
+	data.positionP1.y = position.y;
+	data.positionP1.z = position.z;
+	return position
+}
+
+let keyDownP2 = function(keyCode, position) {
+	if (keyCode == 39) 
+		position.x -=0.3;
+	else if (keyCode == 37) 
+		position.x +=0.3;
+	else if (keyCode == 40) 
+		position.y -=0.3;
+	else if (keyCode == 38)
+		position.y +=0.3;
+	data.positionP2.x = position.x;
+	data.positionP2.y = position.y;
+	data.positionP2.z = position.z;
+	return data.positionP2
+}
+
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
 
-    if (keyCode == 82) {
-	    cube.position.z = 20.0;
-    }
-	try {
-		Pallet.position = socket.keyDownP1(keyCode, Pallet.position)
-	} catch (error) {
+	if (keyCode == 82) {
+		cube.position.z = 20.0;
 	}
+	// try {
+		console.log("send",  Pallet.position)
+		let pos = keyDownP1(keyCode, Pallet.position);
+		Pallet.position.set(pos)
+		console.log("return ", Pallet.position, pos)
+		// data.positionP1=Pallet.position
+		socket.send(data);
+	// } catch (error) {
+	// }
 	try {
-		Pallet2.position = socket.keyDownP2(keyCode, Pallet2.position)
+		// socket.send({type: "P2"});
+		// Pallet2.position = keyDownP2(keyCode, Pallet2.position)
 	} catch (error) {
 		// 
 	}
 	// console.log(keyCode)
 };
-
 
 // const loader = new FontLoader();
 
@@ -309,8 +458,6 @@ var hit = false;
 
 // collidableMeshList.push()
 var score = 0;
- 
-
 
 function reset_game()
 {
@@ -331,7 +478,7 @@ cube.position.x = 0
 directionBall.directionX = THREE.MathUtils.randFloat(0, 1)
 directionBall.directionY = THREE.MathUtils.randFloat(0, 1)
 
-function collide(){
+function collide() {
 	var ballBox = new THREE.Box3().setFromObject(cube);
 	var pallet1 = new THREE.Box3().setFromObject(Pallet);
 	var pallet2 = new THREE.Box3().setFromObject(Pallet2);
@@ -351,6 +498,8 @@ function collide(){
 	}
 }
 
+
+
 controls.maxDistance = 35
 // var w = 0;
 function animate() {
@@ -365,20 +514,27 @@ function animate() {
 	cube.position.y +=( directionBall.speedBall * directionBall.directionY);
 	cube.position.x +=( directionBall.speedBall * directionBall.directionX);
 
-	
 	controls.update();
 	collide()
 	// rebound()
-	directionBall = socket.rebound(cube.position, directionBall)
+	directionBall = rebound(cube.position, directionBall)
 	if(hit == true)
 		directionBall.directionZ *= -1;
 	renderer.render( scene, camera );
 	// console.log("Min"+ controls.minDistance)
 	// console.log("Min="+controls.maxDistance)
-	// composer.render();
+	composer.render();
 }
 animate();
 
+let callBack = (msg) => {
+	console.log(msg);
+	if (typeof msg !== "object" && !Array.isArray(msg))
+		return ;
+	console.log(msg.type);
+}
+
+socket.use(callBack);
 
 // const materialLine = new THREE.LineBasicMaterial( { color: 0xffffff } );
 // const points = [];
@@ -398,6 +554,7 @@ animate();
 
 /////
 
+
 //////////
 
-console.log("cookie");
+console.log("cookieeeeeeee");
