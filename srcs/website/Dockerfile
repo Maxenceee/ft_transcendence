@@ -1,8 +1,10 @@
-FROM python:3.7
+FROM python:3.7-slim
 
 RUN apt-get update -y && apt-get upgrade -y
 
-RUN pip install Django
+RUN pip install --upgrade pip
+
+RUN pip install Django psycopg2-binary python-dotenv
 
 RUN mkdir /app
 
@@ -16,6 +18,8 @@ EXPOSE 8000
 
 RUN python3 manage.py makemigrations
 
-RUN python3 manage.py migrate
+COPY ./startup.sh ./
 
-CMD ["python3", "manage.py", "runserver"]
+RUN chmod +x ./startup.sh
+
+CMD ["./startup.sh"]

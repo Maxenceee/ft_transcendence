@@ -1,13 +1,56 @@
 version: '3'
 
 services:
-    transcendence:
+    website:
         container_name: docker_django
         build: 
             context: ./srcs/website
-        command: python manage.py runserver 0.0.0.0:8000
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file:
+            - .env
         ports:
             - 8000:8000
+        networks:
+            - transcendence
+        depends_on:
+            postgres:
+                condition: service_healthy
         restart: always
-        image: docker_django
 
+    postgres:
+        container_name: docker_postgres
+        build:
+            context: ./srcs/database
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file:
+            - .env
+        volumes:
+            - postgres_volume:/var/lib/postgresql/data
+        networks:
+            - transcendence
+        restart: always
+        healthcheck:
+            test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 15s
+            retries: 12
+
+networks:
+    transcendence:
+        name: transcendence
+        driver: bridge
+
+volumes:
+    postgres_volume:
+        name: postgres_volume
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ./data/postgres
