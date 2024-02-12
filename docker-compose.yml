@@ -36,7 +36,7 @@ services:
             - transcendence
         restart: always
         healthcheck:
-            test: ["CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+            test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
             interval: 5s
             timeout: 5s
             retries: 5
