@@ -1,0 +1,4 @@
+CREATE USER docker WITH PASSWORD 'dockerpsw';
+
+CREATE DATABASE post_db;
+GRANT ALL PRIVILEGES ON DATABASE post_db TO docker;

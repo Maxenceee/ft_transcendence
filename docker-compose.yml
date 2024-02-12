@@ -5,7 +5,6 @@ services:
         container_name: docker_django
         build: 
             context: ./srcs/website
-        command: python manage.py runserver 0.0.0.0:8000
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
             POSTGRES_USER: ${POSTGRES_USER}
