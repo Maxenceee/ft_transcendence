@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get upgrade -y
 
 RUN pip install --upgrade pip
 
-RUN pip install Django psycopg2-binary
+RUN pip install Django psycopg2-binary python-dotenv
 
 RUN mkdir /app
 
