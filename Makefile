@@ -35,8 +35,7 @@ clean: down
 
 fclean: clean
 	@printf "$(RED)Cleaning data...$(DEFAULT)\n"
-	@rm -rf data
-	@-docker volume rm $(shell docker volume ls -q)
+	@./clean.sh
 	@printf "$(BLUE)Data has been cleaned\n"
 
 .PHONY: all up re clean

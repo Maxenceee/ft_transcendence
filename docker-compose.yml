@@ -37,9 +37,9 @@ services:
         restart: always
         healthcheck:
             test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
-            interval: 5s
-            timeout: 5s
-            retries: 5
+            interval: 10s
+            timeout: 15s
+            retries: 12
 
 networks:
     transcendence:
