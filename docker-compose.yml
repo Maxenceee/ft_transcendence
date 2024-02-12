@@ -7,9 +7,9 @@ services:
             context: ./srcs/website
         command: python manage.py runserver 0.0.0.0:8000
         environment:
-            POSTGRES_DB: docker
-            POSTGRES_USER: docker
-            POSTGRES_PASSWORD: docker
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         env_file:
             - .env
         ports:
@@ -25,9 +25,9 @@ services:
         build:
             context: ./srcs/database
         environment:
-            POSTGRES_DB: docker
-            POSTGRES_USER: docker
-            POSTGRES_PASSWORD: docker
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         env_file:
             - .env
         volumes:
