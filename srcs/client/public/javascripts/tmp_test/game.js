@@ -81,7 +81,6 @@ const sky = new THREE.TextureLoader().load( "/static/javascripts/tmp_test/sky3.j
 const geometryPlane = new THREE.PlaneGeometry( 50, 50 );
 const materialPlane = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff00ff, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
 // const materialPlane2 = new THREE.MeshPhysicalMaterial( 	{wireframe:false ,color: 0xff0000, side: THREE.DoubleSide, opacity:0.1, transparent : true} );
-const materialPalette = new THREE.MeshPhysicalMaterial(  {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map: kitten} );
 const materialPalette2 = new THREE.MeshPhysicalMaterial( {wireframe:false, wireframeLinewidth: 10, side: THREE.DoubleSide, opacity:1, transparent : true, map:frieren} );
 // const geometryPlane = new THREE.Plane({normal:(30, 30, 30)})
 const plane = new THREE.Mesh( geometryPlane, materialPlane );
@@ -92,7 +91,7 @@ const tmp2 = new THREE.BoxGeometry( 6, 6, 1 )
 // const plane4 = new THREE.Mesh( geometryPlane, materialPlane2 );
 // const plane5 = new THREE.Mesh( geometryPlane, materialPlane2 );
 // const plane6 = new THREE.Mesh( geometryPlane, materialPlane2 );
-const Pallet = new THREE.Mesh( tmp2, materialPalette );
+const Pallet = new THREE.Mesh( tmp2, materialPalette2 );
 const Pallet2 = new THREE.Mesh( tmp2, materialPalette2 );
 // plane2.position.z += 40
 
@@ -523,7 +522,7 @@ function animate() {
 	renderer.render( scene, camera );
 	// console.log("Min"+ controls.minDistance)
 	// console.log("Min="+controls.maxDistance)
-	composer.render();
+	// composer.render();
 }
 animate();
 

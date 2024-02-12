@@ -10,7 +10,7 @@ import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
 import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 
 const scene = new THREE.Scene()
-scene.add(new THREE.AxesHelper(5))
+// scene.add(new THREE.AxesHelper(5))
 
 
 const light = new THREE.PointLight(0xffffff, 1000)
@@ -99,7 +99,7 @@ const planeGeo = new THREE.PlaneGeometry(50, 50);
 		const cube = new THREE.Mesh( geometryCube, materialCube );
 
 		cube.position.y +=3;
-		// scene.add(cube, plane);
+		scene.add(cube, plane);
 // const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true })
 const outputSSRPass = new SSRPass(
 {
@@ -138,7 +138,7 @@ composer.addPass(outputSSRPass)
 const loader = new GLTFLoader()
 loader.load( 'static/javascripts/tmp_test/pong_visual.glb', function ( gltf ) {
 
-	scene.add( gltf.scene );
+	// scene.add( gltf.scene );
 
 }, undefined, function ( error ) {
 
