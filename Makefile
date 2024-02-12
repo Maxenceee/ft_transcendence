@@ -15,6 +15,7 @@ debug: all
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
+	@mkdir -p ./data
 	@mkdir -p ./data/postgres
 	@docker compose up -d
 	@printf "$(GREEN)The server is running on http://localhost:$(FORWARDPORT)\n"
