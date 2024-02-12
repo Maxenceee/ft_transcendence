@@ -12,6 +12,7 @@ all: clean up
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
+	mkdir -p data && mkdir -p data/postgres
 	@docker compose up -d
 	@printf "$(BLUE)The server is running on http://localhost:$(FORWARDPORT)\n"
 
@@ -27,5 +28,10 @@ fclean: clean
 	@docker system prune -af --volumes
 	@docker builder prune -af
 	@printf "$(GREEN)Docker has been cleaned\n"
+
+fclean_all: fclean
+	@printf "$(RED)Cleaning data...$(DEFAULT)\n"
+	rm -rf data
+	@printf "$(GREEN)Data has been cleaned\n"
 
 .PHONY: all up re clean
