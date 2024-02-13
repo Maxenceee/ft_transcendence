@@ -11,9 +11,8 @@ done
 if [[ $input == "y" || $input == "Y" ]]
 then
 	printf "\033[1;31mCleaning data...\033[0m\n"
-	rm -rf data
 	docker volume rm $(docker volume ls -q)
 else
 	echo "Abort"
-	# exit 1
+	exit 1
 fi
