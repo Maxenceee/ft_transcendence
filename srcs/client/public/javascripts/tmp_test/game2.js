@@ -4,8 +4,11 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
+// import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
 import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+
 
 
 let socket = new Socket({path: "/socket"});
@@ -346,7 +349,7 @@ function initiateMapError()
 
 const params = {
 	threshold: 0,
-	strength: 0.5,
+	strength: 0.35,
 	radius: 0,
 	exposure: 1
 };
@@ -535,7 +538,8 @@ function wallCollideFourPlayer(){
 		}
 	if (moveSpeed > 5)
 		moveSpeed = 5
-};
+		createText()
+	};
 
 function wallCollideTwoPlayer(){
 	if (ball.position.x < -mapWidth/2 + 1 )
@@ -559,6 +563,7 @@ function wallCollideTwoPlayer(){
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
+	createText()
 };
 
 function palletReboundP1(){
@@ -587,20 +592,70 @@ function ballRotate()
 if (palletPlayer1 != 0)
 	scene.add(palletPlayer1, palletPlayer2)
 
-function animate() {
+
+
+
+let font, textGeo, materials, textMesh2
+function loadFont() {
+
+	const loader = new FontLoader();
+	loader.load( '/static/javascripts/font.json', function ( response ) {
+
+		font = response;
+
+		createText();
+
+	} );
+}
+
+function createText() {
+
+		scene.remove(textMesh2);
+
+		textGeo = new TextGeometry( score.scoreP2 + " : " + score.scoreP1, {
+
+			font: font,
+
+			size: 10,
+			height: 0.5,
+			curveSegments: 2,
+
+			bevelThickness: 0.1,
+			bevelSize: 0.01,
+			bevelEnabled: true
+
+		} );
+		
+		materials = [
+			new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+			new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+		];
+		textMesh2 = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
+		textMesh2.rotateX(-Math.PI/180 * 90);
+		textMesh2.rotateZ(Math.PI/180 * 90);
+		textMesh2.position.z += 12.5;
+		textMesh2.position.x += 2.5;
+		textMesh2.position.y -= 2;
+		scene.add(textMesh2);
+		
+	}
+	
+	
+	loadFont()
+	function animate() {
 	if (palletPlayer3!=0)
 		wallCollideFourPlayer()
 	else 
 		wallCollideTwoPlayer()
 	requestAnimationFrame(animate)
 	ballRotate();
-    controls.update()
+	controls.update()
 	if (composer){
 		renderer.render( scene, camera );
 		composer.render();	
 	}
 	else
-		renderer.render( sceneError, camera );
+	renderer.render( sceneError, camera );
 	ball.position.x +=( ballDirection.x ) * 0.3 * moveSpeed 
 	ball.position.z +=( ballDirection.z ) * 0.3 * moveSpeed 
 
