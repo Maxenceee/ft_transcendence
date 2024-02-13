@@ -85,6 +85,17 @@ var p = zs;
 let r = p(T1, { children: [p(Li, { path: "/", element: p("h1", {children: "Oui"}) }), p(Li, { path: "*", element: p("h1", {children: "non"}) })] });
 console.log(r);
 
+function xf(e) {
+    var t = e;
+    console.log("-----------------------------------------------------------------")
+    do {
+		if (typeof t === 'object' && t !== null && t.props !== void 0) {
+			t = t.props.children;
+		} else
+			t = null;
+    } while (t !== null);
+}
+
 ////////////////////////////////////////////
 
 function ina() {}
@@ -101,8 +112,24 @@ function Rt(e) {
 Rt.prototype.render = function(elem) {
 	let t = this._internalRoot;
 	if (t === null) throw Error('Unable to find root node.');
-	
+	xf(elem);;
 };
+
+// function Cs(e, t, n) {
+//     var r,
+//         l = {},
+//         o = null,
+//         i = null;
+//     if (t != null) for (r in (t.ref !== void 0 && (i = t.ref), t.key !== void 0 && (o = "" + t.key), t)) Object.prototype.hasOwnProperty.call(t, r) && !xs.hasOwnProperty(r) && (l[r] = t[r]);
+//     var u = arguments.length - 2;
+//     if (u === 1) l.children = n;
+//     else if (1 < u) {
+//         for (var a = Array(u), s = 0; s < u; s++) a[s] = arguments[s + 2];
+//         l.children = a;
+//     }
+//     if (e && e.defaultProps) for (r in ((u = e.defaultProps), u)) l[r] === void 0 && (l[r] = u[r]);
+//     return { $$typeof: hr, type: e, key: o, ref: i, props: l, _owner: Vi.current };
+// }
 
 var _s = { exports: {} },
 	A2;
@@ -113,6 +140,8 @@ let Xe = {
 			new Rt(t)
 		);
 	},
+	// createElement: Cs,
+	
 }
 ina(), (_s.exports = Xe);
 var A2 = _s.exports,
@@ -120,4 +149,4 @@ var A2 = _s.exports,
 
 (Ao.createRoot = Xe.createRoot);
 
-Ao.createRoot(document.getElementById('root')).render();
+Ao.createRoot(document.getElementById('root')).render(r);

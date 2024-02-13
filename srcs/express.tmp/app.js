@@ -89,7 +89,13 @@ app.use(cors({
  * 
  */
 
-app.use((req, res, next) => {
+app.get('/:page', (req, res, next) => {
+	if (!req.params.page || req.params.page == "index.html")
+		return res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/index.html'));
+	res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/'+req.params.page));
+});
+
+app.use((_, res) => {
 	res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/index.html'));
 });
 

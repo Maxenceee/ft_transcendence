@@ -25,6 +25,9 @@ down:
 	@docker compose down --rmi all
 	@printf "$(BLUE)The container has been removed\n"
 
+status:
+	@docker ps -a
+
 clean: down
 	@printf "$(RED)Cleaning docker...$(DEFAULT)\n"
 	@docker system prune -af --volumes
