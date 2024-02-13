@@ -1,4 +1,4 @@
-SERVER_DIR	=	srcs/website
+SERVER_DIR	=	srcs
 NAME		=	docker_django
 FORWARDPORT	=	8000
 
@@ -15,8 +15,6 @@ debug: all
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
-	@mkdir -p ./data
-	@mkdir -p ./data/postgres
 	@docker compose up -d
 	@printf "$(GREEN)The server is running on http://localhost:$(FORWARDPORT)\n"
 

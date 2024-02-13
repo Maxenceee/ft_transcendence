@@ -4,9 +4,9 @@ services:
     website:
         container_name: docker_django
         build: 
-            context: ./srcs/website
+            context: ./srcs
         environment:
-            POSTGRES_DB: ${POSTGRES_DB}
+            # POSTGRES_DB: ${POSTGRES_DB}
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         env_file:
@@ -22,21 +22,18 @@ services:
 
     postgres:
         container_name: docker_postgres
-        build:
-            context: ./srcs/database
+        image: postgres:latest
+        restart: always
         environment:
-            POSTGRES_DB: ${POSTGRES_DB}
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        env_file:
-            - .env
-        volumes:
-            - postgres_volume:/var/lib/postgresql/data
+            # POSTGRES_DB: ${POSTGRES_DB}
+        volumes: 
+          - postgres_volume:/var/lib/postgresql/data
         networks:
-            - transcendence
-        restart: always
+          - transcendence
         healthcheck:
-            test: ["CMD", "pg_isready", "-d", "${POSTGRES_DB}"]
+            test: ["CMD", "pg_isready"]
             interval: 10s
             timeout: 15s
             retries: 12
@@ -50,7 +47,7 @@ volumes:
     postgres_volume:
         name: postgres_volume
         driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ./data/postgres
+        # driver_opts:
+        #     type: none
+        #     o: bind
+        #     device: ./data/postgres
