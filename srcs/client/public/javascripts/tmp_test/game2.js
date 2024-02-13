@@ -436,33 +436,43 @@ let moveSpeed = 1.05
 // initiateMapFourPlayer({})
 // initiateMapError({})
 initiateMapTwoPlayer({})
-
+//serverside under it
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     var keyCode = event.which;
 
 	if (keyCode == 68) 
-		palletPlayer1.position.x += mapWidth/60 * (moveSpeed * moveSpeed);
+		palletPlayer1.position.x += mapWidth/60 ;
 	else if (keyCode == 65)
-		palletPlayer1.position.x-= mapWidth/60 * (moveSpeed * moveSpeed);
+		palletPlayer1.position.x-= mapWidth/60 ;
 	if (keyCode == 39) 
-		palletPlayer2.position.x -= mapWidth/60 * (moveSpeed * moveSpeed);
+		palletPlayer2.position.x -= mapWidth/60 ;
 	if (keyCode == 37) 
-		palletPlayer2.position.x += mapWidth/60 * (moveSpeed * moveSpeed);
+		palletPlayer2.position.x += mapWidth/60 ;
 
 
     if (palletPlayer3 != 0)
 	{
 	if (keyCode == 81) 
-		palletPlayer3.position.z += mapWidth/60;
+		palletPlayer3.position.z += mapWidth/60 ;
 	else if (keyCode == 69) 
-		palletPlayer3.position.z-= mapWidth/60 ;
+		palletPlayer3.position.z-= mapWidth/60  ;
 	if (keyCode == 90) 
-		palletPlayer4.position.z -= mapWidth/60;
+		palletPlayer4.position.z -= mapWidth/60 ;
 	else if (keyCode == 67) 
-		palletPlayer4.position.z += mapWidth/60;
+		palletPlayer4.position.z += mapWidth/60 ;
 	}
 	console.log(keyCode);
+}
+
+function resetBall()
+{
+	ball.position.z = 0
+	ball.position.x = 0
+	ball.position.y = 0
+	moveSpeed = 1.05
+	ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
+	ballDirection.z = 1;
 }
 
 let ballDirection = {
@@ -470,8 +480,89 @@ let ballDirection = {
 	z : 0.5 + Math.random(),
 };
 
-function rebound(){
-	if (ball.position.x < -mapWidth/2 + 0.5 )
+let score = {
+	scoreP1: 0,
+	scoreP2: 0,
+	scoreP3: 0,
+	scoreP4: 0,
+};
+
+function wallCollideFourPlayer(){
+	let hit = false
+	if (ball.position.x < -mapWidth/2 + 1 )
+	{
+		moveSpeed += 0.05
+		score.scoreP1++
+		console.log("score P1 : "+score.scoreP1)
+		resetBall()
+		// ballDirection.x *= -1;
+		hit = true
+	}
+
+	else if (ball.position.x > mapWidth/2 - 1)
+	{
+		moveSpeed += 0.05
+		score.scoreP2++
+		console.log("score P2 : "+score.scoreP2)
+		resetBall()
+		// ballDirection.z *= -1;
+		hit = true
+	}
+
+	if (ball.position.z < -mapLenth/2 + 1)
+	{
+		moveSpeed += 0.05 
+		score.scoreP4++
+		console.log("score P4 : "+score.scoreP4)
+		resetBall()
+		// ballDirection.z *= -1;
+		hit = true
+	}
+
+	else if (ball.position.z > mapLenth/2 - 1)
+	{
+		moveSpeed += 0.05
+		score.scoreP3++
+		console.log("score P3 : "+score.scoreP3)
+		resetBall()
+		// ballDirection.z*= -1;
+		hit = true
+	}
+	if (hit)
+		{
+			ballDirection.z = THREE.MathUtils.randFloat(-1, 1)
+			ballDirection.x = THREE.MathUtils.randFloat(-1, 1)
+		}
+	if (moveSpeed > 5)
+		moveSpeed = 5
+};
+
+function wallCollideTwoPlayer(){
+	if (ball.position.x < -mapWidth/2 + 1 )
+			ballDirection.x *= -1;
+	else if (ball.position.x > mapWidth/2 - 1)
+		ballDirection.x *= -1;
+	if (ball.position.z < -mapLenth/2 + 1)
+	{
+
+		score.scoreP2++
+		console.log("score P2 : "+score.scoreP2)
+		resetBall()
+			
+	}
+	else if (ball.position.z > mapLenth/2 - 1)
+	{
+		score.scoreP1++
+		console.log("score P1 : "+score.scoreP1)
+		resetBall()
+		ballDirection.z *= -1;
+	}
+	if (moveSpeed > 5)
+		moveSpeed = 5
+};
+
+function palletReboundP1(){
+	if (ball.position.x < -palletPlayer1.x + 3 )
 	{
 			ballDirection.x *= -1;
 			moveSpeed += 0.05
@@ -481,36 +572,38 @@ function rebound(){
 		ballDirection.x *= -1;
 		moveSpeed += 0.05
 	}
-	if (ball.position.z < -mapLenth/2 + 0.5)
-	{
-			ballDirection.z *= -1;
-			moveSpeed += 0.05 
-	}
-	else if (ball.position.z > mapLenth/2 - 0.5)
-	{
-			ballDirection.z *= -1;
-			moveSpeed += 0.05
-	}
-
+	if (moveSpeed > 5)
+		moveSpeed = 5
 };
+//server side above
 
-
+function ballRotate()
+{
+	// ball.rotation.z +=  ballDirection.z
+	ball.rotation.x +=  .1
+	// ball.rotation.y += 0.1
+}
 
 if (palletPlayer1 != 0)
 	scene.add(palletPlayer1, palletPlayer2)
 
 function animate() {
-	rebound()
+	if (palletPlayer3!=0)
+		wallCollideFourPlayer()
+	else 
+		wallCollideTwoPlayer()
 	requestAnimationFrame(animate)
+	ballRotate();
     controls.update()
 	if (composer){
 		renderer.render( scene, camera );
-		composer.render();
+		composer.render();	
 	}
 	else
-	renderer.render( sceneError, camera );
+		renderer.render( sceneError, camera );
 	ball.position.x +=( ballDirection.x ) * 0.3 * moveSpeed 
 	ball.position.z +=( ballDirection.z ) * 0.3 * moveSpeed 
+
 }
 animate();
 console.log("cookie")
