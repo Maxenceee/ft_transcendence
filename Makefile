@@ -1,4 +1,4 @@
-SERVER_DIR	=	srcs/website
+SERVER_DIR	=	srcs
 NAME		=	docker_django
 FORWARDPORT	=	8000
 
