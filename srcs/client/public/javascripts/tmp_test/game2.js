@@ -5,7 +5,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
-import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
+// import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
@@ -64,7 +64,7 @@ scene.add( Alight );
 const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
 const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
 const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-// const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
+const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
 const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 scene.clear;
@@ -109,7 +109,7 @@ function initiateMapTwoPlayer(data)
 			// map : player1Map 
 			})
 		);
- 
+ ///add helper to see axe)
 							const repaire = new THREE.Mesh( 
 								new THREE.BoxGeometry( 2,2,2 ), 
 								new THREE.MeshStandardMaterial( {
@@ -147,6 +147,7 @@ function initiateMapTwoPlayer(data)
 								);
 								repaire2.position.x +=2
 								scene.add( repaire, repaire1, repaire2);
+//// end of the helper
 	palletPlayer2 = new THREE.Mesh( 
 		new THREE.BoxGeometry( 6, 1, 1 ), 
 		new THREE.MeshStandardMaterial( {
@@ -224,6 +225,10 @@ function initiateMapTwoPlayer(data)
 
 function initiateMapFourPlayer(data)
 {
+	score.scoreP1 = 5
+	score.scoreP2 = 5
+	score.scoreP3 = 5
+	score.scoreP4 = 5
 	/// temporary for dev purpose///
 	data.player1Map = player1Map;
 	data.player2Map = player2Map;
@@ -375,15 +380,6 @@ function initiateMapError()
 //debuging
 
 
-// const params = {
-// 	threshold: 0.8,
-// 	knee: 0.5,
-// 	radius: 6.5,
-// 	exposure: 0.1,
-// 	intensity:0.05,
-// 	strength:0.05
-// };
-
 const params = {
 	threshold: 0,
 	strength: 0.35,
@@ -394,20 +390,13 @@ const params = {
 
 const renderScene = new RenderPass( scene, camera );
 
-// const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-// bloomPass.threshold = params.threshold;
-// bloomPass.strength = params.strength;
-// bloomPass.radius = params.radius;
-// bloomPass.knee = params.knee;
-// // bloomPass.intensity = params.intensity;
-// bloomPass.exposure = params.exposure;
 const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 bloomPass.threshold = params.threshold;
 bloomPass.strength = params.strength;
 bloomPass.radius = params.radius;
 
 	
-const planeGeo = new THREE.PlaneGeometry(50, 50); 
+// const planeGeo = new THREE.PlaneGeometry(50, 50); 
 
 
 
@@ -472,10 +461,17 @@ composer.addPass( outputPass );
 let moveSpeed = 1.05
 
 
+let score = {
+	scoreP1: 0,
+	scoreP2: 0,
+	scoreP3: 0,
+	scoreP4: 0,
+};
 
-// initiateMapFourPlayer({})
+initiateMapFourPlayer({})
 // initiateMapError({})
-initiateMapTwoPlayer({})
+// initiateMapTwoPlayer({})
+
 //serverside under it
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -520,53 +516,109 @@ let ballDirection = {
 	z : 0.5 + Math.random(),
 };
 
-let score = {
-	scoreP1: 0,
-	scoreP2: 0,
-	scoreP3: 0,
-	scoreP4: 0,
-};
+
+
+
+
+
+
+function createTextObject(msg) {
+	let textObj
+
+	textGeo = new TextGeometry( msg , {
+
+		font: font,
+
+		size: 10,
+		height: 0.5,
+		curveSegments: 2,
+
+		bevelThickness: 0.1,
+		bevelSize: 0.01,
+		bevelEnabled: true
+
+	} );
+	materials = [
+	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+	];
+	textObj = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
+
+	return textObj;
+}
+
+
+let P1score, P2score, P3score, P4score
+function displayScore(){
+	scene.remove(P1score, P2score, P3score, P4score)
+	P1score = createTextObject(score.scoreP3 + "") //Red player
+	P1score.position.z += 30
+	P1score.position.y += 6
+	P1score.position.x += 2.5
+	P1score.rotateY(Math.PI);
+
+	
+	P2score = createTextObject(score.scoreP4 + "") //Purple player
+	P2score.position.z -= 30
+	P2score.position.y += 6
+	P2score.position.x -= 5
+	
+	
+	P3score = createTextObject(score.scoreP1 + "") //Cyan player
+	P3score.position.z += 2.5
+	P3score.position.y += 6
+	P3score.position.x -= 30
+	P3score.rotateY(Math.PI*0.5);
+	
+	P4score = createTextObject(score.scoreP2 + "") //Blue player
+	P4score.position.z -= 2.5
+	P4score.position.y += 6
+	P4score.position.x += 30
+	P4score.rotateY(-Math.PI*0.5);
+	
+	scene.add(P1score, P2score, P3score, P4score)
+}
 
 function wallCollideFourPlayer(){
 	let hit = false
 	if (ball.position.x < -mapWidth/2 + 1 )
 	{
 		moveSpeed += 0.05
-		score.scoreP1++
+		score.scoreP1--
 		console.log("score P1 : "+score.scoreP1)
 		resetBall()
 		hit = true
-		createText();
+		displayScore()
 	}
 
 	else if (ball.position.x > mapWidth/2 - 1)
 	{
 		moveSpeed += 0.05
-		score.scoreP2++
+		score.scoreP2--
 		console.log("score P2 : "+score.scoreP2)
 		resetBall()
 		hit = true
-		createText();
+		displayScore()
 	}
 
 	if (ball.position.z < -mapLenth/2 + 1)
 	{
 		moveSpeed += 0.05 
-		score.scoreP4++
+		score.scoreP4--
 		console.log("score P4 : "+score.scoreP4)
 		resetBall()
 		hit = true
-		createText(score.scoreP2 + " : " + score.scoreP1);
+		displayScore()
 	}
 
 	else if (ball.position.z > mapLenth/2 - 1)
 	{
 		moveSpeed += 0.05
-		score.scoreP3++
+		score.scoreP3--
 		console.log("score P3 : "+score.scoreP3)
 		resetBall()
 		hit = true
-		createText(score.scoreP2 + " : " + score.scoreP1);
+		displayScore()
 	}
 	if (hit)
 		{
@@ -604,10 +656,8 @@ function wallCollideTwoPlayer(){
 function palletReboundP1(){
 	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 3) && ball.position.x > (palletPlayer1.position.x - 3)) )
 	{
-
-			ballDirection.z *= -1;
-			moveSpeed += 0.05
-			console.log("hit p1 first")
+		ballDirection.z *= -1;
+		moveSpeed += 0.05
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
@@ -615,10 +665,8 @@ function palletReboundP1(){
 function palletReboundP2(){
 	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 3) && ball.position.x > (palletPlayer2.position.x - 3)) )
 	{
-
-			ballDirection.z *= -1;
-			moveSpeed += 0.05
-			console.log("hit p1 first")
+		ballDirection.z *= -1;
+		moveSpeed += 0.05
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
@@ -647,38 +695,34 @@ function loadFont() {
 
 function createText(msg) {
 
+	scene.remove(textMesh2);
+	textGeo = new TextGeometry( msg , {
 
-		scene.remove(textMesh2);
-		textGeo = new TextGeometry( msg , {
+		font: font,
 
-			font: font,
+		size: 10,
+		height: 0.5,
+		curveSegments: 2,
 
-			size: 10,
-			height: 0.5,
-			curveSegments: 2,
+		bevelThickness: 0.1,
+		bevelSize: 0.01,
+		bevelEnabled: true
 
-			bevelThickness: 0.1,
-			bevelSize: 0.01,
-			bevelEnabled: true
-
-		} );
-		if (materials)
-			materials = [
-			new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-			new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-		];
-		textMesh2 = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
-		textMesh2.rotateX(-Math.PI/180 * 90);
-		textMesh2.rotateZ(Math.PI/180 * 90);
-		textMesh2.position.z += 12.5;
-		textMesh2.position.x += 2.5;
-		textMesh2.position.y -= 2;
-		
-		scene.add(textMesh2);
-		textGeo.remove;
-		textMesh2.remove
+	} );
+	materials = [
+	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+	];
+	textMesh2 = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
+	textMesh2.rotateX(-Math.PI * 0.5);
+	textMesh2.rotateZ(Math.PI * 0.5);
+	textMesh2.position.z += 12.5;
+	textMesh2.position.x += 2.5;
+	textMesh2.position.y -= 2;
 	
-	}
+	scene.add(textMesh2);
+
+}
 	
 	
 loadFont()
@@ -691,11 +735,17 @@ function animate() {
 	}
 	else
 		renderer.render( sceneError, camera );
-	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9|| score.scoreP4 > 9)
+	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9|| score.scoreP4 < 0 || score.scoreP1 < 0 || score.scoreP2 < 0 || score.scoreP3 < 0|| score.scoreP4 > 9)
+	{
+		scene.remove(ball);
 		return;
-	if (palletPlayer3!=0)
+	}
+	if (palletPlayer3!=0){
+		palletReboundP1()
+		palletReboundP2()	
 		wallCollideFourPlayer()
-	else 
+		}
+		else 
 	{
 		palletReboundP1()
 		palletReboundP2()
