@@ -64,7 +64,7 @@ scene.add( Alight );
 const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
 const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
 const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
+// const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
 const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 scene.clear;
@@ -110,6 +110,43 @@ function initiateMapTwoPlayer(data)
 			})
 		);
  
+							const repaire = new THREE.Mesh( 
+								new THREE.BoxGeometry( 2,2,2 ), 
+								new THREE.MeshStandardMaterial( {
+									wireframe:false, 
+									color:0xffffff, 
+									opacity: 1, 
+									emissive:0xffffff,
+									side : THREE.DoubleSide,
+									// map : player1Map 
+									})
+								);
+							repaire.position.z +=2
+							const repaire1 = new THREE.Mesh( 
+								new THREE.BoxGeometry( 2,2,2 ), 
+								new THREE.MeshStandardMaterial( {
+									wireframe:false, 
+									color:0xffff00, 
+									opacity: 1, 
+									emissive:0xffff00,
+									side : THREE.DoubleSide,
+									// map : player1Map 
+									})
+								);
+
+							const repaire2 = new THREE.Mesh( 
+								new THREE.BoxGeometry( 2,2,2 ), 
+								new THREE.MeshStandardMaterial( {
+									wireframe:false, 
+									color:0x00ff00, 
+									opacity: 1, 
+									emissive:0x00ff00,
+									side : THREE.DoubleSide,
+									// map : player1Map 
+									})
+								);
+								repaire2.position.x +=2
+								scene.add( repaire, repaire1, repaire2);
 	palletPlayer2 = new THREE.Mesh( 
 		new THREE.BoxGeometry( 6, 1, 1 ), 
 		new THREE.MeshStandardMaterial( {
@@ -375,20 +412,20 @@ const planeGeo = new THREE.PlaneGeometry(50, 50);
 
 
 const outputPass = new OutputPass();
-const groundReflectorForSSRPass = new ReflectorForSSRPass(
-	planeGeo, {
-		clipBias:0.003,
-		textureWidth:window.innerWidth,
-		textureHeight:window.innerHeight,
-		color : 0x888888,
-		useDepthTexture:true
-	});
-groundReflectorForSSRPass.material.depthWrite=false;
-groundReflectorForSSRPass.rotation.x = -Math.PI/2
-groundReflectorForSSRPass.position.x = -2;
-groundReflectorForSSRPass.visible = false;
-groundReflectorForSSRPass
-scene.add(groundReflectorForSSRPass);
+// const groundReflectorForSSRPass = new ReflectorForSSRPass(
+// 	planeGeo, {
+// 		clipBias:0.003,
+// 		textureWidth:window.innerWidth,
+// 		textureHeight:window.innerHeight,
+// 		color : 0x888888,
+// 		useDepthTexture:true
+// 	});
+// groundReflectorForSSRPass.material.depthWrite=false;
+// groundReflectorForSSRPass.rotation.x = -Math.PI/2
+// groundReflectorForSSRPass.position.x = -2;
+// groundReflectorForSSRPass.visible = false;
+// groundReflectorForSSRPass
+// scene.add(groundReflectorForSSRPass);
 // const outputSSRPass = new SSRPass(
 // {
 // 	scene,
@@ -411,23 +448,23 @@ composer.addPass( outputPass );
 // let composer;
 // composer = setRender();
 
-const planeGeoGround = new THREE.PlaneGeometry(100, 100); 
+// const planeGeoGround = new THREE.PlaneGeometry(100, 100); 
 
 
-const materialPlaneGround = new THREE.MeshStandardMaterial( {
-	wireframe:false, 
-	color:0x000000, 
-	opacity: 1, 
-	roughness :0,
-	// iridescence :1,
-	// emissive:0x000000,
-	side : THREE.DoubleSide,
-	});
+// const materialPlaneGround = new THREE.MeshStandardMaterial( {
+// 	wireframe:false, 
+// 	color:0x000000, 
+// 	opacity: 1, 
+// 	roughness :0,
+// 	// iridescence :1,
+// 	// emissive:0x000000,
+// 	side : THREE.DoubleSide,
+// 	});
 
-const groundReflection = new THREE.Mesh(planeGeoGround, materialPlaneGround)
-groundReflection.rotation.x = Math.PI/180*-90;
-groundReflection.position.y -= 2;
-scene.add(groundReflection)
+// const groundReflection = new THREE.Mesh(planeGeoGround, materialPlaneGround)
+// groundReflection.rotation.x = Math.PI/180*-90;
+// groundReflection.position.y -= 2;
+// scene.add(groundReflection)
 
 
 
@@ -498,8 +535,8 @@ function wallCollideFourPlayer(){
 		score.scoreP1++
 		console.log("score P1 : "+score.scoreP1)
 		resetBall()
-		// ballDirection.x *= -1;
 		hit = true
+		createText();
 	}
 
 	else if (ball.position.x > mapWidth/2 - 1)
@@ -508,8 +545,8 @@ function wallCollideFourPlayer(){
 		score.scoreP2++
 		console.log("score P2 : "+score.scoreP2)
 		resetBall()
-		// ballDirection.z *= -1;
 		hit = true
+		createText();
 	}
 
 	if (ball.position.z < -mapLenth/2 + 1)
@@ -518,8 +555,8 @@ function wallCollideFourPlayer(){
 		score.scoreP4++
 		console.log("score P4 : "+score.scoreP4)
 		resetBall()
-		// ballDirection.z *= -1;
 		hit = true
+		createText(score.scoreP2 + " : " + score.scoreP1);
 	}
 
 	else if (ball.position.z > mapLenth/2 - 1)
@@ -528,8 +565,8 @@ function wallCollideFourPlayer(){
 		score.scoreP3++
 		console.log("score P3 : "+score.scoreP3)
 		resetBall()
-		// ballDirection.z*= -1;
 		hit = true
+		createText(score.scoreP2 + " : " + score.scoreP1);
 	}
 	if (hit)
 		{
@@ -538,7 +575,6 @@ function wallCollideFourPlayer(){
 		}
 	if (moveSpeed > 5)
 		moveSpeed = 5
-		createText()
 	};
 
 function wallCollideTwoPlayer(){
@@ -548,11 +584,10 @@ function wallCollideTwoPlayer(){
 		ballDirection.x *= -1;
 	if (ball.position.z < -mapLenth/2 + 1)
 	{
-
 		score.scoreP2++
 		console.log("score P2 : "+score.scoreP2)
-		resetBall()
-			
+		resetBall()	
+		createText(score.scoreP2 + " : " + score.scoreP1)	
 	}
 	else if (ball.position.z > mapLenth/2 - 1)
 	{
@@ -560,34 +595,36 @@ function wallCollideTwoPlayer(){
 		console.log("score P1 : "+score.scoreP1)
 		resetBall()
 		ballDirection.z *= -1;
+		createText(score.scoreP2 + " : " + score.scoreP1)
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
-	createText()
 };
 
 function palletReboundP1(){
-	if (ball.position.x < -palletPlayer1.x + 3 )
+	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 3) && ball.position.x > (palletPlayer1.position.x - 3)) )
 	{
-			ballDirection.x *= -1;
+
+			ballDirection.z *= -1;
 			moveSpeed += 0.05
+			console.log("hit p1 first")
 	}
-	else if (ball.position.x > mapWidth/2 - 0.5)
+	if (moveSpeed > 5)
+		moveSpeed = 5
+};
+function palletReboundP2(){
+	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 3) && ball.position.x > (palletPlayer2.position.x - 3)) )
 	{
-		ballDirection.x *= -1;
-		moveSpeed += 0.05
+
+			ballDirection.z *= -1;
+			moveSpeed += 0.05
+			console.log("hit p1 first")
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
 };
 //server side above
 
-function ballRotate()
-{
-	// ball.rotation.z +=  ballDirection.z
-	ball.rotation.x +=  .1
-	// ball.rotation.y += 0.1
-}
 
 if (palletPlayer1 != 0)
 	scene.add(palletPlayer1, palletPlayer2)
@@ -603,16 +640,16 @@ function loadFont() {
 
 		font = response;
 
-		createText();
+		createText("");
 
 	} );
 }
 
-function createText() {
+function createText(msg) {
+
 
 		scene.remove(textMesh2);
-
-		textGeo = new TextGeometry( score.scoreP2 + " : " + score.scoreP1, {
+		textGeo = new TextGeometry( msg , {
 
 			font: font,
 
@@ -625,8 +662,8 @@ function createText() {
 			bevelEnabled: true
 
 		} );
-		
-		materials = [
+		if (materials)
+			materials = [
 			new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
 			new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
 		];
@@ -636,26 +673,35 @@ function createText() {
 		textMesh2.position.z += 12.5;
 		textMesh2.position.x += 2.5;
 		textMesh2.position.y -= 2;
-		scene.add(textMesh2);
 		
+		scene.add(textMesh2);
+		textGeo.remove;
+		textMesh2.remove
+	
 	}
 	
 	
-	loadFont()
-	function animate() {
-	if (palletPlayer3!=0)
-		wallCollideFourPlayer()
-	else 
-		wallCollideTwoPlayer()
-	requestAnimationFrame(animate)
-	ballRotate();
+loadFont()
+function animate() {
 	controls.update()
+	requestAnimationFrame(animate)
 	if (composer){
 		renderer.render( scene, camera );
 		composer.render();	
 	}
 	else
-	renderer.render( sceneError, camera );
+		renderer.render( sceneError, camera );
+	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9|| score.scoreP4 > 9)
+		return;
+	if (palletPlayer3!=0)
+		wallCollideFourPlayer()
+	else 
+	{
+		palletReboundP1()
+		palletReboundP2()
+		wallCollideTwoPlayer()
+	}
+	ball.rotation.x +=  .1
 	ball.position.x +=( ballDirection.x ) * 0.3 * moveSpeed 
 	ball.position.z +=( ballDirection.z ) * 0.3 * moveSpeed 
 
