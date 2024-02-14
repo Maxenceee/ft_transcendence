@@ -1,27 +1,30 @@
-/*!
+/**!
 
 
 
 
 
 
- __  __                                                  ____                             
+ __  __                                                  ____
 |  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
 |_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
-   
 
 
 
 
 
 
-*/ /**!
- *   @license © Copyright 2022, All rights reserved.
+
+ */
+/**!
+ *   @license © Copyright 2024, All rights reserved.
  *   @author Maxence Gama, @maxencegama
  *   @contact contact@maxencegama.dev
- */ function c1(e, t) {
+ */
+
+function c1(e, t) {
     for (var n = 0; n < t.length; n++) {
         const r = t[n];
         if (typeof r != "string" && !Array.isArray(r)) {
@@ -6008,9 +6011,9 @@ function kf(e) {
 }
 function xf(e) {
     var t = e;
-    // console.log("-----------------------------------------------------------------")
+    console.log("-----------------------------------------------------------------")
     do {
-        // console.log("xf", t);
+        console.log("xf", t);
         var n = t.alternate;
         if (((e = t.return), t.flags & 32768)) {
             if (((n = g2(n, t)), n !== null)) {

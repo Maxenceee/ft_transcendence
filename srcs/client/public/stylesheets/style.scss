@@ -289,7 +289,6 @@ main {
 	min-width: 0;
 	position: relative;
 	overflow: auto;
-	background-color: var(--main-background);
 
 	.data {
 		height: 100vh;
@@ -891,5 +890,35 @@ progress[value]::after {
 		--progress-value: 0;
 	} to {
 		--progress-value: var(--value);
+	}
+}
+
+.video-player {
+	height: 100vh;
+	width: 50%;
+	max-width: 100vw;
+	object-fit: cover;
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: -1;
+
+	// mask: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.5) 20%, black 50%);
+	mask: linear-gradient(to left, transparent, black 100px);
+}
+
+.connection-page {
+	display: flex;
+	justify-content: flex-end;
+	min-height: 100vh;
+
+	section {
+		margin: 0 !important;
+		width: 60vw;
+		// backdrop-filter: blur(20px);
+		// -webkit-backdrop-filter: blur(20px);
+		// mask: linear-gradient(to right, transparent, black 60%, black 100%);;
 	}
 }
