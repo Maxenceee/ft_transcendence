@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ["localhost", "10.12.10.4"]
 
 INSTALLED_APPS = [
     'index',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,6 +56,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'back.urls'
+ASGI_APPLICATION = 'back.asgi.application'
 
 TEMPLATES = [
     {
@@ -79,7 +81,6 @@ WSGI_APPLICATION = 'back.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 
-# POSTGRES_DB = os.environ.get('POSTGRES_DB')
 POSTGRES_USER = os.environ.get('POSTGRES_USER')
 POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 
