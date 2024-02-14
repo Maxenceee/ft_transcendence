@@ -1,25 +1,25 @@
-FROM python:3.7-slim
+FROM python:3.9-slim
 
 RUN apt-get update -y && apt-get upgrade -y
 
 RUN pip install --upgrade pip
 
-RUN pip install Django psycopg2-binary python-dotenv channels
+RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv
 
 RUN mkdir /app
 
-COPY ./server/ /app/server
-
-WORKDIR /app/server
-
-COPY ./client /app/client
-
 EXPOSE 8000
 
-RUN python3 manage.py makemigrations
+WORKDIR /app/server
 
 COPY ./startup.sh ./
 
 RUN chmod +x ./startup.sh
+
+COPY ./client /app/client
+
+COPY ./server/ /app/server
+
+RUN python3 manage.py makemigrations
 
 CMD ["./startup.sh"]
