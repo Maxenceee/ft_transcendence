@@ -4,11 +4,11 @@ RUN apt-get update -y && apt-get upgrade -y
 
 RUN pip install --upgrade pip
 
-RUN pip install Django psycopg2-binary python-dotenv
+RUN pip install Django psycopg2-binary python-dotenv channels
 
 RUN mkdir /app
 
-COPY ./server/src /app/server
+COPY ./server/ /app/server
 
 WORKDIR /app/server
 
