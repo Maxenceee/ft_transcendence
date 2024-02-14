@@ -273,9 +273,6 @@ main {
   position: relative;
   overflow: auto;
 }
-main:not(.transparent) {
-  background-color: var(--main-background);
-}
 main .data {
   height: 100vh;
   overflow-y: scroll;
@@ -773,7 +770,7 @@ progress[value]::after {
 }
 .video-player {
   height: 100vh;
-  width: 80%;
+  width: 50%;
   max-width: 100vw;
   -o-object-fit: cover;
      object-fit: cover;
@@ -783,8 +780,8 @@ progress[value]::after {
   top: 0;
   bottom: 0;
   z-index: -1;
-  -webkit-mask: linear-gradient(to left, transparent 50%, black 0%);
-          mask: linear-gradient(to left, transparent 50%, black 0%);
+  -webkit-mask: linear-gradient(to left, transparent, black 100px);
+          mask: linear-gradient(to left, transparent, black 100px);
 }
 
 .connection-page {
