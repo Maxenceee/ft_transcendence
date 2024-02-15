@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+    website:
+        container_name: docker_django
+        build: 
+            context: ./srcs
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file:
+            - .env
+        ports:
+            - 3000:3000
+        networks:
+            - transcendence
+        depends_on:
+            postgres:
+                condition: service_healthy
+        restart: always
+
+    postgres:
+        container_name: docker_postgres
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        volumes: 
+          - postgres_volume:/var/lib/postgresql/data
+        networks:
+          - transcendence
+        healthcheck:
+            test: ["CMD", "pg_isready"]
+            interval: 10s
+            timeout: 15s
+            retries: 12
+
+networks:
+    transcendence:
+        name: transcendence
+        driver: bridge
+
+volumes:
+    postgres_volume:
+        name: postgres_volume
+        driver: local

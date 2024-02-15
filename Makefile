@@ -1,18 +1,42 @@
-NAME		=	express-tmp
-FORWARDPORT	=	3004
+SERVER_DIR	=	srcs
+NAME		=	docker_django
+FORWARDPORT	=	3000
+
+GREEN			=	\033[1;32m
+BLUE			=	\033[1;34m
+RED				=	\033[1;31m
+YELLOW			=	\033[1;33m
+DEFAULT			=	\033[0m
 
 all: up
 
+debug: all
+	@docker logs docker_django -f
+
 up:
-	cd srcs && \
-	docker build -t $(NAME) . && \
-	docker run -it -d -p $(FORWARDPORT):3000 --name $(NAME) $(NAME)
+	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
+	@docker compose up -d --build
+	@printf "$(GREEN)The server is running on http://localhost:$(FORWARDPORT)\n"
 
-re: clean up
+down:
+	@printf "$(RED)Stopping and removing the container...$(DEFAULT)\n"
+	@docker compose down --rmi all
+	@printf "$(BLUE)The container has been removed\n"
 
-clean:
-	-docker stop $(NAME)
-	-docker rm $(NAME)
-	-docker rmi $(NAME)
+re: down up
+
+status:
+	@docker ps -a
+
+clean: down
+	@printf "$(RED)Cleaning docker...$(DEFAULT)\n"
+	@docker system prune -af --volumes
+	@docker builder prune -af
+	@printf "$(BLUE)Docker has been cleaned\n"
+
+fclean: clean
+	@printf "$(RED)Cleaning data...$(DEFAULT)\n"
+	@./clean.sh
+	@printf "$(BLUE)Data has been cleaned\n"
 
 .PHONY: all up re clean
