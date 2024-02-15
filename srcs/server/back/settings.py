@@ -29,7 +29,8 @@ SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "10.12.10.4"]
+IP_LOCAL = os.environ.get('IP_LOCAL')
+ALLOWED_HOSTS = ["localhost", IP_LOCAL]
 
 
 # Application definition

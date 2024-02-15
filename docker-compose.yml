@@ -6,6 +6,7 @@ services:
         build: 
             context: ./srcs
         environment:
+            IP_LOCAL: ${IP_LOCAL}
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
         env_file:
