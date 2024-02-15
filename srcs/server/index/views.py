@@ -7,3 +7,9 @@ def index(request):
 
 def game(request):
     return render(request, 'views/game.html')
+
+def game4(request):
+    return render(request, 'views/game4.html')
+
+def gameError(request):
+    return render(request, 'views/gameError.html')
