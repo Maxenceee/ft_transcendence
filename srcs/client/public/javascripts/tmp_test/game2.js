@@ -486,9 +486,9 @@ composer.addPass( outputPass );
 let moveSpeed = 1.05
 
 
-// initiateMapFourPlayer({})
+initiateMapFourPlayer({})
 // initiateMapError({})
-initiateMapTwoPlayer({})
+// initiateMapTwoPlayer({})
 //serverside under it
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
