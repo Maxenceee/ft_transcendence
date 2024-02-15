@@ -52,7 +52,7 @@ camera.position.set( 15, 15, 20 );
 const controls = new OrbitControls( camera, renderer.domElement );
 const scene = new THREE.Scene();
 const sceneError = new THREE.Scene
-controls.maxDistance = 40
+controls.maxDistance = 50
 controls.target.set( 0, 0, 0 );
 controls.update();
 
@@ -67,15 +67,39 @@ const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jp
 const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
 const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
-scene.clear;
+let font, textGeo, materials,textMesh2
+
+var score = {
+	scoreP1: 0,
+	scoreP2: 0,
+	scoreP3: 0,
+	scoreP4: 0,
+};
+let P1score = 0, P2score, P3score, P4score
+
+function loadFont() {
+
+	const loader = new FontLoader();
+	loader.load( '/static/javascripts/font.json', function ( response ) {
+
+		font = response;
+
+		createText("");
+
+	} );
+}
 function  initScene(data)
 {
 	switch (data.mapType)
 	{
 		case 1 :
+		{
 			initiateMapTwoPlayer(data)
+		}
 		case 2 :
+		{
 			initiateMapFourPlayer(data)
+		}
 		default :
 		{
 			console.log("the fuck did you send ? " + data)
@@ -146,7 +170,7 @@ function initiateMapTwoPlayer(data)
 									})
 								);
 								repaire2.position.x +=2
-								scene.add( repaire, repaire1, repaire2);
+								// scene.add( repaire, repaire1, repaire2);
 //// end of the helper
 	palletPlayer2 = new THREE.Mesh( 
 		new THREE.BoxGeometry( 6, 1, 1 ), 
@@ -220,6 +244,7 @@ function initiateMapTwoPlayer(data)
 
 	palletPlayer1.position.z += (mapLenth/2) - 1.5
 	palletPlayer2.position.z -= (mapLenth/2) - 1.5
+	
 	scene.add(wallLeft, wallRight, wallP1, wallP2, ball)
 }
 
@@ -350,7 +375,7 @@ function initiateMapFourPlayer(data)
 
 
 	scene.add(wallLeft, wallRight, wallP1, wallP2, palletPlayer3, palletPlayer4, ball)
-	controls.maxDistance = 60
+	controls.maxDistance = 80
 }
 
 function initiateMapError()
@@ -461,17 +486,9 @@ composer.addPass( outputPass );
 let moveSpeed = 1.05
 
 
-let score = {
-	scoreP1: 0,
-	scoreP2: 0,
-	scoreP3: 0,
-	scoreP4: 0,
-};
-
-initiateMapFourPlayer({})
+// initiateMapFourPlayer({})
 // initiateMapError({})
-// initiateMapTwoPlayer({})
-
+initiateMapTwoPlayer({})
 //serverside under it
 document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -542,35 +559,36 @@ function createTextObject(msg) {
 	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
 	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
 	];
-	textObj = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
+	textObj = new THREE.Mesh( textGeo, materials)
 
 	return textObj;
 }
 
 
-let P1score, P2score, P3score, P4score
 function displayScore(){
-	scene.remove(P1score, P2score, P3score, P4score)
-	P1score = createTextObject(score.scoreP3 + "") //Red player
+
+	if (P1score != 0)
+		scene.remove(P1score, P2score, P3score, P4score)
+	P1score = createTextObject("" + score.scoreP3 + "") //Red player
 	P1score.position.z += 30
 	P1score.position.y += 6
 	P1score.position.x += 2.5
 	P1score.rotateY(Math.PI);
 
 	
-	P2score = createTextObject(score.scoreP4 + "") //Purple player
+	P2score = createTextObject("" + score.scoreP4 + "") //Purple player
 	P2score.position.z -= 30
 	P2score.position.y += 6
 	P2score.position.x -= 5
 	
 	
-	P3score = createTextObject(score.scoreP1 + "") //Cyan player
+	P3score = createTextObject("" + score.scoreP1 + "") //Cyan player
 	P3score.position.z += 2.5
 	P3score.position.y += 6
 	P3score.position.x -= 30
 	P3score.rotateY(Math.PI*0.5);
 	
-	P4score = createTextObject(score.scoreP2 + "") //Blue player
+	P4score = createTextObject("" + score.scoreP2 + "") //Blue player
 	P4score.position.z -= 2.5
 	P4score.position.y += 6
 	P4score.position.x += 30
@@ -678,21 +696,6 @@ if (palletPlayer1 != 0)
 	scene.add(palletPlayer1, palletPlayer2)
 
 
-
-
-let font, textGeo, materials, textMesh2
-function loadFont() {
-
-	const loader = new FontLoader();
-	loader.load( '/static/javascripts/font.json', function ( response ) {
-
-		font = response;
-
-		createText("");
-
-	} );
-}
-
 function createText(msg) {
 
 	scene.remove(textMesh2);
@@ -713,7 +716,7 @@ function createText(msg) {
 	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
 	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
 	];
-	textMesh2 = new THREE.Mesh( textGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ))
+	textMesh2 = new THREE.Mesh( textGeo, materials)
 	textMesh2.rotateX(-Math.PI * 0.5);
 	textMesh2.rotateZ(Math.PI * 0.5);
 	textMesh2.position.z += 12.5;
@@ -723,8 +726,7 @@ function createText(msg) {
 	scene.add(textMesh2);
 
 }
-	
-	
+
 loadFont()
 function animate() {
 	controls.update()
@@ -745,8 +747,7 @@ function animate() {
 		palletReboundP2()	
 		wallCollideFourPlayer()
 		}
-		else 
-	{
+	else {
 		palletReboundP1()
 		palletReboundP2()
 		wallCollideTwoPlayer()
