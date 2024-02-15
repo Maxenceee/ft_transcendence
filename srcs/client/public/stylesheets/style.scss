@@ -289,9 +289,6 @@ main {
 	min-width: 0;
 	position: relative;
 	overflow: auto;
-	&:not(.transparent) {	
-		background-color: var(--main-background);
-	}
 
 	.data {
 		height: 100vh;
@@ -898,7 +895,7 @@ progress[value]::after {
 
 .video-player {
 	height: 100vh;
-	width: 80%;
+	width: 50%;
 	max-width: 100vw;
 	object-fit: cover;
 	position: fixed;
@@ -907,17 +904,9 @@ progress[value]::after {
 	top: 0;
 	bottom: 0;
 	z-index: -1;
-	mask: linear-gradient(to left, transparent 50%, black 0%);
 
-	// &::before {
-	// 	content: "";
-	// 	position: absolute;
-	// 	top: 0;
-	// 	left: 0;
-	// 	width: 50%;
-	// 	height: 100%;
-	// 	z-index: 0;
-	// }
+	// mask: linear-gradient(to left, transparent, rgba(0, 0, 0, 0.5) 20%, black 50%);
+	mask: linear-gradient(to left, transparent, black 100px);
 }
 
 .connection-page {
