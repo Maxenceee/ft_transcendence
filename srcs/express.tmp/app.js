@@ -4,6 +4,8 @@ var cors = require('cors');
 var path = require('path');
 var fs = require('fs');
 var morgan = require('morgan');
+var uuid = require('uuid');
+const expressWs = require('express-ws');
 require('dotenv').config();
 
 /**
@@ -81,6 +83,58 @@ app.use(cors({
 	credentials: true,
 	origin: origin_list,
 }));
+
+
+/**
+ * Socket handler
+ */
+
+let playerSet = [];
+let playerPools = [];
+
+let getOpp = function(id) {
+	if (!playerPools.length) return
+	let el = playerPools.find(e => Object.keys(e).includes(id));
+	if (!el) return
+	let [player1, player2] = Object.values(el);
+	if (player1.id == id)
+		return player2;
+	return player1
+}
+
+expressWs(app);
+
+app.ws('/socket', function(ws, req) {
+	ws.id = uuid.v4();
+	console.info("new connection", ws.id);
+
+	if (playerSet.length == 1) {
+		let opp = playerSet.pop();
+		let data = {};
+		data[opp.id] = opp;
+		data[ws.id] = ws;
+		playerPools.push(data);
+	} else {
+		playerSet.push(ws);
+	}
+
+	ws.on('message', function(msg) {
+		let op = getOpp(ws.id)
+		if (op) {
+			op.send(msg);
+		}
+	});
+
+	ws.on('close', () => {
+		console.info("close connection", ws.id);
+		playerSet = playerSet.filter(e => e != ws.id);
+		let el = playerPools.find(e => Object.keys(e).includes(ws.id));
+		if (el) {
+			Object.values(el).forEach(e => e.close());
+		} 
+		playerPools = playerPools.filter(e => Object.keys(e).includes(ws.id));
+	});
+});
 
 
 /**
