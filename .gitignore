@@ -1,4 +1,4 @@
-.env
+# .env
 data/
 old_*
 .DS_Store
