@@ -14,18 +14,24 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 let socket = new Socket({path: "/socket"});
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
-	socket.send({type: 1, data :"truc"});
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
 
 socket.use((msg) =>{
-	console.log(msg);
+	// console.log(msg);
+	data=msg
+	score = msg.score
+	// console.log(data);
+	// if (msg.type == 2)
+		// ball.position.z = msg.data
 });
 
 
+
 let ball;
+
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -61,7 +67,6 @@ var score = {
 	scoreP3: 0,
 	scoreP4: 0,
 };
-let P1score = 0, P2score, P3score, P4score
 
 function loadFont() {
 
@@ -303,21 +308,46 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapTwoPlayer({})
 //serverside under it
-document.addEventListener("keydown", onDocumentKeyDown, false);
-function onDocumentKeyDown(event) {
-    var keyCode = event.which;
+document.addEventListener("keyup", onDocumentKeyUp, true);
 
-	if (keyCode == 68) 
-	{
-		socket.send(score)
-		palletPlayer1.position.x += mapWidth/60 ;
-	}
-	else if (keyCode == 65)
-		palletPlayer1.position.x-= mapWidth/60 ;
-	if (keyCode == 39) 
-		palletPlayer2.position.x -= mapWidth/60 ;
-	if (keyCode == 37) 
-		palletPlayer2.position.x += mapWidth/60 ;
+document.addEventListener("keydown", onDocumentKeyDown, true);
+// document.addEventListener("keydown", onDocumentKeyDown, false);
+function onDocumentKeyDown(event) {
+    let keyVar = event.which;
+
+	if (keyVar == 68)
+		keyCode.Key68 = 1
+	if (keyVar == 65)
+		keyCode.Key65 = 1
+	if (keyVar == 39)
+		keyCode.Key39 = 1
+	if (keyVar == 37)
+		keyCode.Key37 = 1
+	data.keyCode = keyCode
+	
+	socket.send({type:2, data})
+	palletPlayer1.position.x = data.P1position.x ;
+	palletPlayer2.position.x = data.P2position.x ;
+	// console.log(keyCode);
+}
+function onDocumentKeyUp(event) {
+    let keyVar = event.which;
+
+
+	if (keyVar == 68)
+		keyCode.Key68 = 0
+	if (keyVar == 65)
+		keyCode.Key65 = 0
+	if (keyVar == 39)
+		keyCode.Key39 = 0
+	if (keyVar == 37)
+		keyCode.Key37 = 0
+
+	data.keyCode = keyCode
+	
+	socket.send({type:2, data})
+	palletPlayer1.position.x = data.P1position.x ;
+	palletPlayer2.position.x = data.P2position.x ;
 	console.log(keyCode);
 }
 
@@ -341,20 +371,23 @@ function wallCollideTwoPlayer(){
 			ballDirection.x *= -1;
 	else if (ball.position.x > mapWidth/2 - 1)
 		ballDirection.x *= -1;
+
 	if (ball.position.z < -mapLenth/2 + 1)
 	{
-		score.scoreP2++
-		console.log("score P2 : "+score.scoreP2)
+		data.score.scoreP2++
+		console.log("score P2 : "+data.score.scoreP2)
 		resetBall()	
-		createText(score.scoreP2 + " : " + score.scoreP1)	
+		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
+		socket.send({type : 0, data:data})
 	}
 	else if (ball.position.z > mapLenth/2 - 1)
 	{
-		score.scoreP1++
-		console.log("score P1 : "+score.scoreP1)
+		data.score.scoreP1++
+		console.log("score P1 : "+data.score.scoreP1)
 		resetBall()
 		ballDirection.z *= -1;
-		createText(score.scoreP2 + " : " + score.scoreP1)
+		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+		socket.send({type : 0, data:data})
 	}
 	if (moveSpeed > 5)
 		moveSpeed = 5
@@ -415,7 +448,23 @@ function createText(msg) {
 	scene.add(textMesh2);
 
 }
+var keyCode = {
+	Key68 : 0,
+	Key65 : 0,
+	Key39 : 0,
+	Key37 : 0,
+}
 
+let data = {
+	ball : ball.position,
+	ballSpin : ball.rotation,
+	P1position : palletPlayer1.position,
+	P2position : palletPlayer2.position,
+	score : score,
+	keyCode : keyCode,
+	moveSpeed : moveSpeed,
+};
+socket.send({type : 0, data : data})
 loadFont()
 function animate() {
 	controls.update()
