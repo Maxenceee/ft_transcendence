@@ -15,7 +15,7 @@ def get_lobies(request):
     return HttpResponse('lobies page')
 
 def login(request):
-    return HttpResponse('login page')
+    return render(request, 'views/connection.html')
 
 def redirect(request, url):
     return render(request, 'views/index.html')
