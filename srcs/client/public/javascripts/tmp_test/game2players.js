@@ -309,7 +309,7 @@ let moveSpeed = 1.05
 initiateMapTwoPlayer({})
 //serverside under it
 document.addEventListener("keyup", onDocumentKeyUp, true);
-
+var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -324,10 +324,10 @@ function onDocumentKeyDown(event) {
 	if (keyVar == 37)
 		keyCode.Key37 = 1
 	data.keyCode = keyCode
-	
-	socket.send({type:2, data})
-	palletPlayer1.position.x = data.P1position.x ;
-	palletPlayer2.position.x = data.P2position.x ;
+	updatePlayer = 1;
+	// socket.send({type:2, data})
+	// palletPlayer1.position.x = data.P1position.x ;
+	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
 }
 function onDocumentKeyUp(event) {
@@ -344,21 +344,25 @@ function onDocumentKeyUp(event) {
 		keyCode.Key37 = 0
 
 	data.keyCode = keyCode
-	
-	socket.send({type:2, data})
-	palletPlayer1.position.x = data.P1position.x ;
-	palletPlayer2.position.x = data.P2position.x ;
-	console.log(keyCode);
+	updatePlayer = 1
+	// socket.send({type:2, data})
+	// palletPlayer1.position.x = data.P1position.x ;
+	// palletPlayer2.position.x = data.P2position.x ;
+	// console.log(keyCode);
 }
 
 function resetBall()
 {
-	ball.position.z = 0
-	ball.position.x = 0
-	ball.position.y = 0
+	data.ball.z = 0
+	data.ball.x = 0
+	data.ball.y = 0
 	moveSpeed = 1.05
-	ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
-	ballDirection.z = 1;
+	data.ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
+	data.ballDirection.z *= -1;
+	try {		
+		ball.position = data.ball// it throw a error cause the  position is read only
+	} catch (error) {
+	}
 }
 
 let ballDirection = {
@@ -366,51 +370,51 @@ let ballDirection = {
 	z : 0.5 + Math.random(),
 };
 
-function wallCollideTwoPlayer(){
-	if (ball.position.x < -mapWidth/2 + 1 )
-			ballDirection.x *= -1;
-	else if (ball.position.x > mapWidth/2 - 1)
-		ballDirection.x *= -1;
+// function wallCollideTwoPlayer(){
+// 	if (ball.position.x < -mapWidth/2 + 1 )
+// 			data.ballDirection.x *= -1;
+// 	else if (ball.position.x > mapWidth/2 - 1)
+// 			data.ballDirection.x *= -1;
 
-	if (ball.position.z < -mapLenth/2 + 1)
-	{
-		data.score.scoreP2++
-		console.log("score P2 : "+data.score.scoreP2)
-		resetBall()	
-		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
-		socket.send({type : 0, data:data})
-	}
-	else if (ball.position.z > mapLenth/2 - 1)
-	{
-		data.score.scoreP1++
-		console.log("score P1 : "+data.score.scoreP1)
-		resetBall()
-		ballDirection.z *= -1;
-		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
-		socket.send({type : 0, data:data})
-	}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-};
+// 	if (ball.position.z < -mapLenth/2 + 1)
+// 	{
+// 		console.log("score P2 : "+data.score.scoreP2)
+// 		resetBall()	
+// 		data.score.scoreP2++
+// 		data.ballDirection.z *= -1;
+// 		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
+// 	}
+// 	else if (ball.position.z > mapLenth/2 - 1)
+// 	{
+// 		data.score.scoreP1++
+// 		console.log("score P1 : "+data.score.scoreP1)
+// 		resetBall()
+// 		data.ballDirection.z *= -1;
+// 		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
+// 	}
+// 	if (moveSpeed > 5)
+// 		moveSpeed = 5
+// 	ballDirection = data.ballDirection
+// };
 
-function palletReboundP1(){
-	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 3) && ball.position.x > (palletPlayer1.position.x - 3)) )
-	{
-		ballDirection.z *= -1;
-		moveSpeed += 0.05
-	}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-};
-function palletReboundP2(){
-	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 3) && ball.position.x > (palletPlayer2.position.x - 3)) )
-	{
-		ballDirection.z *= -1;
-		moveSpeed += 0.05
-	}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-};
+// function palletReboundP1(){
+// 	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 4) && ball.position.x > (palletPlayer1.position.x - 4)) )
+// 	{
+// 		data.ballDirection.z *= -1;
+// 		moveSpeed += 0.05
+// 	}
+// 	if (moveSpeed > 5)
+// 		moveSpeed = 5
+// };
+// function palletReboundP2(){
+// 	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 4) && ball.position.x > (palletPlayer2.position.x - 4)) )
+// 	{
+// 		data.ballDirection.z *= -1;
+// 		moveSpeed += 0.05
+// 	}
+// 	if (moveSpeed > 5)
+// 		moveSpeed = 5
+// };
 //server side above
 
 
@@ -457,18 +461,20 @@ var keyCode = {
 
 let data = {
 	ball : ball.position,
+	ballDirection : ballDirection,
 	ballSpin : ball.rotation,
 	P1position : palletPlayer1.position,
 	P2position : palletPlayer2.position,
 	score : score,
 	keyCode : keyCode,
 	moveSpeed : moveSpeed,
+	updateScore : 0
 };
 socket.send({type : 0, data : data})
 loadFont()
-function animate() {
-	controls.update()
-	requestAnimationFrame(animate)
+
+const animate = async () => {
+
 	if (composer){
 		renderer.render( scene, camera );
 		composer.render();	
@@ -477,18 +483,33 @@ function animate() {
 		renderer.render( sceneError, camera );
 	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9 || score.scoreP4 > 9)
 	{
+		// resetBall()
 		scene.remove(ball);
 		return;
 	}
-	palletReboundP1()
-	palletReboundP2()
-	wallCollideTwoPlayer()
+	// palletReboundP1()
+	// palletReboundP2()
+	// wallCollideTwoPlayer()
+	if (data.updateScore == 1)
+		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
 	ball.rotation.x +=  .1
-	ball.position.x +=( ballDirection.x ) * 0.3 * moveSpeed 
-	ball.position.z +=( ballDirection.z ) * 0.3 * moveSpeed 
-
+	ball.position.x = data.ball.x
+	ball.position.z = data.ball.z
+	palletPlayer1.position.x = data.P1position.x ;
+	palletPlayer2.position.x = data.P2position.x ;
+	await sleep(33)
+	// if (updatePlayer == 1)
+	// {
+		socket.send({type : 0, data:data})	
+		// updatePlayer = 0;
+	// }
+	controls.update()
+	requestAnimationFrame(animate)
 }
-animate();
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+sleep(500).then(() => {animate(); });
+// animate()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
 
