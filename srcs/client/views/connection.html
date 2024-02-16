@@ -3,21 +3,128 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>ft_transcendence</title>
+	<title>Connexion Transcendence</title>
 	<meta name="author" content="mgama,ngennaro,mbrement,elamadon" />
+	<link rel="icon" type="image/ico" href="/static/images/favicon-16x16.png" sizes="16x16">
+	<link rel="apple-touch-icon" href="/static/images/favicon-32x32.png" sizes="32x32">
+	<link rel="shortcut icon" type="image/png" href="/static/images/favicon.ico"/>
+	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
+	<link rel="preload" as="image" href="/static/images/favicon.ico">
 	<link rel="stylesheet" href="/static/stylesheets/style.css">
 	<link rel="preload" type="video/mp4" as="video" href="/static/videos/0001-0150.mp4">
+	<link rel="preload" type="image/png" as="image" href="/static/images/pong_visal_1.png">
 </head>
 <body class="variant">
-	<main class="transparent">
+	<main>
 		<div class="connection-page">
 			<video class="video-player" autoplay loop muted poster="/static/images/pong_visal_1.png">
 				<source src="/static/videos/0001-0150.mp4" type="video/mp4">
 			</video>
 			<section>
-
+				<div class="semi">
+					<div class="cntc">
+						<div class="auth-form">
+							<!-- doit etre rendu si la mot de pass est invalide -->
+							<!-- <% if (locals.is_invalid) { %>
+							<div>
+								<div class="auth-unauthorized">
+									<div class="in">
+										<div aria-atomic="true" role="alert">
+											<strong>Nom d'utilisateur</strong> ou <strong>Mot de passe</strong> incorrect.
+										</div>
+									</div>
+								</div>
+							</div>
+							<% } %> -->
+							<div class="auth-form-body">
+								<h1>Connexion</h1>
+								<form data-turbo="false" action="/login" accept-charset="UTF-8" method="post">
+									<div class="auth-form-input">
+										<div class="ttpo form-input">
+											<label class="f0n8F">
+												<span class="_9nyy2">Nom d'utilisateur</span>
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="">
+											</label>
+										</div>
+										<div class="ttpo form-input">
+											<!-- <% if (locals.redirect) { %>
+												<input type="hidden" name="redirect" id="redirect" value="<%= redirect %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.return_to) { %>
+												<input type="hidden" name="return_to" id="return_to" value="<%= return_to %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.timestamp) { %>
+												<input type="hidden" name="timestamp" id="timestamp" value="<%= timestamp %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.client_id) { %>
+												<input type="hidden" name="client_id" id="client_id" value="<%= client_id %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.login) { %>
+												<input type="hidden" name="credential_type" value="password">
+												<input type="hidden" name="login" id="login" value="<%= login %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.login_scope) { %>
+												<input type="hidden" name="login_scope" id="login_scope" value="<%= login_scope %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.sudo_state) { %>
+												<input type="hidden" name="sudo_state" id="sudo_state" value="<%= sudo_state %>" autocomplete="off" readonly>
+											<% } %>
+											<% if (locals.sudo_hash) { %>
+												<input type="hidden" name="sudo_hash" id="sudo_hash" value="<%= sudo_hash %>" autocomplete="off" readonly>
+											<% } %> -->
+											<label class="f0n8F">
+												<span class="_9nyy2">Mot de passe</span>
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
+											</label>
+										</div>
+										<!-- <input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource"> -->
+										<input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
+									</div>
+									<div class="card-separator">
+										<!-- <div class="separator-text">Or</div> -->
+									</div>
+									<div class="external-connect">
+										<div>
+											<div id="intra-button" class="external-connect-btn intra-button">
+												<img class="icon" src="/static/images/42_logo_black-684989d43d629b3c0ff6fd7e1157ee04db9bb7a73fba8ec4e01543d650a1c607.png" alt="icon-42">
+												<div class="inner">Sign in with 42 Intra</div>
+											</div>
+											<div id="swivel-ref-h" class="external-connect-btn"></div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
 			</section>
 		</div>
 	</main>
+	<script src="https://cdn.maxencegama.dev/swivel/button"></script>
+	<script defer>
+		document.querySelectorAll(".f0n8F").forEach((e) => {
+			e.querySelector("input").oninput = (ev) => {
+				ev.target.parentNode.classList.toggle("FATdn", ev.target.value.length > 0);
+			};
+		});
+	</script>
+	<script defer>
+		// test de connexion avec 42 (https://profile.intra.42.fr/oauth/applications/20463)
+		document.getElementById("intra-button").onclick = () => {
+			window.location.replace("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback%2Fintra&response_type=code")
+		};
+	</script>
+	<script defer>
+		// test de connexion avec swivel (https://maxencegama.dev/swivel)
+		let s = new Swivel(document.getElementById("swivel-ref-h")),
+			u = new URL(document.location);
+		s.init(
+			"4fMHysGNahEaKcmx8LaS",
+			"http://localhost:3000",
+			"http://localhost:3000/callback/swivel",
+			"user:apidata",
+			true
+		);
+	</script>
 </body>
 </html>
