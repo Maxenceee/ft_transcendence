@@ -1217,9 +1217,9 @@ body:has(.connection-page) {
   border-style: solid;
   border-width: 1px;
   border-radius: 6px;
-  background-image: linear-gradient(rgba(248, 81, 73, 0.15), rgba(248, 81, 73, 0.15));
-  border-color: rgba(248, 81, 73, 0.4);
-  color: var(--color-btn-text);
+  background-image: linear-gradient(rgba(248, 81, 73, 0.25), rgba(248, 81, 73, 0.25));
+  border-color: rgba(248, 81, 73, 0.5);
+  color: #FFF;
 }
 .auth-unauthorized .in {
   padding-right: 8px !important;
@@ -1357,9 +1357,46 @@ body:has(.connection-page) {
 }
 
 .external-connect {
-  display: flex;
   width: 100%;
-  padding: auto;
-  flex-direction: column;
-  align-items: center;
+}
+.external-connect > div {
+  width: -moz-max-content;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.external-connect-btn {
+  margin: 10px 0;
+}
+
+.intra-button {
+  --intra-btn-background: #ffffff;
+  --intra-btn-text: #000000;
+  --intra-btn-border-radius: 4px;
+  height: 44px;
+  background-color: var(--intra-btn-background);
+  border-radius: var(--intra-btn-border-radius);
+  transition: background-color 0.5s ease;
+  padding: 5px 25px;
+  margin: 5px 0;
+  display: flex;
+  flex: 1 auto;
+  position: relative;
+}
+.intra-button .inner {
+  margin: auto 0px;
+  cursor: default;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 19px;
+  color: var(--intra-btn-text);
+  transition: color 0.5s ease;
+}
+.intra-button .icon {
+  height: 21px;
+  width: 21px;
+  vertical-align: baseline;
+  margin: auto 0;
+  display: inline-block;
+  margin-right: 10px;
 }

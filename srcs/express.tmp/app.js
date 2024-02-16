@@ -152,6 +152,13 @@ app.get('/:page', (req, res, next) => {
 	res.status(200).sendFile(p);
 });
 
+app.post('/login', (req, res) => {
+	console.log("login body", req.body);
+	res.writeHead(302, {
+		'Location': '/connection.html'
+	}).end();
+});
+
 app.use((_, res) => {
 	res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/index.html'));
 });
