@@ -21,9 +21,14 @@ socket.onclose(() => {
 
 socket.use((msg) =>{
 	// console.log(msg);
-	data=msg
-	score = msg.score
-	// console.log(data);
+	if (msg.number < data.number)
+		;
+	else
+	{
+		data=msg
+		score = msg.score
+	}
+		// console.log(data);
 	// if (msg.type == 2)
 		// ball.position.z = msg.data
 });
@@ -59,7 +64,7 @@ const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jp
 const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
 const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
-let font, textGeo, materials,textMesh2
+let font, textGeo, textMesh2
 
 var score = {
 	scoreP1: 0,
@@ -308,7 +313,7 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapTwoPlayer({})
 //serverside under it
-document.addEventListener("keyup", onDocumentKeyUp, true);
+// document.addEventListener("keyup", onDocumentKeyUp, true);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -316,13 +321,25 @@ function onDocumentKeyDown(event) {
     let keyVar = event.which;
 
 	if (keyVar == 68)
+	{
 		keyCode.Key68 = 1
+		keyCode.Key65 = 0
+	}
 	if (keyVar == 65)
+	{
 		keyCode.Key65 = 1
+		keyCode.Key68 = 0
+	}
 	if (keyVar == 39)
+	{
 		keyCode.Key39 = 1
+		keyCode.Key37 = 0
+	}
 	if (keyVar == 37)
+	{
+		keyCode.Key39 = 0
 		keyCode.Key37 = 1
+	}
 	data.keyCode = keyCode
 	updatePlayer = 1;
 	// socket.send({type:2, data})
@@ -330,26 +347,26 @@ function onDocumentKeyDown(event) {
 	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
 }
-function onDocumentKeyUp(event) {
-    let keyVar = event.which;
+// function onDocumentKeyUp(event) {
+//     let keyVar = event.which;
 
 
-	if (keyVar == 68)
-		keyCode.Key68 = 0
-	if (keyVar == 65)
-		keyCode.Key65 = 0
-	if (keyVar == 39)
-		keyCode.Key39 = 0
-	if (keyVar == 37)
-		keyCode.Key37 = 0
+// 	if (keyVar == 68)
+// 		keyCode.Key68 = 0
+// 	if (keyVar == 65)
+// 		keyCode.Key65 = 0
+// 	if (keyVar == 39)
+// 		keyCode.Key39 = 0
+// 	if (keyVar == 37)
+// 		keyCode.Key37 = 0
 
-	data.keyCode = keyCode
-	updatePlayer = 1
-	// socket.send({type:2, data})
-	// palletPlayer1.position.x = data.P1position.x ;
-	// palletPlayer2.position.x = data.P2position.x ;
-	// console.log(keyCode);
-}
+// 	data.keyCode = keyCode
+// 	updatePlayer = 1
+// 	// socket.send({type:2, data})
+// 	// palletPlayer1.position.x = data.P1position.x ;
+// 	// palletPlayer2.position.x = data.P2position.x ;
+// 	// console.log(keyCode);
+// }
 
 function resetBall()
 {
@@ -417,7 +434,10 @@ let ballDirection = {
 // };
 //server side above
 
-
+const 	materials = [
+	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+	];
 if (palletPlayer1 != 0)
 	scene.add(palletPlayer1, palletPlayer2)
 
@@ -438,10 +458,7 @@ function createText(msg) {
 		bevelEnabled: true
 
 	} );
-	materials = [
-	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-	];
+
 	textMesh2 = new THREE.Mesh( textGeo, materials)
 	textMesh2.rotateX(-Math.PI * 0.5);
 	textMesh2.rotateZ(Math.PI * 0.5);
@@ -450,7 +467,7 @@ function createText(msg) {
 	textMesh2.position.y -= 2;
 	
 	scene.add(textMesh2);
-
+	textGeo.dispose()
 }
 var keyCode = {
 	Key68 : 0,
@@ -460,6 +477,7 @@ var keyCode = {
 }
 
 let data = {
+	number : 0,
 	ball : ball.position,
 	ballDirection : ballDirection,
 	ballSpin : ball.rotation,
@@ -472,7 +490,7 @@ let data = {
 };
 socket.send({type : 0, data : data})
 loadFont()
-
+let counter =0
 const animate = async () => {
 
 	if (composer){
@@ -481,30 +499,33 @@ const animate = async () => {
 	}
 	else
 		renderer.render( sceneError, camera );
+	controls.update()
+	requestAnimationFrame(animate)
 	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9 || score.scoreP4 > 9)
 	{
-		// resetBall()
+		resetBall()
+		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
 		scene.remove(ball);
 		return;
 	}
 	// palletReboundP1()
 	// palletReboundP2()
 	// wallCollideTwoPlayer()
-	if (data.updateScore == 1)
-		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
-	ball.rotation.x +=  .1
-	ball.position.x = data.ball.x
-	ball.position.z = data.ball.z
-	palletPlayer1.position.x = data.P1position.x ;
-	palletPlayer2.position.x = data.P2position.x ;
-	await sleep(33)
-	// if (updatePlayer == 1)
-	// {
-		socket.send({type : 0, data:data})	
-		// updatePlayer = 0;
-	// }
-	controls.update()
-	requestAnimationFrame(animate)
+	if (data.number > counter)
+	{
+		if (data.updateScore == 1)
+			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+		ball.rotation.x +=  .1
+		ball.position.x = data.ball.x
+		ball.position.z = data.ball.z
+		palletPlayer1.position.x = data.P1position.x ;
+		palletPlayer2.position.x = data.P2position.x ;
+		counter = data.number
+	}
+	
+	
+	socket.send({type : 0, data:data})	
+	await sleep(25)
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
