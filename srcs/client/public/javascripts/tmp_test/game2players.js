@@ -320,6 +320,10 @@ document.addEventListener("keydown", onDocumentKeyDown, true);
 function onDocumentKeyDown(event) {
     let keyVar = event.which;
 
+	keyCode.Key37 = 0
+	keyCode.Key65 = 0
+	keyCode.Key68 = 0
+	keyCode.Key39 = 0
 	if (keyVar == 68)
 	{
 		keyCode.Key68 = 1
@@ -490,7 +494,8 @@ let data = {
 };
 socket.send({type : 0, data : data})
 loadFont()
-let counter =0
+let counter = 0
+var endScore = 0;
 const animate = async () => {
 
 	if (composer){
@@ -504,7 +509,11 @@ const animate = async () => {
 	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9 || score.scoreP4 > 9)
 	{
 		resetBall()
-		createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+		if (endScore == 0)
+		{
+			endScore = 1;
+			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+		}
 		scene.remove(ball);
 		return;
 	}
@@ -525,7 +534,7 @@ const animate = async () => {
 	
 	
 	socket.send({type : 0, data:data})	
-	await sleep(25)
+	await sleep(50)
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))

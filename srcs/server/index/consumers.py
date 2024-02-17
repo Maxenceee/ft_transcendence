@@ -23,6 +23,7 @@ class websocket_client(WebsocketConsumer):
 		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
 			self.data['P2position']['x'] += 1.1
 			self.data['keyCode']['Key37'] = 0
+		return self.data
 		
 	
 	def wallCollideTwoPlayer(self):
@@ -57,7 +58,7 @@ class websocket_client(WebsocketConsumer):
 
 	def reboundP1(self):
 		if self.data['ball']['z'] > 27 and (self.data['ball']['x'] < (self.data['P1position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P1position']['x'] - 4)):
-			self.data['ballDirection']['z'] *= -1	
+			self.data['ballDirection']['z'] = -1	
 			self.data['moveSpeed'] += 0.1
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
@@ -65,7 +66,7 @@ class websocket_client(WebsocketConsumer):
 		
 	def reboundP2(self):
 		if self.data['ball']['z'] < -27 and (self.data['ball']['x'] < (self.data['P2position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P2position']['x'] - 4)):
-			self.data['ballDirection']['z'] *= -1
+			self.data['ballDirection']['z'] = 1
 			self.data['moveSpeed'] += 0.1
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
@@ -88,7 +89,7 @@ class websocket_client(WebsocketConsumer):
 		# elif tmp['type'] == 2:
 		# if self.data['score']['scoreP1'] > 10 or self.data['score']['scoreP2'] > 10 :
 			# return
-		self.playerMove()
+		self.data = self.playerMove()
 		self.data = self.reboundP1()
 		self.data = self.reboundP2()
 		# logging.info("before")
