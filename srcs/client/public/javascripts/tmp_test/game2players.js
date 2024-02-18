@@ -320,28 +320,28 @@ document.addEventListener("keydown", onDocumentKeyDown, true);
 function onDocumentKeyDown(event) {
     let keyVar = event.which;
 
-	keyCode.Key37 = 0
-	keyCode.Key65 = 0
-	keyCode.Key68 = 0
-	keyCode.Key39 = 0
+	// keyCode.Key37 = 0
+	// keyCode.Key65 = 0
+	// keyCode.Key68 = 0
+	// keyCode.Key39 = 0
 	if (keyVar == 68)
 	{
 		keyCode.Key68 = 1
-		keyCode.Key65 = 0
+		// keyCode.Key65 = 0
 	}
-	if (keyVar == 65)
+	else if (keyVar == 65)
 	{
 		keyCode.Key65 = 1
-		keyCode.Key68 = 0
+		// keyCode.Key68 = 0
 	}
 	if (keyVar == 39)
 	{
 		keyCode.Key39 = 1
-		keyCode.Key37 = 0
+		// keyCode.Key37 = 0
 	}
-	if (keyVar == 37)
+	else if (keyVar == 37)
 	{
-		keyCode.Key39 = 0
+		// keyCode.Key39 = 0
 		keyCode.Key37 = 1
 	}
 	data.keyCode = keyCode
@@ -350,6 +350,7 @@ function onDocumentKeyDown(event) {
 	// palletPlayer1.position.x = data.P1position.x ;
 	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
+	console.log(keyCode);
 }
 // function onDocumentKeyUp(event) {
 //     let keyVar = event.which;
@@ -529,6 +530,7 @@ const animate = async () => {
 		ball.position.z = data.ball.z
 		palletPlayer1.position.x = data.P1position.x ;
 		palletPlayer2.position.x = data.P2position.x ;
+		// keyCode = data.keyCode ;
 		counter = data.number
 	}
 	

@@ -14,29 +14,26 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 let socket = new Socket({path: "/socket"});
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
-	socket.send({type: "data"});
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
 
-
-
-// let  callBack = (data) => {
-// 	switch (data.type) {
-// 		case 'playerPos':
-// 			playerMovement(data)
-// 			break
-// 		case 'mapType':
-// 			initScene(data)
-// 			break;
-// 		default :
-// 			console.log("the fuck did you send ? " + data)
-// 		}
-// }
 socket.use((msg) =>{
-	console.log(msg);
+	// console.log(msg);
+	if (msg.number < data.number)
+		;
+	else
+	{
+		data=msg
+		score = msg.score
+	}
+		// console.log(data);
+	// if (msg.type == 2)
+		// ball.position.z = msg.data
 });
+
+
 
 let ball;
 
@@ -67,7 +64,7 @@ const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jp
 const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
 const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
-let font, textGeo, materials,textMesh2
+let font, textGeo, textMesh2
 
 var score = {
 	scoreP1: 0,
@@ -75,7 +72,6 @@ var score = {
 	scoreP3: 0,
 	scoreP4: 0,
 };
-let P1score = 0, P2score, P3score, P4score
 
 function loadFont() {
 
@@ -89,40 +85,19 @@ function loadFont() {
 	} );
 }
 
-// function  initScene(data)
-// {
-// 	switch (data.mapType)
-// 	{
-// 		case 1 :
-// 		{
-// 			initiateMapTwoPlayer(data)
-// 		}
-// 		case 2 :
-// 		{
-// 			initiateMapFourPlayer(data)
-// 		}
-// 		default :
-// 		{
-// 			console.log("the fuck did you send ? " + data)
-// 			initiateMapError();
-// 		}
-// 	}
-// }
 let palletPlayer1 = 0;
 let palletPlayer2 = 0;
 let palletPlayer3 = 0;
 let palletPlayer4 = 0;
 let mapLenth
 let mapWidth
-function initiateMapFourPlayer(data)
+function initiateMapFourPlayer()
 {
 	score.scoreP1 = 5
 	score.scoreP2 = 5
 	score.scoreP3 = 5
 	score.scoreP4 = 5
 	/// temporary for dev purpose///
-	data.player1Map = player1Map;
-	data.player2Map = player2Map;
 	/// temporary for dev purpose///
 	
 	mapLenth = 60;	
@@ -244,6 +219,7 @@ function initiateMapFourPlayer(data)
 	controls.maxDistance = 80
 }
 
+
 //debuging
 
 
@@ -328,46 +304,108 @@ composer.addPass( outputPass );
 let moveSpeed = 1.05
 
 
-initiateMapFourPlayer({})
+// initiateMapFourPlayer({})
 // initiateMapError({})
-// initiateMapTwoPlayer({})
+initiateMapFourPlayer({})
 //serverside under it
-document.addEventListener("keydown", onDocumentKeyDown, false);
+// document.addEventListener("keyup", onDocumentKeyUp, true);
+var updatePlayer = 0;
+document.addEventListener("keydown", onDocumentKeyDown, true);
+// document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
-    var keyCode = event.which;
+    let keyVar = event.which;
 
-	if (keyCode == 68) 
-		palletPlayer1.position.x += mapWidth/60 ;
-	else if (keyCode == 65)
-		palletPlayer1.position.x-= mapWidth/60 ;
-	if (keyCode == 39) 
-		palletPlayer2.position.x -= mapWidth/60 ;
-	if (keyCode == 37) 
-		palletPlayer2.position.x += mapWidth/60 ;
-
-
-    if (palletPlayer3 != 0)
+	// keyCode.Key37 = 0
+	// keyCode.Key65 = 0
+	// keyCode.Key68 = 0
+	// keyCode.Key39 = 0
+	if (keyVar == 68)
 	{
-	if (keyCode == 81) 
-		palletPlayer3.position.z += mapWidth/60 ;
-	else if (keyCode == 69) 
-		palletPlayer3.position.z-= mapWidth/60  ;
-	if (keyCode == 90) 
-		palletPlayer4.position.z -= mapWidth/60 ;
-	else if (keyCode == 67) 
-		palletPlayer4.position.z += mapWidth/60 ;
+		keyCode.Key68 = 1
+		keyCode.Key65 = 0
 	}
+	else if (keyVar == 65)
+	{
+		keyCode.Key65 = 1
+		keyCode.Key68 = 0
+	}
+	if (keyVar == 39)
+	{
+		keyCode.Key39 = 1
+		keyCode.Key37 = 0
+	}
+	else if (keyVar == 37)
+	{
+		keyCode.Key39 = 0
+		keyCode.Key37 = 1
+	}
+	
+	
+	// keyCode.Key81 = 0
+	// keyCode.Key69 = 0
+	// keyCode.Key90 = 0
+	// keyCode.Key67 = 0
+
+	if (keyVar == 81)
+	{
+		keyCode.Key81 = 1
+		keyCode.Key69 = 0
+	}
+	else if (keyVar == 69)
+	{
+		keyCode.Key81 = 0
+		keyCode.Key69 = 1
+	}
+	if (keyVar == 90)
+	{
+		keyCode.Key90 = 1
+		keyCode.Key67 = 0
+	}
+	else if (keyVar == 67)
+	{
+		keyCode.Key90 = 0
+		keyCode.Key67 = 1
+	}
+	data.keyCode = keyCode
+	updatePlayer = 1;
+	// socket.send({type:2, data})
+	// palletPlayer1.position.x = data.P1position.x ;
+	// palletPlayer2.position.x = data.P2position.x ;
 	console.log(keyCode);
 }
+// function onDocumentKeyUp(event) {
+//     let keyVar = event.which;
+
+
+// 	if (keyVar == 68)
+// 		keyCode.Key68 = 0
+// 	if (keyVar == 65)
+// 		keyCode.Key65 = 0
+// 	if (keyVar == 39)
+// 		keyCode.Key39 = 0
+// 	if (keyVar == 37)
+// 		keyCode.Key37 = 0
+
+// 	data.keyCode = keyCode
+// 	updatePlayer = 1
+// 	// socket.send({type:2, data})
+// 	// palletPlayer1.position.x = data.P1position.x ;
+// 	// palletPlayer2.position.x = data.P2position.x ;
+// 	// console.log(keyCode);
+// }
 
 function resetBall()
 {
-	ball.position.z = 0
-	ball.position.x = 0
-	ball.position.y = 0
+	data.ball.z = 0
+	data.ball.x = 0
+	data.ball.y = 0
 	moveSpeed = 1.05
-	ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
-	ballDirection.z = 1;
+	data.ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
+	data.ballDirection.z *= -1;
+	try {		
+		ball.position = data.ball// it throw a error cause the  position is read only
+	} catch (error) {
+	}
 }
 
 let ballDirection = {
@@ -376,10 +414,14 @@ let ballDirection = {
 };
 
 
+const 	materials = [
+	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
+	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
+	];
+if (palletPlayer1 != 0)
+	scene.add(palletPlayer1, palletPlayer2)
 
-
-
-
+let P1score = 0, P2score, P3score, P4score
 
 function createTextObject(msg) {
 	let textObj
@@ -397,40 +439,35 @@ function createTextObject(msg) {
 		bevelEnabled: true
 
 	} );
-	materials = [
-	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-	];
 	textObj = new THREE.Mesh( textGeo, materials)
 
 	return textObj;
 }
 
-
 function displayScore(){
 
 	if (P1score != 0)
 		scene.remove(P1score, P2score, P3score, P4score)
-	P1score = createTextObject("" + score.scoreP3 + "") //Red player
+	P1score = createTextObject("" + score.scoreP1 + "") //Red player
 	P1score.position.z += 30
 	P1score.position.y += 6
 	P1score.position.x += 2.5
 	P1score.rotateY(Math.PI);
 
 	
-	P2score = createTextObject("" + score.scoreP4 + "") //Purple player
+	P2score = createTextObject("" + score.scoreP2 + "") //Purple player
 	P2score.position.z -= 30
 	P2score.position.y += 6
 	P2score.position.x -= 5
 	
 	
-	P3score = createTextObject("" + score.scoreP1 + "") //Cyan player
+	P3score = createTextObject("" + score.scoreP3 + "") //Cyan player
 	P3score.position.z += 2.5
 	P3score.position.y += 6
 	P3score.position.x -= 30
 	P3score.rotateY(Math.PI*0.5);
 	
-	P4score = createTextObject("" + score.scoreP2 + "") //Blue player
+	P4score = createTextObject("" + score.scoreP4 + "") //Blue player
 	P4score.position.z -= 2.5
 	P4score.position.y += 6
 	P4score.position.x += 30
@@ -438,81 +475,6 @@ function displayScore(){
 	
 	scene.add(P1score, P2score, P3score, P4score)
 }
-
-function wallCollideFourPlayer(){
-	let hit = false
-	if (ball.position.x < -mapWidth/2 + 1 )
-	{
-		moveSpeed += 0.05
-		score.scoreP1--
-		console.log("score P1 : "+score.scoreP1)
-		resetBall()
-		hit = true
-		displayScore()
-	}
-
-	else if (ball.position.x > mapWidth/2 - 1)
-	{
-		moveSpeed += 0.05
-		score.scoreP2--
-		console.log("score P2 : "+score.scoreP2)
-		resetBall()
-		hit = true
-		displayScore()
-	}
-
-	if (ball.position.z < -mapLenth/2 + 1)
-	{
-		moveSpeed += 0.05 
-		score.scoreP4--
-		console.log("score P4 : "+score.scoreP4)
-		resetBall()
-		hit = true
-		displayScore()
-	}
-
-	else if (ball.position.z > mapLenth/2 - 1)
-	{
-		moveSpeed += 0.05
-		score.scoreP3--
-		console.log("score P3 : "+score.scoreP3)
-		resetBall()
-		hit = true
-		displayScore()
-	}
-	if (hit)
-		{
-			ballDirection.z = THREE.MathUtils.randFloat(-1, 1)
-			ballDirection.x = THREE.MathUtils.randFloat(-1, 1)
-		}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-	};
-
-function palletReboundP1(){
-	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 3) && ball.position.x > (palletPlayer1.position.x - 3)) )
-	{
-		ballDirection.z *= -1;
-		moveSpeed += 0.05
-	}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-};
-function palletReboundP2(){
-	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 3) && ball.position.x > (palletPlayer2.position.x - 3)) )
-	{
-		ballDirection.z *= -1;
-		moveSpeed += 0.05
-	}
-	if (moveSpeed > 5)
-		moveSpeed = 5
-};
-//server side above
-
-
-if (palletPlayer1 != 0)
-	scene.add(palletPlayer1, palletPlayer2)
-
 
 function createText(msg) {
 
@@ -530,10 +492,7 @@ function createText(msg) {
 		bevelEnabled: true
 
 	} );
-	materials = [
-	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-	new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-	];
+
 	textMesh2 = new THREE.Mesh( textGeo, materials)
 	textMesh2.rotateX(-Math.PI * 0.5);
 	textMesh2.rotateZ(Math.PI * 0.5);
@@ -542,29 +501,83 @@ function createText(msg) {
 	textMesh2.position.y -= 2;
 	
 	scene.add(textMesh2);
-
+	textGeo.dispose()
+}
+var keyCode = {
+	Key68 : 0,
+	Key65 : 0,
+	Key39 : 0,
+	Key37 : 0,
+	Key81 : 0,
+	Key69 : 0,
+	Key90 : 0,
+	Key67 : 0,
 }
 
+let data = {
+	number : 0,
+	ball : ball.position,
+	ballDirection : ballDirection,
+	ballSpin : ball.rotation,
+	P1position : palletPlayer1.position,
+	P2position : palletPlayer2.position,
+	P3position : palletPlayer3.position,
+	P4position : palletPlayer4.position,
+	score : score,
+	keyCode : keyCode,
+	moveSpeed : moveSpeed,
+	updateScore : 0
+};
+socket.send({type : 1, data : data})
 loadFont()
-function animate() {
+let counter = 0
+var endScore = 0;
+const animate = async () => {
+
+	if (composer){
+		renderer.render( scene, camera );
+		composer.render();	
+	}
+	else
+		renderer.render( sceneError, camera );
 	controls.update()
 	requestAnimationFrame(animate)
-	renderer.render( scene, camera );
-	composer.render();	
-	if (score.scoreP4 < 0 || score.scoreP1 < 0 || score.scoreP2 < 0 || score.scoreP3 < 0)
+	if (score.scoreP1 < 1 || score.scoreP2 < 1 || score.scoreP3 < 1 || score.scoreP4 < 1)
 	{
+		resetBall()
+		if (endScore == 0)
+		{
+			endScore = 1;
+			displayScore()
+		}
 		scene.remove(ball);
 		return;
 	}
-	palletReboundP1()
-	palletReboundP2()	
-	wallCollideFourPlayer()
-	ball.rotation.x +=  .1
-	ball.position.x +=( ballDirection.x ) * 0.3 * moveSpeed 
-	ball.position.z +=( ballDirection.z ) * 0.3 * moveSpeed 
-
+	// palletReboundP1()
+	// palletReboundP2()
+	// wallCollideTwoPlayer()
+	if (data.number > counter)
+	{
+		if (data.updateScore == 1)
+			displayScore()
+		ball.rotation.x +=  .1
+		ball.position.x = data.ball.x
+		ball.position.z = data.ball.z
+		palletPlayer1.position.x = data.P1position.x ;
+		palletPlayer2.position.x = data.P2position.x ;
+		palletPlayer3.position.z = data.P3position.z ;
+		palletPlayer4.position.z = data.P4position.z ;
+		counter = data.number
+	}
+	
+	
+	socket.send({type : 1, data:data})	
+	await sleep(50)
 }
-animate();
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+sleep(500).then(() => {animate(); });
+// animate()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
 

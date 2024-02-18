@@ -13,3 +13,6 @@ def game4(request):
 
 def gameError(request):
     return render(request, 'views/gameError.html')
+
+def gameWin(request):
+    return render(request, 'views/gameWin.html')
