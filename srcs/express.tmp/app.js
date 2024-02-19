@@ -146,7 +146,17 @@ app.ws('/socket', function(ws, req) {
 app.get('/:page', (req, res, next) => {
 	if (!req.params.page || req.params.page == "index.html")
 		return res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/index.html'));
-	res.status(200).sendFile(path.join(process.env["CLIENT_BUILD_BIR"], 'views/'+req.params.page));
+	let p = path.join(process.env["CLIENT_BUILD_BIR"], 'views/'+req.params.page);
+	if (!fs.existsSync(p))
+		return next();
+	res.status(200).sendFile(p);
+});
+
+app.post('/login', (req, res) => {
+	console.log("login body", req.body);
+	res.writeHead(302, {
+		'Location': '/connection.html'
+	}).end();
 });
 
 app.use((_, res) => {
