@@ -37,7 +37,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP2'] += 1
 			self.data['ballDirection']['z'] *= -1
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['x'] =  -1
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 			
@@ -47,7 +47,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0
 			self.data['ballDirection']['z'] *= -1
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['x'] =  -1
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		if (self.data['moveSpeed'] > 5) :
@@ -60,8 +60,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP3'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		elif self.data['ball']['x'] > 29:
@@ -69,8 +69,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP4'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		if self.data['ball']['z'] < -29:
@@ -78,8 +78,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP2'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 			
@@ -151,9 +151,8 @@ class websocket_client(WebsocketConsumer):
 	
 	def reboundP3(self):
 		if self.data['ball']['x'] < -27 and (self.data['ball']['z'] < (self.data['P3position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P3position']['z'] - 4)):
-			self.data['ballDirection']['x'] = 1	
+			self.data['ballDirection']['x'] *= -1	
 			self.data['moveSpeed'] += 0.1
-			logging.info(self.data['ballDirection']['x'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
 		return self.data
@@ -162,7 +161,6 @@ class websocket_client(WebsocketConsumer):
 		if self.data['ball']['x'] > 27 and (self.data['ball']['z'] < (self.data['P4position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P4position']['z'] - 4)):
 			self.data['ballDirection']['x'] *= -1
 			self.data['moveSpeed'] += 0.1
-			logging.info(self.data['ballDirection']['x'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
 		return self.data
@@ -206,5 +204,3 @@ class websocket_client(WebsocketConsumer):
 
 
 
-
-		
