@@ -37,6 +37,7 @@ ALLOWED_HOSTS = ["localhost", IP_LOCAL]
 
 INSTALLED_APPS = [
     'index',
+    'game',
     'channels',
     'django.contrib.admin',
     'django.contrib.auth',
