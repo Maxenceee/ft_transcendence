@@ -27,6 +27,7 @@ socket.use((msg) =>{
 	{
 		data=msg
 		score = msg.score
+		keyCode = data.keyCode
 	}
 		// console.log(data);
 	// if (msg.type == 2)
@@ -313,7 +314,7 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapTwoPlayer({})
 //serverside under it
-// document.addEventListener("keyup", onDocumentKeyUp, true);
+document.addEventListener("keyup", onDocumentKeyUp, false);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -327,21 +328,21 @@ function onDocumentKeyDown(event) {
 	if (keyVar == 68)
 	{
 		keyCode.Key68 = 1
-		// keyCode.Key65 = 0
+		keyCode.Key65 = 0
 	}
-	else if (keyVar == 65)
+	if (keyVar == 65)
 	{
 		keyCode.Key65 = 1
-		// keyCode.Key68 = 0
+		keyCode.Key68 = 0
 	}
 	if (keyVar == 39)
 	{
 		keyCode.Key39 = 1
-		// keyCode.Key37 = 0
+		keyCode.Key37 = 0
 	}
-	else if (keyVar == 37)
+	if (keyVar == 37)
 	{
-		// keyCode.Key39 = 0
+		keyCode.Key39 = 0
 		keyCode.Key37 = 1
 	}
 	data.keyCode = keyCode
@@ -352,26 +353,26 @@ function onDocumentKeyDown(event) {
 	// console.log(keyCode);
 	console.log(keyCode);
 }
-// function onDocumentKeyUp(event) {
-//     let keyVar = event.which;
+function onDocumentKeyUp(event) {
+    let keyVar = event.which;
 
 
-// 	if (keyVar == 68)
-// 		keyCode.Key68 = 0
-// 	if (keyVar == 65)
-// 		keyCode.Key65 = 0
-// 	if (keyVar == 39)
-// 		keyCode.Key39 = 0
-// 	if (keyVar == 37)
-// 		keyCode.Key37 = 0
+	if (keyVar == 68)
+		keyCode.Key68 = 0
+	if (keyVar == 65)
+		keyCode.Key65 = 0
+	if (keyVar == 39)
+		keyCode.Key39 = 0
+	if (keyVar == 37)
+		keyCode.Key37 = 0
 
-// 	data.keyCode = keyCode
-// 	updatePlayer = 1
-// 	// socket.send({type:2, data})
-// 	// palletPlayer1.position.x = data.P1position.x ;
-// 	// palletPlayer2.position.x = data.P2position.x ;
-// 	// console.log(keyCode);
-// }
+	data.keyCode = keyCode
+	updatePlayer = 1
+	// socket.send({type:2, data})
+	// palletPlayer1.position.x = data.P1position.x ;
+	// palletPlayer2.position.x = data.P2position.x ;
+	// console.log(keyCode);
+}
 
 function resetBall()
 {
@@ -497,6 +498,7 @@ socket.send({type : 0, data : data})
 loadFont()
 let counter = 0
 var endScore = 0;
+
 const animate = async () => {
 
 	if (composer){
@@ -533,14 +535,23 @@ const animate = async () => {
 		// keyCode = data.keyCode ;
 		counter = data.number
 	}
+	await sleep(25)
 	
-	
-	socket.send({type : 0, data:data})	
-	await sleep(50)
+}
+
+
+const tmp = async () => {
+	while (1 == 1)
+	{
+		socket.send({type : 0, data:data})	
+		await sleep(50)
+	}
+
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 sleep(500).then(() => {animate(); });
+tmp()
 // animate()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})

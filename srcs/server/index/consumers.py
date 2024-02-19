@@ -19,10 +19,10 @@ class websocket_client(WebsocketConsumer):
 			self.data['P2position']['x'] -= 1.1
 		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
 			self.data['P2position']['x'] += 1.1
-		self.data['keyCode']['Key65'] = 0
-		self.data['keyCode']['Key68'] = 0
-		self.data['keyCode']['Key39'] = 0
-		self.data['keyCode']['Key37'] = 0
+		# self.data['keyCode']['Key65'] = 0
+		# self.data['keyCode']['Key68'] = 0
+		# self.data['keyCode']['Key39'] = 0
+		# self.data['keyCode']['Key37'] = 0
 		return self.data
 		
 	
@@ -181,8 +181,8 @@ class websocket_client(WebsocketConsumer):
 		else:
 			self.data = self.playerMove2P()
 			self.data = self.wallCollideTwoPlayer()
-		self.data['ball']['x'] += ( self.data['ballDirection']['x'] ) * 0.2 * self.data['moveSpeed'] 
-		self.data['ball']['z'] += ( self.data['ballDirection']['z'] ) * 0.2 * self.data['moveSpeed']  
+		self.data['ball']['z'] += ( self.data['ballDirection']['z'] ) * 0.4 * self.data['moveSpeed']  
+		self.data['ball']['x'] += ( self.data['ballDirection']['x'] ) * 0.4 * self.data['moveSpeed'] 
 		self.number+=1
 		self.data['number'] = self.number
 		self.send(json.dumps(self.data))
