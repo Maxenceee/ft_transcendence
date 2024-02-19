@@ -201,6 +201,3 @@ class websocket_client(WebsocketConsumer):
 
 
 
-
-
-
