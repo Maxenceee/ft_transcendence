@@ -12,4 +12,5 @@ urlpatterns = [
     path('gameError/', views.gameError, name='gameError'),
     path('gameWin/', views.gameWin, name='gameWin'),
     path('<path:url>', views.redirect, name='redirect'),
+]
 
