@@ -88,8 +88,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['x'] = 0
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		if (self.data['moveSpeed'] > 5) :
@@ -100,28 +100,35 @@ class websocket_client(WebsocketConsumer):
 		# logging.info(type(self.data['keyCode']['Key68']))
 		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 26 :
 			self.data['P1position']['x'] += 1.1
-			self.data['keyCode']['Key68'] = 0
+			
 		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -26 :
 			self.data['P1position']['x'] -= 1.1
-			self.data['keyCode']['Key65'] = 0
+			
 		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -26 :
 			self.data['P2position']['x'] -= 1.1
-			self.data['keyCode']['Key39'] = 0
+			
 		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 26 :
 			self.data['P2position']['x'] += 1.1
-			self.data['keyCode']['Key37'] = 0
+			
 		if self.data['keyCode']['Key81'] == 1 and self.data['P3position']['z']  < 26 :
 			self.data['P3position']['z'] += 1.1
-			self.data['keyCode']['Key81'] = 0
+			
 		if self.data['keyCode']['Key69'] == 1 and self.data['P3position']['z']  > -26:
 			self.data['P3position']['z'] -= 1.1
-			self.data['keyCode']['Key69'] = 0
+			
 		if self.data['keyCode']['Key67'] == 1 and self.data['P4position']['z']  < 26 :
 			self.data['P4position']['z'] += 1.1
-			self.data['keyCode']['Key67'] = 0
+			
 		if self.data['keyCode']['Key90'] == 1 and self.data['P4position']['z']  > -26 :
 			self.data['P4position']['z'] -= 1.1
-			self.data['keyCode']['Key90'] = 0
+	# self.data['keyCode']['Key68'] = 0
+	# self.data['keyCode']['Key65'] = 0
+	# self.data['keyCode']['Key39'] = 0
+	# self.data['keyCode']['Key37'] = 0
+	# self.data['keyCode']['Key81'] = 0
+	# self.data['keyCode']['Key69'] = 0
+	# self.data['keyCode']['Key67'] = 0
+	# self.data['keyCode']['Key90'] = 0	
 		return self.data
 
 
@@ -144,8 +151,9 @@ class websocket_client(WebsocketConsumer):
 	
 	def reboundP3(self):
 		if self.data['ball']['x'] < -27 and (self.data['ball']['z'] < (self.data['P3position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P3position']['z'] - 4)):
-			self.data['ballDirection']['x'] *= -1	
+			self.data['ballDirection']['x'] = 1	
 			self.data['moveSpeed'] += 0.1
+			logging.info(self.data['ballDirection']['x'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
 		return self.data
@@ -154,12 +162,13 @@ class websocket_client(WebsocketConsumer):
 		if self.data['ball']['x'] > 27 and (self.data['ball']['z'] < (self.data['P4position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P4position']['z'] - 4)):
 			self.data['ballDirection']['x'] *= -1
 			self.data['moveSpeed'] += 0.1
+			logging.info(self.data['ballDirection']['x'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
 		return self.data
 		
 	def receive(self, text_data=None, bytes_data=None):
-		# logging.info("server says client message received: " + text_data)
+		
 		tmp = json.loads(text_data)
 		# logging.info(tmp)
 		if not hasattr(self, 'number'):
@@ -181,8 +190,8 @@ class websocket_client(WebsocketConsumer):
 		else:
 			self.data = self.playerMove2P()
 			self.data = self.wallCollideTwoPlayer()
-		self.data['ball']['z'] += ( self.data['ballDirection']['z'] ) * 0.4 * self.data['moveSpeed']  
-		self.data['ball']['x'] += ( self.data['ballDirection']['x'] ) * 0.4 * self.data['moveSpeed'] 
+		self.data['ball']['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']  
+		self.data['ball']['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
 		self.number+=1
 		self.data['number'] = self.number
 		self.send(json.dumps(self.data))

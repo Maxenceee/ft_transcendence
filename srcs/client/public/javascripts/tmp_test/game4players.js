@@ -25,6 +25,18 @@ socket.use((msg) =>{
 		;
 	else
 	{
+		// if (data.number > counter)
+		// {
+			if (data.updateScore == 1)
+				displayScore()
+			ball.position.x = data.ball.x
+			ball.position.z = data.ball.z
+			palletPlayer1.position.x = data.P1position.x ;
+			palletPlayer2.position.x = data.P2position.x ;
+			palletPlayer3.position.z = data.P3position.z ;
+			palletPlayer4.position.z = data.P4position.z ;
+			counter = data.number
+		// }
 		data=msg
 		score = msg.score
 	}
@@ -308,7 +320,7 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapFourPlayer({})
 //serverside under it
-// document.addEventListener("keyup", onDocumentKeyUp, true);
+document.addEventListener("keyup", onDocumentKeyUp, false);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -324,7 +336,7 @@ function onDocumentKeyDown(event) {
 		keyCode.Key68 = 1
 		keyCode.Key65 = 0
 	}
-	else if (keyVar == 65)
+	 if (keyVar == 65)
 	{
 		keyCode.Key65 = 1
 		keyCode.Key68 = 0
@@ -334,7 +346,7 @@ function onDocumentKeyDown(event) {
 		keyCode.Key39 = 1
 		keyCode.Key37 = 0
 	}
-	else if (keyVar == 37)
+	 if (keyVar == 37)
 	{
 		keyCode.Key39 = 0
 		keyCode.Key37 = 1
@@ -351,7 +363,7 @@ function onDocumentKeyDown(event) {
 		keyCode.Key81 = 1
 		keyCode.Key69 = 0
 	}
-	else if (keyVar == 69)
+	 if (keyVar == 69)
 	{
 		keyCode.Key81 = 0
 		keyCode.Key69 = 1
@@ -361,38 +373,37 @@ function onDocumentKeyDown(event) {
 		keyCode.Key90 = 1
 		keyCode.Key67 = 0
 	}
-	else if (keyVar == 67)
+	 if (keyVar == 67)
 	{
 		keyCode.Key90 = 0
 		keyCode.Key67 = 1
 	}
 	data.keyCode = keyCode
 	updatePlayer = 1;
-	// socket.send({type:2, data})
-	// palletPlayer1.position.x = data.P1position.x ;
-	// palletPlayer2.position.x = data.P2position.x ;
+}
+function onDocumentKeyUp(event) {
+    let keyVar = event.which;
+
+	if (keyVar == 68)
+		keyCode.Key68 = 0
+	if (keyVar == 65)
+		keyCode.Key65 = 0
+	if (keyVar == 39)
+		keyCode.Key39 = 0
+	if (keyVar == 37)
+		keyCode.Key37 = 0
+	if (keyVar == 81)
+		keyCode.Key81 = 1
+	if (keyVar == 69)
+		keyCode.Key69 = 0
+	if (keyVar == 90)
+		keyCode.Key90 = 0
+	if (keyVar == 67)
+		keyCode.Key67 = 0
+	data.keyCode = keyCode
+	updatePlayer = 1;
 	console.log(keyCode);
 }
-// function onDocumentKeyUp(event) {
-//     let keyVar = event.which;
-
-
-// 	if (keyVar == 68)
-// 		keyCode.Key68 = 0
-// 	if (keyVar == 65)
-// 		keyCode.Key65 = 0
-// 	if (keyVar == 39)
-// 		keyCode.Key39 = 0
-// 	if (keyVar == 37)
-// 		keyCode.Key37 = 0
-
-// 	data.keyCode = keyCode
-// 	updatePlayer = 1
-// 	// socket.send({type:2, data})
-// 	// palletPlayer1.position.x = data.P1position.x ;
-// 	// palletPlayer2.position.x = data.P2position.x ;
-// 	// console.log(keyCode);
-// }
 
 function resetBall()
 {
@@ -556,27 +567,23 @@ const animate = async () => {
 	// palletReboundP1()
 	// palletReboundP2()
 	// wallCollideTwoPlayer()
-	if (data.number > counter)
-	{
-		if (data.updateScore == 1)
-			displayScore()
-		ball.rotation.x +=  .1
-		ball.position.x = data.ball.x
-		ball.position.z = data.ball.z
-		palletPlayer1.position.x = data.P1position.x ;
-		palletPlayer2.position.x = data.P2position.x ;
-		palletPlayer3.position.z = data.P3position.z ;
-		palletPlayer4.position.z = data.P4position.z ;
-		counter = data.number
-	}
+	ball.rotation.x +=  .1
+
 	
-	
-	socket.send({type : 1, data:data})	
-	await sleep(50)
+	await sleep(25)
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 sleep(500).then(() => {animate(); });
+const tmp = async () => {
+	while (1 == 1)
+	{
+		socket.send({type : 1, data:data})	
+		await sleep(50)
+	}
+
+}
+tmp()
 // animate()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
