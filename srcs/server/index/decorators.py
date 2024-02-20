@@ -5,23 +5,25 @@ from django.utils import timezone
 
 def login_required(func):
     def wrapper(request, *args, **kwargs):
-        if not request.COOKIES.get('token') or not Token.objects.filter(token=request.COOKIES.get('token')).exists():
+        cookie = request.COOKIES.get('token')
+        if not cookie or not Token.objects.filter(token=cookie).exists():
             return redirect("/login")
-        if Token.objects.get(token=request.COOKIES.get('token')).is_valid == False:
+        if Token.objects.get(token=cookie).is_valid == False:
             response = redirect("/login")
             response.delete_cookie('token')
             return response
-        if Token.objects.get(token=request.COOKIES.get('token')).expires_at < timezone.now():
+        if Token.objects.get(token=cookie).expires_at < timezone.now():
             response = redirect("/login")
             response.delete_cookie('token')
             return response
+        request.user = Token.objects.get(token=cookie).user
         return func(request, *args, **kwargs)
     return wrapper
 
 def login_forbiden(func):
     def wrapper(request, *args, **kwargs):
         cookie = request.COOKIES.get('token')
-        if request.COOKIES.get('token') and Token.objects.filter(token=cookie).exists() and Token.objects.get(token=cookie).is_valid and Token.objects.get(token=cookie).expires_at > timezone.now():
+        if cookie and Token.objects.filter(token=cookie).exists() and Token.objects.get(token=cookie).is_valid and Token.objects.get(token=cookie).expires_at > timezone.now():
             return redirect("/")
         return func(request, *args, **kwargs)
     return wrapper
