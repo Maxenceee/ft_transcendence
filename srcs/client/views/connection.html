@@ -103,7 +103,9 @@
 	<script src="https://cdn.maxencegama.dev/swivel/button"></script>
 	<script defer>
 		document.querySelectorAll(".f0n8F").forEach((e) => {
-			e.querySelector("input").oninput = (ev) => {
+			let inp = e.querySelector("input");
+			inp.parentNode.classList.toggle("FATdn", inp.value.length > 0)
+			inp.oninput = (ev) => {
 				ev.target.parentNode.classList.toggle("FATdn", ev.target.value.length > 0);
 			};
 		});
