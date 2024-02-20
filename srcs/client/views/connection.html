@@ -24,19 +24,19 @@
 				<div class="semi">
 					<div class="cntc">
 						<div class="auth-form">
-							{% if is_invalid %}
-							<div>
-								<div class="auth-unauthorized">
-									<div class="in">
-										<div aria-atomic="true" role="alert">
-											<strong>Nom d'utilisateur</strong> ou <strong>Mot de passe</strong> incorrect.
+							<div class="auth-form-body">
+								<h1>Connexion</h1>
+								{% if is_invalid %}
+								<div>
+									<div class="auth-unauthorized">
+										<div class="in">
+											<div aria-atomic="true" role="alert">
+												<strong>Nom d'utilisateur</strong> ou <strong>Mot de passe</strong> incorrect.
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							{% endif %}
-							<div class="auth-form-body">
-								<h1>Connexion</h1>
+								{% endif %}
 								<form data-turbo="false" action="/login" accept-charset="UTF-8" method="post">
 									{% csrf_token %}
 									<div class="auth-form-input">
