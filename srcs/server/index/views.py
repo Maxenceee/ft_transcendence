@@ -7,7 +7,7 @@ import logging
 # Create your views here.
 @login_required
 def index(request):
-    return render(request, 'views/index.html')
+    return render(request, 'views/index.html', {"username": request.user.username})
 
 @login_required
 def get_user(request, id):
@@ -41,4 +41,4 @@ def login(request):
 
 @login_required
 def not_found(request, url):
-    return render(request, 'views/index.html')
+    return redirect("/")

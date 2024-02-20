@@ -22,4 +22,4 @@ def gameWin(request):
 
 @login_required
 def not_found(request, url):
-    return render(request, 'views/index.html')
+    return redirect("/")
