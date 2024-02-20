@@ -24,65 +24,37 @@
 				<div class="semi">
 					<div class="cntc">
 						<div class="auth-form">
-							<!-- doit etre rendu si la mot de pass est invalide -->
-							<!-- <% if (locals.is_invalid) { %>
-							<div>
-								<div class="auth-unauthorized">
-									<div class="in">
-										<div aria-atomic="true" role="alert">
-											<strong>Nom d'utilisateur</strong> ou <strong>Mot de passe</strong> incorrect.
+							<div class="auth-form-body">
+								<h1>Connexion</h1>
+								{% if is_invalid %}
+								<div>
+									<div class="auth-unauthorized">
+										<div class="in">
+											<div aria-atomic="true" role="alert">
+												<strong>Nom d'utilisateur</strong> ou <strong>Mot de passe</strong> incorrect.
+											</div>
 										</div>
 									</div>
 								</div>
-							</div>
-							<% } %> -->
-							<div class="auth-form-body">
-								<h1>Connexion</h1>
+								{% endif %}
 								<form data-turbo="false" action="/login" accept-charset="UTF-8" method="post">
+									{% csrf_token %}
 									<div class="auth-form-input">
 										<div class="ttpo form-input">
 											<label class="f0n8F">
 												<span class="_9nyy2">Nom d'utilisateur</span>
-												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="">
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login }}">
 											</label>
 										</div>
 										<div class="ttpo form-input">
-											<!-- <% if (locals.redirect) { %>
-												<input type="hidden" name="redirect" id="redirect" value="<%= redirect %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.return_to) { %>
-												<input type="hidden" name="return_to" id="return_to" value="<%= return_to %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.timestamp) { %>
-												<input type="hidden" name="timestamp" id="timestamp" value="<%= timestamp %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.client_id) { %>
-												<input type="hidden" name="client_id" id="client_id" value="<%= client_id %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.login) { %>
-												<input type="hidden" name="credential_type" value="password">
-												<input type="hidden" name="login" id="login" value="<%= login %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.login_scope) { %>
-												<input type="hidden" name="login_scope" id="login_scope" value="<%= login_scope %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.sudo_state) { %>
-												<input type="hidden" name="sudo_state" id="sudo_state" value="<%= sudo_state %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.sudo_hash) { %>
-												<input type="hidden" name="sudo_hash" id="sudo_hash" value="<%= sudo_hash %>" autocomplete="off" readonly>
-											<% } %> -->
 											<label class="f0n8F">
 												<span class="_9nyy2">Mot de passe</span>
 												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
 											</label>
 										</div>
-										<!-- <input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource"> -->
-										<input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
+										<input type="submit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
 									</div>
-									<div class="card-separator">
-										<!-- <div class="separator-text">Or</div> -->
-									</div>
+									<div class="card-separator"></div>
 									<div class="external-connect">
 										<div>
 											<div id="intra-button" class="external-connect-btn intra-button">
@@ -103,7 +75,9 @@
 	<script src="https://cdn.maxencegama.dev/swivel/button"></script>
 	<script defer>
 		document.querySelectorAll(".f0n8F").forEach((e) => {
-			e.querySelector("input").oninput = (ev) => {
+			let inp = e.querySelector("input");
+			inp.parentNode.classList.toggle("FATdn", inp.value.length > 0)
+			inp.oninput = (ev) => {
 				ev.target.parentNode.classList.toggle("FATdn", ev.target.value.length > 0);
 			};
 		});

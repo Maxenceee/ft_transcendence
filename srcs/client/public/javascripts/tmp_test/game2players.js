@@ -110,43 +110,43 @@ function initiateMapTwoPlayer(data)
 			// map : player1Map 
 			})
 		);
- ///add helper to see axe)
-							const repaire = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0xffffff, 
-									opacity: 1, 
-									emissive:0xffffff,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
-							repaire.position.z +=2
-							const repaire1 = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0xffff00, 
-									opacity: 1, 
-									emissive:0xffff00,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
+//  ///add helper to see axe)
+// 							const repaire = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0xffffff, 
+// 									opacity: 1, 
+// 									emissive:0xffffff,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
+// 							repaire.position.z +=2
+// 							const repaire1 = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0xffff00, 
+// 									opacity: 1, 
+// 									emissive:0xffff00,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
 
-							const repaire2 = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0x00ff00, 
-									opacity: 1, 
-									emissive:0x00ff00,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
-								repaire2.position.x +=2
+// 							const repaire2 = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0x00ff00, 
+// 									opacity: 1, 
+// 									emissive:0x00ff00,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
+// 								repaire2.position.x +=2
 								// scene.add( repaire, repaire1, repaire2);
 //// end of the helper
 	palletPlayer2 = new THREE.Mesh( 
@@ -314,7 +314,7 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapTwoPlayer({})
 //serverside under it
-document.addEventListener("keyup", onDocumentKeyUp, false);
+// document.addEventListener("keyup", onDocumentKeyUp, false);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -325,26 +325,36 @@ function onDocumentKeyDown(event) {
 	// keyCode.Key65 = 0
 	// keyCode.Key68 = 0
 	// keyCode.Key39 = 0
-	if (keyVar == 68)
-	{
-		keyCode.Key68 = 1
-		keyCode.Key65 = 0
-	}
-	if (keyVar == 65)
-	{
-		keyCode.Key65 = 1
-		keyCode.Key68 = 0
-	}
-	if (keyVar == 39)
-	{
-		keyCode.Key39 = 1
-		keyCode.Key37 = 0
-	}
-	if (keyVar == 37)
-	{
-		keyCode.Key39 = 0
-		keyCode.Key37 = 1
-	}
+	// if (keyVar == 68)
+	// {
+	// 	keyCode.Key68 = 1
+	// 	keyCode.Key65 = 0
+	// }
+	// if (keyVar == 65)
+	// {
+	// 	keyCode.Key65 = 1
+	// 	keyCode.Key68 = 0
+	// }
+	// if (keyVar == 39)
+	// {
+	// 	keyCode.Key39 = 1
+	// 	keyCode.Key37 = 0
+	// }
+	// if (keyVar == 37)
+	// {
+	// 	keyCode.Key39 = 0
+	// 	keyCode.Key37 = 1
+	// }
+	if (keyVar == 68) 
+		palletPlayer1.position.x += mapWidth/60 ;
+	else if (keyVar == 65)
+		palletPlayer1.position.x-= mapWidth/60 ;
+	if (keyVar == 39) 
+		palletPlayer2.position.x -= mapWidth/60 ;
+	if (keyVar == 37) 
+		palletPlayer2.position.x += mapWidth/60 ;
+	data.P1position = palletPlayer1.position ;
+	data.P2position = palletPlayer2.position ;
 	data.keyCode = keyCode
 	updatePlayer = 1;
 	// socket.send({type:2, data})
@@ -353,26 +363,26 @@ function onDocumentKeyDown(event) {
 	// console.log(keyCode);
 	console.log(keyCode);
 }
-function onDocumentKeyUp(event) {
-    let keyVar = event.which;
+// function onDocumentKeyUp(event) {
+//     let keyVar = event.which;
 
 
-	if (keyVar == 68)
-		keyCode.Key68 = 0
-	if (keyVar == 65)
-		keyCode.Key65 = 0
-	if (keyVar == 39)
-		keyCode.Key39 = 0
-	if (keyVar == 37)
-		keyCode.Key37 = 0
+// 	if (keyVar == 68)
+// 		keyCode.Key68 = 0
+// 	if (keyVar == 65)
+// 		keyCode.Key65 = 0
+// 	if (keyVar == 39)
+// 		keyCode.Key39 = 0
+// 	if (keyVar == 37)
+// 		keyCode.Key37 = 0
 
-	data.keyCode = keyCode
-	updatePlayer = 1
-	// socket.send({type:2, data})
-	// palletPlayer1.position.x = data.P1position.x ;
-	// palletPlayer2.position.x = data.P2position.x ;
-	// console.log(keyCode);
-}
+// 	data.keyCode = keyCode
+// 	updatePlayer = 1
+// 	// socket.send({type:2, data})
+// 	// palletPlayer1.position.x = data.P1position.x ;
+// 	// palletPlayer2.position.x = data.P2position.x ;
+// 	// console.log(keyCode);
+// }
 
 function resetBall()
 {
@@ -541,7 +551,7 @@ const animate = async () => {
 
 
 const tmp = async () => {
-	while (1 == 1)
+	while ( true )
 	{
 		socket.send({type : 0, data:data})	
 		await sleep(50)
@@ -556,4 +566,10 @@ tmp()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
 
+document.addEventListener('blur', function() {
+	console.log("window is blured");
+});
 
+document.addEventListener('focus', function() {
+	console.log("window if focused");
+});
