@@ -52,7 +52,6 @@ def signup(request):
             return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
         
         user = User.objects.create(username=username, password=password)
-        logging.info(f"User user {user} {user.username}")
         response = redirect("/")
 
         token=''.join(random.choices(string.ascii_letters + string.digits, k=100))
