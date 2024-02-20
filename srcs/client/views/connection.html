@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="/static/stylesheets/style.css">
 	<link rel="preload" type="video/mp4" as="video" href="/static/videos/0001-0150.mp4">
 	<link rel="preload" type="image/png" as="image" href="/static/images/pong_visal_1.png">
+	<script src="/static/javascripts/main.58fr6fe.js"></script>
 </head>
 <body class="variant">
 	<main>
@@ -25,8 +26,12 @@
 					<div class="cntc">
 						<div class="auth-form">
 							<div class="auth-form-body">
+								{% if is_signup|default:False %}
+								<h1>Créer un compte</h1>
+								{% else %}
 								<h1>Connexion</h1>
-								{% if is_invalid %}
+								{% endif %}
+								{% if is_invalid|default:False %}
 								<div>
 									<div class="auth-unauthorized">
 										<div class="in">
@@ -37,13 +42,24 @@
 									</div>
 								</div>
 								{% endif %}
-								<form data-turbo="false" action="/login" accept-charset="UTF-8" method="post">
+								{% if exists|default:False %}
+								<div>
+									<div class="auth-unauthorized">
+										<div class="in">
+											<div aria-atomic="true" role="alert">
+												Ce nom d'utilisateur n'est pas disponible.
+											</div>
+										</div>
+									</div>
+								</div>
+								{% endif %}
+								<form data-turbo="false" action="{{ action_url|default:"/login" }}" accept-charset="UTF-8" method="post">
 									{% csrf_token %}
 									<div class="auth-form-input">
 										<div class="ttpo form-input">
 											<label class="f0n8F">
 												<span class="_9nyy2">Nom d'utilisateur</span>
-												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login }}">
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login|default:"" }}">
 											</label>
 										</div>
 										<div class="ttpo form-input">
@@ -52,9 +68,22 @@
 												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
 											</label>
 										</div>
+										{% if is_signup|default:False %}
+										<input type="submit" value="Créer mon compte" class="auth-form-submit btn-primary" data-disable-with="Création…" data-signin-label="Créer mon compte" data-sso-label="Créer un compte pour accéder à la ressource">
+										{% else %}
 										<input type="submit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
+										{% endif %}
 									</div>
-									<div class="card-separator"></div>
+									{% if is_signup|default:False %}
+									<div class="auth-form-other-l">
+										<p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+									</div>
+									{% else %}
+									<div class="auth-form-other-l">
+										<p>Nouveau ici ? <a href="/signup">Créer un compte</a></p>
+									</div>
+									{% endif %}
+									<div class="card-separator upper-text"></div>
 									<div class="external-connect">
 										<div>
 											<div id="intra-button" class="external-connect-btn intra-button">

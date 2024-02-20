@@ -178,7 +178,7 @@ button span {
   --input-placeholder: #A6ACCD;
   --input-text: #646B8C;
   --border-default: #E1E6F9;
-  --border-active: #275EFE;
+  --border-active: var(--border-default);
   --background: #fff;
   --button-text: #FFFFFF;
   --main-background: #1c0126;
@@ -195,6 +195,7 @@ button span {
   --progress-filled-color-h: 122.4;
   --progress-filled-color-s: 39.4;
   --progress-filled-color-l: 49.2;
+  --href-color: #0969da;
 }
 
 body.variant {
@@ -935,6 +936,22 @@ body:has(.connection-page) {
 .auth-form .auth-form-body .auth-form-input > .form-input {
   margin: 10px 0 !important;
 }
+.auth-form .auth-form-body .auth-form-other-l {
+  margin-top: 20px;
+  color: #fff;
+  font-size: 16px;
+}
+.auth-form .auth-form-body .auth-form-other-l a {
+  font-size: inherit;
+  text-decoration: none;
+  color: var(--href-color) !important;
+}
+.auth-form .auth-form-body .auth-form-other-l a.active {
+  color: var(--layout-primary) !important;
+}
+.auth-form .auth-form-body .auth-form-other-l a:hover {
+  text-decoration: underline;
+}
 .auth-form .auth-form-body .auth-form-error .container {
   position: relative;
   padding: 5px 16px;
@@ -1144,8 +1161,13 @@ body:has(.connection-page) {
   padding: 5px 0;
   margin: 10px 0;
   overflow: hidden;
+  box-shadow: inset 0 0 0 var(--border-width, 0px) var(--border, var(--border-default));
   border-radius: 6px;
   background-color: #222b38;
+}
+.ttpo:has(input:focus) {
+  --border-width: 1px;
+  --border: var(--border-active);
 }
 .ttpo input {
   border: 0;
@@ -1344,6 +1366,9 @@ body:has(.connection-page) {
   height: 1px;
   margin: 35px 0;
   background-color: var(--separator-color);
+}
+.card-separator.upper-text {
+  margin: 20px 0 35px 0 !important;
 }
 .card-separator .separator-text {
   position: absolute;
