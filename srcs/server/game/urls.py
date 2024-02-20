@@ -7,5 +7,5 @@ urlpatterns = [
     path('error', views.gameError, name='gameError'),
     path('win', views.gameWin, name='gameWin'),
 
-    path('<path:url>', views.redirect, name='redirect'),
+    path('<path:url>', views.not_found, name='redirect'),
 ]

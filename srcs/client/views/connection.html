@@ -25,7 +25,7 @@
 					<div class="cntc">
 						<div class="auth-form">
 							<!-- doit etre rendu si la mot de pass est invalide -->
-							<!-- <% if (locals.is_invalid) { %>
+							{% if is_invalid %}
 							<div>
 								<div class="auth-unauthorized">
 									<div class="in">
@@ -35,15 +35,16 @@
 									</div>
 								</div>
 							</div>
-							<% } %> -->
+							{% endif %}
 							<div class="auth-form-body">
 								<h1>Connexion</h1>
 								<form data-turbo="false" action="/login" accept-charset="UTF-8" method="post">
+									{% csrf_token %}
 									<div class="auth-form-input">
 										<div class="ttpo form-input">
 											<label class="f0n8F">
 												<span class="_9nyy2">Nom d'utilisateur</span>
-												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="">
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login }}">
 											</label>
 										</div>
 										<div class="ttpo form-input">
