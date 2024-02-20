@@ -29,14 +29,14 @@ def login(request):
         
         if User.objects.filter(username=username, password=password).exists():
             user = User.objects.get(username=username, password=password)
+            for token in Token.objects.filter(user=user, is_valid=True):
+                token.is_valid = False
+                token.save()
             token=''.join(random.choices(string.ascii_letters + string.digits, k=100))
-
             response = redirect("/")
             response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
-            
             Token.objects.create(token=token, user=user)
             return response
-
         return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 
 @login_required
