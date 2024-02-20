@@ -24,7 +24,6 @@
 				<div class="semi">
 					<div class="cntc">
 						<div class="auth-form">
-							<!-- doit etre rendu si la mot de pass est invalide -->
 							{% if is_invalid %}
 							<div>
 								<div class="auth-unauthorized">
@@ -48,42 +47,14 @@
 											</label>
 										</div>
 										<div class="ttpo form-input">
-											<!-- <% if (locals.redirect) { %>
-												<input type="hidden" name="redirect" id="redirect" value="<%= redirect %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.return_to) { %>
-												<input type="hidden" name="return_to" id="return_to" value="<%= return_to %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.timestamp) { %>
-												<input type="hidden" name="timestamp" id="timestamp" value="<%= timestamp %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.client_id) { %>
-												<input type="hidden" name="client_id" id="client_id" value="<%= client_id %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.login) { %>
-												<input type="hidden" name="credential_type" value="password">
-												<input type="hidden" name="login" id="login" value="<%= login %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.login_scope) { %>
-												<input type="hidden" name="login_scope" id="login_scope" value="<%= login_scope %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.sudo_state) { %>
-												<input type="hidden" name="sudo_state" id="sudo_state" value="<%= sudo_state %>" autocomplete="off" readonly>
-											<% } %>
-											<% if (locals.sudo_hash) { %>
-												<input type="hidden" name="sudo_hash" id="sudo_hash" value="<%= sudo_hash %>" autocomplete="off" readonly>
-											<% } %> -->
 											<label class="f0n8F">
 												<span class="_9nyy2">Mot de passe</span>
 												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
 											</label>
 										</div>
-										<!-- <input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource"> -->
-										<input type="submit" name="commit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
+										<input type="submit" value="Se connecter" class="auth-form-submit btn-primary" data-disable-with="Connection…" data-signin-label="Se connecter" data-sso-label="Connectez-vous pour accéder à la ressource">
 									</div>
-									<div class="card-separator">
-										<!-- <div class="separator-text">Or</div> -->
-									</div>
+									<div class="card-separator"></div>
 									<div class="external-connect">
 										<div>
 											<div id="intra-button" class="external-connect-btn intra-button">
