@@ -15,5 +15,5 @@ def gameError(request):
 def gameWin(request):
     return render(request, 'views/gameWin.html')
 
-def redirect(request, url):
+def not_found(request, url):
     return render(request, 'views/index.html')

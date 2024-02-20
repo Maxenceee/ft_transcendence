@@ -7,6 +7,6 @@ urlpatterns = [
     path('api/home/get/lobbies', views.get_lobies, name='get_lobies'),
     path('login', views.login, name='login'),
 
-    path('<path:url>', views.redirect, name='redirect'),
+    path('<path:url>', views.not_found, name='redirect'),
 ]
 
