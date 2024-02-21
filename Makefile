@@ -1,5 +1,5 @@
 SERVER_DIR	=	srcs
-NAME		=	docker_django
+NAME		=	django
 FORWARDPORT	=	3000
 
 GREEN			=	\033[1;32m
@@ -11,7 +11,7 @@ DEFAULT			=	\033[0m
 all: up
 
 debug: all
-	@docker logs docker_django -f
+	@docker logs $(NAME) -f
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
