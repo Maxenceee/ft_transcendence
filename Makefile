@@ -34,9 +34,11 @@ clean: down
 	@docker builder prune -af
 	@printf "$(BLUE)Docker has been cleaned\n"
 
-fclean: clean
-	@printf "$(RED)Cleaning data...$(DEFAULT)\n"
+rmdata:
+	@printf "$(RED)Removing data...$(DEFAULT)\n"
 	@./clean.sh
-	@printf "$(BLUE)Data has been cleaned\n"
+	@printf "$(BLUE)Data has been removed\n"
+
+fclean: clean rmdata
 
 .PHONY: all up re clean
