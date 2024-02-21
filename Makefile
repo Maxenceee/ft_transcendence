@@ -41,4 +41,9 @@ rmdata:
 
 fclean: clean rmdata
 
+rmdata: down
+	@printf "$(RED)Cleaning data...$(DEFAULT)\n"
+	@./clean.sh
+	@printf "$(BLUE)Data has been cleaned\n"
+
 .PHONY: all up re clean

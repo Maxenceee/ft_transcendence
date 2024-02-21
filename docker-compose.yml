@@ -22,7 +22,7 @@ services:
 
     postgres:
         container_name: postgres
-        image: postgres:latest
+        image: postgres:16-bullseye
         restart: always
         environment:
             POSTGRES_USER: ${POSTGRES_USER}
