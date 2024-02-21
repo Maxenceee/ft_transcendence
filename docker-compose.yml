@@ -2,7 +2,7 @@ version: '3'
 
 services:
     website:
-        container_name: docker_django
+        container_name: django
         build: 
             context: ./srcs
         environment:
@@ -21,7 +21,7 @@ services:
         restart: always
 
     postgres:
-        container_name: docker_postgres
+        container_name: postgres
         image: postgres:latest
         restart: always
         environment:
