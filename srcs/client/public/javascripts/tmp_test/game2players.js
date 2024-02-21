@@ -10,25 +10,50 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 
+// let playerId = 0;
 
 let socket = new Socket({path: "/socket"});
+let playerNumber = 3
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
+	socket.send({type : 2})
+	// console.log(playerNumber)
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
 
 socket.use((msg) =>{
-	// console.log(msg);
-	if (msg.number < data.number)
-		;
-	else
+	console.log(msg);
+	if (playerNumber == 3)
 	{
+		playerNumber = msg
+		console.log(playerNumber)
+	}
+	else{
+	// if (playerNumber == 3)
+	// 	{
+	// 		console.log(playerNumber)
+	// 		console.log(msg.playerNb)
+	// 		console.log(msg)
+	// 		playerNumber = msg.playerNb;
+	// 		data.playerNumber = playerNumber
+	// 		console.log(playerNumber)
+	// 		// console.log(msg.playerNb)
+	// 		return
+	// 	}
+	// if (msg.playerNumber != 0)
+	// 	playerNumber = msg.playerNumber
+	// 	console.log(playerNumber)
+	// if (msg.number < data.number)
+		// data.number = msg.number;
+	// else
+	// {
 		data=msg
 		score = msg.score
 		keyCode = data.keyCode
 	}
+	// }
 		// console.log(data);
 	// if (msg.type == 2)
 		// ball.position.z = msg.data
@@ -345,13 +370,13 @@ function onDocumentKeyDown(event) {
 	// 	keyCode.Key39 = 0
 	// 	keyCode.Key37 = 1
 	// }
-	if (keyVar == 68) 
+	if (keyVar == 68 && playerNumber%2 == 1) 
 		palletPlayer1.position.x += mapWidth/60 ;
-	else if (keyVar == 65)
+	else if (keyVar == 65 && playerNumber%2 == 1)
 		palletPlayer1.position.x-= mapWidth/60 ;
-	if (keyVar == 39) 
+	if (keyVar == 39 && playerNumber % 2 == 0) 
 		palletPlayer2.position.x -= mapWidth/60 ;
-	if (keyVar == 37) 
+	if (keyVar == 37 && playerNumber % 2 == 0) 
 		palletPlayer2.position.x += mapWidth/60 ;
 	data.P1position = palletPlayer1.position ;
 	data.P2position = palletPlayer2.position ;
@@ -361,7 +386,7 @@ function onDocumentKeyDown(event) {
 	// palletPlayer1.position.x = data.P1position.x ;
 	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
-	console.log(keyCode);
+	// console.log(keyCode);
 }
 // function onDocumentKeyUp(event) {
 //     let keyVar = event.which;
@@ -502,7 +527,8 @@ let data = {
 	score : score,
 	keyCode : keyCode,
 	moveSpeed : moveSpeed,
-	updateScore : 0
+	updateScore : 0,
+	playerNumber : playerNumber,
 };
 socket.send({type : 0, data : data})
 loadFont()
@@ -540,19 +566,24 @@ const animate = async () => {
 		ball.rotation.x +=  .1
 		ball.position.x = data.ball.x
 		ball.position.z = data.ball.z
+		ballDirection = data.direction
 		palletPlayer1.position.x = data.P1position.x ;
 		palletPlayer2.position.x = data.P2position.x ;
 		// keyCode = data.keyCode ;
-		counter = data.number
 	}
+	else
+		counter = data.number
 	await sleep(25)
 	
 }
 
 
+
 const tmp = async () => {
 	while ( true )
 	{
+		data.playerNumber = playerNumber
+		// console.log(data)
 		socket.send({type : 0, data:data})	
 		await sleep(50)
 	}

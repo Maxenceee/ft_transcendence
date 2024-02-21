@@ -12,6 +12,7 @@ def makeid(len):
 
 waiting_list = []
 game_list = []
+pouet = [0]
 
 class Game:
 	def __init__(self, players) -> None:
@@ -21,6 +22,8 @@ class Game:
 		for p in self.players:
 			p.pool_id = self.pool_id
 			p.pool = self
+			# p.number = number
+			# number += 1
 
 	def end_game(self):
 		self.send_all(json.dump({"endgame": True}))
@@ -46,6 +49,9 @@ def start_game(num):
 		logging.info("pas assez de joueurs")
 
 class websocket_client(WebsocketConsumer):
+	
+	number = 0
+
 	def connect(self):
 		logging.info("server says connected")
 		self.accept()
@@ -79,7 +85,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP2'] += 1
 			self.data['ballDirection']['z'] *= -1
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
+				self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 			
@@ -89,7 +96,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0
 			self.data['ballDirection']['z'] *= -1
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			if hasattr(self.data, 'playerNumber') and (self.data['playerNumber'] == 1) :
+				self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		if (self.data['moveSpeed'] > 5) :
@@ -102,8 +110,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP3'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		elif self.data['ball']['x'] > 29:
@@ -111,8 +119,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP4'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 		if self.data['ball']['z'] < -29:
@@ -120,8 +128,8 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['z'] = 0 
 			self.data['ball']['y'] = 0	
 			self.data['score']['scoreP2'] -= 1
-			self.data['ballDirection']['z'] =random.uniform(-1, 1)
-			self.data['ballDirection']['x'] =  random.uniform(-1, 1)
+			self.data['ballDirection']['z'] = random.uniform(-1, 1)
+			self.data['ballDirection']['x'] = random.uniform(-1, 1)
 			self.data['updateScore'] = 1
 			self.data['moveSpeed'] = 1.05
 			
@@ -208,19 +216,32 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 		
 	def receive(self, text_data=None, bytes_data=None):
-		if not hasattr(self, 'pool_id'):
-			return
+		
 		tmp = json.loads(text_data)
 		# logging.info(tmp)
-		if not hasattr(self, 'number'):
-				self.number = 0 
+		if tmp['type'] == 2 :
+				self.send(json.dumps(pouet[0]))
+				pouet[0] += 1
+				return
+		if not hasattr(self, 'pool_id'):
+			return
+		# if not hasattr(self, 'playerNb'):
+		# 	self.playerNb = 1
+		# if not hasattr(self, 'number'):
+		# 		self.number = 0
+		# if not hasattr(self.itteration,'self.pool_id') :
+				# self.itteration[self.pool_id] = 0 
 		if not hasattr(self, 'data'): 
 			self.data = tmp['data']
-		if self.data['number'] < self.number :
+			# self.data['playerID'] = self.pool_id
+		if self.data['number'] < tmp['data']['number'] :
 				return
+		# logging.info(self.data['P1position']['x'])
 		if tmp['data']['keyCode'] != self.data['keyCode']:
 			self.data['keyCode'] = tmp['data']['keyCode']
+		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 1 :
 		self.data['P1position']['x'] = tmp['data']['P1position']['x']   # tmp
+		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 2 :
 		self.data['P2position']['x'] = tmp['data']['P2position']['x']   # tmp
 		self.data = self.reboundP1()
 		self.data = self.reboundP2()
@@ -233,12 +254,16 @@ class websocket_client(WebsocketConsumer):
 		else:
 			# self.data = self.playerMove2P()
 			self.data = self.wallCollideTwoPlayer()
+		
 		self.data['ball']['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']  
 		self.data['ball']['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
-		self.number+=1
+		self.number += 1
 		self.data['number'] = self.number
+		
+		# if self.data['playerId'] == self.pool_id :
+		# 	self.data['number'] = self.itteration[self.pool_id]
 		# logging.info(self.data['P1position']['x'])
-		# self.send(json.dumps(self.data))
+		# logging.info(self.data['number'])
 		self.pool.send_all(json.dumps(self.data))
 		
 	def disconnect(self, code):
