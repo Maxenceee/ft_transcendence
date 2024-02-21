@@ -20,7 +20,7 @@ def get_lobies(request):
 @login_forbiden
 def login(request):
     if request.method == "GET":
-        return render(request, 'views/connection.html', {"login": "", "is_invalid": False})
+        return render(request, 'views/connection.html')
     elif request.method == "POST":
         username = request.POST['login']
         password = request.POST['password']
@@ -38,6 +38,27 @@ def login(request):
             Token.objects.create(token=token, user=user)
             return response
         return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+
+@login_forbiden
+def signup(request):
+    if request.method == "GET":
+        return render(request, 'views/connection.html', { "is_signup": True, "action_url": "/signup"})
+    elif request.method == "POST":
+        username = request.POST['login']
+        password = request.POST['password']
+        if not username or not password:
+            return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
+        
+        if User.objects.filter(username=username).exists():
+            return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
+        
+        user = User.objects.create(username=username, password=password)
+        response = redirect("/")
+
+        token=''.join(random.choices(string.ascii_letters + string.digits, k=100))
+        response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+        Token.objects.create(token=token, user=user)
+        return response
 
 @login_required
 def not_found(request, url):
