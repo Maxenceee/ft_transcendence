@@ -12,14 +12,10 @@ EXPOSE 8000
 
 WORKDIR /app/server
 
-COPY ./startup.sh ./
-
-RUN chmod +x ./startup.sh
-
 COPY ./client /app/client
 
 COPY ./server/ /app/server
 
 RUN python3 manage.py makemigrations
 
-CMD ["./startup.sh"]
+CMD ["sh", "./startup.sh"]

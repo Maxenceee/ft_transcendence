@@ -10,25 +10,50 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 
+// let playerId = 0;
 
 let socket = new Socket({path: "/socket"});
+let playerNumber = 3
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
+	socket.send({type : 2})
+	// console.log(playerNumber)
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
 
 socket.use((msg) =>{
-	// console.log(msg);
-	if (msg.number < data.number)
-		;
-	else
+	console.log(msg);
+	if (playerNumber == 3)
 	{
+		playerNumber = msg
+		console.log(playerNumber)
+	}
+	else{
+	// if (playerNumber == 3)
+	// 	{
+	// 		console.log(playerNumber)
+	// 		console.log(msg.playerNb)
+	// 		console.log(msg)
+	// 		playerNumber = msg.playerNb;
+	// 		data.playerNumber = playerNumber
+	// 		console.log(playerNumber)
+	// 		// console.log(msg.playerNb)
+	// 		return
+	// 	}
+	// if (msg.playerNumber != 0)
+	// 	playerNumber = msg.playerNumber
+	// 	console.log(playerNumber)
+	// if (msg.number < data.number)
+		// data.number = msg.number;
+	// else
+	// {
 		data=msg
 		score = msg.score
 		keyCode = data.keyCode
 	}
+	// }
 		// console.log(data);
 	// if (msg.type == 2)
 		// ball.position.z = msg.data
@@ -110,43 +135,43 @@ function initiateMapTwoPlayer(data)
 			// map : player1Map 
 			})
 		);
- ///add helper to see axe)
-							const repaire = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0xffffff, 
-									opacity: 1, 
-									emissive:0xffffff,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
-							repaire.position.z +=2
-							const repaire1 = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0xffff00, 
-									opacity: 1, 
-									emissive:0xffff00,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
+//  ///add helper to see axe)
+// 							const repaire = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0xffffff, 
+// 									opacity: 1, 
+// 									emissive:0xffffff,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
+// 							repaire.position.z +=2
+// 							const repaire1 = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0xffff00, 
+// 									opacity: 1, 
+// 									emissive:0xffff00,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
 
-							const repaire2 = new THREE.Mesh( 
-								new THREE.BoxGeometry( 2,2,2 ), 
-								new THREE.MeshStandardMaterial( {
-									wireframe:false, 
-									color:0x00ff00, 
-									opacity: 1, 
-									emissive:0x00ff00,
-									side : THREE.DoubleSide,
-									// map : player1Map 
-									})
-								);
-								repaire2.position.x +=2
+// 							const repaire2 = new THREE.Mesh( 
+// 								new THREE.BoxGeometry( 2,2,2 ), 
+// 								new THREE.MeshStandardMaterial( {
+// 									wireframe:false, 
+// 									color:0x00ff00, 
+// 									opacity: 1, 
+// 									emissive:0x00ff00,
+// 									side : THREE.DoubleSide,
+// 									// map : player1Map 
+// 									})
+// 								);
+// 								repaire2.position.x +=2
 								// scene.add( repaire, repaire1, repaire2);
 //// end of the helper
 	palletPlayer2 = new THREE.Mesh( 
@@ -314,7 +339,7 @@ let moveSpeed = 1.05
 // initiateMapError({})
 initiateMapTwoPlayer({})
 //serverside under it
-document.addEventListener("keyup", onDocumentKeyUp, false);
+// document.addEventListener("keyup", onDocumentKeyUp, false);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
 // document.addEventListener("keydown", onDocumentKeyDown, false);
@@ -325,54 +350,64 @@ function onDocumentKeyDown(event) {
 	// keyCode.Key65 = 0
 	// keyCode.Key68 = 0
 	// keyCode.Key39 = 0
-	if (keyVar == 68)
-	{
-		keyCode.Key68 = 1
-		keyCode.Key65 = 0
-	}
-	if (keyVar == 65)
-	{
-		keyCode.Key65 = 1
-		keyCode.Key68 = 0
-	}
-	if (keyVar == 39)
-	{
-		keyCode.Key39 = 1
-		keyCode.Key37 = 0
-	}
-	if (keyVar == 37)
-	{
-		keyCode.Key39 = 0
-		keyCode.Key37 = 1
-	}
+	// if (keyVar == 68)
+	// {
+	// 	keyCode.Key68 = 1
+	// 	keyCode.Key65 = 0
+	// }
+	// if (keyVar == 65)
+	// {
+	// 	keyCode.Key65 = 1
+	// 	keyCode.Key68 = 0
+	// }
+	// if (keyVar == 39)
+	// {
+	// 	keyCode.Key39 = 1
+	// 	keyCode.Key37 = 0
+	// }
+	// if (keyVar == 37)
+	// {
+	// 	keyCode.Key39 = 0
+	// 	keyCode.Key37 = 1
+	// }
+	if (keyVar == 68 && playerNumber%2 == 1) 
+		palletPlayer1.position.x += mapWidth/60 ;
+	else if (keyVar == 65 && playerNumber%2 == 1)
+		palletPlayer1.position.x-= mapWidth/60 ;
+	if (keyVar == 39 && playerNumber % 2 == 0) 
+		palletPlayer2.position.x -= mapWidth/60 ;
+	if (keyVar == 37 && playerNumber % 2 == 0) 
+		palletPlayer2.position.x += mapWidth/60 ;
+	data.P1position = palletPlayer1.position ;
+	data.P2position = palletPlayer2.position ;
 	data.keyCode = keyCode
 	updatePlayer = 1;
 	// socket.send({type:2, data})
 	// palletPlayer1.position.x = data.P1position.x ;
 	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
-	console.log(keyCode);
-}
-function onDocumentKeyUp(event) {
-    let keyVar = event.which;
-
-
-	if (keyVar == 68)
-		keyCode.Key68 = 0
-	if (keyVar == 65)
-		keyCode.Key65 = 0
-	if (keyVar == 39)
-		keyCode.Key39 = 0
-	if (keyVar == 37)
-		keyCode.Key37 = 0
-
-	data.keyCode = keyCode
-	updatePlayer = 1
-	// socket.send({type:2, data})
-	// palletPlayer1.position.x = data.P1position.x ;
-	// palletPlayer2.position.x = data.P2position.x ;
 	// console.log(keyCode);
 }
+// function onDocumentKeyUp(event) {
+//     let keyVar = event.which;
+
+
+// 	if (keyVar == 68)
+// 		keyCode.Key68 = 0
+// 	if (keyVar == 65)
+// 		keyCode.Key65 = 0
+// 	if (keyVar == 39)
+// 		keyCode.Key39 = 0
+// 	if (keyVar == 37)
+// 		keyCode.Key37 = 0
+
+// 	data.keyCode = keyCode
+// 	updatePlayer = 1
+// 	// socket.send({type:2, data})
+// 	// palletPlayer1.position.x = data.P1position.x ;
+// 	// palletPlayer2.position.x = data.P2position.x ;
+// 	// console.log(keyCode);
+// }
 
 function resetBall()
 {
@@ -492,7 +527,8 @@ let data = {
 	score : score,
 	keyCode : keyCode,
 	moveSpeed : moveSpeed,
-	updateScore : 0
+	updateScore : 0,
+	playerNumber : playerNumber,
 };
 socket.send({type : 0, data : data})
 loadFont()
@@ -530,19 +566,24 @@ const animate = async () => {
 		ball.rotation.x +=  .1
 		ball.position.x = data.ball.x
 		ball.position.z = data.ball.z
+		ballDirection = data.direction
 		palletPlayer1.position.x = data.P1position.x ;
 		palletPlayer2.position.x = data.P2position.x ;
 		// keyCode = data.keyCode ;
-		counter = data.number
 	}
+	else
+		counter = data.number
 	await sleep(25)
 	
 }
 
 
+
 const tmp = async () => {
-	while (1 == 1)
+	while ( true )
 	{
+		data.playerNumber = playerNumber
+		// console.log(data)
 		socket.send({type : 0, data:data})	
 		await sleep(50)
 	}
@@ -556,4 +597,10 @@ tmp()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
 
+document.addEventListener('blur', function() {
+	console.log("window is blured");
+});
 
+document.addEventListener('focus', function() {
+	console.log("window if focused");
+});
