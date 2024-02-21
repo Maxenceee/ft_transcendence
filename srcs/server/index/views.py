@@ -2,7 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import *
 from .decorators import *
+from passlib.hash import django_pbkdf2_sha256 as pbkdf2
 import logging
+
+def makeid(length):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 # Create your views here.
 @login_required
@@ -27,14 +31,14 @@ def login(request):
         if not username or not password:
             return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
         
-        if User.objects.filter(username=username, password=password).exists():
-            user = User.objects.get(username=username, password=password)
-            token=''.join(random.choices(string.ascii_letters + string.digits, k=100))
-
-            response = redirect("/")
-            response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
-            Token.objects.create(token=token, user=user)
-            return response
+        if User.objects.filter(username=username).exists():
+            user = User.objects.get(username=username)
+            if pbkdf2.verify(password, user.password):
+                token = makeid(100)
+                response = redirect("/")
+                Token.objects.create(token=token, user=user)
+                response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+                return response
 
         return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 
@@ -51,12 +55,13 @@ def signup(request):
         if User.objects.filter(username=username).exists():
             return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
         
+        password = pbkdf2.hash(password)
         user = User.objects.create(username=username, password=password)
         response = redirect("/")
 
-        token=''.join(random.choices(string.ascii_letters + string.digits, k=100))
-        response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+        token = makeid(100)
         Token.objects.create(token=token, user=user)
+        response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
         return response
 
 @login_required
