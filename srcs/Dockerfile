@@ -16,6 +16,4 @@ COPY ./client /app/client
 
 COPY ./server/ /app/server
 
-RUN python3 manage.py makemigrations
-
 CMD ["sh", "./startup.sh"]
