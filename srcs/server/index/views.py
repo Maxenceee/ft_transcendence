@@ -11,7 +11,7 @@ def makeid(length):
 # Create your views here.
 @login_required
 def index(request):
-    return render(request, 'views/index.html', {"username": request.user.username})
+    return render(request, 'views/index.html', {"username": request.user.nickname})
 
 @login_required
 def get_user(request, id):
@@ -56,13 +56,27 @@ def signup(request):
             return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
         
         password = pbkdf2.hash(password)
-        user = User.objects.create(username=username, password=password)
+        user = User.objects.create(login_type=0, nickname=username, username=username, password=password)
         response = redirect("/")
 
         token = makeid(100)
         Token.objects.create(token=token, user=user)
         response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
         return response
+
+def callback_intra(request):
+
+    intra_id = "ngennaro"
+
+    if not User.objects.filter(intra_id=intra_id).exists():
+        user = User.objects.create(login_type=1, nickname=intra_id, intra_id=intra_id)
+    else:
+        user = User.objects.get(intra_id=intra_id)
+    response = redirect("/")
+    token = makeid(100)
+    Token.objects.create(token=token, user=user)
+    response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+    return response
 
 @login_required
 def not_found(request, url):
