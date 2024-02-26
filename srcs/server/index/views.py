@@ -5,6 +5,7 @@ from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
 import logging
 import os
+import requests
 
 def makeid(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
@@ -66,12 +67,27 @@ def signup(request):
         return response
 
 def callback_intra(request):
+    #debug
     code = request.GET.get('code', '')
     INTRA_USER = os.environ.get('INTRA_USER')
     INTRA_SECRET = os.environ.get('INTRA_SECRET')
 
-    logging.info(f"Code: {code},{INTRA_USER},{INTRA_SECRET}")
-    
+    data = {
+    'grant_type': 'authorization_code',
+    'client_id': INTRA_USER,
+    'client_secret': INTRA_SECRET,
+    'code': code,
+    'redirect_uri': 'https://localhost:3000'
+    }
+
+    response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
+
+    logging.info(response.json())
+
+    return redirect("/login")
+    #end of debug
+
+
     intra_id = "ngennaro"
 
     if not User.objects.filter(intra_id=intra_id).exists():
@@ -87,3 +103,11 @@ def callback_intra(request):
 @login_required
 def not_found(request, url):
     return redirect("/")
+
+
+# curl -F grant_type=authorization_code \
+# -F client_id=u-s4t2ud-dd8dc19aefc610dce6179858323eb56cf27424f87b499071cfd0e3b59165c4c6 \
+# -F client_secret=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 \
+# -F code=dfa0e809d941ab076ac04451d9d9b1417235f61644c49dfb92bc1ceb51f57e9b \
+# -F redirect_uri=http://localhost:3000 \
+# -X POST https://api.intra.42.fr/oauth/token
