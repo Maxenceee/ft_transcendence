@@ -4,7 +4,7 @@ RUN apt-get update -y && apt-get upgrade -y
 
 RUN pip install --upgrade pip
 
-RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv passlib
+RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv passlib requests
 
 RUN mkdir /app
 
@@ -15,5 +15,11 @@ WORKDIR /app/server
 COPY ./client /app/client
 
 COPY ./server/ /app/server
+
+RUN python3 manage.py makemigrations
+
+RUN python3 manage.py makemigrations index
+
+RUN python3 manage.py makemigrations game
 
 CMD ["sh", "./startup.sh"]
