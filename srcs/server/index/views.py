@@ -4,6 +4,7 @@ from .models import *
 from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
 import logging
+import os
 
 def makeid(length):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
@@ -65,7 +66,12 @@ def signup(request):
         return response
 
 def callback_intra(request):
+    code = request.GET.get('code', '')
+    INTRA_USER = os.environ.get('INTRA_USER')
+    INTRA_SECRET = os.environ.get('INTRA_SECRET')
 
+    logging.info(f"Code: {code},{INTRA_USER},{INTRA_SECRET}")
+    
     intra_id = "ngennaro"
 
     if not User.objects.filter(intra_id=intra_id).exists():

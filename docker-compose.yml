@@ -9,6 +9,8 @@ services:
             IP_LOCAL: ${IP_LOCAL}
             POSTGRES_USER: ${POSTGRES_USER}
             POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            INTRA_USER: ${INTRA_USER}
+            INTRA_SECRET: ${INTRA_SECRET}
         env_file:
             - .env
         ports:
