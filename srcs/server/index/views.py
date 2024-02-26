@@ -66,8 +66,8 @@ def signup(request):
         response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
         return response
 
+@login_forbiden
 def callback_intra(request):
-    #debug
     code = request.GET.get('code', '')
     INTRA_USER = os.environ.get('INTRA_USER')
     INTRA_SECRET = os.environ.get('INTRA_SECRET')
@@ -77,19 +77,17 @@ def callback_intra(request):
     'client_id': INTRA_USER,
     'client_secret': INTRA_SECRET,
     'code': code,
-    'redirect_uri': 'https://localhost:3000'
+    'redirect_uri': 'http://localhost:3000/callback/intra'
     }
-
-    response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
-
-    logging.info(response.json())
-
-    return redirect("/login")
-    #end of debug
-
-
-    intra_id = "ngennaro"
-
+    try:
+        response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
+        response = response.json()
+        access_token = response['access_token']
+        intra_id = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
+        intra_id = intra_id.json()
+        intra_id = intra_id['login']
+    except:
+        return redirect("/")
     if not User.objects.filter(intra_id=intra_id).exists():
         user = User.objects.create(login_type=1, nickname=intra_id, intra_id=intra_id)
     else:
@@ -100,14 +98,10 @@ def callback_intra(request):
     response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
     return response
 
+def callback_swivel(request):
+    pass
+
+
 @login_required
 def not_found(request, url):
     return redirect("/")
-
-
-# curl -F grant_type=authorization_code \
-# -F client_id=u-s4t2ud-dd8dc19aefc610dce6179858323eb56cf27424f87b499071cfd0e3b59165c4c6 \
-# -F client_secret=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 \
-# -F code=dfa0e809d941ab076ac04451d9d9b1417235f61644c49dfb92bc1ceb51f57e9b \
-# -F redirect_uri=http://localhost:3000 \
-# -X POST https://api.intra.42.fr/oauth/token
