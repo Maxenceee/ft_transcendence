@@ -16,6 +16,8 @@ COPY ./client /app/client
 
 COPY ./server/ /app/server
 
+RUN python manage.py collectstatic
+
 RUN python3 manage.py makemigrations
 
 RUN python3 manage.py makemigrations index
