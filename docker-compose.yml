@@ -1,9 +1,24 @@
 version: '3'
 
 services:
+    nginx:
+        container_name: nginx
+        build:
+            context: ./srcs/nginx
+        image: nginx
+        networks:
+            - transcendence
+        ports:
+            - 3000:80
+        volumes:
+            - shared_data:/var/www/static/
+        depends_on:
+            - website
+        restart: always
+
     website:
         container_name: django
-        build: 
+        build:
             context: ./srcs
         environment:
             IP_LOCAL: ${IP_LOCAL}
@@ -13,8 +28,10 @@ services:
             INTRA_SECRET: ${INTRA_SECRET}
         env_file:
             - .env
-        ports:
-            - 3000:3000
+        # ports:
+        #     - 3000:3000
+        volumes:
+            - shared_data:/var/www/static/
         networks:
             - transcendence
         depends_on:
@@ -48,3 +65,6 @@ volumes:
     postgres_volume:
         name: postgres_volume
         driver: local
+
+    shared_data:
+        name: shared_data
