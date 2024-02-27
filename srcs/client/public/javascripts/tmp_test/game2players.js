@@ -13,7 +13,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 // let playerId = 0;
 
 let socket = new Socket({path: "/socket"});
-let playerNumber = 3
+let playerNumber = 9007199254740991
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
 	socket.send({type : 2})
@@ -24,10 +24,10 @@ socket.onclose(() => {
 });
 
 socket.use((msg) =>{
-	console.log(msg);
-	if (playerNumber == 3)
+	// console.log(msg);
+	if (playerNumber == 9007199254740991 && msg.type == "id")
 	{
-		playerNumber = msg
+		playerNumber = msg.playerNumber
 		console.log(playerNumber)
 	}
 	else{
@@ -52,6 +52,15 @@ socket.use((msg) =>{
 		data=msg
 		score = msg.score
 		keyCode = data.keyCode
+		if (data.number[0] > counter)
+		// if (palletPlayer1.position.x != data.P1position.x)
+			palletPlayer1.position.x = data.P1position.x
+		if (data.number[1] > counter)
+		// if (palletPlayer1.position.x != data.P1position.x)
+			palletPlayer2.position.x = data.P2position.x
+		// console.log(palletPlayer2.position.x)
+		// console.log(data.P2position.x)
+		console.log(data.number)
 	}
 	// }
 		// console.log(data);
@@ -370,16 +379,31 @@ function onDocumentKeyDown(event) {
 	// 	keyCode.Key39 = 0
 	// 	keyCode.Key37 = 1
 	// }
-	if (keyVar == 68 && playerNumber%2 == 1) 
+	if (keyVar == 68 && playerNumber % 2 == 1) 
+	{
 		palletPlayer1.position.x += mapWidth/60 ;
-	else if (keyVar == 65 && playerNumber%2 == 1)
+		data.P1position = palletPlayer1.position ;
+		counter +=2
+	}
+		else if (keyVar == 65 && playerNumber % 2 == 1)
+	{
 		palletPlayer1.position.x-= mapWidth/60 ;
-	if (keyVar == 39 && playerNumber % 2 == 0) 
+		data.P1position = palletPlayer1.position ;
+		counter +=2
+	}
+		if (keyVar == 39 && playerNumber % 2 == 0) 
+	{
+		data.P2position = palletPlayer2.position ;
 		palletPlayer2.position.x -= mapWidth/60 ;
-	if (keyVar == 37 && playerNumber % 2 == 0) 
+		counter +=2
+	}
+	if (keyVar == 37 && playerNumber % 2 == 0)
+	{
 		palletPlayer2.position.x += mapWidth/60 ;
-	data.P1position = palletPlayer1.position ;
-	data.P2position = palletPlayer2.position ;
+		data.P2position = palletPlayer2.position ;
+		counter +=2
+	}
+
 	data.keyCode = keyCode
 	updatePlayer = 1;
 	// socket.send({type:2, data})
@@ -517,8 +541,9 @@ var keyCode = {
 	Key37 : 0,
 }
 
+let counter = 0
 let data = {
-	number : 0,
+	number : [2],
 	ball : ball.position,
 	ballDirection : ballDirection,
 	ballSpin : ball.rotation,
@@ -532,7 +557,6 @@ let data = {
 };
 socket.send({type : 0, data : data})
 loadFont()
-let counter = 0
 var endScore = 0;
 
 const animate = async () => {
@@ -559,20 +583,20 @@ const animate = async () => {
 	// palletReboundP1()
 	// palletReboundP2()
 	// wallCollideTwoPlayer()
-	if (data.number > counter)
-	{
+	// if (data.number > counter)
+	// {
 		if (data.updateScore == 1)
 			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
 		ball.rotation.x +=  .1
 		ball.position.x = data.ball.x
 		ball.position.z = data.ball.z
 		ballDirection = data.direction
-		palletPlayer1.position.x = data.P1position.x ;
-		palletPlayer2.position.x = data.P2position.x ;
+		// palletPlayer1.position.x = data.P1position.x ;
+		// palletPlayer2.position.x = data.P2position.x ;
 		// keyCode = data.keyCode ;
-	}
-	else
-		counter = data.number
+	// }
+	// else
+		// counter = data.number
 	await sleep(25)
 	
 }
@@ -583,7 +607,21 @@ const tmp = async () => {
 	while ( true )
 	{
 		data.playerNumber = playerNumber
-		// console.log(data)
+		// console.log("player number")
+		// console.log(playerNumber)
+		// console.log(data.playerNumber)
+		counter += 1
+		if (data.playerNumber % 2 == 0)
+		{
+			// console.log("send on 0")
+			data.number[0] = counter
+		}
+		else 
+			{
+				// console.log("send on 1")
+				data.number[1] = counter
+			}
+		// console.log(data.number[data.playerNumber % 2])
 		socket.send({type : 0, data:data})	
 		await sleep(50)
 	}
@@ -597,10 +635,10 @@ tmp()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})
 
-document.addEventListener('blur', function() {
-	console.log("window is blured");
-});
+// document.addEventListener('blur', function() {
+// 	console.log("window is blured");
+// });
 
-document.addEventListener('focus', function() {
-	console.log("window if focused");
-});
+// document.addEventListener('focus', function() {
+// 	console.log("window if focused");
+// });
