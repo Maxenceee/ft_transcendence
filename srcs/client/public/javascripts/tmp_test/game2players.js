@@ -28,7 +28,8 @@ socket.use((msg) =>{
 	if (playerNumber == 9007199254740991 && msg.type == "id")
 	{
 		playerNumber = msg.playerNumber
-		console.log(playerNumber)
+		// console.log(playerNumber)
+		setcam()
 	}
 	else{
 	// if (playerNumber == 3)
@@ -49,18 +50,17 @@ socket.use((msg) =>{
 		// data.number = msg.number;
 	// else
 	// {
-		data=msg
-		score = msg.score
+		data = msg
 		keyCode = data.keyCode
-		if (data.number[0] > counter)
+		if (playerNumber % 2 == 0)
 		// if (palletPlayer1.position.x != data.P1position.x)
 			palletPlayer1.position.x = data.P1position.x
-		if (data.number[1] > counter)
+		else
 		// if (palletPlayer1.position.x != data.P1position.x)
 			palletPlayer2.position.x = data.P2position.x
 		// console.log(palletPlayer2.position.x)
 		// console.log(data.P2position.x)
-		console.log(data.number)
+		// console.log(data.number)
 	}
 	// }
 		// console.log(data);
@@ -84,7 +84,7 @@ camera.position.set( 15, 15, 20 );
 const controls = new OrbitControls( camera, renderer.domElement );
 const scene = new THREE.Scene();
 const sceneError = new THREE.Scene
-controls.maxDistance = 50
+controls.maxDistance = 70
 controls.target.set( 0, 0, 0 );
 controls.update();
 
@@ -241,14 +241,15 @@ function initiateMapTwoPlayer(data)
 	wallP1.position.z += mapLenth/2
 	wallP2.position.z -= mapLenth/2
 
-	const geometryBall = new THREE.SphereGeometry( 1 );
+	const geometryBall = new THREE.BoxGeometry( 1, 1, 1 );
 	const materialBall = new THREE.MeshPhysicalMaterial( {
 		wireframe:false, 
 		color:0xffffff, 
 		opacity: 1, 
 		iridescence :1,
 		side : THREE.DoubleSide,
-		map:ballMap});
+		// map:ballMap
+	});
 	ball = new THREE.Mesh( geometryBall, materialBall );
 
 
@@ -379,31 +380,36 @@ function onDocumentKeyDown(event) {
 	// 	keyCode.Key39 = 0
 	// 	keyCode.Key37 = 1
 	// }
-	if (keyVar == 68 && playerNumber % 2 == 1) 
+	if (playerNumber % 2 == 1)
 	{
-		palletPlayer1.position.x += mapWidth/60 ;
-		data.P1position = palletPlayer1.position ;
-		counter +=2
+		if (keyVar == 68 || keyVar == 39) 
+		{
+			palletPlayer1.position.x += mapWidth/60 ;
+			data.P1position = palletPlayer1.position ;
+			counter +=2
+		}
+		if (keyVar == 65 || keyVar == 37)
+		{
+			palletPlayer1.position.x -= mapWidth/60 ;
+			data.P1position = palletPlayer1.position ;
+			counter +=2
+		}
 	}
-		else if (keyVar == 65 && playerNumber % 2 == 1)
+	else if (playerNumber % 2 == 0)
 	{
-		palletPlayer1.position.x-= mapWidth/60 ;
-		data.P1position = palletPlayer1.position ;
-		counter +=2
+		if (keyVar == 65 || keyVar == 37) 
+		{
+			data.P2position = palletPlayer2.position ;
+			palletPlayer2.position.x += mapWidth/60 ;
+			counter +=2
+		}
+		if (keyVar == 68 || keyVar == 39)
+		{
+			palletPlayer2.position.x -= mapWidth/60 ;
+			data.P2position = palletPlayer2.position ;
+			counter +=2
+		}
 	}
-		if (keyVar == 39 && playerNumber % 2 == 0) 
-	{
-		data.P2position = palletPlayer2.position ;
-		palletPlayer2.position.x -= mapWidth/60 ;
-		counter +=2
-	}
-	if (keyVar == 37 && playerNumber % 2 == 0)
-	{
-		palletPlayer2.position.x += mapWidth/60 ;
-		data.P2position = palletPlayer2.position ;
-		counter +=2
-	}
-
 	data.keyCode = keyCode
 	updatePlayer = 1;
 	// socket.send({type:2, data})
@@ -585,9 +591,14 @@ const animate = async () => {
 	// wallCollideTwoPlayer()
 	// if (data.number > counter)
 	// {
-		if (data.updateScore == 1)
+		if (data.updateScore != 0 && data.score != score)
+		{
+			score = data.score
 			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
-		ball.rotation.x +=  .1
+			data.updateScore -=1
+			console.log(score)
+		}
+		// ball.rotation.x +=  .1
 		ball.position.x = data.ball.x
 		ball.position.z = data.ball.z
 		ballDirection = data.direction
@@ -607,21 +618,11 @@ const tmp = async () => {
 	while ( true )
 	{
 		data.playerNumber = playerNumber
-		// console.log("player number")
-		// console.log(playerNumber)
-		// console.log(data.playerNumber)
 		counter += 1
 		if (data.playerNumber % 2 == 0)
-		{
-			// console.log("send on 0")
 			data.number[0] = counter
-		}
 		else 
-			{
-				// console.log("send on 1")
-				data.number[1] = counter
-			}
-		// console.log(data.number[data.playerNumber % 2])
+			data.number[1] = counter
 		socket.send({type : 0, data:data})	
 		await sleep(50)
 	}
@@ -631,6 +632,12 @@ const tmp = async () => {
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 sleep(500).then(() => {animate(); });
 tmp()
+function setcam () {
+	if (playerNumber % 2 == 1)
+		camera.position.set(30, 30, 40)
+	else
+		camera.position.set(30, 30, -40)
+}
 // animate()
 console.log("cookie")
 // socket.send({type: "mapType", mapType :1})

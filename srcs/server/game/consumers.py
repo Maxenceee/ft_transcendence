@@ -19,6 +19,9 @@ global timeStart
 timeStart = 0
 global pouet; 
 global ballPosition
+global score
+score = dict()
+# score = {'scoreP1', 'scoreP2','scoreP3', 'scoreP4'}
 global ballDirection
 ballPosition = dict()
 ballDirection = {'x', 'y'}
@@ -59,7 +62,6 @@ def start_game(num):
 		logging.info("pas assez de joueurs")
 
 class websocket_client(WebsocketConsumer):
-	
 	number = 0
 
 
@@ -88,6 +90,8 @@ class websocket_client(WebsocketConsumer):
 	def wallCollideTwoPlayer(self):
 		global ballPosition
 		global ballDirection
+		global score
+
 		if ballPosition['x'] < -17 :
 			ballDirection['x'] = 1 #naive version
 		elif ballPosition['x'] > 17:
@@ -96,17 +100,21 @@ class websocket_client(WebsocketConsumer):
 			ballPosition['x'] = 0
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0	
-			self.data['score']['scoreP2'] += 1
+			score['scoreP2'] += 1
+			self.data['score'] = score
 			ballDirection['z'] *= -1
 			if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
 				ballDirection['x'] = random.uniform(-1, 1)
 			else :
 				ballDirection = self.data['ballDirection']
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
+			self.pool.send_all(json.dumps(self.data))
+			logging.info(self.data['score'])
 			
 		elif ballPosition['z'] > 29 and self.data['updateScore'] == 0:
-			self.data['score']['scoreP1'] += 1
+			score['scoreP1'] +=1
+			self.data['score'] = score
 			ballPosition['x'] = 0
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0
@@ -115,8 +123,10 @@ class websocket_client(WebsocketConsumer):
 				ballDirection['x'] = random.uniform(-1, 1)
 			else :
 				ballDirection = self.data['ballDirection']
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
+			self.pool.send_all(json.dumps(self.data))
+			logging.info(self.data['score'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
 		return self.data
@@ -129,7 +139,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['score']['scoreP3'] -= 1
 			self.data['ballDirection']['z'] = random.uniform(-1, 1)
 			self.data['ballDirection']['x'] = random.uniform(-1, 1)
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
 		elif self.data['ball']['x'] > 29:
 			self.data['ball']['x'] = 0
@@ -138,7 +148,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['score']['scoreP4'] -= 1
 			self.data['ballDirection']['z'] = random.uniform(-1, 1)
 			self.data['ballDirection']['x'] = random.uniform(-1, 1)
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
 		if self.data['ball']['z'] < -29:
 			self.data['ball']['x'] = 0
@@ -147,7 +157,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['score']['scoreP2'] -= 1
 			self.data['ballDirection']['z'] = random.uniform(-1, 1)
 			self.data['ballDirection']['x'] = random.uniform(-1, 1)
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
 			
 		elif self.data['ball']['z'] > 29 :
@@ -157,7 +167,7 @@ class websocket_client(WebsocketConsumer):
 			self.data['ball']['y'] = 0
 			self.data['ballDirection']['z'] = random.uniform(-1, 1)
 			self.data['ballDirection']['x'] = random.uniform(-1, 1)
-			self.data['updateScore'] = 1
+			self.data['updateScore'] = 2
 			self.data['moveSpeed'] = 1.05
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
@@ -236,6 +246,7 @@ class websocket_client(WebsocketConsumer):
 		global timeStart
 		global ballPosition
 		global ballDirection
+		global score
 
 		if timeStart == 0 :
 			timeStart = time.time()
@@ -252,6 +263,7 @@ class websocket_client(WebsocketConsumer):
 		if not hasattr(self, 'pool_id'):
 			logging.info("no id")
 			return
+		
 		# if not hasattr(self, 'playerNb'):
 		# 	self.playerNb = 1
 		# if not hasattr(self, 'number'):
@@ -260,6 +272,7 @@ class websocket_client(WebsocketConsumer):
 				# self.itteration[self.pool_id] = 0 
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
+			score = tmp['data']['score']
 			ballPosition = self.data['ball']
 			ballDirection = self.data['ballDirection']
 			# asyncio.run(self.clock())
@@ -279,7 +292,7 @@ class websocket_client(WebsocketConsumer):
 			# self.data['keyCode'] = tmp['data']['keyCode']
 		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 1 :
 		self.data = self.reboundP2()
-		self.data['updateScore'] = 0
+		self.data['updateScore'] = tmp['data']['updateScore']
 		if tmp['type'] == 1 :
 			# self.playerMove4P()
 			self.data = self.wallCollideFourPlayer()
@@ -291,16 +304,18 @@ class websocket_client(WebsocketConsumer):
 		# if int(str(self.data['playerNumber'])) % 2 == 1 :
 		if 	self.data['number'][0] < tmp['data']['number'][0] :
 					self.data['number'][0] = tmp['data']['number'][0]
-			# if self.data['P1position']['x'] != tmp['data']['P1position']['x'] :
+		if self.data['P1position']['x'] != tmp['data']['P1position']['x'] :
 				# logging.info("moving P1")
-		self.data['P1position']['x'] = tmp['data']['P1position']['x']   # tmp
+			self.data['P1position']['x'] = tmp['data']['P1position']['x']   # tmp
 		# if int(str(self.data['playerNumber'])) % 2 == 0 :
 		if self.data['number'][1] < tmp['data']['number'][1] :
 				self.data['number'][1] = tmp['data']['number'][1]
 		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 2 :
 			# if self.data['P2position']['x'] != tmp['data']['P2position']['x'] :
 				# logging.info("moving p2")
-		self.data['P2position']['x'] = tmp['data']['P2position']['x']   # tmp
+		if self.data['P2position']['x'] != tmp['data']['P2position']['x'] :
+			self.data['P2position']['x'] = tmp['data']['P2position']['x']   # tmp
+		# logging.info(self.data['P2position']['x'])
 		self.data = self.reboundP1()
 		if ballPosition['z'] == tmp['data']['ball']['z'] :
 			ballPosition['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']
@@ -319,7 +334,7 @@ class websocket_client(WebsocketConsumer):
 		# logging.info(self.data['P2position']['x'])
 		# logging.info("pouet")
 		# logging.info(self.data)
-		if timeStart + 0.025 < time.time():
+		if timeStart + 0.05 < time.time():
 			self.data['ball'] = ballPosition
 			self.data['ballDirection'] = ballDirection
 			self.pool.send_all(json.dumps(self.data))
