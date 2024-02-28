@@ -22,8 +22,6 @@ services:
             context: ./srcs
         env_file:
             - .env
-        # ports:
-        #     - 3000:3000
         volumes:
             - shared_data:/var/www/static/
         networks:
