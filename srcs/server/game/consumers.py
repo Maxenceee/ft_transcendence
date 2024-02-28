@@ -97,10 +97,10 @@ class websocket_client(WebsocketConsumer):
 		elif ballPosition['x'] > 17:
 			ballDirection['x'] = -1 #naive version
 		if ballPosition['z'] < -29 and self.data['updateScore'] == 0:
+			score['scoreP2'] += 1
 			ballPosition['x'] = 0
 			ballPosition['z'] = 0 
-			ballPosition['y'] = 0	
-			score['scoreP2'] += 1
+			ballPosition['y'] = 0
 			self.data['score'] = score
 			ballDirection['z'] *= -1
 			if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
@@ -198,14 +198,6 @@ class websocket_client(WebsocketConsumer):
 			
 		if self.data['keyCode']['Key90'] == 1 and self.data['P4position']['z']  > -26 :
 			self.data['P4position']['z'] -= 1.1
-	# self.data['keyCode']['Key68'] = 0
-	# self.data['keyCode']['Key65'] = 0
-	# self.data['keyCode']['Key39'] = 0
-	# self.data['keyCode']['Key37'] = 0
-	# self.data['keyCode']['Key81'] = 0
-	# self.data['keyCode']['Key69'] = 0
-	# self.data['keyCode']['Key67'] = 0
-	# self.data['keyCode']['Key90'] = 0	
 		return self.data
 
 	def reboundP1(self):
@@ -252,38 +244,31 @@ class websocket_client(WebsocketConsumer):
 			timeStart = time.time()
 		tmp = json.loads(text_data)
 		# logging.info(tmp)
+		if not hasattr(self, 'pool_id'):
+			logging.info("no id")
+			return
 		if tmp['type'] == 2:
 				tmp = dict()
 				tmp['playerNumber'] = pouet[0]
 				tmp['type'] = "id"
+				tmp['gameID'] = self.pool_id
 				self.send(json.dumps(tmp))
 				pouet[0] += 1
 				logging.info(f"pouet = {tmp}")
 				return
-		if not hasattr(self, 'pool_id'):
-			logging.info("no id")
-			return
-		
-		# if not hasattr(self, 'playerNb'):
-		# 	self.playerNb = 1
-		# if not hasattr(self, 'number'):
-		# 		self.number = 0
-		# if not hasattr(self.itteration,'self.pool_id') :
-				# self.itteration[self.pool_id] = 0 
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
 			score = tmp['data']['score']
 			ballPosition = self.data['ball']
 			ballDirection = self.data['ballDirection']
-			# asyncio.run(self.clock())
-			# self.data['playerID'] = self.pool_id
+			self.data['gameID'] = self.pool_id
+		if  tmp['data']['gameID'] != self.pool_id :
+				logging.info(self.pool_id)
+				logging.info(self.data['gameID'])
+				return
 		if self.data['number'][1] > tmp['data']['number'][1] and  tmp['data']['playerNumber'] % 2 == 1:
-				logging.info("error 01") 
-				logging.info(self.data['number'][1])
 				return
 		if self.data['number'][0] > tmp['data']['number'][0]and  tmp['data']['playerNumber'] % 2 == 0 :
-				logging.info("error 02")
-				logging.info(self.data['number'][0])
 				return
 		
 		# logging.info(tmp['data']['number'])
@@ -326,7 +311,7 @@ class websocket_client(WebsocketConsumer):
 		# logging.info(time.time())
 		
 		# if self.data['playerId'] == self.pool_id :
-		# 	self.data['number'] = self.itteration[self.pool_id]
+		# 	self.data['number'] = self.itteration
 		# logging.info(self.data['P1position']['x'])
 		# logging.info(self.data['number'])
 		# logging.info(self.data['ball']['x'])

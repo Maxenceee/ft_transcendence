@@ -22,50 +22,33 @@ socket.onconnection(() => {
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
-
+let gameID
 socket.use((msg) =>{
 	// console.log(msg);
 	if (playerNumber == 9007199254740991 && msg.type == "id")
 	{
 		playerNumber = msg.playerNumber
+		data.gameID = msg.gameID
+		gameID = data.gameID
 		// console.log(playerNumber)
 		setcam()
 	}
 	else{
-	// if (playerNumber == 3)
-	// 	{
-	// 		console.log(playerNumber)
-	// 		console.log(msg.playerNb)
-	// 		console.log(msg)
-	// 		playerNumber = msg.playerNb;
-	// 		data.playerNumber = playerNumber
-	// 		console.log(playerNumber)
-	// 		// console.log(msg.playerNb)
-	// 		return
-	// 	}
-	// if (msg.playerNumber != 0)
-	// 	playerNumber = msg.playerNumber
-	// 	console.log(playerNumber)
-	// if (msg.number < data.number)
-		// data.number = msg.number;
-	// else
-	// {
+		if (gameID == undefined)
+			gameID = msg.gameID
+		if (msg.gameID != gameID)
+			{
+				console.log("have "   + gameID)
+				console.log("recive " + msg.gameID)
+				return
+			}
 		data = msg
 		keyCode = data.keyCode
 		if (playerNumber % 2 == 0)
-		// if (palletPlayer1.position.x != data.P1position.x)
 			palletPlayer1.position.x = data.P1position.x
 		else
-		// if (palletPlayer1.position.x != data.P1position.x)
 			palletPlayer2.position.x = data.P2position.x
-		// console.log(palletPlayer2.position.x)
-		// console.log(data.P2position.x)
-		// console.log(data.number)
 	}
-	// }
-		// console.log(data);
-	// if (msg.type == 2)
-		// ball.position.z = msg.data
 });
 
 
@@ -560,6 +543,7 @@ let data = {
 	moveSpeed : moveSpeed,
 	updateScore : 0,
 	playerNumber : playerNumber,
+	gameID : 0
 };
 socket.send({type : 0, data : data})
 loadFont()
