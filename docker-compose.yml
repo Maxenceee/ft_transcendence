@@ -20,12 +20,6 @@ services:
         container_name: django
         build:
             context: ./srcs
-        environment:
-            IP_LOCAL: ${IP_LOCAL}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            INTRA_USER: ${INTRA_USER}
-            INTRA_SECRET: ${INTRA_SECRET}
         env_file:
             - .env
         # ports:
@@ -43,9 +37,8 @@ services:
         container_name: postgres
         image: postgres:16-bullseye
         restart: always
-        environment:
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        env_file:
+            - .env
         volumes: 
           - postgres_volume:/var/lib/postgresql/data
         networks:
