@@ -25,6 +25,7 @@ socket.onclose(() => {
 
 socket.use((msg) =>{
 	console.log(msg);
+	return;
 	if (playerNumber == 3)
 	{
 		playerNumber = msg
@@ -541,7 +542,9 @@ const animate = async () => {
 		renderer.render( scene, camera );
 		composer.render();	
 	}
-	else
+	return
+
+		//else
 		renderer.render( sceneError, camera );
 	controls.update()
 	requestAnimationFrame(animate)
@@ -583,7 +586,7 @@ const tmp = async () => {
 	while ( true )
 	{
 		data.playerNumber = playerNumber
-		// console.log(data)
+		console.log("yqy")
 		socket.send({type : 0, data:data})	
 		await sleep(50)
 	}
