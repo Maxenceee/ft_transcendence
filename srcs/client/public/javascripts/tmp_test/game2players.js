@@ -14,15 +14,18 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 let socket = new Socket({path: "/socket"});
 let playerNumber = 9007199254740991
+let connectionStatus = 0
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
 	socket.send({type : 2})
+	connectionStatus = 1
 	// console.log(playerNumber)
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
+	connectionStatus = 2
 });
-let gameID
+let gameID = undefined
 socket.use((msg) =>{
 	// console.log(msg);
 	if (playerNumber == 9007199254740991 && msg.type == "id")
@@ -30,16 +33,22 @@ socket.use((msg) =>{
 		playerNumber = msg.playerNumber
 		data.gameID = msg.gameID
 		gameID = data.gameID
-		// console.log(playerNumber)
+		console.log(playerNumber)
+		console.log(gameID)
 		setcam()
 	}
 	else{
 		if (gameID == undefined)
+		{
 			gameID = msg.gameID
+			playerNumber = msg.playerNumber
+			console.log(playerNumber)
+			console.log(gameID)
+		}
 		if (msg.gameID != gameID)
 			{
 				console.log("have "   + gameID)
-				console.log("recive " + msg.gameID)
+				console.log("receve " + msg.gameID)
 				return
 			}
 		data = msg
@@ -87,8 +96,6 @@ let font, textGeo, textMesh2
 var score = {
 	scoreP1: 0,
 	scoreP2: 0,
-	scoreP3: 0,
-	scoreP4: 0,
 };
 
 function loadFont() {
@@ -127,45 +134,6 @@ function initiateMapTwoPlayer(data)
 			// map : player1Map 
 			})
 		);
-//  ///add helper to see axe)
-// 							const repaire = new THREE.Mesh( 
-// 								new THREE.BoxGeometry( 2,2,2 ), 
-// 								new THREE.MeshStandardMaterial( {
-// 									wireframe:false, 
-// 									color:0xffffff, 
-// 									opacity: 1, 
-// 									emissive:0xffffff,
-// 									side : THREE.DoubleSide,
-// 									// map : player1Map 
-// 									})
-// 								);
-// 							repaire.position.z +=2
-// 							const repaire1 = new THREE.Mesh( 
-// 								new THREE.BoxGeometry( 2,2,2 ), 
-// 								new THREE.MeshStandardMaterial( {
-// 									wireframe:false, 
-// 									color:0xffff00, 
-// 									opacity: 1, 
-// 									emissive:0xffff00,
-// 									side : THREE.DoubleSide,
-// 									// map : player1Map 
-// 									})
-// 								);
-
-// 							const repaire2 = new THREE.Mesh( 
-// 								new THREE.BoxGeometry( 2,2,2 ), 
-// 								new THREE.MeshStandardMaterial( {
-// 									wireframe:false, 
-// 									color:0x00ff00, 
-// 									opacity: 1, 
-// 									emissive:0x00ff00,
-// 									side : THREE.DoubleSide,
-// 									// map : player1Map 
-// 									})
-// 								);
-// 								repaire2.position.x +=2
-								// scene.add( repaire, repaire1, repaire2);
-//// end of the helper
 	palletPlayer2 = new THREE.Mesh( 
 		new THREE.BoxGeometry( 6, 1, 1 ), 
 		new THREE.MeshStandardMaterial( {
@@ -535,12 +503,12 @@ let data = {
 	number : [2],
 	ball : ball.position,
 	ballDirection : ballDirection,
-	ballSpin : ball.rotation,
+	// ballSpin : ball.rotation,
 	P1position : palletPlayer1.position,
 	P2position : palletPlayer2.position,
 	score : score,
-	keyCode : keyCode,
-	moveSpeed : moveSpeed,
+	// keyCode : keyCode,
+	// moveSpeed : moveSpeed,
 	updateScore : 0,
 	playerNumber : playerNumber,
 	gameID : 0
@@ -579,7 +547,6 @@ const animate = async () => {
 		{
 			score = data.score
 			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
-			data.updateScore -=1
 			console.log(score)
 		}
 		// ball.rotation.x +=  .1
@@ -599,7 +566,7 @@ const animate = async () => {
 
 
 const tmp = async () => {
-	while ( true )
+	while ( connectionStatus != 2 )
 	{
 		data.playerNumber = playerNumber
 		counter += 1
