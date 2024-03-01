@@ -53,7 +53,9 @@ var bindPort = function(a, b) {
 	}
 	return ("//"+b+'.'+a);
 }
-var Socket = function({port = 3000, host = "10.12.1.3", path = "/"}) {
+var Socket = function({port = 3000, host = "localhost", path = "/"}) {
+	console.log("============================================================================");
+	console.log(port, host, path);
 	if (!(this instanceof Socket)) {
 		throw new Error("Socket must be instanciated with new keyword");
 	}
