@@ -23,7 +23,7 @@
  *
  * Ne pas toucher !!! 
  * 
- * C'est moi qui implenterai la gestion/creation des sockets avec le reste du front
+ * C'est moi qui implementerai la gestion/creation des sockets avec le reste du front
  * 
  * Pour changer le port, l'hote ou le chemin il faut utiliser les parametres de l'objet
  * 
