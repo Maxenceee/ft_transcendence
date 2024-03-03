@@ -5,12 +5,12 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Transcendence</title>
 	<meta name="author" content="mgama,ngennaro,mbrement,elamadon" />
-	<link rel="icon" type="image/ico" href="/static/images/favicon-16x16.png" sizes="16x16">
-	<link rel="apple-touch-icon" href="/static/images/favicon-32x32.png" sizes="32x32">
-	<link rel="shortcut icon" type="image/png" href="/static/images/favicon.ico"/>
-	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
-	<link rel="preload" as="image" href="/static/images/favicon.ico">
-	<link rel="stylesheet" href="/static/stylesheets/style.css">
+	<link rel="icon" type="image/ico" href="http://localhost:3000/static/images/favicon-16x16.png" sizes="16x16">
+	<link rel="apple-touch-icon" href="http://localhost:3000/static/images/favicon-32x32.png" sizes="32x32">
+	<link rel="shortcut icon" type="image/png" href="http://localhost:3000/static/images/favicon.ico"/>
+	<link rel="icon" type="image/png" href="http://localhost:3000/static/images/favicon.ico">
+	<link rel="preload" as="image" href="http://localhost:3000/static/images/favicon.ico">
+	<link rel="stylesheet" href="http://localhost:3000/static/stylesheets/style.css">
 </head>
 <body class="variant">
 	<div id="root"></div>
@@ -25,14 +25,6 @@
 								<svg class="icon" width="29" height="28" viewBox="0 0 29 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 									<path d="M17.3688 22.7488H11.2228V15.1419C11.2228 14.5944 11.5903 14.2386 12.1378 14.2386H16.4655C17.013 14.2386 17.3688 14.5944 17.3688 15.1419V22.7488ZM3.78914 22.3431C3.78914 24.0268 4.84734 25.0447 6.58194 25.0447H22.0364C23.771 25.0447 24.8175 24.0268 24.8175 22.3431V13.4141L15.0286 5.20275C14.5727 4.81931 14.0306 4.82892 13.5844 5.20275L3.78914 13.4141V22.3431ZM0 11.814C0 12.4189 0.455153 12.935 1.19765 12.935C1.56163 12.935 1.886 12.7466 2.17217 12.5115L13.8119 2.7458C14.1267 2.46713 14.4958 2.46713 14.8127 2.7458L26.4462 12.5115C26.7248 12.7466 27.0492 12.935 27.4132 12.935C28.0863 12.935 28.6012 12.5171 28.6012 11.8428C28.6012 11.447 28.4482 11.1409 28.1515 10.8878L15.9544 0.635973C14.9522 -0.211991 13.6821 -0.211991 12.6703 0.635973L0.459372 10.8899C0.153045 11.1451 0 11.4875 0 11.814ZM21.547 6.13864L24.8576 8.92464V3.26801C24.8576 2.73973 24.521 2.40317 23.9927 2.40317H22.414C21.8953 2.40317 21.547 2.73973 21.547 3.26801V6.13864Z" />
 								</svg>								
-							</div>
-						</a>
-						<a href="/stat">
-							<div class="icon-container">
-								<svg class="icon" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-									<path d="M2.25586 16.8637L9.88172 12.4537L15.4488 17.1799L25.2895 11.2985L24.4078 9.85852L15.5679 15.1465L10.0242 10.4416L2.25586 14.9292V16.8637ZM9.78632 13.9957C11.017 13.9957 12.0241 12.9907 12.0241 11.7579C12.0241 10.5272 11.017 9.52969 9.78632 9.52969C8.55351 9.52969 7.54852 10.5272 7.54852 11.7579C7.54852 12.9907 8.55351 13.9957 9.78632 13.9957ZM15.4526 18.3935C16.6854 18.3935 17.6808 17.3885 17.6808 16.1557C17.6808 14.925 16.6854 13.9275 15.4526 13.9275C14.2219 13.9275 13.2148 14.925 13.2148 16.1557C13.2148 17.3885 14.2219 18.3935 15.4526 18.3935ZM24.2759 13.0362C25.5066 13.0362 26.5116 12.0291 26.5116 10.7984C26.5116 9.56555 25.5066 8.56055 24.2759 8.56055C23.0431 8.56055 22.0381 9.56555 22.0381 10.7984C22.0381 12.0291 23.0431 13.0362 24.2759 13.0362Z" />
-									<path d="M1 24.2688C1 24.8714 1.40242 25.2642 2.00711 25.2642H25.476C26.1161 25.2642 26.6383 24.7781 26.6383 24.1221C26.6383 23.4757 26.1161 22.9779 25.476 22.9779H3.61983C3.38428 22.9779 3.29592 22.8895 3.29592 22.654V4.21946C3.29592 3.58688 2.80022 3.0647 2.15382 3.0647C1.4957 3.0647 1 3.58688 1 4.21946V24.2688Z" />
-								</svg>
 							</div>
 						</a>
 						<a href="/user">
@@ -70,13 +62,13 @@
 						</div>
 						<section>
 							<div class="oa-container">
-								<div class="lobby-container">
+								<div class="lobby-container page-card">
 									<h2 class="container-title">Bonjour {{ username }}, commençons à jouer !</h2>
 									<div class="fa-list">
 
 										<div class="fa-list-row">
 											<div class="lobby-card" style="--card-color: #bb77ff;">
-												<div class="content" style="background-image: url('/static/images/pong_visal_2.png');">
+												<div class="content" style="background-image: url('http://localhost:3000/static/images/pong_visal_2.png');">
 													<div class="card-container">
 														<div class="play-button">
 															<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,7 +84,7 @@
 										</div>
 										<div class="fa-list-row">
 											<div class="lobby-card" style="--card-color: #c93f34;">
-												<div class="content" style="background-image: url('/static/images/pong_visal_3.png');">
+												<div class="content" style="background-image: url('http://localhost:3000/static/images/pong_visal_3.png');">
 													<div class="card-container">
 														<div class="play-button">
 															<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -108,7 +100,7 @@
 										</div>
 										<div class="fa-list-row">
 											<div class="lobby-card" style="--card-color: #bb77ff;">
-												<div class="content" style="background-image: url('/static/images/pong_visal_1.png');">
+												<div class="content" style="background-image: url('http://localhost:3000/static/images/pong_visal_1.png');">
 													<div class="card-container">
 														<div class="play-button">
 															<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,8 +153,8 @@
 		</div>
 		<!-- // -->
 	</div>
-	<script src="/static/javascripts/script.js"></script>
-	<!-- <script src="/static/javascripts/unmf.js"></script> -->
+	<script src="http://localhost:3000/static/javascripts/script.js"></script>
+	<!-- <script src="http://localhost:3000/static/javascripts/unmf.js"></script> -->
 	<script>
 		document.querySelectorAll('a').forEach((e) => {
 			e.addEventListener('click', (evt) => {
