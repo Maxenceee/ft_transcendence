@@ -79,11 +79,11 @@ def callback_intra(request):
     IP_LOCAL = os.environ.get('IP_LOCAL')
 
     data = {
-    'grant_type': 'authorization_code',
-    'client_id': INTRA_USER,
-    'client_secret': INTRA_SECRET,
-    'code': code,
-    'redirect_uri': f'http://{IP_LOCAL}:3000/callback/intra'
+        'grant_type': 'authorization_code',
+        'client_id': INTRA_USER,
+        'client_secret': INTRA_SECRET,
+        'code': code,
+        'redirect_uri': f'http://{IP_LOCAL}:3000/callback/intra'
     }
     try:
         response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
@@ -133,8 +133,6 @@ def callback_swivel(request):
     Token.objects.create(token=token, user=user)
     response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
     return response
-
-
 
 
 @login_required

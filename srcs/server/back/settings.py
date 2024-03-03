@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 IP_LOCAL = os.environ.get('IP_LOCAL')
 ALLOWED_HOSTS = ["localhost","website", IP_LOCAL]
@@ -161,11 +161,6 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
         },
     },
 }
