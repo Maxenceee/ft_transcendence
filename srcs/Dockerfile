@@ -8,7 +8,7 @@ RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv pass
 
 RUN mkdir /app
 
-EXPOSE 8000
+EXPOSE 3000
 
 WORKDIR /app/server
 
