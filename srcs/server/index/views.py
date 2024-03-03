@@ -17,6 +17,10 @@ def index(request):
     return render(request, 'views/index.html', {"username": request.user.nickname})
 
 @login_required
+def user_page(request, id):
+    return render(request, 'views/user.html', {"username": request.user.nickname})
+
+@login_required
 def get_user(request, id):
     return HttpResponse(f'user page {id}')
 
