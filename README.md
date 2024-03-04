@@ -37,3 +37,11 @@
 - Multiples langues (m)
 
 ### Total: 9
+
+# Utils
+
+To get random profile picture (new each time)
+https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder
+
+To get new profile picture link (to be used to get the same image each time)
+https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/new

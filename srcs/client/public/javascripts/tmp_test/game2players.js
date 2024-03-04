@@ -405,7 +405,9 @@ const animate = async () => {
 		renderer.render( scene, camera );
 		composer.render();	
 	}
-	else
+	return
+
+		//else
 		renderer.render( sceneError, camera );
 	controls.update()
 	requestAnimationFrame(animate)
