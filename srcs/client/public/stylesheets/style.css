@@ -1232,7 +1232,7 @@ body:has(.connection-page) {
   border-radius: 6px;
   padding: 16px;
   font-size: 14px;
-  margin-top: var(--base-size-16, 16px) !important;
+  margin-top: 16px !important;
 }
 .auth-form .auth-form-body.consent {
   padding: 0 !important;
@@ -1242,8 +1242,8 @@ body:has(.connection-page) {
   font-weight: 400 !important;
   font-size: 16px !important;
   line-height: 1.5;
-  padding-bottom: var(--base-size-16, 16px) !important;
-  margin-bottom: var(--base-size-24, 24px) !important;
+  padding-bottom: 16px !important;
+  margin-bottom: 24px !important;
 }
 .auth-form .auth-form-body .auth-form-top p {
   color: var(--card-primary) !important;
