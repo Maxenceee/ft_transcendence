@@ -38,7 +38,7 @@ class Game:
 			# number += 1
 
 	def end_game(self):
-		self.send_all(json.dump({"endgame": True}))
+		# self.send_all(json.dump({"endgame": True}))
 		for p in self.players:
 			p.close()
 		game_list.remove(self)
@@ -102,7 +102,6 @@ class websocket_client(WebsocketConsumer):
 			ballPosition['x'] = 0
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0
-			self.data['score'] = score
 			ballDirection['z'] *= -1
 			if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
 				ballDirection['x'] = random.uniform(-1, 1)
@@ -115,7 +114,6 @@ class websocket_client(WebsocketConsumer):
 			
 		elif ballPosition['z'] > 29:
 			score['scoreP1'] +=1
-			self.data['score'] = score
 			ballPosition['x'] = 0
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0
@@ -130,6 +128,7 @@ class websocket_client(WebsocketConsumer):
 			logging.info(self.data['score'])
 		if (self.data['moveSpeed'] > 5) :
 			self.data['moveSpeed'] = 5
+		self.data['score'] = score
 		return self.data
 	
 	def wallCollideFourPlayer(self):
@@ -245,8 +244,13 @@ class websocket_client(WebsocketConsumer):
 			timeStart = time.time()
 		tmp = json.loads(text_data)
 		# logging.info(tmp)
+		if tmp['type'] == "end":
+				self.pool.end_game()
+				return 
 		if not hasattr(self, 'pool_id'):
 			logging.info("no id")
+			tmp['playerNumber'] = pouet[0]
+			pouet[0] += 1
 			return
 		if tmp['type'] == 2:
 				tmp = dict()
@@ -257,7 +261,7 @@ class websocket_client(WebsocketConsumer):
 				pouet[0] += 1
 				logging.info(f"pouet = {tmp}")
 				return
-		return
+		# return
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
 			score = tmp['data']['score']

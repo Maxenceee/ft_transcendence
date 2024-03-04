@@ -20,8 +20,6 @@ socket.onclose(() => {
 	console.info("Bye bye madafaka");
 });
 
-
-
 socket.use((msg) =>{
 	console.log(msg);
 });

@@ -4,13 +4,9 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-// import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
-// import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
-
-// let playerId = 0;
 
 let socket = new Socket({path: "/socket"});
 let playerNumber = 9007199254740991
@@ -19,7 +15,6 @@ socket.onconnection(() => {
 	console.info("Connection opened, yay");
 	socket.send({type : 2})
 	connectionStatus = 1
-	// console.log(playerNumber)
 });
 socket.onclose(() => {
 	console.info("Bye bye madafaka");
@@ -27,7 +22,6 @@ socket.onclose(() => {
 });
 let gameID = undefined
 socket.use((msg) =>{
-	// console.log(msg);
 	if (playerNumber == 9007199254740991 && msg.type == "id")
 	{
 		playerNumber = msg.playerNumber
@@ -40,10 +34,13 @@ socket.use((msg) =>{
 	else{
 		if (gameID == undefined)
 		{
+			socket.send({type : 2})
+			sleep (50)
 			gameID = msg.gameID
 			playerNumber = msg.playerNumber
 			console.log(playerNumber)
 			console.log(gameID)
+			return
 		}
 		if (msg.gameID != gameID)
 			{
@@ -116,10 +113,6 @@ let mapLenth
 let mapWidth
 function initiateMapTwoPlayer(data)
 {
-	/// temporary for dev purpose///
-	data.player1Map = player1Map;
-	data.player2Map = player2Map;
-	/// temporary for dev purpose///
 	
 	mapLenth = 60;
 	mapWidth = 40;
@@ -131,7 +124,6 @@ function initiateMapTwoPlayer(data)
 			opacity: 1, 
 			emissive:0xffffff,
 			side : THREE.DoubleSide,
-			// map : player1Map 
 			})
 		);
 	palletPlayer2 = new THREE.Mesh( 
@@ -142,7 +134,6 @@ function initiateMapTwoPlayer(data)
 			opacity: 1, 
 			emissive:0xffffff,
 			side : THREE.DoubleSide,
-			// map : player2Map
 			})
 		);
 	let wallLeft = new THREE.Mesh(
@@ -195,11 +186,10 @@ function initiateMapTwoPlayer(data)
 	const geometryBall = new THREE.BoxGeometry( 1, 1, 1 );
 	const materialBall = new THREE.MeshPhysicalMaterial( {
 		wireframe:false, 
-		color:0xffffff, 
+		color:0xff0000, 
 		opacity: 1, 
 		iridescence :1,
 		side : THREE.DoubleSide,
-		// map:ballMap
 	});
 	ball = new THREE.Mesh( geometryBall, materialBall );
 
@@ -236,74 +226,20 @@ bloomPass.radius = params.radius;
 
 
 const outputPass = new OutputPass();
-// const groundReflectorForSSRPass = new ReflectorForSSRPass(
-// 	planeGeo, {
-// 		clipBias:0.003,
-// 		textureWidth:window.innerWidth,
-// 		textureHeight:window.innerHeight,
-// 		color : 0x888888,
-// 		useDepthTexture:true
-// 	});
-// groundReflectorForSSRPass.material.depthWrite=false;
-// groundReflectorForSSRPass.rotation.x = -Math.PI/2
-// groundReflectorForSSRPass.position.x = -2;
-// groundReflectorForSSRPass.visible = false;
-// groundReflectorForSSRPass
-// scene.add(groundReflectorForSSRPass);
-// const outputSSRPass = new SSRPass(
-// {
-// 	scene,
-// 	camera,
-// 	width:innerWidth,
-// 	height:innerHeight,
-// 	groundReflector:params.groundReflector ? groundReflector : null,
-// 	selects:params.groundReflector ? selects : null
-// });
-
 let composer
 composer = new EffectComposer( renderer );
 composer.addPass( renderScene );
 composer.addPass( bloomPass );
 composer.addPass( outputPass );
-// composer.addPass(outputSSRPass)
-
-
-//end_of_debuging
-// let composer;
-// composer = setRender();
-
-// const planeGeoGround = new THREE.PlaneGeometry(100, 100); 
-
-
-// const materialPlaneGround = new THREE.MeshStandardMaterial( {
-// 	wireframe:false, 
-// 	color:0x000000, 
-// 	opacity: 1, 
-// 	roughness :0,
-// 	// iridescence :1,
-// 	// emissive:0x000000,
-// 	side : THREE.DoubleSide,
-// 	});
-
-// const groundReflection = new THREE.Mesh(planeGeoGround, materialPlaneGround)
-// groundReflection.rotation.x = Math.PI/180*-90;
-// groundReflection.position.y -= 2;
-// scene.add(groundReflection)
 
 
 
 
 let moveSpeed = 1.05
 
-
-// initiateMapFourPlayer({})
-// initiateMapError({})
 initiateMapTwoPlayer({})
-//serverside under it
-// document.addEventListener("keyup", onDocumentKeyUp, false);
 var updatePlayer = 0;
 document.addEventListener("keydown", onDocumentKeyDown, true);
-// document.addEventListener("keydown", onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
     let keyVar = event.which;
 
@@ -363,11 +299,6 @@ function onDocumentKeyDown(event) {
 	}
 	data.keyCode = keyCode
 	updatePlayer = 1;
-	// socket.send({type:2, data})
-	// palletPlayer1.position.x = data.P1position.x ;
-	// palletPlayer2.position.x = data.P2position.x ;
-	// console.log(keyCode);
-	// console.log(keyCode);
 }
 // function onDocumentKeyUp(event) {
 //     let keyVar = event.which;
@@ -408,53 +339,6 @@ let ballDirection = {
 	x : 0.5 + Math.random(),
 	z : 0.5 + Math.random(),
 };
-
-// function wallCollideTwoPlayer(){
-// 	if (ball.position.x < -mapWidth/2 + 1 )
-// 			data.ballDirection.x *= -1;
-// 	else if (ball.position.x > mapWidth/2 - 1)
-// 			data.ballDirection.x *= -1;
-
-// 	if (ball.position.z < -mapLenth/2 + 1)
-// 	{
-// 		console.log("score P2 : "+data.score.scoreP2)
-// 		resetBall()	
-// 		data.score.scoreP2++
-// 		data.ballDirection.z *= -1;
-// 		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
-// 	}
-// 	else if (ball.position.z > mapLenth/2 - 1)
-// 	{
-// 		data.score.scoreP1++
-// 		console.log("score P1 : "+data.score.scoreP1)
-// 		resetBall()
-// 		data.ballDirection.z *= -1;
-// 		createText(data.score.scoreP2 + " : " + data.score.scoreP1)	
-// 	}
-// 	if (moveSpeed > 5)
-// 		moveSpeed = 5
-// 	ballDirection = data.ballDirection
-// };
-
-// function palletReboundP1(){
-// 	if (ball.position.z > mapLenth/2 - 2 && (ball.position.x < (palletPlayer1.position.x + 4) && ball.position.x > (palletPlayer1.position.x - 4)) )
-// 	{
-// 		data.ballDirection.z *= -1;
-// 		moveSpeed += 0.05
-// 	}
-// 	if (moveSpeed > 5)
-// 		moveSpeed = 5
-// };
-// function palletReboundP2(){
-// 	if (ball.position.z < -mapLenth/2 + 2 && (ball.position.x < (palletPlayer2.position.x + 4) && ball.position.x > (palletPlayer2.position.x - 4)) )
-// 	{
-// 		data.ballDirection.z *= -1;
-// 		moveSpeed += 0.05
-// 	}
-// 	if (moveSpeed > 5)
-// 		moveSpeed = 5
-// };
-//server side above
 
 const 	materials = [
 	new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
@@ -503,13 +387,11 @@ let data = {
 	number : [2],
 	ball : ball.position,
 	ballDirection : ballDirection,
-	// ballSpin : ball.rotation,
 	P1position : palletPlayer1.position,
 	P2position : palletPlayer2.position,
 	score : score,
-	// keyCode : keyCode,
-	// moveSpeed : moveSpeed,
 	updateScore : 0,
+	moveSpeed : moveSpeed,
 	playerNumber : playerNumber,
 	gameID : 0
 };
@@ -527,38 +409,30 @@ const animate = async () => {
 		renderer.render( sceneError, camera );
 	controls.update()
 	requestAnimationFrame(animate)
-	if (score.scoreP1 > 9 || score.scoreP2 > 9 || score.scoreP3 > 9 || score.scoreP4 > 9)
+	if (gameID	!= undefined)
 	{
-		resetBall()
-		if (endScore == 0)
+		if (score.scoreP1 > 1 || score.scoreP2 > 1)
 		{
-			endScore = 1;
-			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+			resetBall()
+			if (endScore == 0)
+			{
+				endScore = 1;
+				createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+			}
+			scene.remove(ball);
+			return;
 		}
-		scene.remove(ball);
-		return;
+			if (data.updateScore != 0 && data.score != score)
+			{
+				score = data.score
+				createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+				// console.log(score)
+			}
+			// ball.rotation.x +=  .1
+			ball.position.x = data.ball.x
+			ball.position.z = data.ball.z
+			ballDirection = data.direction
 	}
-	// palletReboundP1()
-	// palletReboundP2()
-	// wallCollideTwoPlayer()
-	// if (data.number > counter)
-	// {
-		if (data.updateScore != 0 && data.score != score)
-		{
-			score = data.score
-			createText(data.score.scoreP2 + " : " + data.score.scoreP1)
-			console.log(score)
-		}
-		// ball.rotation.x +=  .1
-		ball.position.x = data.ball.x
-		ball.position.z = data.ball.z
-		ballDirection = data.direction
-		// palletPlayer1.position.x = data.P1position.x ;
-		// palletPlayer2.position.x = data.P2position.x ;
-		// keyCode = data.keyCode ;
-	// }
-	// else
-		// counter = data.number
 	await sleep(25)
 	
 }
@@ -575,13 +449,18 @@ const tmp = async () => {
 		else 
 			data.number[1] = counter
 		socket.send({type : 0, data:data})	
+		if (endScore == 1)
+		{
+			socket.send({type : "end"})
+			return
+		}
 		await sleep(50)
 	}
 
 }
 
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
-sleep(500).then(() => {animate(); });
+sleep(250).then(() => {animate(); });
 tmp()
 function setcam () {
 	if (playerNumber % 2 == 1)
@@ -589,14 +468,4 @@ function setcam () {
 	else
 		camera.position.set(30, 30, -40)
 }
-// animate()
 console.log("cookie")
-// socket.send({type: "mapType", mapType :1})
-
-// document.addEventListener('blur', function() {
-// 	console.log("window is blured");
-// });
-
-// document.addEventListener('focus', function() {
-// 	console.log("window if focused");
-// });
