@@ -6,20 +6,20 @@ from index.decorators import *
 
 @login_required
 def game(request):
-    return render(request, 'views/game.html')
+	return render(request, 'views/game.html')
 
 @login_required
 def game4(request):
-    return render(request, 'views/game4.html')
+	return render(request, 'views/game4.html')
 
 @login_required
 def gameError(request):
-    return render(request, 'views/gameError.html')
+	return render(request, 'views/gameError.html')
 
 @login_required
 def gameWin(request):
-    return render(request, 'views/gameWin.html')
+	return render(request, 'views/gameWin.html')
 
 @login_required
 def not_found(request, url):
-    return redirect("/")
+	return redirect("/")
