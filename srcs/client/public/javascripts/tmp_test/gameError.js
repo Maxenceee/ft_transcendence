@@ -66,7 +66,8 @@ function initiateMapError()
 
 
 	const errorCubeMat = new THREE.MeshBasicMaterial( {
-		map :nooo
+		map :nooo, 
+		// side : THREE.BackSide,
 		});
 	
 	const noCube = new THREE.Mesh(errorCube, errorCubeMat)

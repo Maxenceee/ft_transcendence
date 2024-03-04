@@ -16,6 +16,69 @@
  * @author Maxence Gama, @maxencegama
  * @contact contact@maxencegama.dev
  */
+
+/**
+ * 
+ ************************************************************************************************************
+ *
+ * Ne pas toucher !!! 
+ * 
+ * C'est moi qui implementerai la gestion/creation des sockets avec le reste du front
+ * 
+ * Pour changer le port, l'hote ou le chemin il faut utiliser les parametres de l'objet
+ * 
+ * new Socket({port: 4321, host: "website", path: "/le/chemin"});
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ ************************************************************************************************************
+ */
+
+
 var CallBack = function() {}
 CallBack.prototype.on = function(t, e) {
 	this.listeners = this.listeners || {}
@@ -70,13 +133,13 @@ var Socket = function({port = 3000, host = "localhost", path = "/"}) {
 		throw new Error("Path must be a valid path");
 	}
 	this.callBack = null;
+
 	try {
 		let sp = port.toString(),
 			hr = [host];
 		let WSProtocol = (location.protocol === 'https:') ? 'wss:' : 'ws:',
 			WSHost = bindPort(hr[0], sp),
 			spath = WSProtocol.concat(WSHost, path);
-		console.log(spath);
 		this.socket = new WebSocket(spath);
 	} catch (error) {
 		throw new Error("Could not open socket with server");
