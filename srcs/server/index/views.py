@@ -4,6 +4,7 @@ from .models import *
 from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
 import logging
+import string
 import os
 import requests
 import urllib.parse
@@ -17,7 +18,7 @@ def index(request):
     return render(request, 'views/index.html', {"username": request.user.nickname})
 
 @login_required
-def user_page(request, name):
+def user_page(request, id):
     return render(request, 'views/user.html', {"username": request.user.nickname})
 
 @login_required
@@ -63,7 +64,10 @@ def signup(request):
             return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
         
         password = pbkdf2.hash(password)
-        user = User.objects.create(nickname=username, username=username, password=password)
+        id = makeid(10)
+        while User.objects.filter(id=id).exists():
+            id = makeid(10)
+        user = User.objects.create(id=id, nickname=username, username=username, password=password)
         response = redirect("/")
 
         token = makeid(100)
@@ -95,11 +99,16 @@ def callback_intra(request):
     except:
         return redirect("/login")
     if not User.objects.filter(intra_id=intra_id).exists():
-        user = User.objects.create(nickname=intra_id, intra_id=intra_id)
+        id = makeid(10)
+        while User.objects.filter(id=id).exists():
+            id = makeid(10)
+        user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id)
     else:
         user = User.objects.get(intra_id=intra_id)
     response = redirect("/")
     token = makeid(100)
+    while Token.objects.filter(token=token).exists():
+        token = makeid(100)
     Token.objects.create(token=token, user=user)
     response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
     return response
@@ -125,11 +134,16 @@ def callback_swivel(request):
     except:
         return redirect("/login")
     if not User.objects.filter(swivel_id=swivel_id).exists():
-        user = User.objects.create(nickname=swivel_id, swivel_id=swivel_id)
+        id = makeid(10)
+        while User.objects.filter(id=id).exists():
+            id = makeid(10)
+        user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id)
     else:
         user = User.objects.get(swivel_id=swivel_id)
     response = redirect("/")
     token = makeid(100)
+    while Token.objects.filter(token=token).exists():
+        token = makeid(100)
     Token.objects.create(token=token, user=user)
     response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
     return response
@@ -138,3 +152,15 @@ def callback_swivel(request):
 @login_required
 def not_found(request, url):
     return redirect("/")
+
+@login_required
+def logout(request):
+    cookie = request.COOKIES.get('token')
+    response = redirect("/")
+    if not cookie or not Token.objects.filter(token=cookie).exists():
+        return response
+    if Token.objects.get(token=cookie).is_valid:
+        token = Token.objects.get(token=cookie)
+        token.is_valid = False
+        token.save()
+    return response

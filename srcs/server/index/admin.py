@@ -4,3 +4,4 @@ from .models import *
 
 admin.site.register(User)
 admin.site.register(Token)
+admin.site.register(Game_history)
