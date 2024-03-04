@@ -411,7 +411,7 @@ const animate = async () => {
 	requestAnimationFrame(animate)
 	if (gameID	!= undefined)
 	{
-		if (score.scoreP1 > 1 || score.scoreP2 > 1)
+		if (score.scoreP1 > 9 || score.scoreP2 > 9)
 		{
 			resetBall()
 			if (endScore == 0)
