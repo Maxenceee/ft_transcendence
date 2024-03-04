@@ -41,7 +41,9 @@ class Game:
 		# self.send_all(json.dump({"endgame": True}))
 		for p in self.players:
 			p.close()
+		
 		game_list.remove(self)
+
 
 	def send_all(self, data):
 		tmp = json.dumps(data)
