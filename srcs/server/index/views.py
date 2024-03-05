@@ -164,3 +164,9 @@ def logout(request):
 		token.is_valid = False
 		token.save()
 	return response
+
+@login_required
+def api_get_user(request, id):
+	user = get_object_or_404(User, id=id)
+	response = user.to_json()
+	return HttpResponse(json.dumps(response), content_type="application/json")
