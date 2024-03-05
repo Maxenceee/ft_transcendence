@@ -13,8 +13,8 @@ urlpatterns = [
 	path('callback/intra', views.callback_intra, name='callback_intra'),
 	path('callback/swivel', views.callback_swivel, name='callback_swivel'),
 
-	path('api/user/<str:id>/get', views.get_user, name='get_user'),
-	path('api/home/get/lobbies', views.get_lobies, name='get_lobies'),
+	path('api/user/<str:id>/get', views.api_get_user, name='get_user'),
+	# path('api/home/get/lobbies', views.get_lobies, name='get_lobies'),
 
 	path('<path:url>', views.not_found, name='redirect'),
 ]
