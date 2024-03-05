@@ -18,7 +18,7 @@ COPY ./client /app/client
 
 COPY ./server/ /app/server
 
-RUN python manage.py collectstatic
+RUN python3 manage.py collectstatic -c --noinput
 
 RUN python3 manage.py makemigrations
 

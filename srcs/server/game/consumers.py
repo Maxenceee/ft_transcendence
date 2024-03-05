@@ -4,6 +4,7 @@ import json
 import logging
 import asyncio
 import time
+import math
 
 def makeid(len):
 	str = "abcdefghijklmnopqrstuvwxyz0123456789"
@@ -105,10 +106,10 @@ class websocket_client(WebsocketConsumer):
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0
 			ballDirection['z'] *= -1
-			if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
-				ballDirection['x'] = random.uniform(-1, 1)
-			else :
-				ballDirection = self.data['ballDirection']
+			# if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
+			ballDirection['x'] = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			# else :
+				# ballDirection = self.data['ballDirection']
 			self.data['updateScore'] = 6
 			self.data['moveSpeed'] = 1.05
 			self.pool.send_all(json.dumps(self.data))
@@ -120,10 +121,10 @@ class websocket_client(WebsocketConsumer):
 			ballPosition['z'] = 0 
 			ballPosition['y'] = 0
 			ballDirection['z'] *= -1
-			if hasattr(self.data, 'playerNumber') and (self.data['playerNumber'] == 1) :
-				ballDirection['x'] = random.uniform(-1, 1)
-			else :
-				ballDirection = self.data['ballDirection']
+			# if hasattr(self.data, 'playerNumber') and (self.data['playerNumber'] == 1) :
+			ballDirection['x'] = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			# else :
+				# ballDirection = self.data['ballDirection']
 			self.data['updateScore'] = 6
 			self.data['moveSpeed'] = 1.05
 			self.pool.send_all(json.dumps(self.data))
@@ -255,21 +256,30 @@ class websocket_client(WebsocketConsumer):
 			pouet[0] += 1
 			return
 		if tmp['type'] == 2:
-				tmp = dict()
-				tmp['playerNumber'] = pouet[0]
-				tmp['type'] = "id"
-				tmp['gameID'] = self.pool_id
-				self.send(json.dumps(tmp))
-				pouet[0] += 1
-				logging.info(f"pouet = {tmp}")
-				return
-		# return
+			tmp = dict()
+			tmp['playerNumber'] = pouet[0]
+			tmp['type'] = "id"
+			tmp['gameID'] = self.pool_id
+			tmp['P1position'] = dict()
+			tmp['P1position']['x'] = 0
+			tmp['P2position'] = dict()
+			tmp['P2position']['x'] = 0
+			tmp['number'] = [2]
+			self.send(json.dumps(tmp))
+			pouet[0] += 1
+			logging.info(f"pouet = {tmp}")
+			return
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
-			score = tmp['data']['score']
-			ballPosition = self.data['ball']
-			ballDirection = self.data['ballDirection']
-			self.data['gameID'] = self.pool_id
+			try:
+				score = tmp['data']['score']
+				ballPosition = self.data['ball']
+				ballDirection = self.data['ballDirection']
+				self.data['P1position']['x'] = 0
+				self.data['P2position']['x'] = 0
+				self.data['gameID'] = self.pool_id
+			except :
+				self.data = self.data
 		if tmp['data']['gameID'] != self.pool_id :
 				logging.info(f"send {self.pool_id}")
 				logging.info(self.data['gameID'])
@@ -299,14 +309,10 @@ class websocket_client(WebsocketConsumer):
 		if 	self.data['number'][0] < tmp['data']['number'][0] :
 					self.data['number'][0] = tmp['data']['number'][0]
 		if self.data['P1position']['x'] != tmp['data']['P1position']['x'] :
-				# logging.info("moving P1")
 			self.data['P1position']['x'] = tmp['data']['P1position']['x']   # tmp
 		# if int(str(self.data['playerNumber'])) % 2 == 0 :
 		if self.data['number'][1] < tmp['data']['number'][1] :
 				self.data['number'][1] = tmp['data']['number'][1]
-		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 2 :
-			# if self.data['P2position']['x'] != tmp['data']['P2position']['x'] :
-				# logging.info("moving p2")
 		if self.data['P2position']['x'] != tmp['data']['P2position']['x'] :
 			self.data['P2position']['x'] = tmp['data']['P2position']['x']   # tmp
 		# logging.info(self.data['P2position']['x'])
