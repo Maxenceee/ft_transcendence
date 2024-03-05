@@ -238,6 +238,7 @@ class websocket_client(WebsocketConsumer):
 		global ballDirection
 		global score
 
+		logging.info("\n\receive\n\n")
 		if timeStart == 0 :
 			timeStart = time.time()
 		tmp = json.loads(text_data)
@@ -322,47 +323,47 @@ class websocket_client(WebsocketConsumer):
 # 		if waiting_list.count(self):
 # 			waiting_list.remove(self)
 
-class Player:
-	def __init__(self, socket) -> None:
-		self.pos_x = 0
-		self.pos_y = 0
-		self.socket = socket
+# class Player:
+# 	def __init__(self, socket) -> None:
+# 		self.pos_x = 0
+# 		self.pos_y = 0
+# 		self.socket = socket
 
-class Ball:
-	def __init__(self) -> None:
-		self.pos_x = 0
-		self.pos_y = 0
-		self.direction_x = 0
-		self.direction_y = 0
+# class Ball:
+# 	def __init__(self) -> None:
+# 		self.pos_x = 0
+# 		self.pos_y = 0
+# 		self.direction_x = 0
+# 		self.direction_y = 0
 
-class Game:
-	def __init__(self, player1, player2, ball) -> None:
-		self.game_id = None
-		self.players = [player1, player2]
-		self.ball = ball
-		self.score = [0, 0]
+# class Game:
+# 	def __init__(self, player1, player2, ball) -> None:
+# 		self.game_id = None
+# 		self.players = [player1, player2]
+# 		self.ball = ball
+# 		self.score = [0, 0]
 
 
-async def game_master(player1, player2, ball):
-	game = Game(player1, player2, ball)
-	waiting_list.remove(player1)
-	waiting_list.remove(player2)
-	while True:
-		# update game state
-		# send game state to players
-		logging.info ("game on")
+# async def game_master(player1, player2, ball):
+# 	game = Game(player1, player2, ball)
+# 	waiting_list.remove(player1)
+# 	waiting_list.remove(player2)
+# 	while True:
+# 		# update game state
+# 		# send game state to players
+# 		logging.info ("game on")
 
-waiting_list = []
+# waiting_list = []
 
-class websocket_client(WebsocketConsumer):
-	def connect(self):
-		logging.info("server says connected")
-		self.accept()
-		waiting_list.append(Player(self))
-	def disconnect(self, code):
-		logging.info("server says disconnected")
-		if waiting_list.count(self):
-			waiting_list.remove(self)
+# class websocket_client(WebsocketConsumer):
+# 	def connect(self):
+# 		logging.info("server says connected")
+# 		self.accept()
+# 		waiting_list.append(Player(self))
+# 	def disconnect(self, code):
+# 		logging.info("server says disconnected")
+# 		if waiting_list.count(self):
+# 			waiting_list.remove(self)
 
 	# async def clock(self) :
 	# 	i = 0
