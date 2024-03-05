@@ -14,6 +14,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	socket.onconnection(() => {
 		console.info("Connection opened, yay");
 		socket.send({type : 2});
+		socket.send({type : 2});
+		socket.send({type : 2});
+		socket.send({type : 2});
+		socket.send({type : 2});
+		socket.send({type : 2});
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
@@ -56,6 +61,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			else
 				palletPlayer2.position.x = data.P2position.x;
 		}
+	
 	});
 
 	let ball;
@@ -431,11 +437,13 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			socket.send({type : 0, data:data})	
 			if (endScore == 1)
 			{
-				socket.send({type : "end"})
+				// socket.send({type : "end"})
 				return
 			}
-			await sleep(50)
+			await sleep(50);
+
 		}
+		console.log("ping");
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
