@@ -1,68 +1,72 @@
 import random
-import asyncio
-from channels.consumer import AsyncConsumer
 from channels.generic.websocket import WebsocketConsumer
 import json
 import logging
 import asyncio
 import time
 
-global timeStart 
-global pouet; 
-global ballPosition
-global score
-global ballDirection
-global waiting_list
+def makeid(len):
+	str = "abcdefghijklmnopqrstuvwxyz0123456789"
+	res = ""
+	for _ in range(len):
+		res += str[random.randint(0, 35)]
+	return res
 
 waiting_list = []
 game_list = []
 
-score = dict()
+global timeStart 
 timeStart = 0
+global pouet; 
+global ballPosition
+global score
+score = dict()
+global ballDirection
 ballPosition = dict()
 ballDirection = {'x', 'y'}
 pouet = [0]
 
-# class Game:
-# 	def __init__(self, players) -> None:
-# 		logging.info("new game created")
-# 		self.players = players
-# 		self.pool_id = makeid(15)
-# 		for p in self.players:
-# 			p.pool_id = self.pool_id
-# 			p.pool = self
-# 			# p.number = number
-# 			# number += 1
+class Game:
+	def __init__(self, players) -> None:
+		logging.info("new game created")
+		self.players = players
+		self.pool_id = makeid(15)
+		for p in self.players:
+			p.pool_id = self.pool_id
+			p.pool = self
+			# p.number = number
+			# number += 1
 
-def end_game(self):
-	# self.send_all(json.dump({"endgame": True}))
-	for p in self.players:
-		p.close()
-	
-	game_list.remove(self)
+	def end_game(self):
+		# self.send_all(json.dump({"endgame": True}))
+		for p in self.players:
+			p.close()
+		
+		game_list.remove(self)
 
 
-def send_all(self, data):
-	tmp = json.dumps(data)
-	for p in self.players:
-		if type(data) == type(dict()) and self.pool_id == data['gameID'] :
-			p.send(tmp)
+	def send_all(self, data):
+		tmp = json.dumps(data)
+		for p in self.players:
+			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
+				p.send(tmp)
 
-# def start_game(num):
-# 	logging.info(f"waiting list {waiting_list}")
-# 	if len(waiting_list) == num:
-# 		out = []
-# 		for m in waiting_list:
-# 			out += [m] if not isinstance(m, list) else m
-# 		for m in out:
-# 			waiting_list.remove(m)
-# 		logging.info(f"players for game {out}")
-# 		game_list.append(Game(out))
-# 	else:
-# 		logging.info("pas assez de joueurs")
+def start_game(num):
+	logging.info(f"waiting list {waiting_list}")
+	if len(waiting_list) == num:
+		out = []
+		for m in waiting_list:
+			out += [m] if not isinstance(m, list) else m
+		for m in out:
+			waiting_list.remove(m)
+		logging.info(f"players for game {out}")
+		game_list.append(Game(out))
+	else:
+		logging.info("pas assez de joueurs")
 
 class websocket_client(WebsocketConsumer):
 	number = 0
+
 
 	def connect(self):
 		logging.info("server says connected")
@@ -70,21 +74,21 @@ class websocket_client(WebsocketConsumer):
 		waiting_list.append(self)
 		start_game(2)
 
-# 	def playerMove2P(self) :
-# 		# logging.info(type(self.data['keyCode']['Key68']))
-# 		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 16.1 :
-# 			self.data['P1position']['x'] += 1.1
-# 		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -16.1 :
-# 			self.data['P1position']['x'] -= 1.1
-# 		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -16.1 :
-# 			self.data['P2position']['x'] -= 1.1
-# 		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
-# 			self.data['P2position']['x'] += 1.1
-# 		# self.data['keyCode']['Key65'] = 0
-# 		# self.data['keyCode']['Key68'] = 0
-# 		# self.data['keyCode']['Key39'] = 0
-# 		# self.data['keyCode']['Key37'] = 0
-# 		return self.data
+	def playerMove2P(self) :
+		# logging.info(type(self.data['keyCode']['Key68']))
+		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 16.1 :
+			self.data['P1position']['x'] += 1.1
+		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -16.1 :
+			self.data['P1position']['x'] -= 1.1
+		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -16.1 :
+			self.data['P2position']['x'] -= 1.1
+		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
+			self.data['P2position']['x'] += 1.1
+		# self.data['keyCode']['Key65'] = 0
+		# self.data['keyCode']['Key68'] = 0
+		# self.data['keyCode']['Key39'] = 0
+		# self.data['keyCode']['Key37'] = 0
+		return self.data
 	
 	def wallCollideTwoPlayer(self):
 		global ballPosition
@@ -171,66 +175,66 @@ class websocket_client(WebsocketConsumer):
 			self.data['moveSpeed'] = 5
 		return self.data
 	
-# 	def playerMove4P(self) :
-# 		# logging.info(type(self.data['keyCode']['Key68']))
-# 		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 26 :
-# 			self.data['P1position']['x'] += 1.1
+	def playerMove4P(self) :
+		# logging.info(type(self.data['keyCode']['Key68']))
+		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 26 :
+			self.data['P1position']['x'] += 1.1
 			
-# 		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -26 :
-# 			self.data['P1position']['x'] -= 1.1
+		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -26 :
+			self.data['P1position']['x'] -= 1.1
 			
-# 		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -26 :
-# 			self.data['P2position']['x'] -= 1.1
+		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -26 :
+			self.data['P2position']['x'] -= 1.1
 			
-# 		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 26 :
-# 			self.data['P2position']['x'] += 1.1
+		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 26 :
+			self.data['P2position']['x'] += 1.1
 			
-# 		if self.data['keyCode']['Key81'] == 1 and self.data['P3position']['z']  < 26 :
-# 			self.data['P3position']['z'] += 1.1
+		if self.data['keyCode']['Key81'] == 1 and self.data['P3position']['z']  < 26 :
+			self.data['P3position']['z'] += 1.1
 			
-# 		if self.data['keyCode']['Key69'] == 1 and self.data['P3position']['z']  > -26:
-# 			self.data['P3position']['z'] -= 1.1
+		if self.data['keyCode']['Key69'] == 1 and self.data['P3position']['z']  > -26:
+			self.data['P3position']['z'] -= 1.1
 			
-# 		if self.data['keyCode']['Key67'] == 1 and self.data['P4position']['z']  < 26 :
-# 			self.data['P4position']['z'] += 1.1
+		if self.data['keyCode']['Key67'] == 1 and self.data['P4position']['z']  < 26 :
+			self.data['P4position']['z'] += 1.1
 			
 		if self.data['keyCode']['Key90'] == 1 and self.data['P4position']['z']  > -26 :
 			self.data['P4position']['z'] -= 1.1
 		return self.data
 
-# 	def reboundP1(self):
-# 		if self.data['ball']['z'] > 27 and (self.data['ball']['x'] < (self.data['P1position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P1position']['x'] - 4)):
-# 			self.data['ballDirection']['z'] = -1	
-# 			self.data['moveSpeed'] += 0.1
-# 		if (self.data['moveSpeed'] > 5) :
-# 			self.data['moveSpeed'] = 5
-# 		return self.data
+	def reboundP1(self):
+		if self.data['ball']['z'] > 27 and (self.data['ball']['x'] < (self.data['P1position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P1position']['x'] - 4)):
+			self.data['ballDirection']['z'] = -1	
+			self.data['moveSpeed'] += 0.1
+		if (self.data['moveSpeed'] > 5) :
+			self.data['moveSpeed'] = 5
+		return self.data
 		
-# 	def reboundP2(self):
-# 		if self.data['ball']['z'] < -27 and (self.data['ball']['x'] < (self.data['P2position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P2position']['x'] - 4)):
-# 			self.data['ballDirection']['z'] = 1
-# 			self.data['moveSpeed'] += 0.1
-# 		if (self.data['moveSpeed'] > 5) :
-# 			self.data['moveSpeed'] = 5
-# 		return self.data
+	def reboundP2(self):
+		if self.data['ball']['z'] < -27 and (self.data['ball']['x'] < (self.data['P2position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P2position']['x'] - 4)):
+			self.data['ballDirection']['z'] = 1
+			self.data['moveSpeed'] += 0.1
+		if (self.data['moveSpeed'] > 5) :
+			self.data['moveSpeed'] = 5
+		return self.data
 	
-# 	def reboundP3(self):
-# 		if self.data['ball']['x'] < -27 and (self.data['ball']['z'] < (self.data['P3position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P3position']['z'] - 4)):
-# 			self.data['ballDirection']['x'] = 1	
-# 			self.data['moveSpeed'] += 0.1
-# 			logging.info(self.data['ballDirection']['x'])
-# 		if (self.data['moveSpeed'] > 5) :
-# 			self.data['moveSpeed'] = 5
-# 		return self.data
+	def reboundP3(self):
+		if self.data['ball']['x'] < -27 and (self.data['ball']['z'] < (self.data['P3position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P3position']['z'] - 4)):
+			self.data['ballDirection']['x'] = 1	
+			self.data['moveSpeed'] += 0.1
+			logging.info(self.data['ballDirection']['x'])
+		if (self.data['moveSpeed'] > 5) :
+			self.data['moveSpeed'] = 5
+		return self.data
 		
-# 	def reboundP4(self):
-# 		if self.data['ball']['x'] > 27 and (self.data['ball']['z'] < (self.data['P4position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P4position']['z'] - 4)):
-# 			self.data['ballDirection']['x'] *= -1
-# 			self.data['moveSpeed'] += 0.1
-# 			logging.info(self.data['ballDirection']['x'])
-# 		if (self.data['moveSpeed'] > 5) :
-# 			self.data['moveSpeed'] = 5
-# 		return self.data
+	def reboundP4(self):
+		if self.data['ball']['x'] > 27 and (self.data['ball']['z'] < (self.data['P4position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P4position']['z'] - 4)):
+			self.data['ballDirection']['x'] *= -1
+			self.data['moveSpeed'] += 0.1
+			logging.info(self.data['ballDirection']['x'])
+		if (self.data['moveSpeed'] > 5) :
+			self.data['moveSpeed'] = 5
+		return self.data
 		
 	def receive(self, text_data=None, bytes_data=None):
 		global timeStart
@@ -238,7 +242,6 @@ class websocket_client(WebsocketConsumer):
 		global ballDirection
 		global score
 
-		logging.info("\n\receive\n\n")
 		if timeStart == 0 :
 			timeStart = time.time()
 		tmp = json.loads(text_data)
@@ -260,7 +263,7 @@ class websocket_client(WebsocketConsumer):
 				pouet[0] += 1
 				logging.info(f"pouet = {tmp}")
 				return
-
+		# return
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
 			score = tmp['data']['score']
@@ -275,7 +278,7 @@ class websocket_client(WebsocketConsumer):
 				return
 		if self.data['number'][0] > tmp['data']['number'][0]and  tmp['data']['playerNumber'] % 2 == 0 :
 				return
-
+		
 		# logging.info(tmp['data']['number'])
 		# logging.info(self.data['P1position']['x'])
 		# if hasattr(tmp, ['data']['keyCode']) and tmp['data']['keyCode'] != self.data['keyCode']:
@@ -318,52 +321,11 @@ class websocket_client(WebsocketConsumer):
 			self.pool.send_all(self.data)
 			timeStart = time.time()
 
-# 	def disconnect(self, code):
-# 		print("server says disconnected")
-# 		if waiting_list.count(self):
-# 			waiting_list.remove(self)
-
-# class Player:
-# 	def __init__(self, socket) -> None:
-# 		self.pos_x = 0
-# 		self.pos_y = 0
-# 		self.socket = socket
-
-# class Ball:
-# 	def __init__(self) -> None:
-# 		self.pos_x = 0
-# 		self.pos_y = 0
-# 		self.direction_x = 0
-# 		self.direction_y = 0
-
-# class Game:
-# 	def __init__(self, player1, player2, ball) -> None:
-# 		self.game_id = None
-# 		self.players = [player1, player2]
-# 		self.ball = ball
-# 		self.score = [0, 0]
-
-
-# async def game_master(player1, player2, ball):
-# 	game = Game(player1, player2, ball)
-# 	waiting_list.remove(player1)
-# 	waiting_list.remove(player2)
-# 	while True:
-# 		# update game state
-# 		# send game state to players
-# 		logging.info ("game on")
-
-# waiting_list = []
-
-# class websocket_client(WebsocketConsumer):
-# 	def connect(self):
-# 		logging.info("server says connected")
-# 		self.accept()
-# 		waiting_list.append(Player(self))
-# 	def disconnect(self, code):
-# 		logging.info("server says disconnected")
-# 		if waiting_list.count(self):
-# 			waiting_list.remove(self)
+		
+	def disconnect(self, code):
+		print("server says disconnected")
+		if waiting_list.count(self):
+			waiting_list.remove(self)
 
 	# async def clock(self) :
 	# 	i = 0
@@ -371,4 +333,4 @@ class websocket_client(WebsocketConsumer):
 	# 	while True :
 	# 		await asyncio.sleep(0.05)
 	# 		logging.info("send data")
-
+	# 		await self.pool.send_all(json.dumps(tmp))
