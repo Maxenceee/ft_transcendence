@@ -16,16 +16,16 @@ def makeid(len):
 waiting_list = []
 game_list = []
 
-global timeStart 
-timeStart = 0
-global idPlayer; 
-global ballPosition
-global score
-score = dict()
-global ballDirection
-ballPosition = dict()
-ballDirection = {'x', 'y'}
-idPlayer = [0]
+# global timeStart 
+# timeStart = 0
+# global idPlayer; 
+# global ballPosition
+# global score
+# score = dict()
+# global ballDirection
+# ballPosition = dict()
+# ballDirection = {'x', 'y'}
+# idPlayer = [0]
 
 class Ball:
 	def __init__(self) -> None:
@@ -34,18 +34,22 @@ class Ball:
 		self.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 		self.direction_z = 1
 		self.speed = 0
-	
+
+		
 class Player:
 	def __init__(self, id, socket) -> None:
 		self.id = id
 		self.socket = socket
 		self.score = 0
+		self.pallet_x  = 0
+		self.pallet_z  = 0 #change if 4 player mode
 
 class Game:
 	id = ""
 	last_frame = 0
 	players = []
 	ball = Ball()
+
 
 	def __init__(self, players) -> None:
 		logging.info("new game created")
@@ -271,30 +275,34 @@ class websocket_client(WebsocketConsumer):
 				return
 			else:
 					self.data = current
-		
+		# for current in self.data.players:
+		# 	if current.socket == self: 
+		# 		self.playerID = current
 		tmp = json.loads(text_data)
 		if tmp['type'] == "end":
 				self.data.end_game()
 				return 
-		if not hasattr(self, 'pool_id'):
-			logging.info("no id")
-			tmp['playerNumber'] = idPlayer[0]
-			idPlayer[0] += 1
-			return
-		if tmp['type'] == 2:
-			# tmp = dict()
-			# tmp['playerNumber'] = idPlayer[0]
-			# tmp['type'] = "id"
-			# tmp['gameID'] = self.pool_id
-			# tmp['P1position'] = dict()
-			# tmp['P1position']['x'] = 0
-			# tmp['P2position'] = dict()
-			# tmp['P2position']['x'] = 0
-			# tmp['number'] = [2]
-			self.send(json.dumps(self.data))
-			idPlayer[0] += 1
+		# if not hasattr(self, 'pool_id'):
+		# 	logging.info("no id")
+		# 	tmp['playerNumber'] = idPlayer[0]
+		# 	idPlayer[0] += 1
+		# 	return
+		if tmp['type'] == "init":
+			tmp = dict()
+			tmp['playerNumber'] = self.data.players[0].id #it will change
+			# tmp['data'] = self.data
+			tmp['type'] = "id"
+			tmp['gameID'] = self.data.id
+			tmp['P1position'] = dict()
+			tmp['P1position']['x'] = 0
+			tmp['P2position'] = dict()
+			tmp['P2position']['x'] = 0
+			tmp['number'] = [2]
+			
+			self.send(json.dumps(tmp))
 			logging.info(f"idPlayer = {tmp}")
 			return
+		return
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']
 			try:

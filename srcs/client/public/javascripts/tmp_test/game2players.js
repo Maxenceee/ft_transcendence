@@ -14,7 +14,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let connectionStatus = 0;
 	socket.onconnection(() => {
 		console.info("Connection opened, yay");
-		socket.send({type : 2});
+		socket.send({type : "init"});
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
@@ -25,9 +25,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	socket.use((msg) =>{
 		if (playerNumber == -1 && msg.type == "id")
 		{
-			playerNumber = msg.playerNumber;
-			data.gameID = msg.gameID;
-			gameID = data.gameID;
+			data = msg.data;
+			// playerNumber = msg.playerNumber;
+			// data.gameID = msg.gameID;
+			// gameID = data.gameID;
 			console.log(playerNumber);
 			console.log(gameID);
 			setcam();
