@@ -55,17 +55,17 @@ class Game:
 
 	def end_game(self):
 		# self.send_all(json.dump({"endgame": True}))
-		for p in self.players:
-			p.close()
+		for player in self.players:
+			player.socket.close()
 
 		game_list.remove(self)
 
 
 	def send_all(self, data):
 		tmp = json.dumps(data)
-		for p in self.players:
+		for player in self.players:
 			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
-				p.send(tmp)
+				player.socket.send(tmp)
 
 
 
@@ -257,29 +257,24 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 		
 	def receive(self, text_data=None, bytes_data=None):
-		find = 0
-		for current in game_list:
-			current_players = current.players
-			for player in current_players:
-				if player.socket == self:
-					find = 1
+		if not hasattr(self, "data"):
+			find = 0
+			for current in game_list:
+				current_players = current.players
+				for player in current_players:
+					if player.socket == self:
+						find = 1
+						break
+				if find == 1:
 					break
-			if find == 1:
-				break
-		if find == 0:
-			return
-		else:
-			game_data = current
-
-		logging.info(f"{current.id}")
-
-		return
-		if timeStart == 0 :
-			timeStart = time.time()
+			if find == 0:
+				return
+			else:
+					self.data = current
+		
 		tmp = json.loads(text_data)
-		# logging.info(tmp)
 		if tmp['type'] == "end":
-				self.pool.end_game()
+				self.data.end_game()
 				return 
 		if not hasattr(self, 'pool_id'):
 			logging.info("no id")
@@ -287,16 +282,16 @@ class websocket_client(WebsocketConsumer):
 			idPlayer[0] += 1
 			return
 		if tmp['type'] == 2:
-			tmp = dict()
-			tmp['playerNumber'] = idPlayer[0]
-			tmp['type'] = "id"
-			tmp['gameID'] = self.pool_id
-			tmp['P1position'] = dict()
-			tmp['P1position']['x'] = 0
-			tmp['P2position'] = dict()
-			tmp['P2position']['x'] = 0
-			tmp['number'] = [2]
-			self.send(json.dumps(tmp))
+			# tmp = dict()
+			# tmp['playerNumber'] = idPlayer[0]
+			# tmp['type'] = "id"
+			# tmp['gameID'] = self.pool_id
+			# tmp['P1position'] = dict()
+			# tmp['P1position']['x'] = 0
+			# tmp['P2position'] = dict()
+			# tmp['P2position']['x'] = 0
+			# tmp['number'] = [2]
+			self.send(json.dumps(self.data))
 			idPlayer[0] += 1
 			logging.info(f"idPlayer = {tmp}")
 			return
