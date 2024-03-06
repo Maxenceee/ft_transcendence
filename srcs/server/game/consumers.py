@@ -269,6 +269,7 @@ class websocket_client(WebsocketConsumer):
 				current_players = current.players
 				for player in current_players:
 					if player.socket == self:
+						self.playerID = current_players.index(player)
 						find = 1
 						break
 				if find == 1:
@@ -277,6 +278,7 @@ class websocket_client(WebsocketConsumer):
 				return
 			else:
 					self.data = current
+		logging.info(f"player {self.playerID} sent data")
 		
 		tmp = json.loads(text_data)
 		if tmp['type'] == "end":
