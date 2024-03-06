@@ -18,14 +18,14 @@ game_list = []
 
 global timeStart 
 timeStart = 0
-global pouet; 
+global idPlayer; 
 global ballPosition
 global score
 score = dict()
 global ballDirection
 ballPosition = dict()
 ballDirection = {'x', 'y'}
-pouet = [0]
+idPlayer = [0]
 
 class Game:
 	def __init__(self, players) -> None:
@@ -51,6 +51,14 @@ class Game:
 		for p in self.players:
 			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
 				p.send(tmp)
+
+
+class GameData :
+	
+	def __init__(self):
+		game = 0
+		
+		return
 
 def start_game(num):
 	logging.info(f"waiting list {waiting_list}")
@@ -252,12 +260,12 @@ class websocket_client(WebsocketConsumer):
 				return 
 		if not hasattr(self, 'pool_id'):
 			logging.info("no id")
-			tmp['playerNumber'] = pouet[0]
-			pouet[0] += 1
+			tmp['playerNumber'] = idPlayer[0]
+			idPlayer[0] += 1
 			return
 		if tmp['type'] == 2:
 			tmp = dict()
-			tmp['playerNumber'] = pouet[0]
+			tmp['playerNumber'] = idPlayer[0]
 			tmp['type'] = "id"
 			tmp['gameID'] = self.pool_id
 			tmp['P1position'] = dict()
@@ -266,8 +274,8 @@ class websocket_client(WebsocketConsumer):
 			tmp['P2position']['x'] = 0
 			tmp['number'] = [2]
 			self.send(json.dumps(tmp))
-			pouet[0] += 1
-			logging.info(f"pouet = {tmp}")
+			idPlayer[0] += 1
+			logging.info(f"idPlayer = {tmp}")
 			return
 		if not hasattr(self, 'data'):
 			self.data = tmp['data']

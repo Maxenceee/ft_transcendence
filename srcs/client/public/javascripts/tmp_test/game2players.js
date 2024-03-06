@@ -429,10 +429,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	const tmp = async () => {
-		console.log("here");
 		while ( connectionStatus != 2 )
 		{
-			console.log("here");
 			await sleep(50);
 			data.playerNumber = playerNumber;
 			counter += 1;
