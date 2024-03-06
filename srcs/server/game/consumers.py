@@ -27,22 +27,37 @@ ballPosition = dict()
 ballDirection = {'x', 'y'}
 idPlayer = [0]
 
+class Ball:
+	def __init__(self) -> None:
+		self.x = 0
+		self.z = 0
+		self.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+		self.direction_z = 1
+		self.speed = 0
+	
+class Player:
+	def __init__(self, id, socket) -> None:
+		self.id = id
+		self.socket = socket
+		self.score = 0
+
 class Game:
+	game_id = ""
+	last_frame = 0
+	players = []
+	ball = Ball()
+
 	def __init__(self, players) -> None:
 		logging.info("new game created")
+		self.game_id = makeid(15)
+		self.lastframe = time.time()
 		self.players = players
-		self.pool_id = makeid(15)
-		for p in self.players:
-			p.pool_id = self.pool_id
-			p.pool = self
-			# p.number = number
-			# number += 1
 
 	def end_game(self):
 		# self.send_all(json.dump({"endgame": True}))
 		for p in self.players:
 			p.close()
-		
+
 		game_list.remove(self)
 
 
@@ -53,34 +68,27 @@ class Game:
 				p.send(tmp)
 
 
-class GameData :
-	
-	def __init__(self):
-		game = 0
-		
-		return
 
 def start_game(num):
 	logging.info(f"waiting list {waiting_list}")
 	if len(waiting_list) == num:
-		out = []
-		for m in waiting_list:
-			out += [m] if not isinstance(m, list) else m
-		for m in out:
-			waiting_list.remove(m)
-		logging.info(f"players for game {out}")
-		game_list.append(Game(out))
+		players = []
+		for player in waiting_list:
+			players.append(player)
+			waiting_list.remove(player)
+		game = Game(players)
+		game_list.append(game)
+		logging.info(f"game created")
 	else:
 		logging.info("pas assez de joueurs")
 
-class websocket_client(WebsocketConsumer):
-	number = 0
 
+class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		logging.info("server says connected")
+		logging.info("new player connected")
 		self.accept()
-		waiting_list.append(self)
+		waiting_list.append(Player("player_id", self))
 		start_game(2)
 
 	def playerMove2P(self) :
@@ -246,10 +254,21 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 		
 	def receive(self, text_data=None, bytes_data=None):
-		global timeStart
-		global ballPosition
-		global ballDirection
-		global score
+		find = 0
+		for current in game_list:
+			current_players = current.players
+			for player in current_players:
+				if player.socket == self:
+					find = 1
+					break
+			if find == 1:
+				break
+		if find == 0:
+			return
+		else:
+			game_data = current
+
+
 
 		if timeStart == 0 :
 			timeStart = time.time()
@@ -338,13 +357,6 @@ class websocket_client(WebsocketConsumer):
 		
 	def disconnect(self, code):
 		print("server says disconnected")
-		if waiting_list.count(self):
-			waiting_list.remove(self)
-
-	# async def clock(self) :
-	# 	i = 0
-	# 	i+=1
-	# 	while True :
-	# 		await asyncio.sleep(0.05)
-	# 		logging.info("send data")
-	# 		await self.pool.send_all(json.dumps(tmp))
+		for player in waiting_list:
+			if player.socket == self:
+				waiting_list.remove(player)
