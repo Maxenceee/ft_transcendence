@@ -41,6 +41,8 @@ class Player:
 		self.id = id
 		self.socket = socket
 		self.score = 0
+		self.pad_x = 0
+		self.pad_z = 0
 
 class Game:
 	id = ""
@@ -74,6 +76,18 @@ class Game:
 		for player in self.players:
 			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
 				player.socket.send(tmp)
+
+	def to_json(self):
+		#{"player": "[{"id":1,"x": 0, "z": 0}, {"id":2,"x": 0, "z": 0}]", "ball": {"x": 0, "z": 0}, "score": {"1": 0, "2": 0}, "moveSpeed": 1.05}
+		players = []
+		for player in self.players:
+			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
+		response = {
+			"player": players,
+			"ball": {"x": self.ball.x, "z": self.ball.z},
+			"moveSpeed": self.ball.speed
+		}
+		return response
 
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
@@ -278,60 +292,24 @@ class websocket_client(WebsocketConsumer):
 				return
 			else:
 					self.data = current
-		logging.info(f"player {self.playerID} sent data")
-		
-		tmp = json.loads(text_data)
-		if tmp['type'] == "end":
+		#debug
+		receive_package = json.loads(text_data)
+		if receive_package['type'] == "end":
 				self.data.end_game()
 				return 
-		if not hasattr(self, 'pool_id'):
-			logging.info("no id")
-			tmp['playerNumber'] = idPlayer[0]
-			idPlayer[0] += 1
+
+
+		if receive_package['type'] == 2:
+			logging.info(self.data.to_json())
+			#self.send(json.dumps(self.data.to_json())) #not work fix json
 			return
-		if tmp['type'] == 2:
-			# tmp = dict()
-			# tmp['playerNumber'] = idPlayer[0]
-			# tmp['type'] = "id"
-			# tmp['gameID'] = self.pool_id
-			# tmp['P1position'] = dict()
-			# tmp['P1position']['x'] = 0
-			# tmp['P2position'] = dict()
-			# tmp['P2position']['x'] = 0
-			# tmp['number'] = [2]
-			self.send(json.dumps(self.data))
-			idPlayer[0] += 1
-			logging.info(f"idPlayer = {tmp}")
-			return
-		if not hasattr(self, 'data'):
-			self.data = tmp['data']
-			try:
-				score = tmp['data']['score']
-				ballPosition = self.data['ball']
-				ballDirection = self.data['ballDirection']
-				self.data['P1position']['x'] = 0
-				self.data['P2position']['x'] = 0
-				self.data['gameID'] = self.pool_id
-			except :
-				self.data = self.data
-		if tmp['data']['gameID'] != self.pool_id :
-				logging.info(f"send {self.pool_id}")
-				logging.info(self.data['gameID'])
-				return
-		if self.data['number'][1] > tmp['data']['number'][1] and  tmp['data']['playerNumber'] % 2 == 1:
-				return
-		if self.data['number'][0] > tmp['data']['number'][0]and  tmp['data']['playerNumber'] % 2 == 0 :
-				return
 		
-		# logging.info(tmp['data']['number'])
-		# logging.info(self.data['P1position']['x'])
-		# if hasattr(tmp, ['data']['keyCode']) and tmp['data']['keyCode'] != self.data['keyCode']:
-			# self.data['keyCode'] = tmp['data']['keyCode']
-		# if hasattr(tmp['data'], 'playerNumber') and tmp['data']['playerNumber'] == 1 :
+		return
+	
 		self.data = self.reboundP2()
-		if tmp['data']['updateScore'] != 0 :
+		if receive_package['data']['updateScore'] != 0 :
 			self.data['updateScore']  -= 1
-		if tmp['type'] == 1 :
+		if receive_package['type'] == 1 :
 			# self.playerMove4P()
 			self.data = self.wallCollideFourPlayer()
 			self.data = self.reboundP3()
@@ -340,20 +318,20 @@ class websocket_client(WebsocketConsumer):
 			# self.data = self.playerMove2P()
 			self.data = self.wallCollideTwoPlayer()
 		# if int(str(self.data['playerNumber'])) % 2 == 1 :
-		if 	self.data['number'][0] < tmp['data']['number'][0] :
-					self.data['number'][0] = tmp['data']['number'][0]
-		if self.data['P1position']['x'] != tmp['data']['P1position']['x'] :
-			self.data['P1position']['x'] = tmp['data']['P1position']['x']   # tmp
+		if 	self.data['number'][0] < receive_package['data']['number'][0] :
+					self.data['number'][0] = receive_package['data']['number'][0]
+		if self.data['P1position']['x'] != receive_package['data']['P1position']['x'] :
+			self.data['P1position']['x'] = receive_package['data']['P1position']['x']   # receive_package
 		# if int(str(self.data['playerNumber'])) % 2 == 0 :
-		if self.data['number'][1] < tmp['data']['number'][1] :
-				self.data['number'][1] = tmp['data']['number'][1]
-		if self.data['P2position']['x'] != tmp['data']['P2position']['x'] :
-			self.data['P2position']['x'] = tmp['data']['P2position']['x']   # tmp
+		if self.data['number'][1] < receive_package['data']['number'][1] :
+				self.data['number'][1] = receive_package['data']['number'][1]
+		if self.data['P2position']['x'] != receive_package['data']['P2position']['x'] :
+			self.data['P2position']['x'] = receive_package['data']['P2position']['x']   # receive_package
 		# logging.info(self.data['P2position']['x'])
 		self.data = self.reboundP1()
-		if ballPosition['z'] == tmp['data']['ball']['z'] :
+		if ballPosition['z'] == receive_package['data']['ball']['z'] :
 			ballPosition['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']
-		if ballPosition['x'] == tmp['data']['ball']['x'] :
+		if ballPosition['x'] == receive_package['data']['ball']['x'] :
 			ballPosition['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
 		if timeStart + 0.05 < time.time():
 			self.data['ball'] = ballPosition
