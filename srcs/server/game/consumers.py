@@ -1,5 +1,6 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
+from index.models import *
 import json
 import logging
 import asyncio
@@ -58,20 +59,25 @@ class Game:
 		self.players = players
 
 	def end_game(self):
-		# self.send_all(json.dump({"endgame": True}))
+		try:
+			game_list.remove(self)
+		except:
+			return
 		for player in self.players:
 			player.socket.close()
-
-		game_list.remove(self)
-
+		resume_data = []
+		for player in self.players:
+			resume_data.append({"id": player.id, "score": player.score})
+		resume_data = str(resume_data)
+		resume_data = resume_data.replace("'", '"')
+		Game_history.objects.create(type="2v2", data=resume_data)
+		logging.info("game ended")
 
 	def send_all(self, data):
 		tmp = json.dumps(data)
 		for player in self.players:
 			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
 				player.socket.send(tmp)
-
-
 
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
@@ -267,6 +273,7 @@ class websocket_client(WebsocketConsumer):
 				current_players = current.players
 				for player in current_players:
 					if player.socket == self:
+						self.playerID = current_players.index(player)
 						find = 1
 						break
 				if find == 1:
@@ -275,6 +282,7 @@ class websocket_client(WebsocketConsumer):
 				return
 			else:
 					self.data = current
+		logging.info(f"player {self.playerID} sent data")
 		# for current in self.data.players:
 		# 	if current.socket == self: 
 		# 		self.playerID = current
@@ -364,6 +372,9 @@ class websocket_client(WebsocketConsumer):
 		
 	def disconnect(self, code):
 		print("server says disconnected")
-		for player in waiting_list:
-			if player.socket == self:
-				waiting_list.remove(player)
+		if hasattr(self, "data"):
+			self.data.end_game()
+		else:
+			for player in waiting_list:
+				if player.socket == self:
+					waiting_list.remove(player)
