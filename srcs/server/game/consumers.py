@@ -42,14 +42,14 @@ class Player:
 		self.score = 0
 
 class Game:
-	game_id = ""
+	id = ""
 	last_frame = 0
 	players = []
 	ball = Ball()
 
 	def __init__(self, players) -> None:
 		logging.info("new game created")
-		self.game_id = makeid(15)
+		self.id = makeid(15)
 		self.lastframe = time.time()
 		self.players = players
 
@@ -70,12 +70,15 @@ class Game:
 
 
 def start_game(num):
-	logging.info(f"waiting list {waiting_list}")
+	logging.info(f"waiting list {len(waiting_list)}")
 	if len(waiting_list) == num:
 		players = []
 		for player in waiting_list:
 			players.append(player)
+			logging.info(f"player added to game")
+		for player in players:
 			waiting_list.remove(player)
+			logging.info(f"player remove from waiting list")
 		game = Game(players)
 		game_list.append(game)
 		logging.info(f"game created")
@@ -268,8 +271,9 @@ class websocket_client(WebsocketConsumer):
 		else:
 			game_data = current
 
+		logging.info(f"{current.id}")
 
-
+		return
 		if timeStart == 0 :
 			timeStart = time.time()
 		tmp = json.loads(text_data)
