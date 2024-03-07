@@ -74,10 +74,8 @@ class Game:
 		logging.info("game ended")
 
 	def send_all(self, data):
-		tmp = json.dumps(data)
 		for player in self.players:
-			if type(data) == type(dict()) and self.pool_id == data['gameID'] :
-				player.socket.send(tmp)
+			player.socket.send(data)
 
 	def to_json(self):
 		#{"player": "[{"id":1,"x": 0, "z": 0}, {"id":2,"x": 0, "z": 0}]", "ball": {"x": 0, "z": 0}, "score": {"1": 0, "2": 0}, "moveSpeed": 1.05}
@@ -301,10 +299,10 @@ class websocket_client(WebsocketConsumer):
 				return 
 
 
-		if receive_package['type'] == 2:
-			logging.info(self.data.to_json())
-			#self.send(json.dumps(self.data.to_json())) #not work fix json
-			return
+		if receive_package['type'] == "init":
+			logging.info("send")
+			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
+			return 
 		
 		return
 	

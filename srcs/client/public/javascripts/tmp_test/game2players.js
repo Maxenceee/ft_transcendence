@@ -23,6 +23,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	});
 	let gameID = null;
 	socket.use((msg) =>{
+		console.log(msg);
 		if (playerNumber == -1 && msg.type == "id")
 		{
 			data = msg.data;
@@ -33,6 +34,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			console.log(gameID);
 			setcam();
 		}
+		
 		else
 		{
 			if (gameID == null)
@@ -45,6 +47,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				console.log(gameID);
 				return ;
 			}
+		return
 			if (msg.gameID != gameID)
 			{
 				console.log("have "   + gameID);
