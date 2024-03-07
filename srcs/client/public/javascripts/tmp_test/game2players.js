@@ -8,6 +8,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
+	let counter = 0
 	let socket = new Socket({path: "/socket"});
 	let playerNumber = -1;
 	let connectionStatus = 0;
@@ -51,11 +52,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			}
 			data = msg;
 			keyCode = data.keyCode;
-			if (playerNumber % 2 == 0)
+			if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
 				palletPlayer1.position.x = data.P1position.x;
-			else
+			else if (data && data.P2position && data.P2position.x)
 				palletPlayer2.position.x = data.P2position.x;
 		}
+	
 	});
 
 	let ball;
@@ -257,12 +259,16 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			if (keyVar == 68 || keyVar == 39) 
 			{
 				palletPlayer1.position.x += mapWidth/60 ;
+				if (palletPlayer1.x > 16.6)
+					palletPlayer1.x = 16.5;
 				data.P1position = palletPlayer1.position ;
 				counter +=2
 			}
 			if (keyVar == 65 || keyVar == 37)
 			{
 				palletPlayer1.position.x -= mapWidth/60 ;
+				if (palletPlayer1.x < -16.6)
+					palletPlayer1.x = 16.5;
 				data.P1position = palletPlayer1.position ;
 				counter +=2
 			}
@@ -271,13 +277,17 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		{
 			if (keyVar == 65 || keyVar == 37) 
 			{
-				data.P2position = palletPlayer2.position ;
 				palletPlayer2.position.x += mapWidth/60 ;
+				if (palletPlayer2.x > 16.6)
+					palletPlayer2.x = 16.5;
+				data.P2position = palletPlayer2.position ;
 				counter +=2
 			}
 			if (keyVar == 68 || keyVar == 39)
 			{
 				palletPlayer2.position.x -= mapWidth/60 ;
+				if (palletPlayer2.x < -16.6)
+					palletPlayer2.x = 16.5;
 				data.P2position = palletPlayer2.position ;
 				counter +=2
 			}
@@ -315,7 +325,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		data.ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
 		data.ballDirection.z *= -1;
 		try {		
-			ball.position = data.ball // it throw a error cause the  position is read only
+			ball.position = data.ball; // it throw a error cause the  position is read only
 		} catch (error) {}
 	}
 
@@ -364,8 +374,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		Key39 : 0,
 		Key37 : 0,
 	}
-
-	let counter = 0
+	
 	let data = {
 		number : [2],
 		ball : ball.position,
@@ -390,62 +399,65 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		}
 		else
 			renderer.render( sceneError, camera );
-		controls.update()
-		requestAnimationFrame(animate)
+		controls.update();
+		requestAnimationFrame(animate);
 		if (gameID	!= null)
 		{
 			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
-				resetBall()
+				resetBall();
 				if (endScore == 0)
 				{
 					endScore = 1;
-					createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
 				}
 				scene.remove(ball);
 				return;
 			}
 				if (data.updateScore != 0 && data.score != score)
 				{
-					score = data.score
-					createText(data.score.scoreP2 + " : " + data.score.scoreP1)
+					score = data.score;
+					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
 					// console.log(score)
 				}
 				// ball.rotation.x +=  .1
-				ball.position.x = data.ball.x
-				ball.position.z = data.ball.z
-				ballDirection = data.direction
+				ball.position.x = data.ball.x;
+				ball.position.z = data.ball.z;
+				ballDirection = data.direction;
 		}
 		await sleep(25)
 	}
 
 	const tmp = async () => {
+		console.log("here");
 		while ( connectionStatus != 2 )
 		{
-			data.playerNumber = playerNumber
-			counter += 1
+			console.log("here");
+			await sleep(50);
+			data.playerNumber = playerNumber;
+			counter += 1;
 			if (data.playerNumber % 2 == 0)
-				data.number[0] = counter
+				data.number[0] = counter;
 			else 
-				data.number[1] = counter
-			socket.send({type : 0, data:data})	
+				data.number[1] = counter;
+			socket.send({type : 0, data:data});
 			if (endScore == 1)
 			{
-				socket.send({type : "end"})
-				return
+				// socket.send({type : "end"})
+				return;
 			}
-			await sleep(50)
 		}
+		console.log("ping");
 	}
 
-	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
-	tmp()
+	tmp();
 	function setcam () {
 		if (playerNumber % 2 == 1)
-			camera.position.set(30, 30, 40)
+			camera.position.set(30, 30, 40);
 		else
-			camera.position.set(30, 30, -40)
+			camera.position.set(30, 30, -40);
 	}
-	console.log("cookie")
+	console.log("cookie");
 }();

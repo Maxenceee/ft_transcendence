@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import random
 import json
 from datetime import datetime, timedelta
+import logging
 
 class User(models.Model):
 	index = models.AutoField(primary_key=True)
@@ -18,6 +19,23 @@ class User(models.Model):
 
 	def __str__(self):
 		return str(self.username)
+	
+	def to_json(self):
+		game_history = []
+		for game in self.game_history.all():
+			json_game = {
+				"id": game.id,
+				"date": int(game.date.timestamp()),
+				"type": game.type,
+				"data": game.data,
+			}
+			game_history.append(json_game)
+		response = {
+			"id": self.id,
+			"nickname": self.nickname,
+			"game_history": game_history,
+		}
+		return response
 
 class Token(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -39,24 +57,11 @@ class Token(models.Model):
 class Game_history(models.Model):
 	id = models.AutoField(primary_key=True)
 	date = models.DateTimeField(auto_now_add=True)
-	mode = models.IntegerField() # 0: 2v2, 1: 4v4, 2: tournament
-	players = models.CharField(max_length=100)
-	score = models.CharField(max_length=100)
-
-	def get_players(self):
-		return list(self.players)
-	
-	def get_score(self):
-		return list(self.score)
+	type = models.CharField(max_length=100) #2v2, 4v4, tournament
+	data = models.CharField(max_length=100) #[{"id": ",lkfvjl", "score": 12}, {"id": ",lkfvjl", "score": 12}],
 
 	def __str__(self):
 		return str(self.id)
-	
-	def update(self, *args, **kwargs):
-		players = self.get_players()
-		for player in players:
-			user = User.objects.get(id=player)
-			user.game_history.add(self)
 
 	def save(self, *args, **kwargs):
 		new = False
@@ -64,11 +69,12 @@ class Game_history(models.Model):
 			new = True
 		super().save(*args, **kwargs)
 		if new:
-			players = self.get_players()
-			for player in players:
+			data = self.data
+			data = json.loads(data)
+			for player in data:
+				player = player['id']
 				try:
 					user = User.objects.get(id=player)
 					user.game_history.add(self)
 				except:
 					pass
-				
