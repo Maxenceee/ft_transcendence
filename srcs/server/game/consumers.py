@@ -32,9 +32,9 @@ class Ball:
 	def __init__(self) -> None:
 		self.x = 0
 		self.z = 0
-		self.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+		self.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 		self.direction_z = 1
-		self.speed = 0
+		self.speed = 1.05
 
 		
 class Player:
@@ -84,7 +84,7 @@ class Game:
 			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
 		response = {
 			"player": players,
-			"ball": {"x": self.ball.x, "z": self.ball.z},
+			"ball": {"x": self.ball.x, "z": self.ball.z, "direction_x": self.ball.direction_x, "direction_z":self.ball.direction_z},
 			"moveSpeed": self.ball.speed
 		}
 		return response
@@ -304,6 +304,12 @@ class websocket_client(WebsocketConsumer):
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return 
 		
+		# if self.playerID:
+		if self.data.last_frame + 1 < time.time():
+			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
+			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
+			self.data.send_all(json.dumps(self.data.to_json()))
+			self.data.last_frame = time.time()
 		return
 	
 		self.data = self.reboundP2()
@@ -333,11 +339,7 @@ class websocket_client(WebsocketConsumer):
 			ballPosition['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']
 		if ballPosition['x'] == receive_package['data']['ball']['x'] :
 			ballPosition['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
-		if timeStart + 0.05 < time.time():
-			self.data['ball'] = ballPosition
-			self.data['ballDirection'] = ballDirection
-			self.pool.send_all(self.data)
-			timeStart = time.time()
+
 
 		
 	def disconnect(self, code):

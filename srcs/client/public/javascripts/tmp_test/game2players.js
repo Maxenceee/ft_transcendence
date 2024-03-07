@@ -23,7 +23,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	});
 	let gameID = null;
 	socket.use((msg) =>{
-		console.log(msg);
 		if (playerNumber == -1 && msg.type == "id")
 		{
 			data = msg.data;
@@ -37,29 +36,34 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		
 		else
 		{
-			if (gameID == null)
-			{
-				socket.send({type : 2});
-				sleep (50);
-				gameID = msg.gameID;
-				playerNumber = msg.playerNumber;
-				console.log(playerNumber);
-				console.log(gameID);
-				return ;
-			}
-		return
-			if (msg.gameID != gameID)
-			{
-				console.log("have "   + gameID);
-				console.log("receve " + msg.gameID);
-				return ;
-			}
+			// if (gameID == null)
+			// {
+			// 	socket.send({type : 2});
+			// 	sleep (50);
+			// 	gameID = msg.gameID;
+			// 	playerNumber = msg.playerNumber;
+			// 	console.log(playerNumber);
+			// 	console.log(gameID);
+			// 	return ;
+			// }
+		// return
+			// if (msg.gameID != gameID)
+			// {
+			// 	console.log("have "   + gameID);
+			// 	console.log("receve " + msg.gameID);
+			// 	return ;
+			// }
 			data = msg;
-			keyCode = data.keyCode;
-			if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
-				palletPlayer1.position.x = data.P1position.x;
-			else if (data && data.P2position && data.P2position.x)
-				palletPlayer2.position.x = data.P2position.x;
+			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
+			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
+			
+			console.log(data);
+			console.log(ball.position.x);
+			// keyCode = data.keyCode;
+			// if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
+			// 	palletPlayer1.position.x = data.P1position.x;
+			// else if (data && data.P2position && data.P2position.x)
+			// 	palletPlayer2.position.x = data.P2position.x;
 		}
 	
 	});
@@ -425,8 +429,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					// console.log(score)
 				}
 				// ball.rotation.x +=  .1
-				ball.position.x = data.ball.x;
-				ball.position.z = data.ball.z;
+				// ball.position.x = data.ball.x;
+				// ball.position.z = data.ball.z;
 				ballDirection = data.direction;
 		}
 		await sleep(25)
@@ -436,12 +440,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		while ( connectionStatus != 2 )
 		{
 			await sleep(50);
-			data.playerNumber = playerNumber;
-			counter += 1;
-			if (data.playerNumber % 2 == 0)
-				data.number[0] = counter;
-			else 
-				data.number[1] = counter;
+			// data.playerNumber = playerNumber;
+			// counter += 1;
+			// if (data.playerNumber % 2 == 0)
+			// 	data.number[0] = counter;
+			// else 
+			// 	data.number[1] = counter;
 			socket.send({type : 0, data:data});
 			if (endScore == 1)
 			{
