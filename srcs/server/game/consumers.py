@@ -130,7 +130,7 @@ class websocket_client(WebsocketConsumer):
 		# self.data['keyCode']['Key37'] = 0
 		return self.data
 	
-	def wallCollideTwoPlayer(self):
+	def wallCollideTwoPlayer(self): #to change
 		global ballPosition
 		global ballDirection
 		global score
@@ -173,7 +173,7 @@ class websocket_client(WebsocketConsumer):
 		self.data['score'] = score
 		return self.data
 	
-	def wallCollideFourPlayer(self):
+	def wallCollideFourPlayer(self): #to change
 		if self.data['ball']['x'] < -29 :
 			self.data['ball']['x'] = 0
 			self.data['ball']['z'] = 0 
@@ -241,41 +241,23 @@ class websocket_client(WebsocketConsumer):
 		if self.data['keyCode']['Key90'] == 1 and self.data['P4position']['z']  > -26 :
 			self.data['P4position']['z'] -= 1.1
 		return self.data
-
-	def reboundP1(self):
-		if self.data['ball']['z'] > 27 and (self.data['ball']['x'] < (self.data['P1position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P1position']['x'] - 4)):
-			self.data['ballDirection']['z'] = -1	
-			self.data['moveSpeed'] += 0.1
-		if (self.data['moveSpeed'] > 5) :
-			self.data['moveSpeed'] = 5
-		return self.data
 		
-	def reboundP2(self):
-		if self.data['ball']['z'] < -27 and (self.data['ball']['x'] < (self.data['P2position']['x'] + 4)  and self.data['ball']['x'] > (self.data['P2position']['x'] - 4)):
-			self.data['ballDirection']['z'] = 1
-			self.data['moveSpeed'] += 0.1
-		if (self.data['moveSpeed'] > 5) :
-			self.data['moveSpeed'] = 5
+	def rebound_x(self, player_number):
+		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_x + 4)  and self.data.ball.x> (self.data.players[player_number].pad_x - 4)):
+			self.data.ball.direction_z = 1
+			self.data.ball.speed += 0.1
+		if (self.data.ball.speed > 5) :
+			self.data.ball.speed = 5
 		return self.data
 	
-	def reboundP3(self):
-		if self.data['ball']['x'] < -27 and (self.data['ball']['z'] < (self.data['P3position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P3position']['z'] - 4)):
-			self.data['ballDirection']['x'] = 1	
-			self.data['moveSpeed'] += 0.1
-			logging.info(self.data['ballDirection']['x'])
-		if (self.data['moveSpeed'] > 5) :
-			self.data['moveSpeed'] = 5
+	def rebound_z(self, player_number):
+		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_z + 4)  and self.data.ball.x> (self.data.players[player_number].pad_z - 4)):
+			self.data.ball.direction_z = 1
+			self.data.ball.speed += 0.1
+		if (self.data.ball.speed > 5) :
+			self.data.ball.speed = 5
 		return self.data
-		
-	def reboundP4(self):
-		if self.data['ball']['x'] > 27 and (self.data['ball']['z'] < (self.data['P4position']['z'] + 4)  and self.data['ball']['z'] > (self.data['P4position']['z'] - 4)):
-			self.data['ballDirection']['x'] *= -1
-			self.data['moveSpeed'] += 0.1
-			logging.info(self.data['ballDirection']['x'])
-		if (self.data['moveSpeed'] > 5) :
-			self.data['moveSpeed'] = 5
-		return self.data
-		
+
 	def receive(self, text_data=None, bytes_data=None):
 		if not hasattr(self, "data"):
 			find = 0
@@ -302,46 +284,42 @@ class websocket_client(WebsocketConsumer):
 		if receive_package['type'] == "init":
 			logging.info("send")
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
-			return 
+			return
 		
-		# if self.playerID:
 		if self.data.last_frame + 1 < time.time():
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
 			self.data.send_all(json.dumps(self.data.to_json()))
 			self.data.last_frame = time.time()
-		return
 	
-		self.data = self.reboundP2()
-		if receive_package['data']['updateScore'] != 0 :
-			self.data['updateScore']  -= 1
+		self.data = self.rebound_x(0)
+		self.data = self.rebound_x(1)
 		if receive_package['type'] == 1 :
-			# self.playerMove4P()
 			self.data = self.wallCollideFourPlayer()
-			self.data = self.reboundP3()
-			self.data = self.reboundP4()
+			self.data = self.rebound_z(2)
+			self.data = self.rebound_z(3)
 		else:
-			# self.data = self.playerMove2P()
 			self.data = self.wallCollideTwoPlayer()
-		# if int(str(self.data['playerNumber'])) % 2 == 1 :
+
+		#to change
 		if 	self.data['number'][0] < receive_package['data']['number'][0] :
 					self.data['number'][0] = receive_package['data']['number'][0]
 		if self.data['P1position']['x'] != receive_package['data']['P1position']['x'] :
-			self.data['P1position']['x'] = receive_package['data']['P1position']['x']   # receive_package
-		# if int(str(self.data['playerNumber'])) % 2 == 0 :
+			self.data['P1position']['x'] = receive_package['data']['P1position']['x']  #tmp
+
 		if self.data['number'][1] < receive_package['data']['number'][1] :
 				self.data['number'][1] = receive_package['data']['number'][1]
 		if self.data['P2position']['x'] != receive_package['data']['P2position']['x'] :
-			self.data['P2position']['x'] = receive_package['data']['P2position']['x']   # receive_package
-		# logging.info(self.data['P2position']['x'])
-		self.data = self.reboundP1()
+			self.data['P2position']['x'] = receive_package['data']['P2position']['x']   #tmp
+
 		if ballPosition['z'] == receive_package['data']['ball']['z'] :
 			ballPosition['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']
 		if ballPosition['x'] == receive_package['data']['ball']['x'] :
 			ballPosition['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
+		#end of to change
 
+		self.data.send_all(json.dumps(self.data.to_json()))
 
-		
 	def disconnect(self, code):
 		print("server says disconnected")
 		if hasattr(self, "data"):
