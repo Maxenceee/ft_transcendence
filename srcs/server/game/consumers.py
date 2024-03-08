@@ -78,7 +78,6 @@ class Game:
 			player.socket.send(data)
 
 	def to_json(self):
-		#{"player": "[{"id":1,"x": 0, "z": 0}, {"id":2,"x": 0, "z": 0}]", "ball": {"x": 0, "z": 0}, "score": {"1": 0, "2": 0}, "moveSpeed": 1.05}
 		players = []
 		for player in self.players:
 			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
@@ -241,7 +240,7 @@ class websocket_client(WebsocketConsumer):
 		if self.data['keyCode']['Key90'] == 1 and self.data['P4position']['z']  > -26 :
 			self.data['P4position']['z'] -= 1.1
 		return self.data
-		
+
 	def rebound_x(self, player_number):
 		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_x + 4)  and self.data.ball.x> (self.data.players[player_number].pad_x - 4)):
 			self.data.ball.direction_z = 1
@@ -249,7 +248,7 @@ class websocket_client(WebsocketConsumer):
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
 		return self.data
-	
+
 	def rebound_z(self, player_number):
 		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_z + 4)  and self.data.ball.x> (self.data.players[player_number].pad_z - 4)):
 			self.data.ball.direction_z = 1
@@ -294,6 +293,7 @@ class websocket_client(WebsocketConsumer):
 	
 		self.data = self.rebound_x(0)
 		self.data = self.rebound_x(1)
+		
 		if receive_package['type'] == 1 :
 			self.data = self.wallCollideFourPlayer()
 			self.data = self.rebound_z(2)
@@ -304,18 +304,18 @@ class websocket_client(WebsocketConsumer):
 		#to change
 		if 	self.data['number'][0] < receive_package['data']['number'][0] :
 					self.data['number'][0] = receive_package['data']['number'][0]
-		if self.data['P1position']['x'] != receive_package['data']['P1position']['x'] :
-			self.data['P1position']['x'] = receive_package['data']['P1position']['x']  #tmp
+		if self.data.players.players[0].pad_x != receive_package['data']['P1position']['x'] :
+			self.data.players.players[0].pad_x = receive_package['data']['P1position']['x']  #tmp
 
 		if self.data['number'][1] < receive_package['data']['number'][1] :
 				self.data['number'][1] = receive_package['data']['number'][1]
-		if self.data['P2position']['x'] != receive_package['data']['P2position']['x'] :
-			self.data['P2position']['x'] = receive_package['data']['P2position']['x']   #tmp
+		if self.data.players[1].pad_x != receive_package['data']['P2position']['x'] :
+			self.data.players[1].pad_x = receive_package['data']['P2position']['x']   #tmp
 
-		if ballPosition['z'] == receive_package['data']['ball']['z'] :
-			ballPosition['z'] += self.data['ballDirection']['z'] * 0.4 * self.data['moveSpeed']
-		if ballPosition['x'] == receive_package['data']['ball']['x'] :
-			ballPosition['x'] += self.data['ballDirection']['x'] * 0.4 * self.data['moveSpeed'] 
+		if self.data.ball.z == receive_package['data']['ball']['z'] :
+			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
+		if self.data.ball.x == receive_package['data']['ball']['x'] :
+			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed 
 		#end of to change
 
 		self.data.send_all(json.dumps(self.data.to_json()))
