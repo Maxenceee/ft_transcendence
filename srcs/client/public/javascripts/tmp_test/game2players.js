@@ -34,6 +34,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			setcam();
 		}
 		
+		
 		else
 		{
 			// if (gameID == null)
@@ -55,8 +56,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			// }
 			data = msg;
 			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
-			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
-			
+			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
+			palletPlayer1.position.x = msg.P1position.x;
+			palletPlayer1.position.z = msg.P1position.z;
+			palletPlayer2.position.x = msg.P2position.x;
+			palletPlayer2.position.z = msg.P2position.z;
 			console.log(data);
 			console.log(ball.position.x);
 			// keyCode = data.keyCode;

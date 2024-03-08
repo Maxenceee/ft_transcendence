@@ -49,7 +49,6 @@ class Game:
 	id = ""
 	last_frame = 0
 	players = []
-	ball = Ball()
 
 
 	def __init__(self, players) -> None:
@@ -57,6 +56,7 @@ class Game:
 		self.id = makeid(15)
 		self.lastframe = time.time()
 		self.players = players
+		self.ball = Ball()
 
 	def end_game(self):
 		try:
@@ -72,6 +72,7 @@ class Game:
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type="2v2", data=resume_data)
 		logging.info("game ended")
+		#remove from game list
 
 	def send_all(self, data):
 		for player in self.players:
@@ -247,7 +248,6 @@ class websocket_client(WebsocketConsumer):
 			self.data.ball.speed += 0.1
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
-		return self.data
 
 	def rebound_z(self, player_number):
 		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_z + 4)  and self.data.ball.x> (self.data.players[player_number].pad_z - 4)):
@@ -256,25 +256,26 @@ class websocket_client(WebsocketConsumer):
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
 		return self.data
+	
+	def find_game(self):
+		global game_list
+		for current in game_list:
+			current_players = current.players
+			for player in current_players:
+				if player.socket == self:
+					self.playerID = current_players.index(player)
+					self.data = current
+					return
+
 
 	def receive(self, text_data=None, bytes_data=None):
 		if not hasattr(self, "data"):
-			find = 0
-			for current in game_list:
-				current_players = current.players
-				for player in current_players:
-					if player.socket == self:
-						self.playerID = current_players.index(player)
-						find = 1
-						break
-				if find == 1:
-					break
-			if find == 0:
+			self.find_game()
+			if not hasattr(self, "data"):
 				return
-			else:
-					self.data = current
 		#debug
 		receive_package = json.loads(text_data)
+
 		if receive_package['type'] == "end":
 				self.data.end_game()
 				return 
@@ -284,31 +285,34 @@ class websocket_client(WebsocketConsumer):
 			logging.info("send")
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return
+
+		# self.rebound_x(0)
+		# self.rebound_x(1)
 		
-		if self.data.last_frame + 1 < time.time():
+
+		if self.data.last_frame + 0.05 < time.time():
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
-			self.data.send_all(json.dumps(self.data.to_json()))
 			self.data.last_frame = time.time()
-	
-		self.data = self.rebound_x(0)
-		self.data = self.rebound_x(1)
-		
+			self.data.send_all(json.dumps(self.data.to_json()))
+
+		return
+
 		if receive_package['type'] == 1 :
-			self.data = self.wallCollideFourPlayer()
+			# data = self.wallCollideFourPlayer()
 			self.data = self.rebound_z(2)
 			self.data = self.rebound_z(3)
-		else:
-			self.data = self.wallCollideTwoPlayer()
+		# else:
+			# self.data = self.wallCollideTwoPlayer()
 
 		#to change
-		if 	self.data['number'][0] < receive_package['data']['number'][0] :
-					self.data['number'][0] = receive_package['data']['number'][0]
+		# if 	self.data['number'][0] < receive_package['data']['number'][0] :
+					# self.data['number'][0] = receive_package['data']['number'][0]
 		if self.data.players.players[0].pad_x != receive_package['data']['P1position']['x'] :
 			self.data.players.players[0].pad_x = receive_package['data']['P1position']['x']  #tmp
 
-		if self.data['number'][1] < receive_package['data']['number'][1] :
-				self.data['number'][1] = receive_package['data']['number'][1]
+		# if self.data['number'][1] < receive_package['data']['number'][1] :
+				# self.data['number'][1] = receive_package['data']['number'][1]
 		if self.data.players[1].pad_x != receive_package['data']['P2position']['x'] :
 			self.data.players[1].pad_x = receive_package['data']['P2position']['x']   #tmp
 
