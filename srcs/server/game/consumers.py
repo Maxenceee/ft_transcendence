@@ -280,7 +280,14 @@ class websocket_client(WebsocketConsumer):
 		self.rebound_x(0)
 		self.rebound_x(1)
 		
-
+		# self.data.players[1].pad_x = -4
+		# self.data.players[0].pad_x = 4
+		# self.playerMove2P()
+		if receive_package['keyCode']['left'] == 1 and self.data.players[self.playerID].pad_x  < 16.1 :
+			self.data.players[self.playerID].pad_x += 1.1
+		if receive_package['keyCode']['right'] == 1 and self.data.players[self.playerID].pad_x  > -16.1 :
+			self.data.players[self.playerID].pad_x -= 1.1
+		logging.info(self.data.players[1].pad_x)
 		if self.data.last_frame + 0.05 < time.time():
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
@@ -306,13 +313,12 @@ class websocket_client(WebsocketConsumer):
 				# self.data['number'][1] = receive_package['data']['number'][1]
 		if self.data.players[1].pad_x != receive_package['data']['P2position']['x'] :
 			self.data.players[1].pad_x = receive_package['data']['P2position']['x']   #tmp
-
 		if self.data.ball.z == receive_package['data']['ball']['z'] :
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
 		if self.data.ball.x == receive_package['data']['ball']['x'] :
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed 
 		#end of to change
-
+		
 		self.data.send_all(json.dumps(self.data.to_json()))
 
 	def disconnect(self, code):

@@ -57,9 +57,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			data = msg;
 			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
 			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
-			palletPlayer1.position.x = data.player[0].pos_x;
+			// console.log(data);
+			// return ;
+			palletPlayer1.position.x = data.player[0].x;
 			// palletPlayer1.position.z = data.player[0].pos_z;
-			palletPlayer2.position.x = data.player[1].pos_x;
+			palletPlayer2.position.x = data.player[1].x;
+			// console.log(data);
 			// palletPlayer2.position.z = data.player[1].pos_z;
 			// console.log(data);
 			// console.log(ball.position.x);
@@ -393,7 +396,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		updateScore : 0,
 		moveSpeed : moveSpeed,
 		playerNumber : playerNumber,
-		gameID : 0
+		gameID : 0,
+		keyCode : keyCode
 	};
 	// socket.send({type : 0, data : data});
 	loadFont();
@@ -440,7 +444,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		while ( connectionStatus != 2 )
 		{
 			await sleep(50);
-			socket.send({type : 0, data:data});
+			socket.send({type : 0, data:data, keyCode:keyCode});
 			if (endScore == 1)
 			{
 				// socket.send({type : "end"})
