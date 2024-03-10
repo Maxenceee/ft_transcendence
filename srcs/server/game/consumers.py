@@ -116,14 +116,14 @@ class websocket_client(WebsocketConsumer):
 
 	def playerMove2P(self) :
 		# logging.info(type(self.data['keyCode']['Key68']))
-		if self.data['keyCode']['Key68'] == 1 and self.data['P1position']['x']  < 16.1 :
-			self.data['P1position']['x'] += 1.1
-		if self.data['keyCode']['Key65'] == 1 and self.data['P1position']['x']  > -16.1 :
-			self.data['P1position']['x'] -= 1.1
-		if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -16.1 :
-			self.data['P2position']['x'] -= 1.1
-		if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
-			self.data['P2position']['x'] += 1.1
+		if self.data['keyCode']['left'] == 1 and self.data['P1position']['x']  < 16.1 :
+			self.data.players[self.playerID].pos_x += 1.1
+		if self.data['keyCode']['right'] == 1 and self.data['P1position']['x']  > -16.1 :
+			self.data.players[self.playerID].pos_x -= 1.1
+		# if self.data['keyCode']['Key39'] == 1 and self.data['P2position']['x']  > -16.1 :
+		# 	self.data['P2position']['x'] -= 1.1
+		# if self.data['keyCode']['Key37'] == 1 and self.data['P2position']['x']  < 16.1 :
+		# 	self.data['P2position']['x'] += 1.1
 		# self.data['keyCode']['Key65'] = 0
 		# self.data['keyCode']['Key68'] = 0
 		# self.data['keyCode']['Key39'] = 0

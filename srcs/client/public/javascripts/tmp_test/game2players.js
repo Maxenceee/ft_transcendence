@@ -57,12 +57,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			data = msg;
 			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
 			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
-			palletPlayer1.position.x = msg.P1position.x;
-			palletPlayer1.position.z = msg.P1position.z;
-			palletPlayer2.position.x = msg.P2position.x;
-			palletPlayer2.position.z = msg.P2position.z;
-			console.log(data);
-			console.log(ball.position.x);
+			palletPlayer1.position.x = data.player[0].pos_x;
+			// palletPlayer1.position.z = data.player[0].pos_z;
+			palletPlayer2.position.x = data.player[1].pos_x;
+			// palletPlayer2.position.z = data.player[1].pos_z;
+			// console.log(data);
+			// console.log(ball.position.x);
 			// keyCode = data.keyCode;
 			// if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
 			// 	palletPlayer1.position.x = data.P1position.x;
@@ -242,68 +242,66 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
 
-		// keyCode.Key37 = 0
-		// keyCode.Key65 = 0
-		// keyCode.Key68 = 0
-		// keyCode.Key39 = 0
-		// if (keyVar == 68)
-		// {
-		// 	keyCode.Key68 = 1
-		// 	keyCode.Key65 = 0
-		// }
-		// if (keyVar == 65)
-		// {
-		// 	keyCode.Key65 = 1
-		// 	keyCode.Key68 = 0
-		// }
-		// if (keyVar == 39)
-		// {
-		// 	keyCode.Key39 = 1
-		// 	keyCode.Key37 = 0
-		// }
-		// if (keyVar == 37)
-		// {
-		// 	keyCode.Key39 = 0
-		// 	keyCode.Key37 = 1
-		// }
-		if (playerNumber % 2 == 1)
+		keyCode.right = 0
+		keyCode.left = 0
+		if (keyVar == 68)
 		{
-			if (keyVar == 68 || keyVar == 39) 
-			{
-				palletPlayer1.position.x += mapWidth/60 ;
-				if (palletPlayer1.x > 16.6)
-					palletPlayer1.x = 16.5;
-				data.P1position = palletPlayer1.position ;
-				counter +=2
-			}
-			if (keyVar == 65 || keyVar == 37)
-			{
-				palletPlayer1.position.x -= mapWidth/60 ;
-				if (palletPlayer1.x < -16.6)
-					palletPlayer1.x = 16.5;
-				data.P1position = palletPlayer1.position ;
-				counter +=2
-			}
+			keyCode.right = 1
+			keyCode.left = 0
 		}
-		else if (playerNumber % 2 == 0)
+		if (keyVar == 65)
 		{
-			if (keyVar == 65 || keyVar == 37) 
-			{
-				palletPlayer2.position.x += mapWidth/60 ;
-				if (palletPlayer2.x > 16.6)
-					palletPlayer2.x = 16.5;
-				data.P2position = palletPlayer2.position ;
-				counter +=2
-			}
-			if (keyVar == 68 || keyVar == 39)
-			{
-				palletPlayer2.position.x -= mapWidth/60 ;
-				if (palletPlayer2.x < -16.6)
-					palletPlayer2.x = 16.5;
-				data.P2position = palletPlayer2.position ;
-				counter +=2
-			}
+			keyCode.left = 1
+			keyCode.right = 0
 		}
+		if (keyVar == 39)
+		{
+			keyCode.right = 1
+			keyCode.left = 0
+		}
+		if (keyVar == 37)
+		{
+			keyCode.right = 0
+			keyCode.left = 1
+		}
+		// if (playerNumber % 2 == 1)
+		// {
+		// 	if (keyVar == 68 || keyVar == 39) 
+		// 	{
+		// 		palletPlayer1.position.x += mapWidth/60 ;
+		// 		if (palletPlayer1.x > 16.6)
+		// 			palletPlayer1.x = 16.5;
+		// 		data.P1position = palletPlayer1.position ;
+		// 		counter +=2
+		// 	}
+		// 	if (keyVar == 65 || keyVar == 37)
+		// 	{
+		// 		palletPlayer1.position.x -= mapWidth/60 ;
+		// 		if (palletPlayer1.x < -16.6)
+		// 			palletPlayer1.x = 16.5;
+		// 		data.P1position = palletPlayer1.position ;
+		// 		counter +=2
+		// 	}
+		// }
+		// else if (playerNumber % 2 == 0)
+		// {
+		// 	if (keyVar == 65 || keyVar == 37) 
+		// 	{
+		// 		palletPlayer2.position.x += mapWidth/60 ;
+		// 		if (palletPlayer2.x > 16.6)
+		// 			palletPlayer2.x = 16.5;
+		// 		data.P2position = palletPlayer2.position ;
+		// 		counter +=2
+		// 	}
+		// 	if (keyVar == 68 || keyVar == 39)
+		// 	{
+		// 		palletPlayer2.position.x -= mapWidth/60 ;
+		// 		if (palletPlayer2.x < -16.6)
+		// 			palletPlayer2.x = 16.5;
+		// 		data.P2position = palletPlayer2.position ;
+		// 		counter +=2
+		// 	}
+		// }
 		data.keyCode = keyCode;
 		updatePlayer = 1;
 	}
@@ -381,10 +379,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	var keyCode = {
-		Key68 : 0,
-		Key65 : 0,
-		Key39 : 0,
-		Key37 : 0,
+		left : 0,
+		right : 0
 	}
 	
 	let data = {
@@ -444,12 +440,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		while ( connectionStatus != 2 )
 		{
 			await sleep(50);
-			// data.playerNumber = playerNumber;
-			// counter += 1;
-			// if (data.playerNumber % 2 == 0)
-			// 	data.number[0] = counter;
-			// else 
-			// 	data.number[1] = counter;
 			socket.send({type : 0, data:data});
 			if (endScore == 1)
 			{
