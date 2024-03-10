@@ -147,7 +147,6 @@ class websocket_client(WebsocketConsumer):
 			# else :
 				# ballDirection = self.data['ballDirection']
 			self.data.ball.speed = 1.05
-			self.pool.send_all(json.dumps(self.data))
 
 		elif self.data.ball.z > 29:
 			self.data.players[1].score +=1
@@ -160,7 +159,6 @@ class websocket_client(WebsocketConsumer):
 			# else :
 				# ballDirection = self.data['ballDirection']
 			self.data.ball.speed = 1.05
-			self.pool.send_all(json.dumps(self.data))
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
 		return self.data
