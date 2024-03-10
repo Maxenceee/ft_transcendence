@@ -131,46 +131,38 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 	
 	def wallCollideTwoPlayer(self): #to change
-		global ballPosition
-		global ballDirection
-		global score
 
-		if ballPosition['x'] < -17 :
-			ballDirection['x'] = 1 #naive version
-		elif ballPosition['x'] > 17:
-			ballDirection['x'] = -1 #naive version
-		if ballPosition['z'] < -29:
-			score['scoreP2'] += 1
-			ballPosition['x'] = 0
-			ballPosition['z'] = 0 
-			ballPosition['y'] = 0
-			ballDirection['z'] *= -1
+		if self.data.ball.x < -17 :
+			self.data.ball.direction_x = 1 #naive version
+		elif self.data.ball.x > 17:
+			self.data.ball.direction_x = -1 #naive version
+		if self.data.ball.z < -29:
+			self.data.players[0].score += 1
+			self.data.ball.x = 0
+			self.data.ball.z = 0 
+			self.data.ball.y = 0
+			self.data.ball.direction_z *= -1
 			# if ( hasattr(self.data, 'playerNumber') and self.data['playerNumber'] == 1) :
-			ballDirection['x'] = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.data.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 			# else :
 				# ballDirection = self.data['ballDirection']
-			self.data['updateScore'] = 6
-			self.data['moveSpeed'] = 1.05
+			self.data.ball.speed = 1.05
 			self.pool.send_all(json.dumps(self.data))
-			logging.info(self.data['score'])
-			
-		elif ballPosition['z'] > 29:
-			score['scoreP1'] +=1
-			ballPosition['x'] = 0
-			ballPosition['z'] = 0 
-			ballPosition['y'] = 0
-			ballDirection['z'] *= -1
+
+		elif self.data.ball.z > 29:
+			self.data.players[1].score +=1
+			self.data.ball.x = 0
+			self.data.ball.z = 0 
+			self.data.ball.y = 0
+			self.data.ball.direction_z *= -1
 			# if hasattr(self.data, 'playerNumber') and (self.data['playerNumber'] == 1) :
-			ballDirection['x'] = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.data.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 			# else :
 				# ballDirection = self.data['ballDirection']
-			self.data['updateScore'] = 6
-			self.data['moveSpeed'] = 1.05
+			self.data.ball.speed = 1.05
 			self.pool.send_all(json.dumps(self.data))
-			logging.info(self.data['score'])
-		if (self.data['moveSpeed'] > 5) :
-			self.data['moveSpeed'] = 5
-		self.data['score'] = score
+		if (self.data.ball.speed > 5) :
+			self.data.ball.speed = 5
 		return self.data
 	
 	def wallCollideFourPlayer(self): #to change
@@ -286,8 +278,9 @@ class websocket_client(WebsocketConsumer):
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return
 
-		# self.rebound_x(0)
-		# self.rebound_x(1)
+		self.wallCollideTwoPlayer()
+		self.rebound_x(0)
+		self.rebound_x(1)
 		
 
 		if self.data.last_frame + 0.05 < time.time():

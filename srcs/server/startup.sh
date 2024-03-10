@@ -1,4 +1,9 @@
 #!/bin/sh
+python3 manage.py makemigrations
+
+python3 manage.py makemigrations index
+
+python3 manage.py makemigrations game
 
 python3 manage.py migrate
 

@@ -18,12 +18,4 @@ COPY ./client /app/client
 
 COPY ./server/ /app/server
 
-# RUN python3 manage.py collectstatic -c --noinput
-
-RUN python3 manage.py makemigrations
-
-RUN python3 manage.py makemigrations index
-
-RUN python3 manage.py makemigrations game
-
 CMD ["sh", "./startup.sh"]
