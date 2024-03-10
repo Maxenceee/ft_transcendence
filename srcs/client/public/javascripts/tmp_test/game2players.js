@@ -26,6 +26,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		if (playerNumber == -1 && msg.type == "id")
 		{
 			data = msg.data;
+			
 			// playerNumber = msg.playerNumber;
 			// data.gameID = msg.gameID;
 			// gameID = data.gameID;
@@ -62,7 +63,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			palletPlayer1.position.x = data.player[0].x;
 			// palletPlayer1.position.z = data.player[0].pos_z;
 			palletPlayer2.position.x = data.player[1].x;
+			console.log(palletPlayer1.position.x);
 			// console.log(data);
+			keyCode.right = 0
+			keyCode.left = 0		
 			// palletPlayer2.position.z = data.player[1].pos_z;
 			// console.log(data);
 			// console.log(ball.position.x);
@@ -242,6 +246,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	initiateMapTwoPlayer({})
 	var updatePlayer = 0;
 	document.addEventListener("keydown", onDocumentKeyDown, true);
+	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
 
@@ -267,6 +272,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			keyCode.right = 0
 			keyCode.left = 1
 		}
+		socket.send({type : 0, data:data, keyCode:keyCode});
+
 		// if (playerNumber % 2 == 1)
 		// {
 		// 	if (keyVar == 68 || keyVar == 39) 
@@ -308,26 +315,27 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		data.keyCode = keyCode;
 		updatePlayer = 1;
 	}
-	// function onDocumentKeyUp(event) {
-	//     let keyVar = event.which;
+	function onDocumentKeyUp(event) {
+	    let keyVar = event.which;
+// 
+// 
+		if (keyVar == 68)
+			keyCode.Key68 = 0
+		if (keyVar == 65)
+			keyCode.Key65 = 0
+		if (keyVar == 39)
+			keyCode.Key39 = 0
+		if (keyVar == 37)
+			keyCode.Key37 = 0
+		socket.send({type : 0, data:data, keyCode:keyCode});
 
-
-	// 	if (keyVar == 68)
-	// 		keyCode.Key68 = 0
-	// 	if (keyVar == 65)
-	// 		keyCode.Key65 = 0
-	// 	if (keyVar == 39)
-	// 		keyCode.Key39 = 0
-	// 	if (keyVar == 37)
-	// 		keyCode.Key37 = 0
-
-	// 	data.keyCode = keyCode
-	// 	updatePlayer = 1
-	// 	// socket.send({type:2, data})
-	// 	// palletPlayer1.position.x = data.P1position.x ;
-	// 	// palletPlayer2.position.x = data.P2position.x ;
-	// 	// console.log(keyCode);
-	// }
+		// data.keyCode = keyCode
+		// updatePlayer = 1
+		// socket.send({type:2, data})
+		// palletPlayer1.position.x = data.P1position.x ;
+		// palletPlayer2.position.x = data.P2position.x ;
+		// console.log(keyCode);
+	}
 
 	function resetBall()
 	{

@@ -233,11 +233,13 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 
 	def rebound_x(self, player_number):
-		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_x + 4)  and self.data.ball.x> (self.data.players[player_number].pad_x - 4)):
-			self.data.ball.direction_z = 1
+		# logging.info(f"start rebound{self.data.players[self.playerID].pad_x}")
+		if (self.data.ball.z < -27 or self.data.ball.z > 27) and (self.data.ball.x < (self.data.players[player_number].pad_x + 4)  and self.data.ball.x > (self.data.players[player_number].pad_x - 4)):
+			self.data.ball.direction_z *= -1
 			self.data.ball.speed += 0.1
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
+		# logging.info(f"end rebound {self.data.players[self.playerID].pad_x}")
 
 	def rebound_z(self, player_number):
 		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_z + 4)  and self.data.ball.x> (self.data.players[player_number].pad_z - 4)):
@@ -276,18 +278,16 @@ class websocket_client(WebsocketConsumer):
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return
 
+		if receive_package['keyCode']['left'] == 1 and self.data.players[self.playerID].pad_x  < 16.1 :
+			self.data.players[self.playerID].pad_x += 0.4
+		if receive_package['keyCode']['right'] == 1 and self.data.players[self.playerID].pad_x  > -16.1 :
+			self.data.players[self.playerID].pad_x -= 0.4
 		self.wallCollideTwoPlayer()
+		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
 		self.rebound_x(0)
 		self.rebound_x(1)
-		
-		# self.data.players[1].pad_x = -4
-		# self.data.players[0].pad_x = 4
-		# self.playerMove2P()
-		if receive_package['keyCode']['left'] == 1 and self.data.players[self.playerID].pad_x  < 16.1 :
-			self.data.players[self.playerID].pad_x += 1.1
-		if receive_package['keyCode']['right'] == 1 and self.data.players[self.playerID].pad_x  > -16.1 :
-			self.data.players[self.playerID].pad_x -= 1.1
-		logging.info(self.data.players[1].pad_x)
+		# logging.info(self.data.players[self.playerID].pad_x)
+		# logging.info(f"end {self.data.players[self.playerID].pad_x}")	
 		if self.data.last_frame + 0.05 < time.time():
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
