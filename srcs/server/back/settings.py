@@ -32,7 +32,7 @@ DEBUG = False
 IP_LOCAL = os.environ.get('IP_LOCAL')
 ALLOWED_HOSTS = ["localhost", "website", IP_LOCAL]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", f"http://{IP_LOCAL}:3000", "https://trace.maxencegama.dev"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", f"http://{IP_LOCAL}:3000", "http://trace.maxencegama.dev"]
 
 # Application definition
 
