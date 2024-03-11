@@ -132,9 +132,9 @@ class websocket_client(WebsocketConsumer):
 	
 	def wallCollideTwoPlayer(self): #to change
 
-		if self.data.ball.x < -17 :
+		if self.data.ball.x < -18.5 :
 			self.data.ball.direction_x = 1 #naive version
-		elif self.data.ball.x > 17:
+		elif self.data.ball.x > 18.5 :
 			self.data.ball.direction_x = -1 #naive version
 		if self.data.ball.z < -29:
 			self.data.players[0].score += 1
@@ -234,12 +234,17 @@ class websocket_client(WebsocketConsumer):
 
 	def rebound_x(self, player_number):
 		# logging.info(f"start rebound{self.data.players[self.playerID].pad_x}")
-		if (self.data.ball.z < -27 or self.data.ball.z > 27) and (self.data.ball.x < (self.data.players[player_number].pad_x + 4)  and self.data.ball.x > (self.data.players[player_number].pad_x - 4)):
-			self.data.ball.direction_z *= -1
+		if ((self.data.ball.z < -27 and self.playerID == 1) or (self.data.ball.z > 27 and self.playerID == 0)) and (self.data.ball.x < (self.data.players[self.playerID].pad_x + 4)  and self.data.ball.x > (self.data.players[self.playerID].pad_x - 4)):
+			if ( self.playerID == 1) :
+				self.data.ball.direction_z = 1
+			else :
+
+				self.data.ball.direction_z = -1
 			self.data.ball.speed += 0.1
+			logging.info(f"end rebound {self.data.players[self.playerID].pad_x} and {self.data.ball.z}")
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
-		# logging.info(f"end rebound {self.data.players[self.playerID].pad_x}")
+		
 
 	def rebound_z(self, player_number):
 		if self.data.ball.z < -27 and (self.data.ball.x < (self.data.players[player_number].pad_z + 4)  and self.data.ball.x> (self.data.players[player_number].pad_z - 4)):
@@ -285,7 +290,7 @@ class websocket_client(WebsocketConsumer):
 		self.wallCollideTwoPlayer()
 		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
 		self.rebound_x(0)
-		self.rebound_x(1)
+		# self.rebound_x(1)
 		# logging.info(self.data.players[self.playerID].pad_x)
 		# logging.info(f"end {self.data.players[self.playerID].pad_x}")	
 		if self.data.last_frame + 0.05 < time.time():

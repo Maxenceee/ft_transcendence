@@ -63,7 +63,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			palletPlayer1.position.x = data.player[0].x;
 			// palletPlayer1.position.z = data.player[0].pos_z;
 			palletPlayer2.position.x = data.player[1].x;
-			console.log(palletPlayer1.position.x);
+			
+			// console.log("start");
+			// console.log(palletPlayer1.position.x);
+			// console.log(palletPlayer2.position.x);
+			// console.log("end");
+			score = data.score;
 			// console.log(data);
 			keyCode.right = 0
 			keyCode.left = 0		
@@ -434,7 +439,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				scene.remove(ball);
 				return;
 			}
-				if (data.updateScore != 0 && data.score != score)
+				if (data.score != score)
 				{
 					score = data.score;
 					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
