@@ -68,7 +68,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			// console.log(palletPlayer1.position.x);
 			// console.log(palletPlayer2.position.x);
 			// console.log("end");
-			score = data.score;
+			// score = data.score;
 			// console.log(data);
 			keyCode.right = 0
 			keyCode.left = 0		
@@ -442,7 +442,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				if (data.score != score)
 				{
 					score = data.score;
-					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
+					createText(data.player[0].score + " : " + data.player[1].score);
 					// console.log(score)
 				}
 				// ball.rotation.x +=  .1

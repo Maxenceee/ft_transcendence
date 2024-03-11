@@ -232,13 +232,11 @@ class websocket_client(WebsocketConsumer):
 			self.data['P4position']['z'] -= 1.1
 		return self.data
 
-	def rebound_x(self, player_number):
-		# logging.info(f"start rebound{self.data.players[self.playerID].pad_x}")
+	def rebound_x(self):
 		if ((self.data.ball.z < -27 and self.playerID == 1) or (self.data.ball.z > 27 and self.playerID == 0)) and (self.data.ball.x < (self.data.players[self.playerID].pad_x + 4)  and self.data.ball.x > (self.data.players[self.playerID].pad_x - 4)):
 			if ( self.playerID == 1) :
 				self.data.ball.direction_z = 1
 			else :
-
 				self.data.ball.direction_z = -1
 			self.data.ball.speed += 0.1
 			logging.info(f"end rebound {self.data.players[self.playerID].pad_x} and {self.data.ball.z}")
@@ -295,8 +293,7 @@ class websocket_client(WebsocketConsumer):
 				self.data.players[self.playerID].pad_x += 0.4
 		self.wallCollideTwoPlayer()
 		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
-		self.rebound_x(0)
-		# self.rebound_x(1)
+		self.rebound_x()
 		# logging.info(self.data.players[self.playerID].pad_x)
 		# logging.info(f"end {self.data.players[self.playerID].pad_x}")	
 		if self.data.last_frame + 0.05 < time.time():
