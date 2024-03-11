@@ -16,12 +16,6 @@ COPY ./server/ /app/server
 
 WORKDIR /app/server
 
-RUN python3 manage.py makemigrations
-
-RUN python3 manage.py makemigrations index
-
-RUN python3 manage.py makemigrations game
-
 EXPOSE 3000
 
 CMD ["sh", "./startup.sh"]

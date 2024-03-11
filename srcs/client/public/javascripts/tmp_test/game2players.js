@@ -14,7 +14,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let connectionStatus = 0;
 	socket.onconnection(() => {
 		console.info("Connection opened, yay");
-		socket.send({type : 2});
+		socket.send({type : "init"});
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
@@ -25,37 +25,61 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	socket.use((msg) =>{
 		if (playerNumber == -1 && msg.type == "id")
 		{
-			playerNumber = msg.playerNumber;
-			data.gameID = msg.gameID;
-			gameID = data.gameID;
+			data = msg.data;
+			
+			// playerNumber = msg.playerNumber;
+			// data.gameID = msg.gameID;
+			// gameID = data.gameID;
 			console.log(playerNumber);
 			console.log(gameID);
 			setcam();
 		}
+		
+		
 		else
 		{
-			if (gameID == null)
-			{
-				socket.send({type : 2});
-				sleep (50);
-				gameID = msg.gameID;
-				playerNumber = msg.playerNumber;
-				console.log(playerNumber);
-				console.log(gameID);
-				return ;
-			}
-			if (msg.gameID != gameID)
-			{
-				console.log("have "   + gameID);
-				console.log("receve " + msg.gameID);
-				return ;
-			}
+			// if (gameID == null)
+			// {
+			// 	socket.send({type : 2});
+			// 	sleep (50);
+			// 	gameID = msg.gameID;
+			// 	playerNumber = msg.playerNumber;
+			// 	console.log(playerNumber);
+			// 	console.log(gameID);
+			// 	return ;
+			// }
+		// return
+			// if (msg.gameID != gameID)
+			// {
+			// 	console.log("have "   + gameID);
+			// 	console.log("receve " + msg.gameID);
+			// 	return ;
+			// }
 			data = msg;
-			keyCode = data.keyCode;
-			if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
-				palletPlayer1.position.x = data.P1position.x;
-			else if (data && data.P2position && data.P2position.x)
-				palletPlayer2.position.x = data.P2position.x;
+			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
+			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
+			// console.log(data);
+			// return ;
+			palletPlayer1.position.x = data.player[0].x;
+			// palletPlayer1.position.z = data.player[0].pos_z;
+			palletPlayer2.position.x = data.player[1].x;
+			
+			// console.log("start");
+			// console.log(palletPlayer1.position.x);
+			// console.log(palletPlayer2.position.x);
+			// console.log("end");
+			// score = data.score;
+			// console.log(data);
+			keyCode.right = 0
+			keyCode.left = 0		
+			// palletPlayer2.position.z = data.player[1].pos_z;
+			// console.log(data);
+			// console.log(ball.position.x);
+			// keyCode = data.keyCode;
+			// if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
+			// 	palletPlayer1.position.x = data.P1position.x;
+			// else if (data && data.P2position && data.P2position.x)
+			// 	palletPlayer2.position.x = data.P2position.x;
 		}
 	
 	});
@@ -227,94 +251,96 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	initiateMapTwoPlayer({})
 	var updatePlayer = 0;
 	document.addEventListener("keydown", onDocumentKeyDown, true);
+	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
 
-		// keyCode.Key37 = 0
-		// keyCode.Key65 = 0
-		// keyCode.Key68 = 0
-		// keyCode.Key39 = 0
-		// if (keyVar == 68)
-		// {
-		// 	keyCode.Key68 = 1
-		// 	keyCode.Key65 = 0
-		// }
-		// if (keyVar == 65)
-		// {
-		// 	keyCode.Key65 = 1
-		// 	keyCode.Key68 = 0
-		// }
-		// if (keyVar == 39)
-		// {
-		// 	keyCode.Key39 = 1
-		// 	keyCode.Key37 = 0
-		// }
-		// if (keyVar == 37)
-		// {
-		// 	keyCode.Key39 = 0
-		// 	keyCode.Key37 = 1
-		// }
-		if (playerNumber % 2 == 1)
+		keyCode.right = 0
+		keyCode.left = 0
+		if (keyVar == 68)
 		{
-			if (keyVar == 68 || keyVar == 39) 
-			{
-				palletPlayer1.position.x += mapWidth/60 ;
-				if (palletPlayer1.x > 16.6)
-					palletPlayer1.x = 16.5;
-				data.P1position = palletPlayer1.position ;
-				counter +=2
-			}
-			if (keyVar == 65 || keyVar == 37)
-			{
-				palletPlayer1.position.x -= mapWidth/60 ;
-				if (palletPlayer1.x < -16.6)
-					palletPlayer1.x = 16.5;
-				data.P1position = palletPlayer1.position ;
-				counter +=2
-			}
+			keyCode.right = 1
+			keyCode.left = 0
 		}
-		else if (playerNumber % 2 == 0)
+		if (keyVar == 65)
 		{
-			if (keyVar == 65 || keyVar == 37) 
-			{
-				palletPlayer2.position.x += mapWidth/60 ;
-				if (palletPlayer2.x > 16.6)
-					palletPlayer2.x = 16.5;
-				data.P2position = palletPlayer2.position ;
-				counter +=2
-			}
-			if (keyVar == 68 || keyVar == 39)
-			{
-				palletPlayer2.position.x -= mapWidth/60 ;
-				if (palletPlayer2.x < -16.6)
-					palletPlayer2.x = 16.5;
-				data.P2position = palletPlayer2.position ;
-				counter +=2
-			}
+			keyCode.left = 1
+			keyCode.right = 0
 		}
+		if (keyVar == 39)
+		{
+			keyCode.right = 1
+			keyCode.left = 0
+		}
+		if (keyVar == 37)
+		{
+			keyCode.right = 0
+			keyCode.left = 1
+		}
+		socket.send({type : 0, data:data, keyCode:keyCode});
+
+		// if (playerNumber % 2 == 1)
+		// {
+		// 	if (keyVar == 68 || keyVar == 39) 
+		// 	{
+		// 		palletPlayer1.position.x += mapWidth/60 ;
+		// 		if (palletPlayer1.x > 16.6)
+		// 			palletPlayer1.x = 16.5;
+		// 		data.P1position = palletPlayer1.position ;
+		// 		counter +=2
+		// 	}
+		// 	if (keyVar == 65 || keyVar == 37)
+		// 	{
+		// 		palletPlayer1.position.x -= mapWidth/60 ;
+		// 		if (palletPlayer1.x < -16.6)
+		// 			palletPlayer1.x = 16.5;
+		// 		data.P1position = palletPlayer1.position ;
+		// 		counter +=2
+		// 	}
+		// }
+		// else if (playerNumber % 2 == 0)
+		// {
+		// 	if (keyVar == 65 || keyVar == 37) 
+		// 	{
+		// 		palletPlayer2.position.x += mapWidth/60 ;
+		// 		if (palletPlayer2.x > 16.6)
+		// 			palletPlayer2.x = 16.5;
+		// 		data.P2position = palletPlayer2.position ;
+		// 		counter +=2
+		// 	}
+		// 	if (keyVar == 68 || keyVar == 39)
+		// 	{
+		// 		palletPlayer2.position.x -= mapWidth/60 ;
+		// 		if (palletPlayer2.x < -16.6)
+		// 			palletPlayer2.x = 16.5;
+		// 		data.P2position = palletPlayer2.position ;
+		// 		counter +=2
+		// 	}
+		// }
 		data.keyCode = keyCode;
 		updatePlayer = 1;
 	}
-	// function onDocumentKeyUp(event) {
-	//     let keyVar = event.which;
+	function onDocumentKeyUp(event) {
+	    let keyVar = event.which;
+// 
+// 
+		if (keyVar == 68)
+			keyCode.Key68 = 0
+		if (keyVar == 65)
+			keyCode.Key65 = 0
+		if (keyVar == 39)
+			keyCode.Key39 = 0
+		if (keyVar == 37)
+			keyCode.Key37 = 0
+		socket.send({type : 0, data:data, keyCode:keyCode});
 
-
-	// 	if (keyVar == 68)
-	// 		keyCode.Key68 = 0
-	// 	if (keyVar == 65)
-	// 		keyCode.Key65 = 0
-	// 	if (keyVar == 39)
-	// 		keyCode.Key39 = 0
-	// 	if (keyVar == 37)
-	// 		keyCode.Key37 = 0
-
-	// 	data.keyCode = keyCode
-	// 	updatePlayer = 1
-	// 	// socket.send({type:2, data})
-	// 	// palletPlayer1.position.x = data.P1position.x ;
-	// 	// palletPlayer2.position.x = data.P2position.x ;
-	// 	// console.log(keyCode);
-	// }
+		// data.keyCode = keyCode
+		// updatePlayer = 1
+		// socket.send({type:2, data})
+		// palletPlayer1.position.x = data.P1position.x ;
+		// palletPlayer2.position.x = data.P2position.x ;
+		// console.log(keyCode);
+	}
 
 	function resetBall()
 	{
@@ -369,10 +395,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	var keyCode = {
-		Key68 : 0,
-		Key65 : 0,
-		Key39 : 0,
-		Key37 : 0,
+		left : 0,
+		right : 0
 	}
 	
 	let data = {
@@ -385,7 +409,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		updateScore : 0,
 		moveSpeed : moveSpeed,
 		playerNumber : playerNumber,
-		gameID : 0
+		gameID : 0,
+		keyCode : keyCode
 	};
 	// socket.send({type : 0, data : data});
 	loadFont();
@@ -414,33 +439,25 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				scene.remove(ball);
 				return;
 			}
-				if (data.updateScore != 0 && data.score != score)
+				if (data.score != score)
 				{
 					score = data.score;
-					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
+					createText(data.player[0].score + " : " + data.player[1].score);
 					// console.log(score)
 				}
 				// ball.rotation.x +=  .1
-				ball.position.x = data.ball.x;
-				ball.position.z = data.ball.z;
+				// ball.position.x = data.ball.x;
+				// ball.position.z = data.ball.z;
 				ballDirection = data.direction;
 		}
 		await sleep(25)
 	}
 
 	const tmp = async () => {
-		console.log("here");
 		while ( connectionStatus != 2 )
 		{
-			console.log("here");
 			await sleep(50);
-			data.playerNumber = playerNumber;
-			counter += 1;
-			if (data.playerNumber % 2 == 0)
-				data.number[0] = counter;
-			else 
-				data.number[1] = counter;
-			socket.send({type : 0, data:data});
+			socket.send({type : 0, data:data, keyCode:keyCode});
 			if (endScore == 1)
 			{
 				// socket.send({type : "end"})
