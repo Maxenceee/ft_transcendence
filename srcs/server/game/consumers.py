@@ -284,9 +284,15 @@ class websocket_client(WebsocketConsumer):
 			return
 
 		if receive_package['keyCode']['left'] == 1 and self.data.players[self.playerID].pad_x  < 16.1 :
-			self.data.players[self.playerID].pad_x += 0.4
+			if self.playerID == 1:
+				self.data.players[self.playerID].pad_x += 0.4
+			else:
+				self.data.players[self.playerID].pad_x -= 0.4
 		if receive_package['keyCode']['right'] == 1 and self.data.players[self.playerID].pad_x  > -16.1 :
-			self.data.players[self.playerID].pad_x -= 0.4
+			if self.playerID == 1:
+				self.data.players[self.playerID].pad_x -= 0.4
+			else:
+				self.data.players[self.playerID].pad_x += 0.4
 		self.wallCollideTwoPlayer()
 		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
 		self.rebound_x(0)
