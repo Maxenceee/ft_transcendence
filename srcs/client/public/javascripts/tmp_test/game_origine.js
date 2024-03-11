@@ -11,7 +11,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 
 
-let socket = new Socket({host: "localhost", path: "/socket"});
+let socket = new Socket({path: "/socket"});
 socket.onconnection(() => {
 	console.info("Connection opened, yay");
 	socket.send({type: "data"});
