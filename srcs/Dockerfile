@@ -10,8 +10,6 @@ RUN apt-get install -y curl wget
 
 RUN mkdir /app
 
-EXPOSE 3000
-
 COPY ./client /app/client
 
 COPY ./server/ /app/server
@@ -25,5 +23,7 @@ RUN python3 manage.py makemigrations
 RUN python3 manage.py makemigrations index
 
 RUN python3 manage.py makemigrations game
+
+EXPOSE 3000
 
 CMD ["sh", "./startup.sh"]

@@ -47,7 +47,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v2
       with:
-        context: .
+        context: ./srcs
         file: ./srcs/Dockerfile
         build-args: |
           APP_RELEASE=${{ github.sha }}
