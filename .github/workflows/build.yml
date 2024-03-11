@@ -34,24 +34,24 @@ jobs:
         username: ${{ env.OWNER }}
         password: ${{ secrets.GH_PAT }}
 
-    - name: Prepare metadata
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME }}
-        tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=ref,event=tag
+    # - name: Prepare metadata
+    #   id: meta
+    #   uses: docker/metadata-action@v3
+    #   with:
+    #     images: ${{ env.REGISTRY }}/${{ env.OWNER }}/${{ env.IMAGE_NAME }}
+    #     tags: |
+    #       type=ref,event=branch
+    #       type=ref,event=pr
+    #       type=ref,event=tag
 
-    - name: Build and push
-      uses: docker/build-push-action@v2
-      with:
-        build-args: |
-          APP_RELEASE=${{ github.sha }}
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+    # - name: Build and push
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     build-args: |
+    #       APP_RELEASE=${{ github.sha }}
+    #     push: ${{ github.event_name != 'pull_request' }}
+    #     tags: ${{ steps.meta.outputs.tags }}
+    #     labels: ${{ steps.meta.outputs.labels }}
 
     - name: Deploy the new image
       uses: appleboy/ssh-action@master
