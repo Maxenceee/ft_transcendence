@@ -12,11 +12,11 @@ RUN mkdir /app
 
 EXPOSE 3000
 
-WORKDIR /app/server
-
 COPY ./client /app/client
 
 COPY ./server/ /app/server
+
+WORKDIR /app/server
 
 RUN python3 manage.py collectstatic -c --noinput
 
