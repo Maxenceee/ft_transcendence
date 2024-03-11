@@ -281,15 +281,15 @@ class websocket_client(WebsocketConsumer):
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return
 
-		if receive_package['keyCode']['left'] == 1 and self.data.players[self.playerID].pad_x  < 16.1 :
-			if self.playerID == 1:
+		if receive_package['keyCode']['left'] == 1:
+			if self.playerID == 1 and self.data.players[self.playerID].pad_x  < 16.1:
 				self.data.players[self.playerID].pad_x += 0.4
-			else:
+			elif self.data.players[self.playerID].pad_x  > -16.1:
 				self.data.players[self.playerID].pad_x -= 0.4
-		if receive_package['keyCode']['right'] == 1 and self.data.players[self.playerID].pad_x  > -16.1 :
-			if self.playerID == 1:
+		if receive_package['keyCode']['right'] == 1:
+			if self.playerID == 1 and self.data.players[self.playerID].pad_x  > -16.1:
 				self.data.players[self.playerID].pad_x -= 0.4
-			else:
+			elif self.data.players[self.playerID].pad_x  < 16.1:
 				self.data.players[self.playerID].pad_x += 0.4
 		self.wallCollideTwoPlayer()
 		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
