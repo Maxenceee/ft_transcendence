@@ -89,6 +89,7 @@ def callback_intra(request):
 		'code': code,
 		'redirect_uri': f'{REDIRECT_URI}/callback/intra'
 	}
+	logging.info(data)
 	try:
 		response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 		response = response.json()
