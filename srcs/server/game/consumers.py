@@ -109,9 +109,29 @@ def start_game(num):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
+		cookies = {}
+		data = self.scope['headers']
+		for i in data:
+			if b'cookie' in i:
+				cookie = i[1].decode('utf-8')
+				cookie = cookie.split(';')
+				for j in cookie:
+					j = j.strip()
+					j = j.split('=')
+					cookies[j[0]] = j[1]
+		token = cookies['token']
+		if not Token.objects.filter(token=token).exists():
+			return
+		token = Token.objects.get(token=token)
+		if token.is_valid:
+			self.accept()
+		else:
+			return
+		user = token.user
+
+		logging.info(user.id)
 		logging.info("new player connected")
-		self.accept()
-		waiting_list.append(Player("player_id", self))
+		waiting_list.append(Player(user.id, self))
 		start_game(2)
 
 	def playerMove2P(self) :
@@ -291,15 +311,15 @@ class websocket_client(WebsocketConsumer):
 				self.data.players[self.playerID].pad_x -= 0.4
 			elif self.data.players[self.playerID].pad_x  < 16.1:
 				self.data.players[self.playerID].pad_x += 0.4
-		self.wallCollideTwoPlayer()
 		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
-		self.rebound_x()
 		# logging.info(self.data.players[self.playerID].pad_x)
 		# logging.info(f"end {self.data.players[self.playerID].pad_x}")	
 		if self.data.last_frame + 0.05 < time.time():
+			self.data.last_frame = time.time()
 			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
 			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
-			self.data.last_frame = time.time()
+			self.wallCollideTwoPlayer()
+			self.rebound_x()
 			self.data.send_all(json.dumps(self.data.to_json()))
 
 		return
