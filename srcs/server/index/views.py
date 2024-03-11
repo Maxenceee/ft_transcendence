@@ -80,14 +80,14 @@ def callback_intra(request):
 	code = request.GET.get('code', '')
 	INTRA_USER = os.environ.get('INTRA_USER')
 	INTRA_SECRET = os.environ.get('INTRA_SECRET')
-	IP_LOCAL = os.environ.get('IP_LOCAL')
+	REDIRECT_URI = os.environ.get('REDIRECT_URI')
 
 	data = {
 		'grant_type': 'authorization_code',
 		'client_id': INTRA_USER,
 		'client_secret': INTRA_SECRET,
 		'code': code,
-		'redirect_uri': f'http://{IP_LOCAL}:3000/callback/intra'
+		'redirect_uri': f'{REDIRECT_URI}/callback/intra'
 	}
 	try:
 		response = requests.post('https://api.intra.42.fr/oauth/token', data=data)

@@ -100,8 +100,8 @@
 			</section>
 		</div>
 	</main>
-	<script src="https://cdn.maxencegama.dev/swivel/button"></script>
-	<script defer>
+	<script defer src="https://cdn.maxencegama.dev/swivel/button"></script>
+	<script>
 		document.querySelectorAll(".f0n8F").forEach((e) => {
 			let inp = e.querySelector("input");
 			inp.parentNode.classList.toggle("FATdn", inp.value.length > 0)
@@ -110,14 +110,14 @@
 			};
 		});
 	</script>
-	<script defer>
+	<script>
 		// test de connexion avec 42 (https://profile.intra.42.fr/oauth/applications/20463)
 		let redir_uri = encodeURIComponent(window.location.origin.concat("/callback/intra"));
 		document.getElementById("intra-button").onclick = () => {
 			window.location.replace("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&response_type=code&redirect_uri=".concat(redir_uri));
 		};
 	</script>
-	<script defer>
+	<script>
 		// test de connexion avec swivel (https://maxencegama.dev/swivel)
 		let s = new Swivel(document.getElementById("swivel-ref-h")),
 			u = new URL(document.location);
