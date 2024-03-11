@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-
 DEBUG = False
 
 IP_LOCAL = os.environ.get('IP_LOCAL')
-ALLOWED_HOSTS = ["localhost", "website", IP_LOCAL]
+ALLOWED_HOSTS = ["localhost", "website", IP_LOCAL, "trace.maxencegama.dev"]
 
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", f"http://{IP_LOCAL}:3000"]
 

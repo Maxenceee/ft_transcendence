@@ -5,6 +5,8 @@ python3 manage.py makemigrations index
 
 python3 manage.py makemigrations game
 
+python3 manage.py collectstatic -c --noinput
+
 python3 manage.py migrate
 
 python3 manage.py collectstatic -c --noinput

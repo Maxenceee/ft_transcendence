@@ -10,12 +10,12 @@ RUN apt-get install -y curl wget
 
 RUN mkdir /app
 
-EXPOSE 3000
-
-WORKDIR /app/server
-
 COPY ./client /app/client
 
 COPY ./server/ /app/server
+
+WORKDIR /app/server
+
+EXPOSE 3000
 
 CMD ["sh", "./startup.sh"]
