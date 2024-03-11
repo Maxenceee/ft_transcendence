@@ -122,8 +122,8 @@
 			u = new URL(document.location);
 		s.init(
 			"4fMHysGNahEaKcmx8LaS",
-			"http://localhost:3000",
-			"http://localhost:3000/callback/swivel",
+			window.location.origin,
+			window.location.origin.concat("/callback/swivel"),
 			"user:full",
 			true
 		);
