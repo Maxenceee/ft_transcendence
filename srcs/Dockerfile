@@ -16,8 +16,6 @@ COPY ./server/ /app/server
 
 WORKDIR /app/server
 
-RUN python3 manage.py collectstatic -c --noinput
-
 RUN python3 manage.py makemigrations
 
 RUN python3 manage.py makemigrations index
