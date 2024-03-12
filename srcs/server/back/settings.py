@@ -29,9 +29,9 @@ SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "website", "trace.maxencegama.dev"]
+ALLOWED_HOSTS = ["localhost", "website", "trace.maxencegama.dev", "tracendance.tech"]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", "https://trace.maxencegama.dev"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", "https://trace.maxencegama.dev", "https://tracendance.tech"]
 
 # Application definition
 
