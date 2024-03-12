@@ -33,6 +33,9 @@ class Player:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.keyCode = {}
+		self.keyCode['left'] = 0
+		self.keyCode ['right'] = 0 
 
 class Game:
 	id = ""
@@ -92,8 +95,47 @@ def start_game(num):
 		game = Game(players)
 		game_list.append(game)
 		logging.info(f"game created")
+		# game_master(game);
 	else:
 		logging.info("pas assez de joueurs")
+
+
+
+
+
+
+
+def game_master(Game):
+	while True:
+		# if Game.keyCode.left == 1:
+		# 	if Game.playerID == 1 and Game.data.players[Game.playerID].pad_x  < 16.5 :
+		# 		Game.data.players[Game.playerID].pad_x += 0.6
+		# 		if Game.data.players[Game.playerID].pad_x  > 16.0 :
+		# 				Game.data.players[Game.playerID].pad_x = 16
+		# 	elif Game.data.players[Game.playerID].pad_x  > -16.5:
+		# 		Game.data.players[Game.playerID].pad_x -= 0.6
+		# 		if Game.data.players[Game.playerID].pad_x  < -16.0:
+		# 				Game.data.players[Game.playerID].pad_x = -16
+		# if Game.keyCode.right == 1:
+		# 	if Game.playerID == 1 and Game.data.players[Game.playerID].pad_x  > -16.5:
+		# 		Game.data.players[Game.playerID].pad_x -= 0.6
+		# 		if Game.data.players[Game.playerID].pad_x  < -16.0:
+		# 				Game.data.players[Game.playerID].pad_x = -16
+		# 	elif Game.data.players[Game.playerID].pad_x  < 16.5:
+		# 		Game.data.players[Game.playerID].pad_x += 0.6
+		# 		if Game.data.players[Game.playerID].pad_x  > 16.0 :
+		# 			Game.data.players[Game.playerID].pad_x = 16
+		time.sleep(0.05)
+		Game.data.last_frame = time.time()
+		Game.data.ball.x += Game.data.ball.direction_x * 0.15 * Game.data.ball.speed
+		Game.data.ball.z += Game.data.ball.direction_z * 0.15 * Game.data.ball.speed
+		Game.wallCollideTwoPlayer()
+		Game.rebound_x()
+		Game.data.send_all(json.dumps(Game.data.to_json()))
+		if Game.data.players[Game.playerID].score  > 9 :
+			Game.data.end_game()
+			return
+
 
 
 
@@ -346,6 +388,11 @@ class websocket_client(WebsocketConsumer):
 			self.data.send_all(json.dumps(self.data.to_json())) #not work fix json
 			return
 
+
+		# ____________________
+		self.data.players[self.playerID].keycode = receive_package['keyCode']
+		return				#should be handled by game_master()
+		# _______________________________
 		if receive_package['keyCode']['left'] == 1:
 			if self.playerID == 1 and self.data.players[self.playerID].pad_x  < 16.5 :
 				self.data.players[self.playerID].pad_x += 0.6
