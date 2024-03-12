@@ -13,13 +13,13 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let playerNumber = -1;
 	let connectionStatus = 0;
 	socket.onconnection(() => {
-		console.info("Connection opened, yay");
+		console.info("Connection opened");
 		socket.send({type : "init"});
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
 
-		console.info("Bye bye madafaka");
+		console.info("Connection closed");
 		connectionStatus = 2;
 		window.location.replace("/")				//url of end game
 	});
@@ -263,64 +263,29 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		{
 			keyCode.right = 1
 			keyCode.left = 0
+			socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 65)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
+			socket.send({type : 'keyCode', move : "left"});
 		}
 		if (keyVar == 39)
 		{
 			keyCode.right = 1
 			keyCode.left = 0
+			socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
 			keyCode.right = 0
 			keyCode.left = 1
+			socket.send({type : 'keyCode', move : "left"});
 		}
-		// socket.send({type : 0, data:data, keyCode:keyCode});
-
-		// if (playerNumber % 2 == 1)
-		// {
-		// 	if (keyVar == 68 || keyVar == 39) 
-		// 	{
-		// 		palletPlayer1.position.x += mapWidth/60 ;
-		// 		if (palletPlayer1.x > 16.6)
-		// 			palletPlayer1.x = 16.5;
-		// 		data.P1position = palletPlayer1.position ;
-		// 		counter +=2
-		// 	}
-		// 	if (keyVar == 65 || keyVar == 37)
-		// 	{
-		// 		palletPlayer1.position.x -= mapWidth/60 ;
-		// 		if (palletPlayer1.x < -16.6)
-		// 			palletPlayer1.x = 16.5;
-		// 		data.P1position = palletPlayer1.position ;
-		// 		counter +=2
-		// 	}
-		// }
-		// else if (playerNumber % 2 == 0)
-		// {
-		// 	if (keyVar == 65 || keyVar == 37) 
-		// 	{
-		// 		palletPlayer2.position.x += mapWidth/60 ;
-		// 		if (palletPlayer2.x > 16.6)
-		// 			palletPlayer2.x = 16.5;
-		// 		data.P2position = palletPlayer2.position ;
-		// 		counter +=2
-		// 	}
-		// 	if (keyVar == 68 || keyVar == 39)
-		// 	{
-		// 		palletPlayer2.position.x -= mapWidth/60 ;
-		// 		if (palletPlayer2.x < -16.6)
-		// 			palletPlayer2.x = 16.5;
-		// 		data.P2position = palletPlayer2.position ;
-		// 		counter +=2
-		// 	}
-		// }
-		data.keyCode = keyCode;
-		updatePlayer = 1;
+		
+		// data.keyCode = keyCode;
+		// updatePlayer = 1;
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
@@ -454,17 +419,17 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	const tmp = async () => {
-		while ( connectionStatus != 2 )
-		{
-			await sleep(25);
-			socket.send({type : 0, data:data, keyCode:keyCode});
-			if (endScore == 1)
-			{
-				// socket.send({type : "end"})
-				return;
-			}
-		}
-		console.log("ping");
+		// while ( connectionStatus != 2 )
+		// {
+		// 	await sleep(25);
+		// 	socket.send({type : 0, data:data, keyCode:keyCode});
+		// 	if (endScore == 1)
+		// 	{
+		// 		// socket.send({type : "end"})
+		// 		return;
+		// 	}
+		// }
+		// console.log("ping");
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
