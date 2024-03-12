@@ -106,9 +106,69 @@ def start_game(num):
 		logging.info("pas assez de joueurs")
 
 
+
+# _____________________
+tournamentList= {} 		
+game_list_tournament = []										# make a map please
+def start_gameTournament(name, size):
+	if tournamentList.find(name) == False :
+			tournamentList.append(Tournament(size, name))
+	else :
+			target =  tournamentList.find(name)
+	if target.full:
+		# pass
+		it = 0
+		tmp = []
+		while it < target.size + 1 :
+			tmp[0] = target.players[it]
+			tmp[1] = target.players[it + 1]
+			it += 2
+			game_list_tournament.append(Game(tmp))
+		target.size /= 2
+		return
+	else :
+		return
+	
+	# logging.info(f"waiting list {len(waiting_list)}")
+	# if len(waiting_list) == num:
+	# 	players = []
+	# 	for player in waiting_list:
+	# 		players.append(player)
+	# 		logging.info(f"player added to game")
+	# 	for player in players:
+	# 		waiting_list.remove(player)
+	# 		logging.info(f"player remove from waiting list")
+	# 	game = Game(players)
+	# 	game_list.append(game)
+	# 	logging.info(f"game created")
+	# else:
+	# 	logging.info("pas assez de joueurs")
+
+class Tournament :
+	players = []
+	size = 0
+	name = "default"
+
+	def __init__(self, size, name):
+		self.size = size
+		self.name = name
+		pass
+	
+	def add(self, player):
+		self.players.append(player)
+	
+	def full(self):
+		if (len(self.players) == self.size):
+			return True
+		return False
+# _______________________
+
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
+		# ft_getGameType(self) 								?????????????????????????
+
+
 		cookies = {}
 		data = self.scope['headers']
 		for i in data:
@@ -131,8 +191,17 @@ class websocket_client(WebsocketConsumer):
 
 		logging.info(user.id)
 		logging.info("new player connected")
+		# if type = 2v2
 		waiting_list.append(Player(user.id, self))
 		start_game(2)
+		# else if type = 4v4
+			# waiting_list4Player.append(Player("player_id", self))
+		# else if type = tournament
+			# waiting_listTournament.append(Player("player_id", self))
+			# name = tournament_name
+			# start_gameTournament(name, size)
+		# start_game(gameType, name)
+
 
 	def playerMove2P(self) :
 		# logging.info(type(self.data['keyCode']['Key68']))
