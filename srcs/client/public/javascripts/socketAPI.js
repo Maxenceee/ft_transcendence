@@ -138,7 +138,7 @@ var Socket = function({port = 3000, host = window.location.hostname, path = "/"}
 		let sp = port.toString(),
 			hr = [host];
 		let WSProtocol = (location.protocol === 'https:') ? 'wss:' : 'ws:',
-			WSHost = bindPort(hr[0], sp),
+			WSHost = (host === 'localhost') ? bindPort(hr[0], sp) : hr[0],
 			spath = WSProtocol.concat(WSHost, path);
 		this.socket = new WebSocket(spath);
 	} catch (error) {
