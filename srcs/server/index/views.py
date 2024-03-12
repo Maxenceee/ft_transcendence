@@ -168,6 +168,26 @@ def logout(request):
 
 @login_required
 def api_get_user(request, id):
-	user = get_object_or_404(User, id=id)
+	if id == "me":
+		id = request.COOKIES.get('token')
+		user = Token.objects.get(token=id).user
+	else:
+		user = get_object_or_404(User, id=id)
 	response = user.to_json()
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+def api_update_user(request, id, type):
+	cookie = request.COOKIES.get('token')
+	if not cookie or not Token.objects.filter(token=cookie).exists():
+		return HttpResponse("Forbidden", status=403)
+	if not Token.objects.get(token=cookie).is_valid:
+		return HttpResponse("Forbidden", status=403)
+	if Token.objects.get(token=cookie).user.id != id:
+		return HttpResponse("Forbidden", status=403)
+	user = get_object_or_404(User, id=id)
+	if type == "nickname":
+		user.nickname = request.POST['nickname']
+	elif type == "password":
+		user.password = pbkdf2.hash(request.POST['password'])
+	user.save()
+	return HttpResponse("success")
