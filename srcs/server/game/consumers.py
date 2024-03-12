@@ -17,17 +17,6 @@ def makeid(len):
 waiting_list = []
 game_list = []
 
-# global timeStart 
-# timeStart = 0
-# global idPlayer; 
-# global ballPosition
-# global score
-# score = dict()
-# global ballDirection
-# ballPosition = dict()
-# ballDirection = {'x', 'y'}
-# idPlayer = [0]
-
 class Ball:
 	def __init__(self) -> None:
 		self.x = 0
@@ -72,6 +61,7 @@ class Game:
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type="2v2", data=resume_data)
 		logging.info("game ended")
+
 		#remove from game list
 
 	def send_all(self, data):
@@ -106,9 +96,55 @@ def start_game(num):
 		logging.info("pas assez de joueurs")
 
 
+
+# _____________________
+# tournamentList= {} 		
+# game_list_tournament = []										# make a map please
+# def start_gameTournament(name, size):
+# 	if tournamentList.find(name) == False :
+# 			tournamentList.append(Tournament(size, name))
+# 	else :
+# 			target =  tournamentList.find(name)
+# 	if target.full:
+# 		# pass
+# 		it = 0
+# 		tmp = []
+# 		while it < target.size + 1 :
+# 			tmp[0] = target.players[it]
+# 			tmp[1] = target.players[it + 1]
+# 			it += 2
+# 			game_list_tournament.append(Game(tmp))
+# 		target.size /= 2
+# 		return
+# 	else :
+# 		return
+
+
+# class Tournament :
+# 	players = []
+# 	size = 0
+# 	name = "default"
+
+# 	def __init__(self, size, name):
+# 		self.size = size
+# 		self.name = name
+# 		pass
+	
+# 	def add(self, player):
+# 		self.players.append(player)
+	
+# 	def full(self):
+# 		if (len(self.players) == self.size):
+# 			return True
+# 		return False
+# _______________________
+
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
+		# ft_getGameType(self) 								?????????????????????????
+
+
 		cookies = {}
 		data = self.scope['headers']
 		for i in data:
@@ -131,8 +167,17 @@ class websocket_client(WebsocketConsumer):
 
 		logging.info(user.id)
 		logging.info("new player connected")
+		# if type = 2v2
 		waiting_list.append(Player(user.id, self))
 		start_game(2)
+		# else if type = 4v4
+			# waiting_list4Player.append(Player("player_id", self))
+		# else if type = tournament
+			# waiting_listTournament.append(Player("player_id", self))
+			# name = tournament_name
+			# start_gameTournament(name, size)
+		# start_game(gameType, name)
+
 
 	def playerMove2P(self) :
 		# logging.info(type(self.data['keyCode']['Key68']))
@@ -253,13 +298,13 @@ class websocket_client(WebsocketConsumer):
 		return self.data
 
 	def rebound_x(self):
-		if ((self.data.ball.z < -27 and self.playerID == 1) or (self.data.ball.z > 27 and self.playerID == 0)) and (self.data.ball.x < (self.data.players[self.playerID].pad_x + 4)  and self.data.ball.x > (self.data.players[self.playerID].pad_x - 4)):
+		if ((self.data.ball.z < -27 and self.playerID == 1) or (self.data.ball.z > 27 and self.playerID == 0)) and (self.data.ball.x < (self.data.players[self.playerID].pad_x + 4.5)  and self.data.ball.x > (self.data.players[self.playerID].pad_x - 4.5)):
 			if ( self.playerID == 1) :
 				self.data.ball.direction_z = 1
 			else :
 				self.data.ball.direction_z = -1
 			self.data.ball.speed += 0.1
-			logging.info(f"end rebound {self.data.players[self.playerID].pad_x} and {self.data.ball.z}")
+			# logging.info(f"end rebound {self.data.players[self.playerID].pad_x} and {self.data.ball.z}")
 		if (self.data.ball.speed > 5) :
 			self.data.ball.speed = 5
 		
@@ -302,25 +347,32 @@ class websocket_client(WebsocketConsumer):
 			return
 
 		if receive_package['keyCode']['left'] == 1:
-			if self.playerID == 1 and self.data.players[self.playerID].pad_x  < 16.1:
-				self.data.players[self.playerID].pad_x += 0.4
-			elif self.data.players[self.playerID].pad_x  > -16.1:
-				self.data.players[self.playerID].pad_x -= 0.4
+			if self.playerID == 1 and self.data.players[self.playerID].pad_x  < 16.5 :
+				self.data.players[self.playerID].pad_x += 0.6
+				if self.data.players[self.playerID].pad_x  > 16.0 :
+						self.data.players[self.playerID].pad_x = 16
+			elif self.data.players[self.playerID].pad_x  > -16.5:
+				self.data.players[self.playerID].pad_x -= 0.6
+				if self.data.players[self.playerID].pad_x  < -16.0:
+						self.data.players[self.playerID].pad_x = -16
 		if receive_package['keyCode']['right'] == 1:
-			if self.playerID == 1 and self.data.players[self.playerID].pad_x  > -16.1:
-				self.data.players[self.playerID].pad_x -= 0.4
-			elif self.data.players[self.playerID].pad_x  < 16.1:
-				self.data.players[self.playerID].pad_x += 0.4
-		# logging.info(f"start{self.data.players[self.playerID].pad_x}")
-		# logging.info(self.data.players[self.playerID].pad_x)
-		# logging.info(f"end {self.data.players[self.playerID].pad_x}")	
-		if self.data.last_frame + 0.05 < time.time():
+			if self.playerID == 1 and self.data.players[self.playerID].pad_x  > -16.5:
+				self.data.players[self.playerID].pad_x -= 0.6
+				if self.data.players[self.playerID].pad_x  < -16.0:
+						self.data.players[self.playerID].pad_x = -16
+			elif self.data.players[self.playerID].pad_x  < 16.5:
+				self.data.players[self.playerID].pad_x += 0.6
+				if self.data.players[self.playerID].pad_x  > 16.0 :
+					self.data.players[self.playerID].pad_x = 16
+		if self.data.last_frame + 0.0025 < time.time():
 			self.data.last_frame = time.time()
-			self.data.ball.x += self.data.ball.direction_x * 0.4 * self.data.ball.speed
-			self.data.ball.z += self.data.ball.direction_z * 0.4 * self.data.ball.speed
+			self.data.ball.x += self.data.ball.direction_x * 0.15 * self.data.ball.speed
+			self.data.ball.z += self.data.ball.direction_z * 0.15 * self.data.ball.speed
 			self.wallCollideTwoPlayer()
 			self.rebound_x()
 			self.data.send_all(json.dumps(self.data.to_json()))
+			if self.data.players[self.playerID].score  > 9 :
+				self.data.end_game()
 
 		return
 

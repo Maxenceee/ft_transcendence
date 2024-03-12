@@ -18,8 +18,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
+
 		console.info("Bye bye madafaka");
 		connectionStatus = 2;
+		window.location.replace("/")				//url of end game
 	});
 	let gameID = null;
 	socket.use((msg) =>{
@@ -30,8 +32,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			// playerNumber = msg.playerNumber;
 			// data.gameID = msg.gameID;
 			// gameID = data.gameID;
-			console.log(playerNumber);
-			console.log(gameID);
+			// console.log(playerNumber);
+			// console.log(gameID);
 			setcam();
 		}
 		
@@ -71,7 +73,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			// score = data.score;
 			// console.log(data);
 			keyCode.right = 0
-			keyCode.left = 0		
+			keyCode.left = 0	
 			// palletPlayer2.position.z = data.player[1].pos_z;
 			// console.log(data);
 			// console.log(ball.position.x);
@@ -106,11 +108,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	scene.add( Alight );
 
 
-	const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
-	const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
-	const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
-	const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
+	// const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
+	// const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
+	// const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
+	// const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
+	// const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 	let font, textGeo, textMesh2
 
@@ -277,7 +279,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			keyCode.right = 0
 			keyCode.left = 1
 		}
-		socket.send({type : 0, data:data, keyCode:keyCode});
+		// socket.send({type : 0, data:data, keyCode:keyCode});
 
 		// if (playerNumber % 2 == 1)
 		// {
@@ -332,7 +334,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			keyCode.Key39 = 0
 		if (keyVar == 37)
 			keyCode.Key37 = 0
-		socket.send({type : 0, data:data, keyCode:keyCode});
+		// socket.send({type : 0, data:data, keyCode:keyCode});
 
 		// data.keyCode = keyCode
 		// updatePlayer = 1
@@ -426,37 +428,35 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			renderer.render( sceneError, camera );
 		controls.update();
 		requestAnimationFrame(animate);
-		if (gameID	!= null)
-		{
+		// if (gameID	!= null)
+		// {
 			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
-				resetBall();
-				if (endScore == 0)
-				{
-					endScore = 1;
-					createText(data.score.scoreP2 + " : " + data.score.scoreP1);
-				}
+				// resetBall();
+				// if (endScore == 0)
+				// {
+				// 	endScore = 1;
+				// 	createText(data.score.scoreP2 + " : " + data.score.scoreP1);
+				// }
 				scene.remove(ball);
 				return;
 			}
-				if (data.score != score)
-				{
-					score = data.score;
-					createText(data.player[0].score + " : " + data.player[1].score);
-					// console.log(score)
-				}
-				// ball.rotation.x +=  .1
-				// ball.position.x = data.ball.x;
-				// ball.position.z = data.ball.z;
-				ballDirection = data.direction;
-		}
+			if (score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score)
+			{
+				score.scoreP1 = data.player[0].score;
+				score.scoreP2 = data.player[1].score;
+				createText(data.player[0].score + " : " + data.player[1].score);
+			}
+			// console.log(score.scoreP1 + " " + data.player[0].score + score.scoreP2 + " " + data.player[1].score)
+			// ballDirection = data.direction;
+		// }
 		await sleep(25)
 	}
 
 	const tmp = async () => {
 		while ( connectionStatus != 2 )
 		{
-			await sleep(50);
+			await sleep(25);
 			socket.send({type : 0, data:data, keyCode:keyCode});
 			if (endScore == 1)
 			{
