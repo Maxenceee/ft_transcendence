@@ -109,7 +109,6 @@ def callback_intra(request):
 		access_token = response['access_token']
 		intra_data = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
 		intra_data = intra_data.json()
-		logging.info(intra_data)
 		intra_id = intra_data['login']
 		default_profile_picture = intra_data['image']['versions']['medium']
 	except:
