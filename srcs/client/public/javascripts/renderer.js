@@ -80,60 +80,59 @@
  */
 
 class Component {
-    constructor(props) {
-        this.props = props || {};
-        this.state = {};
-        this._pendingState = null;
-        this._pendingStateCallbacks = [];
-        this._element = null;
+	constructor(props) {
+		this.props = props || {};
+		this.state = {};
+		this._pendingState = null;
+		this._pendingStateCallbacks = [];
+		this._element = null;
 		this._parent = null;
-    }
+	}
 
-    setState(newState, callback) {
-        this._pendingState = Object.assign({}, this.state, newState);
-        if (callback) {
-            this._pendingStateCallbacks.push(callback);
-        }
-        this._updateComponent();
-    }
+	setState(newState, callback) {
+		this._pendingState = Object.assign({}, this.state, newState);
+		if (callback) {
+			this._pendingStateCallbacks.push(callback);
+		}
+		this._updateComponent();
+	}
 
 	setParent(parent) {
-        this._parent = parent;
-    }
+		this._parent = parent;
+	}
 
-    _updateComponent() {
+	_updateComponent() {
 		let node;
-        if (!this._pendingState) return;
-        
-        this.state = this._pendingState;
-        this._pendingState = null;
+		if (!this._pendingState) return;
+		
+		this.state = this._pendingState;
+		this._pendingState = null;
 
-        const oldElement = this._element && this._element.element || null;
-        const newElement = this.render();
+		const oldElement = this._element && this._element.element || null;
+		const newElement = this.render();
 		console.log("reloading element", this, oldElement, newElement);
-        if (node = (this._parent || (oldElement && oldElement.parentNode))) {
-            node.replaceChild(newElement, oldElement);
-        }
-        // this._element = newElement;
+		if (node = (this._parent || (oldElement && oldElement.parentNode))) {
+			node.replaceChild(newElement, oldElement);
+		}
 
-        this._pendingStateCallbacks.forEach(callback => callback());
-        this._pendingStateCallbacks = [];
-    }   
+		this._pendingStateCallbacks.forEach(callback => callback());
+		this._pendingStateCallbacks = [];
+	}   
 
-    render() {
-        throw new Error('La méthode render doit être implémentée');
-    }
+	render() {
+		throw new Error('La méthode render doit être implémentée');
+	}
 }
 
 function Is(e) {
-    switch (e) {
-        case "svg":
-            return "http://www.w3.org/2000/svg";
+	switch (e) {
+		case "svg":
+			return "http://www.w3.org/2000/svg";
 		case "math":
 			return "http://www.w3.org/1998/Math/MathML";
 		default:
 			return "http://www.w3.org/2000/svg";
-    }
+	}
 }
 
 // function createElement(type, props = {}) {
@@ -172,71 +171,71 @@ function Is(e) {
 // }
 
 function createElement(type, props = {}) {
-    let t;
-    if (typeof type === 'function') {
-        return new type(props);
-    } else {
-        type = type.toLowerCase();
-        let element = (["svg", "path", "circle", "text"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
-        let jv = function(c) {
-            if (c instanceof Component) {
+	let t;
+	if (typeof type === 'function') {
+		return new type(props);
+	} else {
+		type = type.toLowerCase();
+		let element = (["svg", "path", "circle", "text"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
+		let jv = function(c) {
+			if (c instanceof Component) {
 				console.log("c instanceof Component", c);
 				(c = c.render()) && (element.appendChild(c));
-            } else if (typeof c === 'string') {
-                element.appendChild(document.createTextNode(c));
-            } else {
+			} else if (typeof c === 'string') {
+				element.appendChild(document.createTextNode(c));
+			} else {
 				(c = c.render() || c);
-                element.appendChild(c);
-            }
-        }
-        Object.keys(props).forEach(key => {
-            if (key === 'children') {
-                const children = props[key];
-                if (!children) return;
-                if (Array.isArray(children)) {
-                    children.forEach(child => jv(child));
-                } else {
-                    jv(children);
-                }
-            } else if (key.startsWith('on') && typeof props[key] === 'function') {
-                element.addEventListener(key.substring(2).toLowerCase(), props[key]);
-            } else {
-                element.setAttribute(key, props[key]);
-            }
-        });
-        return {
-            data: props,
+				element.appendChild(c);
+			}
+		}
+		Object.keys(props).forEach(key => {
+			if (key === 'children') {
+				const children = props[key];
+				if (!children) return;
+				if (Array.isArray(children)) {
+					children.forEach(child => jv(child));
+				} else {
+					jv(children);
+				}
+			} else if (key.startsWith('on') && typeof props[key] === 'function') {
+				element.addEventListener(key.substring(2).toLowerCase(), props[key]);
+			} else {
+				element.setAttribute(key, props[key]);
+			}
+		});
+		return {
+			data: props,
 			element: element,
-            render() {
-                return element;
-            }
-        };
-    }
+			render() {
+				return element;
+			}
+		};
+	}
 }
 
 class Router extends Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 		console.log(this);
-        this.state = { route: window.location.pathname };
-        window.addEventListener('popstate', () => {
-            this.setState({ route: window.location.pathname });
-        });
-    }
+		this.state = { route: window.location.pathname };
+		window.addEventListener('popstate', () => {
+			this.setState({ route: window.location.pathname });
+		});
+	}
 
-    render() {
-        const { children } = this.props;
-        const { route } = this.state;
+	render() {
+		const { children } = this.props;
+		const { route } = this.state;
 
 		const currentRoute = children.find(child => child.props.path === route);
 		console.log("router", currentRoute, this);
-        if (currentRoute) {
+		if (currentRoute) {
 			this._element = currentRoute.render();
-        } else {
+		} else {
 			this._element = null;
-        }
+		}
 		return (this._element && this._element.render() || null);
-    }
+	}
 }
 
 class Route extends Component {
@@ -255,26 +254,26 @@ class Route extends Component {
 }
 
 function router(...routes) {
-    return createElement(Router, { children: routes });
+	return createElement(Router, { children: routes });
 }
 
 function route({ path, element }) {
-    return createElement(Route, { path, element });
+	return createElement(Route, { path, element });
 }
 
 
 function link(props) {
-    const { to, children } = props;
+	const { to, children } = props;
 
 	if (to === void 0) throw new Error('Missing `to` prop');
 
-    const handleClick = (event) => {
-        event.preventDefault();
-        window.history.pushState({}, '', to);
-        window.dispatchEvent(new Event('popstate'));
-    };
+	const handleClick = (event) => {
+		event.preventDefault();
+		window.history.pushState({}, '', to);
+		window.dispatchEvent(new Event('popstate'));
+	};
 
-    return createElement('a', { href: to, onClick: handleClick, children });
+	return createElement('a', { href: to, onClick: handleClick, children });
 }
 
 let renderer = function() {
@@ -291,32 +290,29 @@ renderer.prototype.render = function(elem) {
 }
 
 function setParentToComponents(obj) {
-    const stack = [obj]; // Utilisation d'une pile pour la traversée non récursive
-    const visited = new Set(); // Utilisé pour éviter les références circulaires
+	const stack = [obj]; 
+	const visited = new Set();
 
-    while (stack.length > 0) {
-        const current = stack.pop();
+	while (stack.length > 0) {
+		const current = stack.pop();
 
-        // Si l'élément est une instance de Component, définissez son parent
-        if (current instanceof Component) {
-            if (stack.length > 0) {
-                const parent = stack[stack.length - 1];
-                current.setParent(parent);
-            }
-        }
+		if (current instanceof Component) {
+			if (stack.length > 0) {
+				const parent = stack[stack.length - 1];
+				current.setParent(parent);
+			}
+		}
 
-        // Parcourez toutes les propriétés de l'objet actuel
-        for (const key in current) {
-            if (current.hasOwnProperty(key)) {
-                const child = current[key];
-                // Vérifiez si l'enfant est un objet et n'a pas été visité
-                if (typeof child === 'object' && child !== null && !visited.has(child)) {
-                    stack.push(child);
-                    visited.add(child);
-                }
-            }
-        }
-    }
+		for (const key in current) {
+			if (current.hasOwnProperty(key)) {
+				const child = current[key];
+				if (typeof child === 'object' && child !== null && !visited.has(child)) {
+					stack.push(child);
+					visited.add(child);
+				}
+			}
+		}
+	}
 }
 
 const App = {
@@ -871,7 +867,7 @@ class Main extends Component {
 				})
 			]
 		});
-    }
+	}
 }
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));
