@@ -86,9 +86,9 @@ class Game:
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1 #naive version
+			self.ball.direction_x = 1
 		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1 #naive version
+			self.ball.direction_x = -1
 		if self.ball.z < -29:
 			self.players[0].score += 1
 			self.ball.x = 0
@@ -178,6 +178,48 @@ def game_master(game):
 				game.end_game()
 				return
 
+
+# _____________________
+# tournamentList= {} 		
+# game_list_tournament = []										# make a map please
+# def start_gameTournament(name, size):
+# 	if tournamentList.find(name) == False :
+# 			tournamentList.append(Tournament(size, name))
+# 	else :
+# 			target =  tournamentList.find(name)
+# 	if target.full:
+# 		# pass
+# 		it = 0
+# 		tmp = []
+# 		while it < target.size + 1 :
+# 			tmp[0] = target.players[it]
+# 			tmp[1] = target.players[it + 1]
+# 			it += 2
+# 			game_list_tournament.append(Game(tmp))
+# 		target.size /= 2
+# 		return
+# 	else :
+# 		return
+
+
+# class Tournament :
+# 	players = []
+# 	size = 0
+# 	name = "default"
+
+# 	def __init__(self, size, name):
+# 		self.size = size
+# 		self.name = name
+# 		pass
+	
+# 	def add(self, player):
+# 		self.players.append(player)
+	
+# 	def full(self):
+# 		if (len(self.players) == self.size):
+# 			return True
+# 		return False
+# _______________________
 
 class websocket_client(WebsocketConsumer):
 

@@ -13,6 +13,10 @@ def game4(request):
 	return render(request, 'views/game4.html')
 
 @login_required
+def gameLocal(request):
+	return render(request, 'views/gameLocal.html')
+
+@login_required
 def gameError(request):
 	return render(request, 'views/gameError.html')
 

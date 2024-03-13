@@ -31,7 +31,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball.position.x = data.ball.x;			
 				ball.position.z = data.ball.z;			
 				palletPlayer1.position.x = data.player[0].x;
-				palletPlayer2.position.x = data.player[1].x;
+				palletPlayer2.position.x = data.player[1].xP2;
 			}
 			else if (msg.type == "resetCam")
 				setcam(10, 69, 0);
@@ -60,12 +60,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	const Alight = new THREE.AmbientLight({color:0xffffff});
 	scene.add( Alight );
 
-
-	// const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
-	// const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
-	// const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-	// const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
-	// const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 	let font, textGeo, textMesh2
 
@@ -205,29 +199,29 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
 		keyCode.right = 0
+		keyCode2P.right = 0
+		keyCode2P.left = 0
 		keyCode.left = 0
 		if (keyVar == 68)
 		{
 			keyCode.left = 0
 			keyCode.right = 1
-			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 65)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
-			// socket.send({type : 'keyCode', move : "left"});
 		}
 		if (keyVar == 39)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
-			// socket.send({type : 'keyCode', move : "right"});
+			keyCode2P.left = 0
+			keyCode2P.right = 1
+			// socket.send({type : 'keyCode2P', move : "right"});
 		}
 		if (keyVar == 37)
 		{
-			keyCode.left = 1
-			keyCode.right = 0
+			keyCode2P.left = 1
+			keyCode2P.right = 0
 			// socket.send({type : 'keyCode', move : "left"})
 		}
 		if (keyVar == 82)
@@ -239,6 +233,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			socket.send({type : 'keyCode', move : "right"});
 		else if (keyCode.right == 0 && keyCode.left == 1) 
 			socket.send({type : 'keyCode', move : "left"})
+		if (keyCode2P.right == 1 && keyCode2P.left == 0)
+			socket.send({type : 'keyCode2P', move : "right"});
+		else if (keyCode2P.right == 0 && keyCode2P.left == 1) 
+			socket.send({type : 'keyCode2P', move : "left"})
 		else
 			;
 	}
@@ -251,9 +249,9 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		if (keyVar == 65)
 			keyCode.left = 0
 		if (keyVar == 39)
-			keyCode.right = 0
+			keyCode2P.right = 0
 		if (keyVar == 37)
-			keyCode.left = 0
+			keyCode2P.left = 0
 	}
 
 	let ballDirection = {
@@ -299,6 +297,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		left : 0,
 		right : 0
 	}
+	var keyCode2P = {
+		left : 0,
+		right : 0
+	}
 	
 	let data = {
 		number : [2],
@@ -333,11 +335,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					scene.remove(ball);
 					return;
 				}
-				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+				if ((score.scoreP2 != data.player[1].scoreP2 || score.scoreP1 != data.player[0].score))
 				{
 					score.scoreP1 = data.player[0].score;
-					score.scoreP2 = data.player[1].score;
-					createText(data.player[0].score + " : " + data.player[1].score);
+					score.scoreP2 = data.player[1].scoreP2;
+					createText(score.scoreP1 + " : " + score.scoreP2);
 				}
 			}
 		await sleep(25)
