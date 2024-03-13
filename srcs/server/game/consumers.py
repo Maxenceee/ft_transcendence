@@ -136,6 +136,7 @@ def start_game(num):
 
 
 def game_master(game):
+	game.send_all("gameState", game.to_json())
 	game.players[0].socket.send("setCam", {"x : 0", "y : 0", "z : 0"})
 	game.players[1].socket.send("setCam", {"x : 10", "y : 69", "z : 0"})
 	while True:
