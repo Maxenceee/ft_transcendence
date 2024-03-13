@@ -306,7 +306,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		P2position : palletPlayer2.position,
 		score : score,
 		updateScore : 0,
-		moveSpeed : moveSpeed,a
+		moveSpeed : moveSpeed,
 		playerNumber : playerNumber,
 		gameID : 0,
 		keyCode : keyCode
