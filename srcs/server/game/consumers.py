@@ -136,8 +136,8 @@ def start_game(num):
 
 
 def game_master(game):
-	# for player in game.players:
-	# 	player.socket.send("gameID", game.id)
+	game.player[0].socket.send("setCam", {"x : 0", "y : 0", "z : 0"})
+	game.player[1].socket.send("setCam", {"x : 10", "y : 69", "z : 0"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
