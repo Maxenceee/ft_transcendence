@@ -24,20 +24,22 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		window.location.replace("/")				//url of end game
 	});
 	socket.use((msg) =>{
-			if (msg.type = "gameState")
+			if (msg.type == "gameState")
 			{	
+				console.log("here");
 				data = msg.data;
+				data.type = msg.type
 				ball.position.x = data.ball.x;			
 				ball.position.z = data.ball.z;			
 				palletPlayer1.position.x = data.player[0].x;
 				palletPlayer2.position.x = data.player[1].x;
-				keyCode.right = 0;
-				keyCode.left = 0;
+				// keyCode.right = 0;
+				// keyCode.left = 0;
 			}
 			else if (msg.type == "resetCam")
 				setcam(10, 69, 0);
 			else if (msg.type == "setCam")
-				setcam(msg.x, msg.y, msg.z);
+				setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
@@ -190,9 +192,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	bloomPass.threshold = params.threshold;
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
-		
-	// const planeGeo = new THREE.PlaneGeometry(50, 50); 
-
 	const outputPass = new OutputPass();
 	let composer
 	composer = new EffectComposer( renderer );
@@ -307,7 +306,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		P2position : palletPlayer2.position,
 		score : score,
 		updateScore : 0,
-		moveSpeed : moveSpeed,
+		moveSpeed : moveSpeed,a
 		playerNumber : playerNumber,
 		gameID : 0,
 		keyCode : keyCode
@@ -325,17 +324,19 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			renderer.render( sceneError, camera );
 		controls.update();
 		requestAnimationFrame(animate);
-			if (score.scoreP1 > 9 || score.scoreP2 > 9)
+			if (data.type == "gameState")
 			{
-				scene.remove(ball);
-				return;
-			}
-			if (score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score)
-			{
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score);
-				console.log(camera);
+				if (score.scoreP1 > 9 || score.scoreP2 > 9)
+				{
+					scene.remove(ball);
+					return;
+				}
+				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+				{
+					score.scoreP1 = data.player[0].score;
+					score.scoreP2 = data.player[1].score;
+					createText(data.player[0].score + " : " + data.player[1].score);
+				}
 			}
 		await sleep(25)
 	}
