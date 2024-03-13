@@ -143,10 +143,11 @@ let Xe = {
 	// createElement: Cs,
 	
 }
-ina(), (_s.exports = Xe);
-var A2 = _s.exports,
-	Ao = A2;
+// ina(), (_s.exports = Xe);
+// var A2 = _s.exports,
+// 	Ao = A2;
 
-(Ao.createRoot = Xe.createRoot);
+// (Ao.createRoot = Xe.createRoot);
 
-Ao.createRoot(document.getElementById('root')).render(r);
+// Ao.createRoot(document.getElementById('root')).render(r);
+

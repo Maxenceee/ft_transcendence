@@ -1,0 +1,288 @@
+createElement('div', {
+    children: createElement('div', {
+        class: "data", children: [
+            createElement('div', {
+                class: "featured-bar", children: createElement('div', {
+                    class: "featured-bar-margin", children: createElement('div', {
+                        class: "featured-bar-content", children: createElement('div', {
+                            class: "featured-bar-primary-row", children: createElement('div', {
+                                class: "feature-title"
+                            })
+                        })
+                    })
+                })
+            }),
+            createElement('section', {
+                class: "player-profile", children: createElement('div', {
+                    class: "oa-container", children: createElement('div', {
+                        class: "player-container", children: [
+                            createElement('div', {
+                                class: "player-card", children: [
+                                    createElement('div', {
+                                        class: "card-header", children: createElement('h2', {
+                                            children: "{{ username }}"
+                                        })
+                                    }),
+                                    createElement('div', {
+                                        class: "card-picture", children: createElement('img', {
+                                            src: "user_profile_picture", alt: "profile-picture"
+                                        })
+                                    })
+                                ]
+                            }),
+                            createElement('div', {
+                                class: "card-container", children: [
+                                    createElement('div', {
+                                        class: "stat-card page-card", children: [
+                                            createElement('div', {
+                                                class: "card-title", children: createElement('h2', {
+                                                    children: "Statistics"
+                                                })
+                                            }),
+                                            createElement('div', {
+                                                class: "stat-card-content", children: [
+                                                    createElement('div', {
+                                                        class: "stat-group w-full", children: [
+                                                            createElement('h1', {
+                                                                children: "Normal"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "20 Played"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "WR: 55%"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "progress-bar", style: "--value: 55%;", children: [
+                                                                    createElement('div', {
+                                                                        
+                                                                    }),
+                                                                    createElement('div', {
+                                                                        
+                                                                    })
+                                                                ]
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "stat-group w-full", children: [
+                                                            createElement('h1', {
+                                                                children: "4 Players"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "1 Played"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "WR: 100%"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "progress-bar", style: "--value: 100%;", children: [
+                                                                    createElement('div', {
+                                                                        
+                                                                    }),
+                                                                    createElement('div', {
+                                                                        
+                                                                    })
+                                                                ]
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "stat-group w-full", children: [
+                                                            createElement('h1', {
+                                                                children: "Tournament"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "0 Played"
+                                                            }),
+                                                            createElement('p', {
+                                                                class: "note", children: "WR: none"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "progress-bar", style: "--value: none;", children: [
+                                                                    createElement('div', {
+                                                                        
+                                                                    }),
+                                                                    createElement('div', {
+                                                                        
+                                                                    })
+                                                                ]
+                                                            })
+                                                        ]
+                                                    })
+                                                ]
+                                            })
+                                        ]
+                                    }),
+                                    createElement('div', {
+                                        class: "history-card page-card", children: [
+                                            createElement('div', {
+                                                class: "card-title", children: createElement('h2', {
+                                                    children: "Game History"
+                                                })
+                                            }),
+                                            createElement('div', {
+                                                class: "history-card-content", children: [
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "6 - 10"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "10 - 9"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "4 Players"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "2 - 10"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "10 - 8"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "10 - 5"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "10 - 4"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "6 - 10"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "win", children: "Victory"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "10 - 7"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "9 - 10"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "note score", children: "4 - 10"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "Normal"
+                                                            })
+                                                        ]
+                                                    }),
+                                                    createElement('div', {
+                                                        class: "history-row", children: [
+                                                            createElement('div', {
+                                                                class: "lost", children: "Defeat"
+                                                            }),
+                                                            createElement('div', {
+                                                                class: "type", children: "4 Players"
+                                                            })
+                                                        ]
+                                                    })
+                                                ]
+                                            })
+                                        ]
+                                    })
+                                ]
+                            })
+                        ]
+                    })
+                })
+            })
+        ]
+    })
+})
