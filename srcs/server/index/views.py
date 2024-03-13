@@ -107,9 +107,11 @@ def callback_intra(request):
 		response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 		response = response.json()
 		access_token = response['access_token']
-		intra_id = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
-		intra_id = intra_id.json()
-		intra_id = intra_id['login']
+		intra_data = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
+		intra_data = intra_data.json()
+		logging.info(intra_data)
+		intra_id = intra_data['login']
+		default_profile_picture = intra_data['image']['versions']['medium']
 	except:
 		return redirect("/login")
 	if not User.objects.filter(intra_id=intra_id).exists():
@@ -117,10 +119,6 @@ def callback_intra(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		default_profile_picture = get_new_default_profile_picture()
-		if (default_profile_picture == None):
-			logging.error("Failed to get default profile picture")
-			default_profile_picture = ""
 		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(intra_id=intra_id)
@@ -148,9 +146,10 @@ def callback_swivel(request):
 		response = requests.post(f"https://auth0.maxencegama.dev/o/auth/access_token?{query_string}")
 		response = response.json()
 		access_token = response['access_token']
-		swivel_id = requests.get('https://api.maxencegama.dev/user/user.full', headers={'Authorization': f'Bearer {access_token}'})
-		swivel_id = swivel_id.json()
-		swivel_id = swivel_id['username']
+		swivel_data = requests.get('https://api.maxencegama.dev/user/user.full', headers={'Authorization': f'Bearer {access_token}'})
+		swivel_data = swivel_data.json()
+		swivel_id = swivel_data['username']
+		default_profile_picture = swivel_data['account_default_picture_url']
 	except:
 		return redirect("/login")
 	if not User.objects.filter(swivel_id=swivel_id).exists():
@@ -158,10 +157,6 @@ def callback_swivel(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		default_profile_picture = get_new_default_profile_picture()
-		if (default_profile_picture == None):
-			logging.error("Failed to get default profile picture")
-			default_profile_picture = ""
 		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
