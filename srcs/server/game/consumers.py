@@ -68,6 +68,9 @@ class Game:
 	def send_all(self, type, data):
 		for player in self.players:
 			player.socket.send(json.dumps({"type" : type, "data" : data}))
+	
+	def send(self, player, type, data):
+		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
 
 	def to_json(self):
 		players = []
@@ -137,8 +140,8 @@ def start_game(num):
 
 def game_master(game):
 	game.send_all("gameState", game.to_json())
-	game.players[0].socket.send("setCam", {"x : 0", "y : 0", "z : 0"})
-	game.players[1].socket.send("setCam", {"x : 10", "y : 69", "z : 0"})
+	game.send(0, "setCam", {"x : 0", "y : 0", "z : 0"})
+	game.send(1, "setCam", {"x : 10", "y : 69", "z : 0"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
