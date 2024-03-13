@@ -160,8 +160,8 @@ def game_master(game):
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 		time.sleep(0.05)
-		game.ball.x += game.ball.direction_x * 0.5 * game.ball.speed
-		game.ball.z += game.ball.direction_z * 0.5 * game.ball.speed
+		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
+		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
 		game.wallCollideTwoPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)

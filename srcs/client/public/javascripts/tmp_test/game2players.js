@@ -36,6 +36,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			}
 			else if (msg.type == "resetCam")
 				setcam(10, 69, 0);
+			else if (msg.type == "setCam")
+				setcam(msg.x, msg.y, msg.z);
 	});
 
 	let ball;
