@@ -140,8 +140,8 @@ def start_game(num):
 
 def game_master(game):
 	game.send_all("gameState", game.to_json())
-	game.send(0, "setCam", str({"x : 0", "y : 0", "z : 0"}))
-	game.send(1, "setCam", str({"x : 10", "y : 69", "z : 0"}))
+	game.send(0, "setCam", {"x" : "0", "y" : "0", "z" : "0"})
+	game.send(1, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
