@@ -67,7 +67,7 @@ class Game:
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send({"type" : type, "data" : data})
+			player.socket.send(str({"type" : type, "data" : data}))
 
 	def to_json(self):
 		players = []
