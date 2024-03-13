@@ -145,10 +145,11 @@ def callback_swivel(request):
 		response = requests.post(f"https://auth0.maxencegama.dev/o/auth/access_token?{query_string}")
 		response = response.json()
 		access_token = response['access_token']
-		swivel_data = requests.get('https://api.maxencegama.dev/user/user.full', headers={'Authorization': f'Bearer {access_token}'})
+		swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 		swivel_data = swivel_data.json()
+		logging.info(swivel_data)
 		swivel_id = swivel_data['username']
-		default_profile_picture = swivel_data['account_default_picture_url']
+		default_profile_picture = swivel_data['profile_picture']
 	except:
 		return redirect("/login")
 	if not User.objects.filter(swivel_id=swivel_id).exists():
