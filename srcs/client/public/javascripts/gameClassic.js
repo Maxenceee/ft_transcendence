@@ -9,7 +9,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
 	let counter = 0
-	let socket = new Socket({path: "/socket"});
+	let socket = new Socket({path: "/game_classic"});
 	let playerNumber = -1;
 	let connectionStatus = 0;
 	socket.onconnection(() => {
