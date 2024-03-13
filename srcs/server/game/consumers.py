@@ -67,7 +67,7 @@ class Game:
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send({"type" : type, "data" : data})
+			player.socket.send(json.dumps({"type" : type, "data" : data}))
 
 	def to_json(self):
 		players = []
@@ -165,13 +165,11 @@ def game_master(game):
 		game.wallCollideTwoPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
-		game.send_all("gameState", json.dumps(game.to_json()))
+		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
 				game.end_game()
 				return
-
-
 
 
 # _____________________
