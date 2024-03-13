@@ -147,7 +147,6 @@ def callback_swivel(request):
 		access_token = response['access_token']
 		swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 		swivel_data = swivel_data.json()
-		logging.info(swivel_data)
 		swivel_id = swivel_data['username']
 		default_profile_picture = swivel_data['profile_picture']
 	except:
