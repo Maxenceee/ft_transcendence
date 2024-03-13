@@ -23,67 +23,23 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		connectionStatus = 2;
 		window.location.replace("/")				//url of end game
 	});
-	let gameID = null;
 	socket.use((msg) =>{
-		if (playerNumber == -1 && msg.type == "id")
-		{
-			data = msg.data;
-			
-			// playerNumber = msg.playerNumber;
-			// data.gameID = msg.gameID;
-			// gameID = data.gameID;
-			// console.log(playerNumber);
-			// console.log(gameID);
-			setcam();
-		}
-		
-		
-		else
-		{
-			// if (gameID == null)
-			// {
-			// 	socket.send({type : 2});
-			// 	sleep (50);
-			// 	gameID = msg.gameID;
-			// 	playerNumber = msg.playerNumber;
-			// 	console.log(playerNumber);
-			// 	console.log(gameID);
-			// 	return ;
-			// }
-		// return
-			// if (msg.gameID != gameID)
-			// {
-			// 	console.log("have "   + gameID);
-			// 	console.log("receve " + msg.gameID);
-			// 	return ;
-			// }
-			data = msg;
-			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
-			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
-			// console.log(data);
-			// return ;
-			palletPlayer1.position.x = data.player[0].x;
-			// palletPlayer1.position.z = data.player[0].pos_z;
-			palletPlayer2.position.x = data.player[1].x;
-			
-			// console.log("start");
-			// console.log(palletPlayer1.position.x);
-			// console.log(palletPlayer2.position.x);
-			// console.log("end");
-			// score = data.score;
-			// console.log(data);
-			keyCode.right = 0
-			keyCode.left = 0	
-			// palletPlayer2.position.z = data.player[1].pos_z;
-			// console.log(data);
-			// console.log(ball.position.x);
-			// keyCode = data.keyCode;
-			// if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
-			// 	palletPlayer1.position.x = data.P1position.x;
-			// else if (data && data.P2position && data.P2position.x)
-			// 	palletPlayer2.position.x = data.P2position.x;
-		}
-	
+			if (msg.type == "gameState")
+			{	
+				console.log("here");
+				data = msg.data;
+				data.type = msg.type
+				ball.position.x = data.ball.x;			
+				ball.position.z = data.ball.z;			
+				palletPlayer1.position.x = data.player[0].x;
+				palletPlayer2.position.x = data.player[1].x;
+				// keyCode.right = 0;
+				// keyCode.left = 0;
+			}
+			else if (msg.type == "resetCam")
+				setcam(10, 69, 0);
+			else if (msg.type == "setCam")
+				setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
@@ -99,7 +55,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	const controls = new OrbitControls( camera, renderer.domElement );
 	const scene = new THREE.Scene();
 	const sceneError = new THREE.Scene;
-	controls.maxDistance = 70;
+	controls.maxDistance = 90;
 	controls.target.set( 0, 0, 0 );
 	controls.update();
 
@@ -223,9 +179,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
 	}
 
-	//debuging
-
-	const params = {
+		const params = {
 		threshold: 0,
 		strength: 0.35,
 		radius: 0,
@@ -238,9 +192,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	bloomPass.threshold = params.threshold;
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
-		
-	// const planeGeo = new THREE.PlaneGeometry(50, 50); 
-
 	const outputPass = new OutputPass();
 	let composer
 	composer = new EffectComposer( renderer );
@@ -251,75 +202,56 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let moveSpeed = 1.05
 
 	initiateMapTwoPlayer({})
-	var updatePlayer = 0;
+
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-
 		keyCode.right = 0
 		keyCode.left = 0
 		if (keyVar == 68)
 		{
-			keyCode.right = 1
 			keyCode.left = 0
-			socket.send({type : 'keyCode', move : "right"});
+			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 65)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
-			socket.send({type : 'keyCode', move : "left"});
+			// socket.send({type : 'keyCode', move : "left"});
 		}
 		if (keyVar == 39)
 		{
-			keyCode.right = 1
 			keyCode.left = 0
-			socket.send({type : 'keyCode', move : "right"});
+			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
-			keyCode.right = 0
 			keyCode.left = 1
-			socket.send({type : 'keyCode', move : "left"});
+			keyCode.right = 0
+			// socket.send({type : 'keyCode', move : "left"})
 		}
-		
-		// data.keyCode = keyCode;
-		// updatePlayer = 1;
+		if (keyCode.right == 1 && keyCode.left == 0)
+			socket.send({type : 'keyCode', move : "right"});
+		else if (keyCode.right == 0 && keyCode.left == 1) 
+			socket.send({type : 'keyCode', move : "left"})
+		else
+			;
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
 // 
 // 
 		if (keyVar == 68)
-			keyCode.Key68 = 0
+			keyCode.right = 0
 		if (keyVar == 65)
-			keyCode.Key65 = 0
+			keyCode.left = 0
 		if (keyVar == 39)
-			keyCode.Key39 = 0
+			keyCode.right = 0
 		if (keyVar == 37)
-			keyCode.Key37 = 0
-		// socket.send({type : 0, data:data, keyCode:keyCode});
-
-		// data.keyCode = keyCode
-		// updatePlayer = 1
-		// socket.send({type:2, data})
-		// palletPlayer1.position.x = data.P1position.x ;
-		// palletPlayer2.position.x = data.P2position.x ;
-		// console.log(keyCode);
-	}
-
-	function resetBall()
-	{
-		data.ball.z = 0;
-		data.ball.x = 0;
-		data.ball.y = 0;
-		moveSpeed = 1.05;
-		data.ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
-		data.ballDirection.z *= -1;
-		try {		
-			ball.position = data.ball; // it throw a error cause the  position is read only
-		} catch (error) {}
+			keyCode.left = 0
 	}
 
 	let ballDirection = {
@@ -381,7 +313,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	};
 	// socket.send({type : 0, data : data});
 	loadFont();
-	var endScore = 0;
 
 	const animate = async () => {
 
@@ -393,53 +324,27 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			renderer.render( sceneError, camera );
 		controls.update();
 		requestAnimationFrame(animate);
-		// if (gameID	!= null)
-		// {
-			if (score.scoreP1 > 9 || score.scoreP2 > 9)
+			if (data.type == "gameState")
 			{
-				// resetBall();
-				// if (endScore == 0)
-				// {
-				// 	endScore = 1;
-				// 	createText(data.score.scoreP2 + " : " + data.score.scoreP1);
-				// }
-				scene.remove(ball);
-				return;
+				if (score.scoreP1 > 9 || score.scoreP2 > 9)
+				{
+					scene.remove(ball);
+					return;
+				}
+				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+				{
+					score.scoreP1 = data.player[0].score;
+					score.scoreP2 = data.player[1].score;
+					createText(data.player[0].score + " : " + data.player[1].score);
+				}
 			}
-			if (score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score)
-			{
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score);
-			}
-			// console.log(score.scoreP1 + " " + data.player[0].score + score.scoreP2 + " " + data.player[1].score)
-			// ballDirection = data.direction;
-		// }
 		await sleep(25)
-	}
-
-	const tmp = async () => {
-		// while ( connectionStatus != 2 )
-		// {
-		// 	await sleep(25);
-		// 	socket.send({type : 0, data:data, keyCode:keyCode});
-		// 	if (endScore == 1)
-		// 	{
-		// 		// socket.send({type : "end"})
-		// 		return;
-		// 	}
-		// }
-		// console.log("ping");
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
-	tmp();
-	function setcam () {
-		if (playerNumber % 2 == 1)
-			camera.position.set(30, 30, 40);
-		else
-			camera.position.set(30, 30, -40);
+	function setcam (x, y, z) {
+		camera.position.set(x, y, z);
 	}
 	console.log("cookie");
 }();

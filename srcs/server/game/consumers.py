@@ -65,9 +65,12 @@ class Game:
 		Game_history.objects.create(type="2v2", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
-	def send_all(self, data):
+	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(data)
+			player.socket.send(json.dumps({"type" : type, "data" : data}))
+	
+	def send(self, player, type, data):
+		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
 
 	def to_json(self):
 		players = []
@@ -136,6 +139,10 @@ def start_game(num):
 
 
 def game_master(game):
+	game.send_all("gameState", game.to_json())
+	time.sleep(0.05)
+	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
+	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
@@ -158,18 +165,16 @@ def game_master(game):
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 		time.sleep(0.05)
-		game.ball.x += game.ball.direction_x * 0.5 * game.ball.speed
-		game.ball.z += game.ball.direction_z * 0.5 * game.ball.speed
+		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
+		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
 		game.wallCollideTwoPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
-		game.send_all(json.dumps(game.to_json()))
+		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
 				game.end_game()
 				return
-
-
 
 
 # _____________________
@@ -263,13 +268,15 @@ class websocket_client(WebsocketConsumer):
 		receive_package = json.loads(text_data)
 
 		if receive_package['type'] == "keyCode":
-			if receive_package['move'] == "left":
-				self.data.queue.put([self.playerID, "left"])
+			try:
+				if receive_package['move'] == "left":
+					self.data.queue.put([self.playerID, "left"])
+					return
+				elif receive_package['move'] == "right":
+					self.data.queue.put([self.playerID, "right"])
+					return
+			except:
 				return
-			elif receive_package['move'] == "right":
-				self.data.queue.put([self.playerID, "right"])
-				return
-
 		return
 
 	def disconnect(self, code):
