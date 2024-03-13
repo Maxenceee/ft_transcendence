@@ -37,7 +37,8 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", "https:/
 
 INSTALLED_APPS = [
 	'index',
-	'game',
+	'game_classic',
+	'game_local',
 	'channels',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',
