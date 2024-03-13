@@ -874,4 +874,4 @@ class Main extends Component {
     }
 }
 
-App.createRoot(document.getElementById('root')).render(new Main());
+App.createRoot(document.getElementById('root')).render(createElement(Main));
