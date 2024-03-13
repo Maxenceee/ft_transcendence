@@ -23,67 +23,16 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		connectionStatus = 2;
 		window.location.replace("/")				//url of end game
 	});
-	let gameID = null;
 	socket.use((msg) =>{
-		if (playerNumber == -1 && msg.type == "id")
-		{
-			data = msg.data;
-			
-			// playerNumber = msg.playerNumber;
-			// data.gameID = msg.gameID;
-			// gameID = data.gameID;
-			// console.log(playerNumber);
-			// console.log(gameID);
-			setcam();
-		}
-		
-		
-		else
-		{
-			// if (gameID == null)
-			// {
-			// 	socket.send({type : 2});
-			// 	sleep (50);
-			// 	gameID = msg.gameID;
-			// 	playerNumber = msg.playerNumber;
-			// 	console.log(playerNumber);
-			// 	console.log(gameID);
-			// 	return ;
-			// }
-		// return
-			// if (msg.gameID != gameID)
-			// {
-			// 	console.log("have "   + gameID);
-			// 	console.log("receve " + msg.gameID);
-			// 	return ;
-			// }
 			data = msg;
-			ball.position.x = msg.ball.x;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday
-			ball.position.z = msg.ball.z;				// it can move the ball, so, gota be fun to refacto all, doable, will do it sunday or monday.
-			// console.log(data);
-			// return ;
+			ball.position.x = msg.ball.x;			
+			ball.position.z = msg.ball.z;			
 			palletPlayer1.position.x = data.player[0].x;
-			// palletPlayer1.position.z = data.player[0].pos_z;
 			palletPlayer2.position.x = data.player[1].x;
-			
-			// console.log("start");
-			// console.log(palletPlayer1.position.x);
-			// console.log(palletPlayer2.position.x);
-			// console.log("end");
-			// score = data.score;
-			// console.log(data);
-			keyCode.right = 0
-			keyCode.left = 0	
-			// palletPlayer2.position.z = data.player[1].pos_z;
-			// console.log(data);
-			// console.log(ball.position.x);
-			// keyCode = data.keyCode;
-			// if (playerNumber % 2 == 0 && data && data.P1position && data.P1position.x)
-			// 	palletPlayer1.position.x = data.P1position.x;
-			// else if (data && data.P2position && data.P2position.x)
-			// 	palletPlayer2.position.x = data.P2position.x;
-		}
-	
+			keyCode.right = 0;
+			keyCode.left = 0;
+			if (msg.type == "cam")
+				setcam();
 	});
 
 	let ball;
@@ -251,75 +200,56 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let moveSpeed = 1.05
 
 	initiateMapTwoPlayer({})
-	var updatePlayer = 0;
+
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-
 		keyCode.right = 0
 		keyCode.left = 0
 		if (keyVar == 68)
 		{
-			keyCode.right = 1
 			keyCode.left = 0
-			socket.send({type : 'keyCode', move : "right"});
+			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 65)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
-			socket.send({type : 'keyCode', move : "left"});
+			// socket.send({type : 'keyCode', move : "left"});
 		}
 		if (keyVar == 39)
 		{
-			keyCode.right = 1
 			keyCode.left = 0
-			socket.send({type : 'keyCode', move : "right"});
+			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
-			keyCode.right = 0
 			keyCode.left = 1
-			socket.send({type : 'keyCode', move : "left"});
+			keyCode.right = 0
+			// socket.send({type : 'keyCode', move : "left"})
 		}
-		
-		// data.keyCode = keyCode;
-		// updatePlayer = 1;
+		if (keyCode.right == 1 && keyCode.left == 0)
+			socket.send({type : 'keyCode', move : "right"});
+		else if (keyCode.right == 0 && keyCode.left == 1) 
+			socket.send({type : 'keyCode', move : "left"})
+		else
+			;
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
 // 
 // 
 		if (keyVar == 68)
-			keyCode.Key68 = 0
+			keyCode.right = 0
 		if (keyVar == 65)
-			keyCode.Key65 = 0
+			keyCode.left = 0
 		if (keyVar == 39)
-			keyCode.Key39 = 0
+			keyCode.right = 0
 		if (keyVar == 37)
-			keyCode.Key37 = 0
-		// socket.send({type : 0, data:data, keyCode:keyCode});
-
-		// data.keyCode = keyCode
-		// updatePlayer = 1
-		// socket.send({type:2, data})
-		// palletPlayer1.position.x = data.P1position.x ;
-		// palletPlayer2.position.x = data.P2position.x ;
-		// console.log(keyCode);
-	}
-
-	function resetBall()
-	{
-		data.ball.z = 0;
-		data.ball.x = 0;
-		data.ball.y = 0;
-		moveSpeed = 1.05;
-		data.ballDirection.x = THREE.MathUtils.randFloat(-1, 1);
-		data.ballDirection.z *= -1;
-		try {		
-			ball.position = data.ball; // it throw a error cause the  position is read only
-		} catch (error) {}
+			keyCode.left = 0
 	}
 
 	let ballDirection = {
@@ -411,6 +341,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				score.scoreP1 = data.player[0].score;
 				score.scoreP2 = data.player[1].score;
 				createText(data.player[0].score + " : " + data.player[1].score);
+				console.log(camera);
 			}
 			// console.log(score.scoreP1 + " " + data.player[0].score + score.scoreP2 + " " + data.player[1].score)
 			// ballDirection = data.direction;
@@ -436,10 +367,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	sleep(250).then(() => { animate(); });
 	tmp();
 	function setcam () {
-		if (playerNumber % 2 == 1)
-			camera.position.set(30, 30, 40);
-		else
-			camera.position.set(30, 30, -40);
+			// if (playerNumber % 2 == 1)
+				camera.position.set(10, 69, 0);
+			// else
+			// 	camera.position.set(30, 30, -40);
 	}
 	console.log("cookie");
 }();

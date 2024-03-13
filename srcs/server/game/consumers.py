@@ -261,7 +261,6 @@ class websocket_client(WebsocketConsumer):
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
-
 		if receive_package['type'] == "keyCode":
 			if receive_package['move'] == "left":
 				self.data.queue.put([self.playerID, "left"])
