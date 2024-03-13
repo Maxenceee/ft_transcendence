@@ -65,9 +65,9 @@ class Game:
 		Game_history.objects.create(type="2v2", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
-	def send_all(self, data):
+	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(data)
+			player.socket.send({type : type, data : data})
 
 	def to_json(self):
 		players = []
@@ -163,7 +163,7 @@ def game_master(game):
 		game.wallCollideTwoPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
-		game.send_all(json.dumps(game.to_json()))
+		game.send_all("gameState", json.dumps(game.to_json()))
 		for player in game.players:
 			if player.score  > 9 :
 				game.end_game()
@@ -261,14 +261,17 @@ class websocket_client(WebsocketConsumer):
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
-		if receive_package['type'] == "keyCode":
-			if receive_package['move'] == "left":
-				self.data.queue.put([self.playerID, "left"])
-				return
-			elif receive_package['move'] == "right":
-				self.data.queue.put([self.playerID, "right"])
-				return
 
+		if receive_package['type'] == "keyCode":
+			try:
+				if receive_package['move'] == "left":
+					self.data.queue.put([self.playerID, "left"])
+					return
+				elif receive_package['move'] == "right":
+					self.data.queue.put([self.playerID, "right"])
+					return
+			except:
+				return
 		return
 
 	def disconnect(self, code):
