@@ -106,7 +106,6 @@ def callback_intra(request):
 		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id)
 	else:
 		user = User.objects.get(intra_id=intra_id)
-
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
@@ -142,7 +141,6 @@ def callback_swivel(request):
 		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
-
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
