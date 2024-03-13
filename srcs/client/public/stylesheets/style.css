@@ -951,10 +951,10 @@ main .gr-container {
   left: 0;
   width: 100%;
   height: 100%;
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
   -webkit-mask: linear-gradient(to bottom, transparent 50%, black);
           mask: linear-gradient(to bottom, transparent 50%, black);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   pointer-events: none;
   z-index: -1;
 }
@@ -1865,4 +1865,4 @@ body:has(.connection-page) {
 }
 .history-row .score {
   font-size: 15px;
-}
+}/*# sourceMappingURL=style.css.map */
