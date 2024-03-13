@@ -117,11 +117,21 @@ class Component {
 
 		this._pendingStateCallbacks.forEach(callback => callback());
 		this._pendingStateCallbacks = [];
-	}   
+
+		if (!this._element) {
+			this.componentDidMount();
+		} else {
+			this.componentDidUpdate();
+		}
+	}
 
 	render() {
 		throw new Error('La méthode render doit être implémentée');
 	}
+
+	componentDidMount() {}
+
+	componentDidUpdate() {}
 }
 
 function Is(e) {
@@ -135,41 +145,6 @@ function Is(e) {
 	}
 }
 
-// function createElement(type, props = {}) {
-// 	let t;
-// 	if (typeof type === 'function') {
-// 		return new type(props);
-// 	} else {
-// 		type = type.toLowerCase();
-// 		let element = (["svg", "path", "circle", "text"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
-// 		let jv = function(c) {
-// 			if (c instanceof Component) {
-// 				(c = c.render()) && (element.appendChild(c));
-// 			} else if (typeof c === 'string') {
-// 				element.appendChild(document.createTextNode(c));
-// 			} else {
-// 				element.appendChild(c);
-// 			}
-// 		}
-// 		Object.keys(props).forEach(key => {
-// 			if (key === 'children') {
-// 				const children = props[key];
-// 				if (!children) return;
-// 				if (Array.isArray(children)) {
-// 					children.forEach(child => jv(child));
-// 				} else {
-// 					jv(children);
-// 				}
-// 			} else if (key.startsWith('on') && typeof props[key] === 'function') {
-// 				element.addEventListener(key.substring(2).toLowerCase(), props[key]);
-// 			} else {
-// 				element.setAttribute(key, props[key]);
-// 			}
-// 		});
-// 		return element;
-// 	}
-// }
-
 function createElement(type, props = {}) {
 	let t;
 	if (typeof type === 'function') {
@@ -180,7 +155,7 @@ function createElement(type, props = {}) {
 		let jv = function(c) {
 			if (c instanceof Component) {
 				console.log("c instanceof Component", c);
-				(c = c.render()) && (element.appendChild(c));
+				(c = c.render()) && (c instanceof HTMLElement ? element.appendChild(c) : element.appendChild(c.render()));
 			} else if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
@@ -325,7 +300,6 @@ const App = {
 		);
 	},
 }
-
 
 /**
  * 
@@ -510,6 +484,41 @@ class HomePage extends Component {
 	}
 }
 
+class UserPagePlayerHistory extends Component {
+	constructor(props) {
+		super(props);
+		this.history = [...Array(Math.floor(Math.random() * 10))].fill({});
+	}
+
+	componentDidMount() {
+		console.log("this.componentDidMount");
+	}
+	
+	componentDidUpdate() {
+		console.log("this.componentDidUpdate");
+	}
+
+	render() {
+		return createElement('div', {
+			class: "history-card-content", children: this.history.map(game => {
+				return createElement('div', {
+					class: "history-row", children: [
+						createElement('div', {
+							class: "lost", children: "Defeat"
+						}),
+						createElement('div', {
+							class: "note score", children: "6 - 10"
+						}),
+						createElement('div', {
+							class: "type", children: "Normal"
+						})
+					]
+				})
+			})
+		})
+	}
+}
+
 class UserPage extends Component {
 	constructor(props) {
 		super(props);
@@ -638,160 +647,7 @@ class UserPage extends Component {
 															children: "Game History"
 														})
 													}),
-													createElement('div', {
-														class: "history-card-content", children: [
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "6 - 10"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "10 - 9"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "4 Players"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "2 - 10"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "10 - 8"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "10 - 5"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "10 - 4"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "6 - 10"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "win", children: "Victory"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "10 - 7"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "9 - 10"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "note score", children: "4 - 10"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "Normal"
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "history-row", children: [
-																	createElement('div', {
-																		class: "lost", children: "Defeat"
-																	}),
-																	createElement('div', {
-																		class: "type", children: "4 Players"
-																	})
-																]
-															})
-														]
-													})
+													createElement(UserPagePlayerHistory),
 												]
 											})
 										]
