@@ -55,7 +55,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	const controls = new OrbitControls( camera, renderer.domElement );
 	const scene = new THREE.Scene();
 	const sceneError = new THREE.Scene;
-	controls.maxDistance = 70;
+	controls.maxDistance = 90;
 	controls.target.set( 0, 0, 0 );
 	controls.update();
 
