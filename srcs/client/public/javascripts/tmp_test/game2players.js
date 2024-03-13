@@ -24,15 +24,18 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		window.location.replace("/")				//url of end game
 	});
 	socket.use((msg) =>{
-			data = msg;
-			ball.position.x = msg.ball.x;			
-			ball.position.z = msg.ball.z;			
-			palletPlayer1.position.x = data.player[0].x;
-			palletPlayer2.position.x = data.player[1].x;
-			keyCode.right = 0;
-			keyCode.left = 0;
-			if (msg.type == "cam")
-				setcam();
+			if (msg.type = "gameState")
+			{	
+				data = msg.data;
+				ball.position.x = data.ball.x;			
+				ball.position.z = data.ball.z;			
+				palletPlayer1.position.x = data.player[0].x;
+				palletPlayer2.position.x = data.player[1].x;
+				keyCode.right = 0;
+				keyCode.left = 0;
+			}
+			else if (msg.type == "resetCam")
+				setcam(10, 69, 0);
 	});
 
 	let ball;
@@ -172,9 +175,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
 	}
 
-	//debuging
-
-	const params = {
+		const params = {
 		threshold: 0,
 		strength: 0.35,
 		radius: 0,
@@ -311,7 +312,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	};
 	// socket.send({type : 0, data : data});
 	loadFont();
-	var endScore = 0;
 
 	const animate = async () => {
 
@@ -323,16 +323,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			renderer.render( sceneError, camera );
 		controls.update();
 		requestAnimationFrame(animate);
-		// if (gameID	!= null)
-		// {
 			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
-				// resetBall();
-				// if (endScore == 0)
-				// {
-				// 	endScore = 1;
-				// 	createText(data.score.scoreP2 + " : " + data.score.scoreP1);
-				// }
 				scene.remove(ball);
 				return;
 			}
@@ -343,34 +335,13 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				createText(data.player[0].score + " : " + data.player[1].score);
 				console.log(camera);
 			}
-			// console.log(score.scoreP1 + " " + data.player[0].score + score.scoreP2 + " " + data.player[1].score)
-			// ballDirection = data.direction;
-		// }
 		await sleep(25)
-	}
-
-	const tmp = async () => {
-		// while ( connectionStatus != 2 )
-		// {
-		// 	await sleep(25);
-		// 	socket.send({type : 0, data:data, keyCode:keyCode});
-		// 	if (endScore == 1)
-		// 	{
-		// 		// socket.send({type : "end"})
-		// 		return;
-		// 	}
-		// }
-		// console.log("ping");
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
-	tmp();
-	function setcam () {
-			// if (playerNumber % 2 == 1)
-				camera.position.set(10, 69, 0);
-			// else
-			// 	camera.position.set(30, 30, -40);
+	function setcam (x, y, z) {
+		camera.position.set(x, y, z);
 	}
 	console.log("cookie");
 }();
