@@ -17,6 +17,8 @@ class User(models.Model):
 	intra_id = models.CharField(max_length=100)
 	swivel_id = models.CharField(max_length=100)
 
+	default_profile_picture = models.CharField(max_length=100)
+
 	def __str__(self):
 		return str(self.username)
 	

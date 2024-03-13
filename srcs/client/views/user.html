@@ -67,7 +67,7 @@
 											<h2>{{ username }}</h2>
 										</div>
 										<div class="card-picture">
-											<img src="https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder" alt="profile-picture">
+											<img src={{ user_profile_picture|default:"https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder" }} alt="profile-picture">
 										</div>
 									</div>
 									<div class="card-container">

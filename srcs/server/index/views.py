@@ -9,6 +9,14 @@ import os
 import requests
 import urllib.parse
 
+def get_new_default_profile_picture():
+	try:
+		response = requests.get("https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/new")
+		response = response.json()
+		return response['content']
+	except:
+		return None
+
 def makeid(length):
 	return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
@@ -19,7 +27,7 @@ def index(request):
 
 @login_required
 def user_page(request, id):
-	return render(request, 'views/user.html', {"username": request.user.nickname})
+	return render(request, 'views/user.html', {"username": request.user.nickname, "user_profile_picture": request.user.default_profile_picture})
 
 @login_required
 def get_user(request, id):
@@ -67,7 +75,12 @@ def signup(request):
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=username, username=username, password=password)
+
+		default_profile_picture = get_new_default_profile_picture()
+		if (default_profile_picture == None):
+			logging.error("Failed to get default profile picture")
+			default_profile_picture = ""
+		user = User.objects.create(id=id, nickname=username, username=username, password=password, default_profile_picture=default_profile_picture)
 		response = redirect("/")
 
 		token = makeid(100)
@@ -103,9 +116,15 @@ def callback_intra(request):
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id)
+
+		default_profile_picture = get_new_default_profile_picture()
+		if (default_profile_picture == None):
+			logging.error("Failed to get default profile picture")
+			default_profile_picture = ""
+		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(intra_id=intra_id)
+
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
@@ -138,9 +157,15 @@ def callback_swivel(request):
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id)
+
+		default_profile_picture = get_new_default_profile_picture()
+		if (default_profile_picture == None):
+			logging.error("Failed to get default profile picture")
+			default_profile_picture = ""
+		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
+
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():

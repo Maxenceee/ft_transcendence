@@ -929,7 +929,7 @@ main .gr-container {
   justify-content: center;
   color: white;
   height: 100%;
-  background-color: var(--card-color);
+  background-color: #fff;
   border-radius: 35px;
   overflow: hidden;
 }
@@ -1473,6 +1473,8 @@ body:has(.connection-page) {
 
 .ttpo {
   align-items: center;
+  -moz-appearance: none;
+       appearance: none;
   -webkit-appearance: none;
   display: inline-block;
   flex-direction: row;
@@ -1865,4 +1867,4 @@ body:has(.connection-page) {
 }
 .history-row .score {
   font-size: 15px;
-}/*# sourceMappingURL=style.css.map */
+}
