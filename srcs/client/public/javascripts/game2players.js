@@ -26,15 +26,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	socket.use((msg) =>{
 			if (msg.type == "gameState")
 			{	
-				console.log("here");
 				data = msg.data;
 				data.type = msg.type
 				ball.position.x = data.ball.x;			
 				ball.position.z = data.ball.z;			
 				palletPlayer1.position.x = data.player[0].x;
 				palletPlayer2.position.x = data.player[1].x;
-				// keyCode.right = 0;
-				// keyCode.left = 0;
 			}
 			else if (msg.type == "resetCam")
 				setcam(10, 69, 0);
@@ -232,6 +229,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			keyCode.left = 1
 			keyCode.right = 0
 			// socket.send({type : 'keyCode', move : "left"})
+		}
+		if (keyVar == 82)
+		{
+			setcam(10, 69, 0)
+			controls.target.set( 0, 0, 0 );
 		}
 		if (keyCode.right == 1 && keyCode.left == 0)
 			socket.send({type : 'keyCode', move : "right"});
