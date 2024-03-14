@@ -18,12 +18,37 @@ def makeid(len):
 waiting_list = []
 game_list = []
 
+class AIPlayer:
+	def __init__(self, game):
+		self.game = game
+		self.running = False
+		self.thread = threading.Thread(target=self.run)
+
+	def start(self):
+		self.running = True
+		self.thread.start()
+
+	def stop(self):
+		self.running = False
+		self.thread.join()
+
+	def run(self):
+		while self.running:
+			ball_x = self.game.ball.x
+			pad_x = self.game.players[1].pad_xP2
+			if ball_x > pad_x:
+				self.game.queue.put([1, "right"])
+			elif ball_x < pad_x:
+				self.game.queue.put([1, "left"])
+			time.sleep(1)  
+
+
 class Ball:
 	def __init__(self) -> None:
-		self.x = 0
-		self.z = 0
+		self.x = 0 # abscisse
+		self.z = 0 # ordonne
 		self.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-		self.direction_z = 1
+		self.direction_z = 1 # -1 = balle vers l'ia
 		self.speed = 1.05
 
 		
@@ -40,6 +65,7 @@ class Player:
 		self.keyCode = {}
 		self.keyCode['left'] = 0
 		self.keyCode ['right'] = 0 
+
 
 class Game:
 	id = ""
@@ -89,9 +115,9 @@ class Game:
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1 #naive version
+			self.ball.direction_x *= -1 #naive version
 		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1 #naive version
+			self.ball.direction_x *= -1 #naive version
 		if self.ball.z < -29:
 			self.players[0].score += 1
 			self.ball.x = 0
@@ -161,7 +187,10 @@ def game_master(game):
 	time.sleep(0.05)
 	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+	ai_player = AIPlayer(game)
+	ai_player.start()
 	while True:
+		logging.info(game.ball.direction_x)
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
 			if action == "right":
@@ -190,6 +219,7 @@ def game_master(game):
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
+				ai_player.stop()
 				game.end_game()
 				return
 
