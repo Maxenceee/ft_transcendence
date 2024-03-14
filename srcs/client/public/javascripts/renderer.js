@@ -283,6 +283,9 @@ function link(props) {
 	if (to === void 0) throw new Error('Missing `to` prop');
 
 	const handleClick = (event) => {
+		if (event.metaKey || event.ctrlKey) {
+			return;
+		}
 		event.preventDefault();
 		window.history.pushState({}, '', to);
 		window.dispatchEvent(new Event('popstate'));
