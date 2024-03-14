@@ -23,7 +23,7 @@ class Ball:
 		self.x = 0
 		self.z = 0
 		self.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-		self.direction_z = 1
+		self.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 		self.speed = 1.05
 
 		
@@ -31,7 +31,7 @@ class Player:
 	def __init__(self, id, socket) -> None:
 		self.id = id
 		self.socket = socket
-		self.score = 0
+		self.score = 5
 		self.pad_x = 0
 		self.pad_z = 0
 		self.keyCode = {}
@@ -62,7 +62,7 @@ class Game:
 			resume_data.append({"id": player.id, "score": player.score})
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
-		Game_history.objects.create(type="2v2", data=resume_data)
+		Game_history.objects.create(type="4v4", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
@@ -83,28 +83,39 @@ class Game:
 		}
 		return response
 	
-	def wallCollideTwoPlayer(self):
+	def wallCollideFourPlayer(self):
 
-		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1
-		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1
-		if self.ball.z < -29:
-			self.players[0].score += 1
+		if self.ball.x < -29 :
+			self.players[2].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z *= -1
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+		elif self.ball.x > 29 :
+			self.players[3].score -= 1
+			self.ball.x = 0
+			self.ball.z = 0 
+			self.ball.y = 0
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.speed = 1.05
+		elif self.ball.z < -29:
+			self.players[1].score -= 1
+			self.ball.x = 0
+			self.ball.z = 0 
+			self.ball.y = 0
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
 
 		elif self.ball.z > 29:
-			self.players[1].score +=1
+			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z *= -1
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
@@ -117,6 +128,20 @@ class Game:
 			else :
 				self.ball.direction_x = (self.ball.x - self.players[playerID].pad_x)/4.5
 				self.ball.direction_z = -1
+			self.ball.speed += 0.1
+		if (self.ball.speed > 5) :
+			self.ball.speed = 5
+
+	def rebound_z(self, playerID):
+		if ((self.ball.x < -27 and playerID == 3) or (self.ball.x > 27 and playerID == 2)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
+			if (playerID == 3) :
+				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+				# self.ball.direction_z = -1
+				self.ball.direction_x = 1
+			else :
+				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+				# self.ball.direction_z = -1
+				self.ball.direction_x = -1
 			self.ball.speed += 0.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
@@ -143,38 +168,59 @@ def start_game(num):
 def game_master(game):
 	game.send_all("gameState", game.to_json())
 	time.sleep(0.05)
-	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
-	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
+	game.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "30"})
+	game.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "30"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
 			if action == "right":
-				if game.players[playerID].pad_x  < 16.5 and playerID == 0:
+				if game.players[playerID].pad_x  < 27.5 and playerID == 0:
 					game.players[playerID].pad_x += 0.8
-					if game.players[playerID].pad_x  > 16.0 :
-							game.players[playerID].pad_x = 16
-				if game.players[playerID].pad_x  > -16.5 and playerID == 1:
+					if game.players[playerID].pad_x  > 27 :
+							game.players[playerID].pad_x = 27
+				if game.players[playerID].pad_x  > -27.5 and playerID == 1:
 					game.players[playerID].pad_x -= 0.8
-					if game.players[playerID].pad_x  < -16.0:
-							game.players[playerID].pad_x = -16
+					if game.players[playerID].pad_x  < -27:
+							game.players[playerID].pad_x = -27
+				if  playerID == 2:
+					game.players[playerID].pad_z += 0.8
+					if game.players[playerID].pad_z  > 27 :
+							game.players[playerID].pad_z = 27
+				if  playerID == 3:
+					game.players[playerID].pad_z -= 0.8
+					if game.players[playerID].pad_z  < -27:
+							game.players[playerID].pad_z = -27
 			elif action == "left":
-				if game.players[playerID].pad_x  > -16.5 and playerID == 0:
+				if game.players[playerID].pad_x  > -27.5 and playerID == 0:
 					game.players[playerID].pad_x -= 0.8
-					if game.players[playerID].pad_x  < -16.0:
-							game.players[playerID].pad_x = -16
-				if game.players[playerID].pad_x  < 16.5 and playerID == 1:
+					if game.players[playerID].pad_x  < -27:
+							game.players[playerID].pad_x = -27
+				if game.players[playerID].pad_x  < 27.5 and playerID == 1:
 					game.players[playerID].pad_x += 0.8
-					if game.players[playerID].pad_x  > 16.0 :
-						game.players[playerID].pad_x = 16
+					if game.players[playerID].pad_x  > 27 :
+						game.players[playerID].pad_x = 27
+				if  playerID == 2:
+					game.players[playerID].pad_z -= 0.8
+					if game.players[playerID].pad_z  < -27:
+							game.players[playerID].pad_z = -27
+				if  playerID == 3:
+					game.players[playerID].pad_z += 0.8
+					if game.players[playerID].pad_z  > 27 :
+						game.players[playerID].pad_z = 27
+
 		time.sleep(0.05)
 		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
 		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
-		game.wallCollideTwoPlayer()
+		game.wallCollideFourPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
+		game.rebound_z(2)
+		game.rebound_z(3)
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
-			if player.score  > 9 :
+			if player.score  < 1 :
 				game.end_game()
 				return
 
@@ -249,7 +295,7 @@ class websocket_client(WebsocketConsumer):
 		logging.info(user.id)
 		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
-		start_game(2)
+		start_game(4)
 	
 	def find_game(self):
 		global game_list
