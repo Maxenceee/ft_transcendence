@@ -9,7 +9,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
 	let counter = 0
-	let socket = new Socket({path: "/game_classic"});
+	let socket = new Socket({path: "/game_4player"});
 	let playerNumber = -1;
 	let connectionStatus = 0;
 	socket.onconnection(() => {
@@ -297,58 +297,60 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		scene.add(palletPlayer1, palletPlayer2);
 
 
-		// function createTextObject(msg) {
-		// 	let textObj
+		function createTextObject(msg) {
+			let textObj
 	
-		// 	textGeo = new TextGeometry( msg , {
+			textGeo = new TextGeometry( msg , {
 	
-		// 		font: font,
+				font: font,
 	
-		// 		size: 10,
-		// 		height: 0.5,
-		// 		curveSegments: 2,
+				size: 10,
+				height: 0.5,
+				curveSegments: 2,
 	
-		// 		bevelThickness: 0.1,
-		// 		bevelSize: 0.01,
-		// 		bevelEnabled: true
+				bevelThickness: 0.1,
+				bevelSize: 0.01,
+				bevelEnabled: true
 	
-		// 	} );
-		// 	textObj = new THREE.Mesh( textGeo, materials)
+			} );
+			textObj = new THREE.Mesh( textGeo, materials)
 	
-		// 	return textObj;
-		// }
-	
-		// function displayScore(){
-	
-		// 	if (P1score != 0)
-		// 		scene.remove(P1score, P2score, P3score, P4score)
-		// 	P1score = createTextObject("" + score.scoreP1 + "") //Red player
-		// 	P1score.position.z += 30
-		// 	P1score.position.y += 6
-		// 	P1score.position.x += 2.5
-		// 	P1score.rotateY(Math.PI);
+			return textObj;
+		}
+		let P1score = 5
+		let P2score = 5
+		let P3score = 5
+		let P4score = 5
+		function displayScore(){
+			if (P1score != 0)
+				scene.remove(P1score, P2score, P3score, P4score)
+			P1score = createTextObject("" + score.scoreP1 + "") //Red player
+			P1score.position.z += 30
+			P1score.position.y += 6
+			P1score.position.x += 2.5
+			P1score.rotateY(Math.PI);
 	
 			
-		// 	P2score = createTextObject("" + score.scoreP2 + "") //Purple player
-		// 	P2score.position.z -= 30
-		// 	P2score.position.y += 6
-		// 	P2score.position.x -= 5
+			P2score = createTextObject("" + score.scoreP2 + "") //Purple player
+			P2score.position.z -= 30
+			P2score.position.y += 6
+			P2score.position.x -= 5
 			
 			
-		// 	P3score = createTextObject("" + score.scoreP3 + "") //Cyan player
-		// 	P3score.position.z += 2.5
-		// 	P3score.position.y += 6
-		// 	P3score.position.x -= 30
-		// 	P3score.rotateY(Math.PI*0.5);
+			P3score = createTextObject("" + score.scoreP3 + "") //Cyan player
+			P3score.position.z += 2.5
+			P3score.position.y += 6
+			P3score.position.x -= 30
+			P3score.rotateY(Math.PI*0.5);
 			
-		// 	P4score = createTextObject("" + score.scoreP4 + "") //Blue player
-		// 	P4score.position.z -= 2.5
-		// 	P4score.position.y += 6
-		// 	P4score.position.x += 30
-		// 	P4score.rotateY(-Math.PI*0.5);
+			P4score = createTextObject("" + score.scoreP4 + "") //Blue player
+			P4score.position.z -= 2.5
+			P4score.position.y += 6
+			P4score.position.x += 30
+			P4score.rotateY(-Math.PI*0.5);
 			
-		// 	scene.add(P1score, P2score, P3score, P4score)
-		// }
+			scene.add(P1score, P2score, P3score, P4score)
+		}
 	function createText(msg) {
 		scene.remove(textMesh2);
 		textGeo = new TextGeometry( msg , {
@@ -414,13 +416,15 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				// 	scene.remove(ball);
 				// 	return;
 				// }
-				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score ||
+						score.scoreP3 != data.player[2].score || score.scoreP4 != data.player[3].score))
 				{
 					score.scoreP1 = data.player[0].score;
 					score.scoreP2 = data.player[1].score;
 					score.scoreP3 = data.player[2].score;
 					score.scoreP4 = data.player[3].score;
-					createText(data.player[0].score + " : " + data.player[1].score);
+					// createText(data.player[0].score + " : " + data.player[1].score);
+					displayScore();
 				}
 			}
 		await sleep(25)

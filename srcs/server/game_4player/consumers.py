@@ -90,32 +90,32 @@ class Game:
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 		elif self.ball.x > 29 :
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
-		if self.ball.z < -29:
-			self.players[0].score -= 1
+		elif self.ball.z < -29:
+			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
 
 		elif self.ball.z > 29:
-			self.players[1].score -=1
+			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
@@ -133,12 +133,14 @@ class Game:
 			self.ball.speed = 5
 
 	def rebound_z(self, playerID):
-		if ((self.ball.x < -27 and playerID == 2) or (self.ball.x > 27 and playerID == 3)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
-			if (playerID == 2) :
-				self.ball.direction_z = (self.ball.x - self.players[playerID].pad_x)/4.5
+		if ((self.ball.x < -27 and playerID == 3) or (self.ball.x > 27 and playerID == 2)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
+			if (playerID == 3) :
+				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+				# self.ball.direction_z = -1
 				self.ball.direction_x = 1
 			else :
-				self.ball.direction_z = (self.ball.x - self.players[playerID].pad_x)/4.5
+				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+				# self.ball.direction_z = -1
 				self.ball.direction_x = -1
 			self.ball.speed += 0.1
 		if (self.ball.speed > 5) :
@@ -183,12 +185,10 @@ def game_master(game):
 					if game.players[playerID].pad_x  < -27:
 							game.players[playerID].pad_x = -27
 				if  playerID == 2:
-					logging.info("P2 right")
 					game.players[playerID].pad_z += 0.8
 					if game.players[playerID].pad_z  > 27 :
 							game.players[playerID].pad_z = 27
 				if  playerID == 3:
-					logging.info("P3 right")
 					game.players[playerID].pad_z -= 0.8
 					if game.players[playerID].pad_z  < -27:
 							game.players[playerID].pad_z = -27
@@ -202,12 +202,10 @@ def game_master(game):
 					if game.players[playerID].pad_x  > 27 :
 						game.players[playerID].pad_x = 27
 				if  playerID == 2:
-					logging.info("P2 left")
 					game.players[playerID].pad_z -= 0.8
 					if game.players[playerID].pad_z  < -27:
 							game.players[playerID].pad_z = -27
 				if  playerID == 3:
-					logging.info("P3 left")
 					game.players[playerID].pad_z += 0.8
 					if game.players[playerID].pad_z  > 27 :
 						game.players[playerID].pad_z = 27
