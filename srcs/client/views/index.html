@@ -10,6 +10,25 @@
 	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
 	<link rel="preload" as="image" href="/static/images/favicon.ico">
 	<link rel="stylesheet" href="/static/stylesheets/style.css">
+	<style>
+		body {
+			margin: 0;
+		}
+		.preload {
+			position: relative; height: 100vh; width: 100vw; flex-direction: column; display: flex; align-items: center; justify-content: center;
+		}
+		.preload .icon {
+			position: relative; height: 100px; width: 100px; border-radius: 5px; color: #24292f;
+		}
+		@media (prefers-color-scheme: dark) {
+			.preload .icon {
+				color: #c9d1d9 !important;
+			}
+		}
+		.cls-1 {
+			fill: currentColor !important;
+		}
+	</style>
 </head>
 <body class="variant">
 	<div id="root">
