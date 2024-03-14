@@ -72,6 +72,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	var score = {
 		scoreP1: 0,
 		scoreP2: 0,
+		scoreP3: 0,
+		scoreP4: 0,
 	};
 
 	function loadFont() {
@@ -95,13 +97,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	ball
 	function initiateMapFourPlayer()
 	{
-		score.scoreP1 = 5
-		score.scoreP2 = 5
-		score.scoreP3 = 5
-		score.scoreP4 = 5
-		/// temporary for dev purpose///
-		/// temporary for dev purpose///
-		
+	
 		mapLenth = 60;	
 		mapWidth = 60;
 		palletPlayer1 = new THREE.Mesh( 
@@ -298,6 +294,59 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	if (palletPlayer1 != 0)
 		scene.add(palletPlayer1, palletPlayer2);
 
+
+		// function createTextObject(msg) {
+		// 	let textObj
+	
+		// 	textGeo = new TextGeometry( msg , {
+	
+		// 		font: font,
+	
+		// 		size: 10,
+		// 		height: 0.5,
+		// 		curveSegments: 2,
+	
+		// 		bevelThickness: 0.1,
+		// 		bevelSize: 0.01,
+		// 		bevelEnabled: true
+	
+		// 	} );
+		// 	textObj = new THREE.Mesh( textGeo, materials)
+	
+		// 	return textObj;
+		// }
+	
+		// function displayScore(){
+	
+		// 	if (P1score != 0)
+		// 		scene.remove(P1score, P2score, P3score, P4score)
+		// 	P1score = createTextObject("" + score.scoreP1 + "") //Red player
+		// 	P1score.position.z += 30
+		// 	P1score.position.y += 6
+		// 	P1score.position.x += 2.5
+		// 	P1score.rotateY(Math.PI);
+	
+			
+		// 	P2score = createTextObject("" + score.scoreP2 + "") //Purple player
+		// 	P2score.position.z -= 30
+		// 	P2score.position.y += 6
+		// 	P2score.position.x -= 5
+			
+			
+		// 	P3score = createTextObject("" + score.scoreP3 + "") //Cyan player
+		// 	P3score.position.z += 2.5
+		// 	P3score.position.y += 6
+		// 	P3score.position.x -= 30
+		// 	P3score.rotateY(Math.PI*0.5);
+			
+		// 	P4score = createTextObject("" + score.scoreP4 + "") //Blue player
+		// 	P4score.position.z -= 2.5
+		// 	P4score.position.y += 6
+		// 	P4score.position.x += 30
+		// 	P4score.rotateY(-Math.PI*0.5);
+			
+		// 	scene.add(P1score, P2score, P3score, P4score)
+		// }
 	function createText(msg) {
 		scene.remove(textMesh2);
 		textGeo = new TextGeometry( msg , {
