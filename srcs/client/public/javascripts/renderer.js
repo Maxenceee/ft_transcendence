@@ -830,7 +830,7 @@ class Main extends Component {
     }
 
 	loadUser() {
-		fetch('http://localhost:3000/api/user/me/get', {
+		fetch('/api/user/me/get', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
