@@ -132,6 +132,18 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+	def rebound_x(self, playerID):
+		if ((self.ball.x < -27 and playerID == 2) or (self.ball.x > 27 and playerID == 3)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.x > (self.players[playerID].pad_z - 4.5)):
+			if (playerID == 1) :
+				self.ball.direction_z = (self.ball.x - self.players[playerID].pad_x)/4.5
+				self.ball.direction_x = 1
+			else :
+				self.ball.direction_z = (self.ball.x - self.players[playerID].pad_x)/4.5
+				self.ball.direction_x = -1
+			self.ball.speed += 0.1
+		if (self.ball.speed > 5) :
+			self.ball.speed = 5
+
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
 	if len(waiting_list) == num:
@@ -154,10 +166,10 @@ def start_game(num):
 def game_master(game):
 	game.send_all("gameState", game.to_json())
 	time.sleep(0.05)
-	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
-	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
-	game.send(2, "setCam", {"x" : "-60", "y" : "30", "z" : "30"})
-	game.send(3, "setCam", {"x" : "60", "y" : "30", "z" : "30"})
+	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
+	game.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "30"})
+	game.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "30"})
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
@@ -170,11 +182,13 @@ def game_master(game):
 					game.players[playerID].pad_x -= 0.8
 					if game.players[playerID].pad_x  < -27:
 							game.players[playerID].pad_x = -27
-				if game.players[playerID].pad_z  < 27.5 and playerID == 2:
+				if  playerID == 2:
+					logging.info("P2 right")
 					game.players[playerID].pad_z += 0.8
 					if game.players[playerID].pad_z  > 27 :
 							game.players[playerID].pad_z = 27
-				if game.players[playerID].pad_z  > -27.5 and playerID == 3:
+				if  playerID == 3:
+					logging.info("P3 right")
 					game.players[playerID].pad_z -= 0.8
 					if game.players[playerID].pad_z  < -27:
 							game.players[playerID].pad_z = -27
@@ -187,11 +201,13 @@ def game_master(game):
 					game.players[playerID].pad_x += 0.8
 					if game.players[playerID].pad_x  > 27 :
 						game.players[playerID].pad_x = 27
-				if game.players[playerID].pad_z  > -27.5 and playerID == 2:
+				if  playerID == 2:
+					logging.info("P2 left")
 					game.players[playerID].pad_z -= 0.8
 					if game.players[playerID].pad_z  < -27:
 							game.players[playerID].pad_z = -27
-				if game.players[playerID].pad_z  < 27.5 and playerID == 3:
+				if  playerID == 3:
+					logging.info("P3 left")
 					game.players[playerID].pad_z += 0.8
 					if game.players[playerID].pad_z  > 27 :
 						game.players[playerID].pad_z = 27
@@ -202,6 +218,8 @@ def game_master(game):
 		game.wallCollideFourPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
+		game.rebound_z(2)
+		game.rebound_z(3)
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  < 1 :

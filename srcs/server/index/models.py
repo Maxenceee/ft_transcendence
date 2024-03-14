@@ -60,7 +60,7 @@ class Game_history(models.Model):
 	id = models.AutoField(primary_key=True)
 	date = models.DateTimeField(auto_now_add=True)
 	type = models.CharField(max_length=100) #2v2, 4v4, tournament
-	data = models.CharField(max_length=100) #[{"id": ",lkfvjl", "score": 12}, {"id": ",lkfvjl", "score": 12}]
+	data = models.CharField(max_length=1000) #[{"id": ",lkfvjl", "score": 12}, {"id": ",lkfvjl", "score": 12}]
 
 	def __str__(self):
 		return str(self.id)

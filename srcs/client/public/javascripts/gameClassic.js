@@ -32,6 +32,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball.position.z = data.ball.z;			
 				palletPlayer1.position.x = data.player[0].x;
 				palletPlayer2.position.x = data.player[1].x;
+				palletPlayer3.position.z = data.player[2].z;
+				palletPlayer4.position.z = data.player[3].z;
 			}
 			else if (msg.type == "resetCam")
 				setcam(10, 69, 0);
@@ -380,11 +382,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 	
 	let data = {
-		number : [2],
 		ball : ball.position,
 		ballDirection : ballDirection,
 		P1position : palletPlayer1.position,
 		P2position : palletPlayer2.position,
+		P3position : palletPlayer3.position,
+		P4position : palletPlayer4.position,
 		score : score,
 		updateScore : 0,
 		moveSpeed : moveSpeed,
@@ -415,6 +418,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				{
 					score.scoreP1 = data.player[0].score;
 					score.scoreP2 = data.player[1].score;
+					score.scoreP3 = data.player[2].score;
+					score.scoreP4 = data.player[3].score;
 					createText(data.player[0].score + " : " + data.player[1].score);
 				}
 			}
