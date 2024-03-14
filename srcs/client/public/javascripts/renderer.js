@@ -511,6 +511,103 @@ class HomePage extends Component {
 	}
 }
 
+class UserPagePlayerStats extends Component {
+	constructor(props) {
+		super(props);
+		this.state = { user: props.user };
+	}
+
+	isWinner(data) {
+		data = data.map(e => {
+			let p = e.data.sort((a, b) => a.score < b.score);
+			return p[0].id == this.state.user.id;
+		});
+		return data;
+	}
+
+	getWinRate(data) {
+		let n = this.isWinner(data.filter(e => e.type === "2v2"));
+		let f = this.isWinner(data.filter(e => e.type === "4v4"));
+		let t = this.isWinner(data.filter(e => e.type === "tournament"));
+		return ({
+			normal: {
+				total: n.length,
+				wr: n.length > 0 ? ((n.filter(e => e).length / n.length) * 100).toFixed(0)+"%" : "none",
+			},
+			four: {
+				total: f.length,
+				wr: f.length > 0 ? ((f.filter(e => e).length / f.length) * 100).toFixed(0)+"%" : "none",
+			},
+			tournament: {
+				total: t.length,
+				wr: t.length > 0 ? ((t.filter(e => e).length / t.length) * 100).toFixed(0)+"%" : "none",
+			},
+		})
+	}
+
+	render() {
+		let data = this.getWinRate(this.state.user.game_history);
+		console.log(data);
+		return createElement('div', {
+			class: "stat-card-content", children: [
+				createElement('div', {
+					class: "stat-group w-full", children: [
+						createElement('h1', {
+							children: "Normal"
+						}),
+						createElement('p', {
+							class: "note", children: "<count> Played".replace("<count>", data.normal.total)
+						}),
+						createElement('p', {
+							class: "note", children: "WR: <per>".replace("<per>", data.normal.wr)
+						}),
+						createElement('div', {
+							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.normal.wr), children: [
+								createElement('div', {}), createElement('div', {})
+							]
+						})
+					]
+				}),
+				createElement('div', {
+					class: "stat-group w-full", children: [
+						createElement('h1', {
+							children: "4 Players"
+						}),
+						createElement('p', {
+							class: "note", children: "<count>  Played".replace("<count>", data.four.total)
+						}),
+						createElement('p', {
+							class: "note", children: "WR: <per>".replace("<per>", data.four.wr)
+						}),
+						createElement('div', {
+							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.four.wr), children: [
+								createElement('div', {}), createElement('div', {})
+							]
+						})
+					]
+				}),
+				createElement('div', {
+					class: "stat-group w-full", children: [
+						createElement('h1', {
+							children: "Tournament"
+						}),
+						createElement('p', {
+							class: "note", children: "<count>  Played".replace("<count>", data.tournament.total)
+						}),
+						createElement('p', {
+							class: "note", children: "WR: <per>".replace("<per>", data.tournament.wr)
+						}),
+						createElement('div', {
+							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.tournament.wr), children: [
+								createElement('div', {}), createElement('div', {})
+							]
+						})
+					]
+				})
+			]
+		})
+	}
+}
 class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
@@ -528,13 +625,13 @@ class UserPagePlayerHistory extends Component {
 				class: "history-card-content", children: (
 					(this.state.user.game_history && this.state.user.game_history.length) ?
 					this.state.user.game_history.sort((a, b) => a.date > b.date).map(game => {
-						let p = game.data.sort((a, b) => a.score < b.score);
-						console.log(p);
+						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1)[0].id == this.state.user.id;
+						let s = game.data.sort((_, b) => b.id == this.state.user.id);
 						if (game.type === "2v2") {
 							return createElement('div', {
 								class: "history-row", children: [
 									(
-										p[0].id == this.state.user.id ?
+										p ?
 										createElement('div', {
 											class: "win", children: "Victory"
 										})
@@ -544,7 +641,7 @@ class UserPagePlayerHistory extends Component {
 										})
 									),
 									createElement('div', {
-										class: "note score", children: "".concat(p[0].score, " - ", p[1].score)
+										class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
 									}),
 									createElement('div', {
 										class: "type", children: "Normal"
@@ -555,7 +652,7 @@ class UserPagePlayerHistory extends Component {
 							return createElement('div', {
 								class: "history-row", children: [
 									(
-										p[0].id == this.state.user.id ?
+										p ?
 										createElement('div', {
 											class: "win", children: "Victory"
 										})
@@ -573,7 +670,7 @@ class UserPagePlayerHistory extends Component {
 					})
 					:
 					createElement('div', {children:
-						createElement('p', {children: "No game played yet", style: "text-align: center;"})
+						createElement('p', {children: "No game played yet", style: "text-align: center; margin-bottom: 10px;"})
 					})
 				)
 			})
@@ -629,79 +726,7 @@ class UserPage extends Component {
 															children: "Statistics"
 														})
 													}),
-													createElement('div', {
-														class: "stat-card-content", children: [
-															createElement('div', {
-																class: "stat-group w-full", children: [
-																	createElement('h1', {
-																		children: "Normal"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "20 Played"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "WR: 55%"
-																	}),
-																	createElement('div', {
-																		class: "progress-bar", style: "--value: 55%;", children: [
-																			createElement('div', {
-																				
-																			}),
-																			createElement('div', {
-																				
-																			})
-																		]
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "stat-group w-full", children: [
-																	createElement('h1', {
-																		children: "4 Players"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "1 Played"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "WR: 100%"
-																	}),
-																	createElement('div', {
-																		class: "progress-bar", style: "--value: 100%;", children: [
-																			createElement('div', {
-																				
-																			}),
-																			createElement('div', {
-																				
-																			})
-																		]
-																	})
-																]
-															}),
-															createElement('div', {
-																class: "stat-group w-full", children: [
-																	createElement('h1', {
-																		children: "Tournament"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "0 Played"
-																	}),
-																	createElement('p', {
-																		class: "note", children: "WR: none"
-																	}),
-																	createElement('div', {
-																		class: "progress-bar", style: "--value: none;", children: [
-																			createElement('div', {
-																				
-																			}),
-																			createElement('div', {
-																				
-																			})
-																		]
-																	})
-																]
-															})
-														]
-													})
+													createElement(UserPagePlayerStats, {user: this.state.user})
 												]
 											}),
 											createElement('div', {
@@ -827,7 +852,7 @@ class Main extends Component {
     }
 
 	loadUser() {
-		fetch('/api/user/me/get', {
+		fetch(((window.location.hostname == "localhost" ? "http://localhost:3000" : "") + '/api/user/me/get'), {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
