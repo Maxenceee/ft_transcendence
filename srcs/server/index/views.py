@@ -171,7 +171,7 @@ def callback_swivel(request):
 
 @login_required
 def not_found(request, url):
-	return redirect("/")
+	return render(request, 'views/index.html', {"username": request.user.nickname})
 
 @login_required
 def logout(request):
