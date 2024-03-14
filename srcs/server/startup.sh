@@ -3,7 +3,13 @@ python3 manage.py makemigrations
 
 python3 manage.py makemigrations index
 
-python3 manage.py makemigrations game
+python3 manage.py makemigrations game_2player
+
+python3 manage.py makemigrations game_4player
+
+python3 manage.py makemigrations game_AI
+
+python3 manage.py makemigrations game_2player
 
 python3 manage.py migrate
 
