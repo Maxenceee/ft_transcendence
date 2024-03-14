@@ -91,6 +91,7 @@ class Component {
 
 	setState(newState, callback) {
 		this._pendingState = Object.assign({}, this.state, newState);
+		console.log("this._pendingState", this._pendingState);
 		if (callback) {
 			this._pendingStateCallbacks.push(callback);
 		}
@@ -101,6 +102,19 @@ class Component {
 		this._parent = parent;
 	}
 
+	// useState(initialState) {
+	// 	if (!this._state) {
+	// 		this._state = initialState;
+	// 	}
+
+	// 	const setState = (newState) => {
+	// 		this._state = Object.assign({}, this._state, newState);
+	// 		this._updateComponent();
+	// 	};
+
+	// 	return [this._state, setState];
+	// }
+
 	_updateComponent() {
 		let node;
 		if (!this._pendingState) return;
@@ -108,11 +122,13 @@ class Component {
 		this.state = this._pendingState;
 		this._pendingState = null;
 
-		const oldElement = this._element && this._element.element || null;
+		console.log("this.state, this._pendingState", this.state, this._pendingState, this);
+
+		const oldElement = this._element && this._element || null;
 		const newElement = this.render();
 		console.log("reloading element", this, oldElement, newElement);
-		if (node = (this._parent || (oldElement && oldElement.parentNode))) {
-			node.replaceChild(newElement, oldElement);
+		if (node = (this._parent || (oldElement && oldElement._element.parentNode))) {
+			node.replaceChild(newElement._element, oldElement._element);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
@@ -123,6 +139,7 @@ class Component {
 		} else {
 			this.componentDidUpdate();
 		}
+		this._element = newElement;
 	}
 
 	render() {
@@ -155,12 +172,15 @@ function createElement(type, props = {}) {
 		let jv = function(c) {
 			if (c instanceof Component) {
 				console.log("c instanceof Component", c);
-				(c = c.render()) && (c instanceof HTMLElement ? element.appendChild(c) : element.appendChild(c.render()));
-			} else if (typeof c === 'string') {
+				t = c;
+				c = c.render(); //&& (c instanceof HTMLElement ? element.appendChild(c) : element.appendChild(c.render()));
+				t._element = c;
+				console.log("c instanceof Component", c);
+			}
+			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
-				(c = c.render() || c);
-				element.appendChild(c);
+				c && element.appendChild(c.render());
 			}
 		}
 		Object.keys(props).forEach(key => {
@@ -180,7 +200,7 @@ function createElement(type, props = {}) {
 		});
 		return {
 			data: props,
-			element: element,
+			_element: element,
 			render() {
 				return element;
 			}
@@ -193,8 +213,13 @@ class Router extends Component {
 		super(props);
 		console.log(this);
 		this.state = { route: window.location.pathname };
+		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
-			this.setState({ route: window.location.pathname });
+			const newRoute = window.location.pathname;
+			if (newRoute !== this.previousRoute) {
+				this.setState({ route: newRoute });
+				this.previousRoute = newRoute;
+			}
 		});
 	}
 
@@ -209,7 +234,8 @@ class Router extends Component {
 		} else {
 			this._element = null;
 		}
-		return (this._element && this._element.render() || null);
+		// console.log("in render router", this, this._element);
+		return (this._element && this._element || null);
 	}
 }
 
@@ -224,6 +250,7 @@ class Route extends Component {
 		const { element } = this.props;
 
 		this._element = element.render();
+		// console.log("in render route", this, this._element);
 		return this._element;
 	}
 }
@@ -258,7 +285,7 @@ renderer.prototype.render = function(elem) {
 	this._children = elem;
 	if (this._internalRoot === null) throw Error('Unable to find root node.');
 	let element = this._children.render();
-	console.log("root element", element);
+	// console.log("root element", element);
 	// console.log(JSON.stringify(element));
 	// setParentToComponents(element);
 	this._internalRoot.appendChild(element.render());
@@ -487,7 +514,8 @@ class HomePage extends Component {
 class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
-		this.history = [...Array(Math.floor(Math.random() * 10))].fill({});
+		// this.history = [...Array(Math.floor(Math.random() * 10))].fill({});
+		this.state = { history: [...Array(Math.floor(Math.random() * 10))].fill({}) };
 	}
 
 	componentDidMount() {
@@ -498,24 +526,33 @@ class UserPagePlayerHistory extends Component {
 		console.log("this.componentDidUpdate");
 	}
 
+	onClick() {
+		console.log("click");
+		this.setState({ history: [...Array(Math.floor(Math.random() * 10))].fill({}) });
+	}
+
 	render() {
-		return createElement('div', {
-			class: "history-card-content", children: this.history.map(game => {
-				return createElement('div', {
-					class: "history-row", children: [
-						createElement('div', {
-							class: "lost", children: "Defeat"
-						}),
-						createElement('div', {
-							class: "note score", children: "6 - 10"
-						}),
-						createElement('div', {
-							class: "type", children: "Normal"
-						})
-					]
+		console.log("render user page", this);
+		return createElement('div', {children: [
+			createElement('button', { onclick: this.onClick.bind(this), children: "Reload" }),
+			createElement('div', {
+				class: "history-card-content", children: this.state.history.map(game => {
+					return createElement('div', {
+						class: "history-row", children: [
+							createElement('div', {
+								class: "lost", children: "Defeat"
+							}),
+							createElement('div', {
+								class: "note score", children: "6 - 10"
+							}),
+							createElement('div', {
+								class: "type", children: "Normal"
+							})
+						]
+					})
 				})
 			})
-		})
+		]})
 	}
 }
 
