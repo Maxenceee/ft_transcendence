@@ -88,58 +88,26 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 	let palletPlayer1 = 0;
 	let palletPlayer2 = 0;
-	let palletPlayer3 = 0;
-	let palletPlayer4 = 0;
 	let mapLenth
 	let mapWidth
-	ball
-	function initiateMapFourPlayer()
+	function initiateMapTwoPlayer(data)
 	{
-		score.scoreP1 = 5
-		score.scoreP2 = 5
-		score.scoreP3 = 5
-		score.scoreP4 = 5
-		/// temporary for dev purpose///
-		/// temporary for dev purpose///
 		
-		mapLenth = 60;	
-		mapWidth = 60;
+		mapLenth = 60;
+		mapWidth = 40;
 		palletPlayer1 = new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0xffffff, 
-				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
-				// map : player1Map 
+					color:0xffffff, 
+					opacity: 1, 
+					emissive:0xffffff,
+					side : THREE.DoubleSide,
 				})
 			);
 		palletPlayer2 = new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
-				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
-				// map : player1Map 
-				})
-			);
-		palletPlayer3 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
-				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
-				// map : player3Map 
-				})
-			);
-		palletPlayer4 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
 				opacity: 1, 
@@ -149,21 +117,21 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		);
 		let wallLeft = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0x00ffff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0x00ffff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);
 		let wallRight = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0x0000ff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0x0000ff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);
@@ -171,32 +139,26 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		wallLeft.position.x -= mapWidth/2;
 		let wallP2 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xff00ff, 
 				opacity: 1, 
 				emissive:0xff00ff,
 				side : THREE.DoubleSide,
-				})
+			})
 		);	
 		let wallP1 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe:false,
-				color: new THREE.Color("rgb(255, 0, 0)"), 
+				color:0x00ffff, 
 				opacity: 1, 
-				emissive: new THREE.Color("rgb(255, 0, 0)"),
-				
+				emissive:0x00ffff,
 				side : THREE.DoubleSide,
-				})
+			})
 		);
 		wallP1.position.z += mapLenth/2
 		wallP2.position.z -= mapLenth/2
-		
-		palletPlayer1.position.z += (mapLenth/2) - 1.5
-		palletPlayer2.position.z -= (mapLenth/2) - 1.5
-		palletPlayer3.position.x += (mapLenth/2) - 1.5
-		palletPlayer4.position.x -= (mapLenth/2) - 1.5
 
 		const geometryBall = new THREE.BoxGeometry( 1, 1, 1 );
 		const materialBall = new THREE.MeshPhysicalMaterial({
@@ -208,9 +170,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		});
 		ball = new THREE.Mesh( geometryBall, materialBall );
 
-		scene.add(wallLeft, wallRight, wallP1, wallP2, palletPlayer3, palletPlayer4, ball)
-		controls.maxDistance = 80
+		palletPlayer1.position.z += (mapLenth/2) - 1.5;
+		palletPlayer2.position.z -= (mapLenth/2) - 1.5;
+		
+		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
 	}
+
 		const params = {
 		threshold: 0,
 		strength: 0.35,
@@ -233,7 +198,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 	let moveSpeed = 1.05
 
-	initiateMapFourPlayer({})
+	initiateMapTwoPlayer({})
 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true)
@@ -245,21 +210,25 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		{
 			keyCode.left = 0
 			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 65)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
+			// socket.send({type : 'keyCode', move : "left"});
 		}
 		if (keyVar == 39)
 		{
 			keyCode.left = 0
 			keyCode.right = 1
+			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
 			keyCode.left = 1
 			keyCode.right = 0
+			// socket.send({type : 'keyCode', move : "left"})
 		}
 		if (keyVar == 82)
 		{
@@ -275,7 +244,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
-
+// 
+// 
 		if (keyVar == 68)
 			keyCode.right = 0
 		if (keyVar == 65)
@@ -343,6 +313,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		gameID : 0,
 		keyCode : keyCode
 	};
+	// socket.send({type : 0, data : data});
 	loadFont();
 
 	const animate = async () => {
@@ -357,11 +328,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 			if (data.type == "gameState")
 			{
-				// if (score.scoreP1 > 9 || score.scoreP2 > 9)
-				// {
-				// 	scene.remove(ball);
-				// 	return;
-				// }
+				if (score.scoreP1 > 9 || score.scoreP2 > 9)
+				{
+					scene.remove(ball);
+					return;
+				}
 				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
 				{
 					score.scoreP1 = data.player[0].score;
