@@ -166,6 +166,7 @@ function Is(e) {
 
 function createElement(type, props = {}) {
 	let t;
+	if (typeof props != "object") throw new Error('`props` must be an object.');
 	if (typeof type === 'function') {
 		return new type(props);
 	} else {
@@ -197,6 +198,7 @@ function createElement(type, props = {}) {
 			} else if (key.startsWith('on') && typeof props[key] === 'function') {
 				element.addEventListener(key.substring(2).toLowerCase(), props[key]);
 			} else {
+				console.log("setAttribute", key, props[key]);
 				element.setAttribute(key, props[key]);
 			}
 		});
@@ -229,7 +231,7 @@ class Router extends Component {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		const currentRoute = children.find(child => child.props.path === route);
+		const currentRoute = children.find(child => child.canRoute(route));
 		console.log("router", currentRoute, this);
 		if (currentRoute) {
 			currentRoute.active = true;
@@ -252,8 +254,9 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
-		if (this.state.route === route) return true;
+		console.log("can route", route, this.state.route, "^" + this.state.route.replace(/\*/g, '.*') + "$");
         const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
+		console.log(regex.test(route));
         return regex.test(route);
 	}
 
@@ -346,21 +349,6 @@ const App = {
  * 
  * 
  */
-
-// class Page1 extends Component {
-// 	render() {
-// 		// let route1 = route({path: "/", element: "non"});
-// 		// let route2 = route({path: "/oui", element: "oui"});
-// 		// return createElement('div', {children: [createElement('p', {children: "page 1"}), link({to: "/about", children: "click me"}), createElement('p', {children: router(route1, route2)})]});
-// 		return createElement('div', {children: [createElement('p', {children: "page 1"}), link({to: "/about", children: "click me"}), createElement('p', {children: "oui"})]});
-// 	}
-// }
-
-// class Page2 extends Component {
-// 	render() {
-// 		return createElement('div', {children: [createElement('p', {children: "page 2"}), link({to: "/", children: "click me"})]});
-// 	}
-// }
 
 class HomePage extends Component {
 	constructor(props) {
@@ -527,7 +515,6 @@ class HomePage extends Component {
 class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
-		// this.history = [...Array(Math.floor(Math.random() * 10))].fill({});
 		this.state = { user: props.user };
 		console.log(this.state);
 	}
@@ -537,7 +524,6 @@ class UserPagePlayerHistory extends Component {
 	}
 
 	render() {
-		console.log("render user page", this);
 		return createElement('div', {children: [
 			createElement('div', {
 				class: "history-card-content", children: (
@@ -753,6 +739,18 @@ class Loader extends Component {
 	}
 }
 
+class NotFound extends Component {
+	render() {
+		return createElement("div", {children: [
+				createElement("p", {children:
+					"Page not found"
+				}),
+				link({to: "/", children: "Go back to home"})
+			]
+		});
+	}
+}
+
 class BadConnection extends Component {
 	render() {
 		return createElement('div', {
@@ -849,9 +847,7 @@ class Main extends Component {
 
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
-		setTimeout(() => {
-			this.loadUser();
-		}, 1500);
+		this.loadUser();
 	}
 
     render() {
@@ -914,7 +910,7 @@ class Main extends Component {
 						router(
 							route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 							route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
-							// route({path: "*", element: createElement(NotFound)})
+							route({path: "*", element: createElement(NotFound)})
 						)
 					})
 				]
