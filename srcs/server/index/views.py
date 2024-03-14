@@ -9,6 +9,14 @@ import os
 import requests
 import urllib.parse
 
+def get_new_default_profile_picture():
+	try:
+		response = requests.get("https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/new")
+		response = response.json()
+		return response['content']
+	except:
+		return None
+
 def makeid(length):
 	return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
@@ -19,7 +27,7 @@ def index(request):
 
 @login_required
 def user_page(request, id):
-	return render(request, 'views/user.html', {"username": request.user.nickname})
+	return render(request, 'views/user.html', {"username": request.user.nickname, "user_profile_picture": request.user.default_profile_picture})
 
 @login_required
 def get_user(request, id):
@@ -67,7 +75,12 @@ def signup(request):
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=username, username=username, password=password)
+
+		default_profile_picture = get_new_default_profile_picture()
+		if (default_profile_picture == None):
+			logging.error("Failed to get default profile picture")
+			default_profile_picture = ""
+		user = User.objects.create(id=id, nickname=username, username=username, password=password, default_profile_picture=default_profile_picture)
 		response = redirect("/")
 
 		token = makeid(100)
@@ -94,18 +107,21 @@ def callback_intra(request):
 		response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 		response = response.json()
 		access_token = response['access_token']
-		intra_id = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
-		intra_id = intra_id.json()
-		intra_id = intra_id['login']
+		intra_data = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
+		intra_data = intra_data.json()
+		intra_id = intra_data['login']
+		default_profile_picture = intra_data['image']['versions']['medium']
 	except:
 		return redirect("/login")
 	if not User.objects.filter(intra_id=intra_id).exists():
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id)
+
+		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(intra_id=intra_id)
+
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
@@ -129,18 +145,21 @@ def callback_swivel(request):
 		response = requests.post(f"https://auth0.maxencegama.dev/o/auth/access_token?{query_string}")
 		response = response.json()
 		access_token = response['access_token']
-		swivel_id = requests.get('https://api.maxencegama.dev/user/user.full', headers={'Authorization': f'Bearer {access_token}'})
-		swivel_id = swivel_id.json()
-		swivel_id = swivel_id['username']
+		swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
+		swivel_data = swivel_data.json()
+		swivel_id = swivel_data['username']
+		default_profile_picture = swivel_data['profile_picture']
 	except:
 		return redirect("/login")
 	if not User.objects.filter(swivel_id=swivel_id).exists():
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
-		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id)
+
+		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
+
 	response = redirect("/")
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
