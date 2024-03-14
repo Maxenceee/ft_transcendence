@@ -198,7 +198,6 @@ function createElement(type, props = {}) {
 			} else if (key.startsWith('on') && typeof props[key] === 'function') {
 				element.addEventListener(key.substring(2).toLowerCase(), props[key]);
 			} else {
-				console.log("setAttribute", key, props[key]);
 				element.setAttribute(key, props[key]);
 			}
 		});
