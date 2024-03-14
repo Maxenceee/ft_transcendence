@@ -31,7 +31,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "website", "trace.maxencegama.dev", "tracendance.tech"]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", "https://trace.maxencegama.dev", "https://tracendance.tech"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:3001", "http://website:3000", "https://trace.maxencegama.dev", "https://tracendance.tech"]
 
 # Application definition
 
