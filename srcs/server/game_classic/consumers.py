@@ -132,7 +132,7 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
-	def rebound_x(self, playerID):
+	def rebound_z(self, playerID):
 		if ((self.ball.x < -27 and playerID == 2) or (self.ball.x > 27 and playerID == 3)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.x > (self.players[playerID].pad_z - 4.5)):
 			if (playerID == 1) :
 				self.ball.direction_z = (self.ball.x - self.players[playerID].pad_x)/4.5
