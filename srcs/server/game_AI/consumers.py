@@ -36,10 +36,17 @@ class AIPlayer:
 		while self.running:
 			ball_x = self.game.ball.x
 			pad_x = self.game.players[1].pad_xP2
+#			dif = pad_x - ball_x
+#			if dif >= 0:
+#				for i in range(dif):
+#					self.game.queue.put([dif, "left"])
+#			else:
+#				for i in range(-dif):
+#					self.game.queue.put([-dif, "right"])
 			if ball_x > pad_x:
-				self.game.queue.put([1, "right"])
-			elif ball_x < pad_x:
 				self.game.queue.put([1, "left"])
+			elif ball_x < pad_x:
+				self.game.queue.put([1, "right"])
 			time.sleep(1)  
 
 
@@ -190,7 +197,6 @@ def game_master(game):
 	ai_player = AIPlayer(game)
 	ai_player.start()
 	while True:
-		logging.info(game.ball.direction_x)
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
 			if action == "right":
