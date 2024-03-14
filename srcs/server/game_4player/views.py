@@ -5,8 +5,8 @@ from index.decorators import *
 # Create your views here.
 
 @login_required
-def game_classic(request):
-	return render(request, 'views/game.html')
+def game_4player(request):
+	return render(request, 'views/game4.html')
 
 @login_required
 def not_found(request, url):
