@@ -5,7 +5,7 @@ from index.decorators import *
 # Create your views here.
 
 @login_required
-def game_classic(request):
+def game_2player(request):
 	return render(request, 'views/game.html')
 
 @login_required
