@@ -528,8 +528,8 @@ class UserPagePlayerStats extends Component {
 	}
 
 	getWinRate(data) {
-		let n = this.isWinner(data.filter(e => e.type === "2v2"));
-		let f = this.isWinner(data.filter(e => e.type === "4v4"));
+		let n = this.isWinner(data.filter(e => e.type === "2p"));
+		let f = this.isWinner(data.filter(e => e.type === "4p"));
 		let t = this.isWinner(data.filter(e => e.type === "tournament"));
 		console.log(n, f, t);
 		return ({
@@ -627,10 +627,10 @@ class UserPagePlayerHistory extends Component {
 			createElement('div', {
 				class: "history-card-content", children: (
 					(this.state.user.game_history && this.state.user.game_history.length) ?
-					this.state.user.game_history.sort((a, b) => a.date > b.date).map(game => {
+					this.state.user.game_history.sort((a, b) => a.date < b.date).map(game => {
 						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1)[0].id == this.state.user.id;
 						let s = game.data.sort((_, b) => b.id == this.state.user.id);
-						if (game.type === "2v2") {
+						if (game.type === "2p") {
 							return createElement('div', {
 								class: "history-row", children: [
 									(

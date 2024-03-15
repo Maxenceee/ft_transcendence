@@ -1855,6 +1855,7 @@ body:has(.connection-page) {
 }
 .history-row .win,
 .history-row .lost,
+.history-row .draw,
 .history-row .type {
   font-size: 16px;
   font-weight: 500;
@@ -1864,6 +1865,9 @@ body:has(.connection-page) {
 }
 .history-row .lost {
   color: red;
+}
+.history-row .draw {
+  color: blue;
 }
 .history-row .score {
   font-size: 15px;

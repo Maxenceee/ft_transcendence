@@ -2122,6 +2122,7 @@ body:has(.connection-page) {
 
 	.win,
 	.lost,
+	.draw,
 	.type {
 		font-size: 16px;
 		font-weight: 500;
@@ -2131,6 +2132,9 @@ body:has(.connection-page) {
 	}
 	.lost {
 		color: red;
+	}
+	.draw {
+		color: blue;
 	}
 
 	.score {
