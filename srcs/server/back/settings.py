@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 	'game_2player',
 	'game_4player',
 	'game_local',
+	'tournament',
 	'channels',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',

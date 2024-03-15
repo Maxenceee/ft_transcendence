@@ -23,5 +23,6 @@ urlpatterns = [
 	path('game/2', include('game_2player.urls')),
 	path('game/4', include('game_4player.urls')),
 	path('game/local', include('game_local.urls')),
+	path('tournament', include('tournament.urls')),
 	path('', include('index.urls')),
 ]
