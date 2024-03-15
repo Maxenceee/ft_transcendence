@@ -62,7 +62,7 @@ class Game:
 			resume_data.append({"id": player.id, "score": player.score})
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
-		Game_history.objects.create(type="4v4", data=resume_data)
+		Game_history.objects.create(type="4p", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
