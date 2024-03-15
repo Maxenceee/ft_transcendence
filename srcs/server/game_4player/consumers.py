@@ -62,7 +62,7 @@ class Game:
 			resume_data.append({"id": player.id, "score": player.score})
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
-		Game_history.objects.create(type="4v4", data=resume_data)
+		Game_history.objects.create(type="4p", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
@@ -86,13 +86,22 @@ class Game:
 	def wallCollideFourPlayer(self):
 
 		if self.ball.x < -29 :
+			if self.players[2].score <= 0 :
+				self.ball.direction_x *=-1
+				return	
 			self.players[2].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.speed = 1.05
+			if self.players[2].score <= 0:
+				self.send_all("deletePallet", {"n" : 2})
 		elif self.ball.x > 29 :
+			if self.players[3].score <= 0 :
+				self.ball.direction_x *=-1
+				return	
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -100,7 +109,12 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			if self.players[3].score <= 0:
+				self.send_all("deletePallet", {"n" : 3})
 		elif self.ball.z < -29:
+			if self.players[1].score <= 0 :
+				self.ball.direction_z *=-1
+				return	
 			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -108,8 +122,12 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
-
+			if self.players[1].score <= 0:
+				self.send_all("deletePallet", {"n" : 1})
 		elif self.ball.z > 29:
+			if self.players[0].score <= 0 :
+				self.ball.direction_z *=-1
+				return	
 			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -117,15 +135,17 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			if self.players[0].score <= 0:
+				self.send_all("deletePallet", {"n" : 0})
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
 	def rebound_x(self, playerID):
 		if ((self.ball.z < -27 and playerID == 1) or (self.ball.z > 27 and playerID == 0)) and (self.ball.x < (self.players[playerID].pad_x + 4.5)  and self.ball.x > (self.players[playerID].pad_x - 4.5)):
-			if (playerID == 1) :
+			if (playerID == 1 and self.players[1].score >= 1) :
 				self.ball.direction_x = (self.ball.x - self.players[playerID].pad_x)/4.5
 				self.ball.direction_z = 1
-			else :
+			elif (playerID == 0 and self.players[0].score >= 1) :
 				self.ball.direction_x = (self.ball.x - self.players[playerID].pad_x)/4.5
 				self.ball.direction_z = -1
 			self.ball.speed += 0.1
@@ -134,13 +154,11 @@ class Game:
 
 	def rebound_z(self, playerID):
 		if ((self.ball.x < -27 and playerID == 3) or (self.ball.x > 27 and playerID == 2)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
-			if (playerID == 3) :
+			if (playerID == 3 and self.players[3].score >= 1) :
 				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
-				# self.ball.direction_z = -1
 				self.ball.direction_x = 1
-			else :
+			elif playerID == 2 and self.players[2].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
-				# self.ball.direction_z = -1
 				self.ball.direction_x = -1
 			self.ball.speed += 0.1
 		if (self.ball.speed > 5) :
@@ -219,8 +237,11 @@ def game_master(game):
 		game.rebound_z(2)
 		game.rebound_z(3)
 		game.send_all("gameState", game.to_json())
+		i = 0
 		for player in game.players:
 			if player.score  < 1 :
+				i += 1
+			if i >= 3 :
 				game.end_game()
 				return
 

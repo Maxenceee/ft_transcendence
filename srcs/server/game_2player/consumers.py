@@ -62,7 +62,7 @@ class Game:
 			resume_data.append({"id": player.id, "score": player.score})
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
-		Game_history.objects.create(type="2v2", data=resume_data)
+		Game_history.objects.create(type="2p", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
@@ -86,9 +86,9 @@ class Game:
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1
+			self.ball.direction_x *= -1
 		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1
+			self.ball.direction_x *= -1
 		if self.ball.z < -29:
 			self.players[0].score += 1
 			self.ball.x = 0
