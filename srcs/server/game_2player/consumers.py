@@ -86,9 +86,9 @@ class Game:
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1
+			self.ball.direction_x *= -1
 		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1
+			self.ball.direction_x *= -1
 		if self.ball.z < -29:
 			self.players[0].score += 1
 			self.ball.x = 0
