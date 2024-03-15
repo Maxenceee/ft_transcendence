@@ -32,7 +32,7 @@ class AIPlayer:
 		self.running = False
 		self.thread.join()
 
-	def run(self):
+	def runEasy(self):
 		while self.running:
 			ball_x = self.game.ball.x
 			dir_z = self.game.ball.direction_z
@@ -57,7 +57,49 @@ class AIPlayer:
 						self.game.queue.put([1, "left"])
 						time.sleep(0.1)
 
-			time.sleep(1)  
+			time.sleep(1)
+
+	def run(self):
+		while self.running:
+			i = 1
+			ball_x = self.game.ball.x
+			ball_z = self.game.ball.z
+			dir_x = self.game.ball.direction_x
+			dir_z = self.game.ball.direction_z
+			pad_x = self.game.players[1].pad_xP2
+			future_ball_x = ball_x
+			future_ball_z = ball_z
+			if (dir_z == -1):
+				i = 0
+			if i == 0:
+				tmp = 1
+				while (future_ball_z >= -27):
+					future_ball_x += self.game.ball.speed * dir_x * tmp
+					future_ball_z -= self.game.ball.speed
+					if future_ball_x > 18.5 or future_ball_x <  -18.5:
+						tmp *=-1
+					i += 1
+
+			dif = pad_x - future_ball_x
+			if int(dif) >= 0 and dir_z == -1:
+				for i in range(int(dif)):
+					self.game.queue.put([1, "right"])
+					time.sleep(0.1)
+			elif dir_z == -1:
+				for i in range(int(-dif)):
+					self.game.queue.put([1, "left"])
+					time.sleep(0.1)
+			else:
+				if int(pad_x) >= 0:
+					for i in range (int(pad_x)):
+						self.game.queue.put([1, "right"])
+						time.sleep(0.1)
+				else:
+					for i in range (int(-pad_x)):
+						self.game.queue.put([1, "left"])
+						time.sleep(0.1)
+
+			time.sleep(1)
 
 
 class Ball:
