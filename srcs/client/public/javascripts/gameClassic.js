@@ -424,20 +424,20 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					displayScore();
 				}
 			}
-		await sleep(25)
-	}
-
-	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-	sleep(250).then(() => { animate(); });
-	function setcam (x, y, z) {
-		camera.position.set(x, y, z);
-	}
+			await sleep(25)
+		}
+		
+		const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+		sleep(250).then(() => { animate(); });
+		function setcam (x, y, z) {
+			camera.position.set(x, y, z);
+		}
 	function deletePallet(n){
 		console.log(n);
-		if (n == 0)
-		{
+		if (n == 0){
+			scene.remove(wallP1);
 			wallP1 = new THREE.Mesh( 
-				new THREE.BoxGeometry( 1, 1, 6 ), 
+				new THREE.BoxGeometry( mapWidth - 1 , 1, 1), 
 				new THREE.MeshStandardMaterial( {
 					wireframe:false, 
 					color:0xffffff, 
@@ -445,12 +445,14 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					emissive:0xffffff,
 					side : THREE.DoubleSide,
 				}));
+			wallP1.position.z += mapLenth/2
 			scene.add(wallP1);
 			scene.remove(palletPlayer1);
 		}
 		else if (n == 1){
+			scene.remove(wallP2);
 			wallP2 = new THREE.Mesh( 
-				THREE.BoxGeometry( mapWidth - 1 , 1, 1) 
+				new THREE.BoxGeometry( mapWidth - 1 , 1, 1),
 				new THREE.MeshStandardMaterial( {
 					wireframe:false, 
 					color:0xffffff, 
@@ -459,11 +461,13 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					side : THREE.DoubleSide,
 				}));
 			scene.add(wallP2);
+			wallP2.position.z -= mapLenth/2
 			scene.remove(palletPlayer2);
 		}
 		else if (n == 3){
+			scene.remove(wallRight);
 			wallRight = new THREE.Mesh( 
-				THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
+				new THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
 				new THREE.MeshStandardMaterial( {
 					wireframe:false, 
 					color:0xffffff, 
@@ -471,12 +475,14 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					emissive:0xffffff,
 					side : THREE.DoubleSide,
 				}));
+			wallRight.position.x += mapWidth/2;
 			scene.add(wallRight);
 			scene.remove(palletPlayer3);
 		}
 		else if (n == 2){
+			scene.remove(wallLeft);
 			wallLeft = new THREE.Mesh( 
-				THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
+				new THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
 				new THREE.MeshStandardMaterial( {
 					wireframe:false, 
 					color:0xffffff, 
@@ -484,9 +490,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					emissive:0xffffff,
 					side : THREE.DoubleSide,
 				}));
+			wallLeft.position.x -= mapWidth/2;
 			scene.add(wallLeft);
 			scene.remove(palletPlayer4);
+			}
 		}
-	}
-	console.log("cookie");
-}();
+		console.log("cookie");
+	}();
+	
