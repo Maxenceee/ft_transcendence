@@ -35,18 +35,28 @@ class AIPlayer:
 	def run(self):
 		while self.running:
 			ball_x = self.game.ball.x
+			dir_z = self.game.ball.direction_z
 			pad_x = self.game.players[1].pad_xP2
-#			dif = pad_x - ball_x
-#			if dif >= 0:
-#				for i in range(dif):
-#					self.game.queue.put([dif, "left"])
-#			else:
-#				for i in range(-dif):
-#					self.game.queue.put([-dif, "right"])
-			if ball_x > pad_x:
-				self.game.queue.put([1, "left"])
-			elif ball_x < pad_x:
-				self.game.queue.put([1, "right"])
+			dif = pad_x - ball_x
+			
+			if int(dif) >= 0 and dir_z == -1:
+				for i in range(int(dif)):
+					self.game.queue.put([1, "right"])
+					time.sleep(0.1)
+			elif dir_z == -1:
+				for i in range(int(-dif)):
+					self.game.queue.put([1, "left"])
+					time.sleep(0.1)
+			else:
+				if int(pad_x) >= 0:
+					for i in range (int(pad_x)):
+						self.game.queue.put([1, "right"])
+						time.sleep(0.1)
+				else:
+					for i in range (int(-pad_x)):
+						self.game.queue.put([1, "left"])
+						time.sleep(0.1)
+
 			time.sleep(1)  
 
 
