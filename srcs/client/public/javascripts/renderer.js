@@ -253,7 +253,6 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
-		console.log("can route", route, this.state.route, "^" + this.state.route.replace(/\*/g, '.*') + "$");
         const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
 		console.log(regex.test(route));
         return regex.test(route);
@@ -532,6 +531,7 @@ class UserPagePlayerStats extends Component {
 		let n = this.isWinner(data.filter(e => e.type === "2v2"));
 		let f = this.isWinner(data.filter(e => e.type === "4v4"));
 		let t = this.isWinner(data.filter(e => e.type === "tournament"));
+		console.log(n, f, t);
 		return ({
 			normal: {
 				total: n.length,
