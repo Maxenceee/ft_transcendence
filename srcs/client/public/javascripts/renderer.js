@@ -629,7 +629,7 @@ class UserPagePlayerHistory extends Component {
 					(this.state.user.game_history && this.state.user.game_history.length) ?
 					this.state.user.game_history.sort((a, b) => a.date > b.date ? -1 : 1).map(game => {
 						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1)[0].id == this.state.user.id;
-						let s = game.data.sort((_, b) => b.id == this.state.user.id);
+						let s = game.data.sort((_, b) => b.id == this.state.user.id ? 1 : -1);
 						if (game.type === "2p") {
 							return createElement('div', {
 								class: "history-row", children: [
