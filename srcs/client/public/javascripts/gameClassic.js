@@ -8,7 +8,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
-	let counter = 0
+
 	let socket = new Socket({path: "/game_4player"});
 	let playerNumber = -1;
 	let connectionStatus = 0;
@@ -39,6 +39,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				setcam(10, 69, 0);
 			else if (msg.type == "setCam")
 				setcam(msg.data.x, msg.data.y, msg.data.z);
+			else if (msg.type == "deletePallet")
+				deletePallet(msg.data.n);
 	});
 
 	let ball;
@@ -110,7 +112,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player1Map 
 				})
 			);
 		palletPlayer2 = new THREE.Mesh( 
@@ -121,7 +122,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player1Map 
 				})
 			);
 		palletPlayer3 = new THREE.Mesh( 
@@ -132,7 +132,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player3Map 
 				})
 			);
 		palletPlayer4 = new THREE.Mesh( 
@@ -411,11 +410,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 			if (data.type == "gameState")
 			{
-				// if (score.scoreP1 > 9 || score.scoreP2 > 9)
-				// {
-				// 	scene.remove(ball);
-				// 	return;
-				// }
 				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score ||
 						score.scoreP3 != data.player[2].score || score.scoreP4 != data.player[3].score))
 				{
@@ -423,7 +417,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					score.scoreP2 = data.player[1].score;
 					score.scoreP3 = data.player[2].score;
 					score.scoreP4 = data.player[3].score;
-					// createText(data.player[0].score + " : " + data.player[1].score);
 					displayScore();
 				}
 			}
@@ -434,6 +427,16 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	sleep(250).then(() => { animate(); });
 	function setcam (x, y, z) {
 		camera.position.set(x, y, z);
+	}
+	function deletePallet(n){
+		if (n == 0)
+			scene.remove(palletPlayer1);
+		else if (n == 1)
+			scene.remove(palletPlayer2);
+		else if (n == 3)
+			scene.remove(palletPlayer3);
+		else if (n == 2)
+			scene.remove(palletPlayer4);
 	}
 	console.log("cookie");
 }();
