@@ -1,20 +1,28 @@
-/**!
+/*!
 
 
 
- __  __                                                  ____                             
+
+
+
+ __  __                                                  ____
 |  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
 |_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
-    
 
 
 
-*/
+
+
+
+
+ */
+
 /**!
- * @author Maxence Gama, @maxencegama
- * @contact contact@maxencegama.dev
+ *   @license © Copyright 2024, All rights reserved.
+ *   @author Maxence Gama, @maxencegama
+ *   @contact contact@maxencegama.dev
  */
 
 /**
@@ -110,6 +118,7 @@ var mergeProto = function(a, b) {
 		e && (Object.setPrototypeOf ? Object.setPrototypeOf(t, e) : t.__proto__ = e)
 	}(a, b)
 };
+
 var bindPort = function(a, b) {
 	if (!isNaN(parseInt(b))) {
 		return ("//"+a+':'+b);

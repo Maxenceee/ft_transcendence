@@ -5,11 +5,11 @@
 
 
 
- __  __                                                  ____
-|  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
+ __  __												  ____
+|  \/  |   __ _  __  __   ___   _ __	 ___	___	 / ___|   __ _   _ __ ___	 __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
-|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
+|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|	\____|  \__,_| |_| |_| |_|  \__,_|
 
 
 
@@ -79,6 +79,430 @@
  ************************************************************************************************************
  */
 
+var CallBack = function() {}
+CallBack.prototype.on = function(t, e) {
+	this.listeners = this.listeners || {}
+	this.listeners[t] || (this.listeners[t] = []),
+	this.listeners[t].push(e);
+}
+CallBack.prototype.emit = function(t) {
+	for (var e = arguments.length, n = Array(e > 1 ? e - 1 : 0), o = 1; o < e; o++)
+		n[o - 1] = arguments[o];
+	if (!this.listeners)
+		return ;
+	var i = this.listeners[t];
+	i && i.length && i.forEach(function(t) {
+		return (t.apply(void 0, n));
+	})
+}
+var mergeProto = function(a, b) {
+	return function(t, e) {
+		if ("function" != typeof e && null !== e)
+			throw new TypeError("Super expression must either be null or a function, not " + typeof e);
+		t.prototype = Object.create(e && e.prototype, {
+			constructor: {
+				value: t,
+				enumerable: !1,
+				writable: !0,
+				configurable: !0
+			}
+		}),
+		e && (Object.setPrototypeOf ? Object.setPrototypeOf(t, e) : t.__proto__ = e)
+	}(a, b)
+};
+
+var bindPort = function(a, b) {
+	if (!isNaN(parseInt(b))) {
+		return ("//"+a+':'+b);
+	}
+	return ("//"+b+'.'+a);
+}
+const {toString: Yh} = Object.prototype,
+	{getPrototypeOf: n1} = Object,
+	sl = e => t => typeof t === e,
+	ku = (()=>typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : global)(),
+	pt = sl("function"),
+	vi = sl("undefined"),
+	isString = sl("string"),
+	Mu = e => !vi(e) && e !== ku,
+	ol = (e=>t=>{
+		const r = Yh.call(t);
+		return e[r] || (e[r] = r.slice(8, -1).toLowerCase())
+	})(Object.create(null)),
+	la = e=>{
+		if (ol(e) !== "object")
+			return !1;
+		const t = n1(e);
+		return (t === null || t === Object.prototype || Object.getPrototypeOf(t) === null) && !(Symbol.toStringTag in e) && !(Symbol.iterator in e)
+	}
+
+function Su(e, t) {
+	t = t.toLowerCase();
+	const r = Object.keys(e);
+	let i = r.length, a;
+	for (; i-- > 0; )
+		if (a = r[i],
+		t === a.toLowerCase())
+			return a;
+	return null
+}
+
+const isUndefined = vi,
+isArray = Array.isArray,
+forEach = function(e, t, { allOwnKeys: r = false } = {}) {
+	if (e === null || typeof e > "u")
+		return;
+	let i, a;
+	if (typeof e != "object" && (e = [e]), isArray(e))
+		for (i = 0,a = e.length; i < a; i++)
+			t.call(null, e[i], i, e);
+	else {
+		const l = r ? Object.getOwnPropertyNames(e) : Object.keys(e), o = l.length;
+		let s;
+		for (i = 0; i < o; i++)
+			s = l[i],
+			t.call(null, e[s], s, e)
+	}
+},
+extend = (e,t,r,{allOwnKeys: i}={})=>(forEach(t, (a,l)=>{
+	r && pt(a) ? e[l] = wrap(a, r) : e[l] = a
+}, {
+	allOwnKeys: i
+}), e), s5 = e=>(e.charCodeAt(0) === 65279 && (e = e.slice(1)), e),
+isPlainObject = e => {
+    if (ol(e) !== "object")
+        return !1;
+    const t = n1(e);
+    return (t === null || t === Object.prototype || Object.getPrototypeOf(t) === null) && !(Symbol.toStringTag in e) && !(Symbol.iterator in e)
+},
+merge = function() {
+    const {caseless: e} = Mu(this) && this || {},
+	t = {},
+	r = (i, a) => {
+        const l = e && Su(t, a) || a;
+        la(t[l]) && la(i) ? t[l] = merge(t[l], i) : la(i) ? t[l] = merge({}, i) : isArray(i) ? t[l] = i.slice() : t[l] = i
+    }
+    ;
+    for (let i = 0, a = arguments.length; i < a; i++)
+        arguments[i] && forEach(arguments[i], r);
+    return t
+}
+
+function wr(e, t) {
+	t = t || {};
+	const r = {};
+	function i(u, h, f) {
+		return isPlainObject(u) && isPlainObject(h) ? merge.call({
+			caseless: f
+		}, u, h) : isPlainObject(h) ? merge({}, h) : isArray(h) ? h.slice() : h
+	}
+	function a(u, h, f) {
+		if (isUndefined(h)) {
+			if (!isUndefined(u))
+				return i(void 0, u, f)
+		} else
+			return i(u, h, f)
+	}
+	function l(u, h) {
+		if (!isUndefined(h))
+			return i(void 0, h)
+	}
+	function o(u, h) {
+		if (isUndefined(h)) {
+			if (!isUndefined(u))
+				return i(void 0, u)
+		} else
+			return i(void 0, h)
+	}
+	function s(u, h, f) {
+		if (f in t)
+			return i(u, h);
+		if (f in e)
+			return i(void 0, u)
+	}
+	const d = {
+		url: l,
+		method: l,
+		data: l,
+		baseURL: o,
+		transformRequest: o,
+		transformResponse: o,
+		paramsSerializer: o,
+		timeout: o,
+		timeoutMessage: o,
+		withCredentials: o,
+		withXSRFToken: o,
+		adapter: o,
+		responseType: o,
+		xsrfCookieName: o,
+		xsrfHeaderName: o,
+		onUploadProgress: o,
+		onDownloadProgress: o,
+		decompress: o,
+		maxContentLength: o,
+		maxBodyLength: o,
+		beforeRedirect: o,
+		transport: o,
+		httpAgent: o,
+		httpsAgent: o,
+		cancelToken: o,
+		socketPath: o,
+		responseEncoding: o,
+		validateStatus: s,
+		headers: (u,h)=>a(jc(u), jc(h), !0)
+	};
+	return forEach(Object.keys(Object.assign({}, e, t)), function(h) {
+		const f = d[h] || a,
+			y = f(e[h], t[h], h);
+		isUndefined(y) && f !== s || (r[h] = y)
+	}),
+	r
+}
+
+class XHR {
+	constructor(t) {
+		this.defaults = t || {}
+	}
+
+	request(u, d) {
+		typeof u == "string" ? (d = d || {}, d.url = u) : d = u || {},
+			d = wr(this.defaults, d);
+		d.method = (d.method || this.defaults.method || "get").toLowerCase();
+		const transport = d.transport || "xhr";
+		const handler = Go[transport];
+
+		if (!handler) {
+			throw new Error(`Transport "${transport}" is not supported`);
+		}
+
+		return handler(d)
+	}
+}
+
+const Go = {
+	xhr: function(config) {
+		return new Promise(function(resolve, reject) {
+			let data = config.data;
+			const headers = config.headers || {};
+
+			const xhr = new XMLHttpRequest();
+
+			xhr.open(config.method.toUpperCase(), config.url, true);
+			xhr.timeout = config.timeout;
+
+			xhr.onload = function() {
+				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
+				function transformResponse (t) {
+					const a = this.responseType === "json";
+					if (t && isString(t) && (!this.responseType)) {
+						const o = a;
+						try {
+							return JSON.parse(t)
+						} catch (s) {
+							throw o ? new Error("Unable to parse JSON data") : s
+						}
+					}
+					return t
+				}
+				const responseData = {
+					data: transformResponse(xhr.response),
+					status: xhr.status,
+					statusText: xhr.statusText,
+					headers: responseHeaders,
+					config: config,
+					request: xhr
+				};
+				resolve(responseData);
+			};
+
+			xhr.onerror = function() {
+				reject(new Error("Network Error"));
+			};
+
+			xhr.ontimeout = function() {
+				reject(new Error(config.timeoutErrorMessage || "Timeout exceeded"));
+			};
+
+			Object.keys(headers).forEach(function(key) {
+				xhr.setRequestHeader(key, headers[key]);
+			});
+			isUndefined(config.withCredentials) || (xhr.withCredentials = !!config.withCredentials);
+
+			xhr.send(data);
+		});
+	},
+	http: function(config) {
+		throw new Error("HTTP transport is not implemented");
+	}
+};
+
+function parseHeaders(headers) {
+	const r = {};
+	if (!headers) {
+		return r;
+	}
+	headers.trim().split('\n').forEach(function(line) {
+		const [key, ...values] = line.split(':');
+		const t = key.trim();
+		if (t) {
+			r[t] = values.join(':').trim();
+		}
+	});
+	return r;
+}
+
+forEach(["delete", "get", "head", "options"], function(t) {
+	XHR.prototype[t] = function(r, i) {
+		return this.request(wr(i || {}, {
+			method: t,
+			url: r,
+			data: (i || {}).data
+		}))
+	}
+});
+
+forEach(["post", "put", "patch"], function(t) {
+	function r(i) {
+		return function(l, o, s) {
+			return this.request(wr(s || {}, {
+				method: t,
+				headers: i ? {
+					"Content-Type": "multipart/form-data"
+				} : {},
+				url: l,
+				data: o
+			}))
+		}
+	}
+	XHR.prototype[t] = r(),
+	XHR.prototype[t + "Form"] = r(!0)
+});
+
+function wrap(e, t) {
+	return function() {
+		return e.apply(t, arguments)
+	}
+}
+
+function Bu(e) {
+	const t = new XHR(e),
+		r = wrap(XHR.prototype.request, t);
+	return extend(r, XHR.prototype, t, {
+		allOwnKeys: !0
+	}),
+	extend(r, t, null, {
+		allOwnKeys: !0
+	}),
+	r.create = function(a) {
+		return Bu(wr(e, a))
+	},
+	r
+}
+const xhrsum = Bu({
+	timeout: 0,
+	maxContentLength: -1,
+	maxBodyLength: -1,
+	env: {
+		FormData: typeof FormData < "u" ? FormData : null,
+		Blob: typeof Blob < "u" ? Blob : null
+	},
+});
+
+xhrsum.default = xhrsum;
+const xhr = xhrsum;
+
+/**
+ * TODO:
+ * Improve the code
+ */
+var Socket = function({port = 3000, host = window.location.hostname, path = "/"}) {
+	if (!(this instanceof Socket)) {
+		throw new Error("Socket must be instanciated with new keyword");
+	}
+	if (typeof port !== "number" || typeof host !== "string" || typeof path !== "string") {
+		throw new Error("Socket must be instanciated with an object containing port, host and path");
+	}
+	if (port < 0 || port > 65535) {
+		throw new Error("Port must be a valid port number");
+	}
+	if (host.length < 3) {
+		throw new Error("Host must be a valid domain name");
+	}
+	if (path.length < 1) {
+		throw new Error("Path must be a valid path");
+	}
+	this.callBack = null;
+
+	try {
+		let sp = port.toString(),
+			hr = [host];
+		let WSProtocol = (location.protocol === 'https:') ? 'wss:' : 'ws:',
+			WSHost = (host === 'localhost') ? bindPort(hr[0], sp) : hr[0],
+			spath = WSProtocol.concat(WSHost, path);
+		this.socket = new WebSocket(spath);
+	} catch (error) {
+		throw new Error("Could not open socket with server");
+	}
+	
+	this.socket.onerror = (error) => {
+		throw new Error("Server is not available, please try again later.");
+	}
+
+	this.socket.onopen = () => this.emit('connection');
+
+	this.socket.onmessage = (message) => {
+		try {
+			let msg = this.p(message.data);
+			if (!this.callBack) throw new Error("No callback function defined");
+			this.callBack(msg);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	this.socket.onclose = () => this.emit('close');
+};
+mergeProto(Socket, CallBack);
+var s = Socket.prototype;
+s.j = function(a) {
+	return JSON.stringify(a);
+};
+s.p = function(a) {
+	return JSON.parse(a);
+};
+s.end = function() {
+	this.delete();
+};
+s.send = function(a) {
+	if (this.socket.readyState !== 1) {
+		console.error("Socket is not ready to send data");
+		return;
+	}
+	this.socket.send(this.j(a));
+};
+s.delete = function() {
+	this.socket.close();
+	delete this
+}
+s.onconnection = function(a) {
+	if (typeof a !== "function") {
+		throw new Error("Callback must be a function");
+	}
+	this.on('connection', a);
+};
+s.onclose = function(a) {
+	if (typeof a !== "function") {
+		throw new Error("Callback must be a function");
+	}
+	this.on('close', a);
+};
+s.use = function(fn) {
+	if (typeof fn !== "function") {
+		throw new Error("Callback must be a function");
+	}
+	this.callBack = fn;
+}
+
 class Component {
 	constructor(props) {
 		this.props = props || {};
@@ -145,7 +569,7 @@ class Component {
 	}
 
 	render() {
-		throw new Error('La méthode render doit être implémentée');
+		throw new Error('Render method must be implemented');
 	}
 
 	componentDidMount() {}
@@ -253,9 +677,9 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
-        const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
+		const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
 		console.log(regex.test(route));
-        return regex.test(route);
+		return regex.test(route);
 	}
 
 	render() {
@@ -298,7 +722,7 @@ let renderer = function() {
 }
 renderer.prototype.render = function(elem) {
 	this._children = elem;
-	if (this._internalRoot === null) throw Error('Unable to find root node.');
+	if (this._internalRoot === null) throw Error('Unable to find root node');
 	let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
 	console.log("root element", this, element);
 	this._children._element = element;
@@ -528,10 +952,9 @@ class UserPagePlayerStats extends Component {
 	}
 
 	getWinRate(data) {
-		let n = this.isWinner(data.filter(e => e.type === "2p"));
-		let f = this.isWinner(data.filter(e => e.type === "4p"));
-		let t = this.isWinner(data.filter(e => e.type === "tournament"));
-		console.log(n, f, t);
+		let n = data.length && this.isWinner(data.filter(e => e.type === "2p")) || [];
+		let f = data.length && this.isWinner(data.filter(e => e.type === "4p")) || [];
+		let t = data.length && this.isWinner(data.filter(e => e.type === "tournament")) || [];
 		return ({
 			normal: {
 				total: n.length,
@@ -549,8 +972,8 @@ class UserPagePlayerStats extends Component {
 	}
 
 	render() {
+		console.log("user data", this.state.user);
 		let data = this.getWinRate(this.state.user.game_history);
-		console.log(data);
 		return createElement('div', {
 			class: "stat-card-content", children: [
 				createElement('div', {
@@ -849,19 +1272,14 @@ class BadConnection extends Component {
 }		
 
 class Main extends Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 		this.state = { user: null, loading: true, error: null };
-    }
+	}
 
 	loadUser() {
-		fetch(((window.location.hostname == "localhost" ? "http://localhost:3000" : "") + '/api/user/me/get'), {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		})
-		.then(response => response.json())
+		xhr.get((window.location.hostname == "localhost" ? "http://localhost:3000" : "") + '/api/user/me/get')
+		.then(res => res.data)
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false });
@@ -877,7 +1295,7 @@ class Main extends Component {
 		this.loadUser();
 	}
 
-    render() {
+	render() {
 		console.log("main state on render", this.state);
 		return (
 			this.state.loading ?
