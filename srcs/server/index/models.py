@@ -9,6 +9,7 @@ class User(models.Model):
 	index = models.AutoField(primary_key=True)
 	id = models.CharField(max_length=10)
 	nickname = models.CharField(max_length=100)
+	is_online = models.BooleanField(default=False)
 	game_history = models.ManyToManyField('Game_history', related_name='game_history')
 	
 	username = models.CharField(max_length=100)
@@ -35,6 +36,7 @@ class User(models.Model):
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
+			"is_online": self.is_online,
 			"game_history": game_history,
 			"profile_picture": self.default_profile_picture,
 		}
