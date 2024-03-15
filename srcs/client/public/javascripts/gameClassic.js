@@ -8,7 +8,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
-	let counter = 0
+
 	let socket = new Socket({path: "/game_4player"});
 	let playerNumber = -1;
 	let connectionStatus = 0;
@@ -39,6 +39,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				setcam(10, 69, 0);
 			else if (msg.type == "setCam")
 				setcam(msg.data.x, msg.data.y, msg.data.z);
+			else if (msg.type == "deletePallet")
+				deletePallet(msg.data.n);
 	});
 
 	let ball;
@@ -96,6 +98,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	let palletPlayer4 = 0;
 	let mapLenth
 	let mapWidth
+	let wallLeft
+	let wallRight
+	let wallP2
+	let wallP1
 	ball
 	function initiateMapFourPlayer()
 	{
@@ -110,7 +116,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player1Map 
 				})
 			);
 		palletPlayer2 = new THREE.Mesh( 
@@ -121,7 +126,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player1Map 
 				})
 			);
 		palletPlayer3 = new THREE.Mesh( 
@@ -132,7 +136,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				opacity: 1, 
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
-				// map : player3Map 
 				})
 			);
 		palletPlayer4 = new THREE.Mesh( 
@@ -145,7 +148,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				side : THREE.DoubleSide,
 			})
 		);
-		let wallLeft = new THREE.Mesh(
+		wallLeft = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial( {
 				wireframe:false, 
@@ -155,7 +158,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				side : THREE.DoubleSide,
 			})
 		);
-		let wallRight = new THREE.Mesh(
+		wallRight = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe:false, 
@@ -167,7 +170,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		);
 		wallRight.position.x += mapWidth/2;
 		wallLeft.position.x -= mapWidth/2;
-		let wallP2 = new THREE.Mesh(
+		wallP2 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe:false, 
@@ -177,7 +180,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				side : THREE.DoubleSide,
 				})
 		);	
-		let wallP1 = new THREE.Mesh(
+		wallP1 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe:false,
@@ -411,11 +414,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 			if (data.type == "gameState")
 			{
-				// if (score.scoreP1 > 9 || score.scoreP2 > 9)
-				// {
-				// 	scene.remove(ball);
-				// 	return;
-				// }
 				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score ||
 						score.scoreP3 != data.player[2].score || score.scoreP4 != data.player[3].score))
 				{
@@ -423,17 +421,80 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					score.scoreP2 = data.player[1].score;
 					score.scoreP3 = data.player[2].score;
 					score.scoreP4 = data.player[3].score;
-					// createText(data.player[0].score + " : " + data.player[1].score);
 					displayScore();
 				}
 			}
-		await sleep(25)
-	}
-
-	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-	sleep(250).then(() => { animate(); });
-	function setcam (x, y, z) {
-		camera.position.set(x, y, z);
-	}
-	console.log("cookie");
-}();
+			await sleep(25)
+		}
+		
+		const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+		sleep(250).then(() => { animate(); });
+		function setcam (x, y, z) {
+			camera.position.set(x, y, z);
+		}
+	function deletePallet(n){
+		console.log(n);
+		if (n == 0){
+			scene.remove(wallP1);
+			wallP1 = new THREE.Mesh( 
+				new THREE.BoxGeometry( mapWidth - 1 , 1, 1), 
+				new THREE.MeshStandardMaterial( {
+					wireframe:false, 
+					color:0xffffff, 
+					opacity: 1, 
+					emissive:0xffffff,
+					side : THREE.DoubleSide,
+				}));
+			wallP1.position.z += mapLenth/2
+			scene.add(wallP1);
+			scene.remove(palletPlayer1);
+		}
+		else if (n == 1){
+			scene.remove(wallP2);
+			wallP2 = new THREE.Mesh( 
+				new THREE.BoxGeometry( mapWidth - 1 , 1, 1),
+				new THREE.MeshStandardMaterial( {
+					wireframe:false, 
+					color:0xffffff, 
+					opacity: 1, 
+					emissive:0xffffff,
+					side : THREE.DoubleSide,
+				}));
+			scene.add(wallP2);
+			wallP2.position.z -= mapLenth/2
+			scene.remove(palletPlayer2);
+		}
+		else if (n == 3){
+			scene.remove(wallRight);
+			wallRight = new THREE.Mesh( 
+				new THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
+				new THREE.MeshStandardMaterial( {
+					wireframe:false, 
+					color:0xffffff, 
+					opacity: 1, 
+					emissive:0xffffff,
+					side : THREE.DoubleSide,
+				}));
+			wallRight.position.x += mapWidth/2;
+			scene.add(wallRight);
+			scene.remove(palletPlayer3);
+		}
+		else if (n == 2){
+			scene.remove(wallLeft);
+			wallLeft = new THREE.Mesh( 
+				new THREE.BoxGeometry( 1 , 1, mapLenth + 1), 
+				new THREE.MeshStandardMaterial( {
+					wireframe:false, 
+					color:0xffffff, 
+					opacity: 1, 
+					emissive:0xffffff,
+					side : THREE.DoubleSide,
+				}));
+			wallLeft.position.x -= mapWidth/2;
+			scene.add(wallLeft);
+			scene.remove(palletPlayer4);
+			}
+		}
+		console.log("cookie");
+	}();
+	
