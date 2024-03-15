@@ -118,7 +118,7 @@ def callback_intra(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
+		user = User.objects.create(id=id, nickname=intra_id, username=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(intra_id=intra_id)
 
@@ -156,7 +156,7 @@ def callback_swivel(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
+		user = User.objects.create(id=id, nickname=swivel_id, username=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
 
