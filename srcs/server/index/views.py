@@ -102,7 +102,6 @@ def callback_intra(request):
 		'code': code,
 		'redirect_uri': f'{REDIRECT_URI}/callback/intra'
 	}
-	logging.info(data)
 	try:
 		response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 		response = response.json()
@@ -110,9 +109,14 @@ def callback_intra(request):
 		intra_data = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
 		intra_data = intra_data.json()
 		intra_id = intra_data['login']
-		default_profile_picture = intra_data['image']['versions']['medium']
+
+		if "image" in intra_data and "versions" in intra_data['image'] and "medium" in intra_data['image']['versions']:
+			default_profile_picture = intra_data['image']['versions']['medium']
+		else:
+			default_profile_picture = get_new_default_profile_picture()
 	except:
 		return redirect("/login")
+
 	if not User.objects.filter(intra_id=intra_id).exists():
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
@@ -126,6 +130,7 @@ def callback_intra(request):
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
 		token = makeid(100)
+
 	Token.objects.create(token=token, user=user)
 	response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
 	return response
@@ -151,6 +156,7 @@ def callback_swivel(request):
 		default_profile_picture = swivel_data['profile_picture']
 	except:
 		return redirect("/login")
+
 	if not User.objects.filter(swivel_id=swivel_id).exists():
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
@@ -164,6 +170,7 @@ def callback_swivel(request):
 	token = makeid(100)
 	while Token.objects.filter(token=token).exists():
 		token = makeid(100)
+
 	Token.objects.create(token=token, user=user)
 	response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
 	return response
@@ -179,6 +186,7 @@ def logout(request):
 	response = redirect("/")
 	if not cookie or not Token.objects.filter(token=cookie).exists():
 		return response
+
 	if Token.objects.get(token=cookie).is_valid:
 		token = Token.objects.get(token=cookie)
 		token.is_valid = False
@@ -193,20 +201,24 @@ def api_get_user(request, id):
 	else:
 		user = get_object_or_404(User, id=id)
 	response = user.to_json()
+
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 def api_update_user(request, id, type):
 	cookie = request.COOKIES.get('token')
+
 	if not cookie or not Token.objects.filter(token=cookie).exists():
 		return HttpResponse("Forbidden", status=403)
 	if not Token.objects.get(token=cookie).is_valid:
 		return HttpResponse("Forbidden", status=403)
 	if Token.objects.get(token=cookie).user.id != id:
 		return HttpResponse("Forbidden", status=403)
+
 	user = get_object_or_404(User, id=id)
 	if type == "nickname":
 		user.nickname = request.POST['nickname']
 	elif type == "password":
 		user.password = pbkdf2.hash(request.POST['password'])
 	user.save()
+
 	return HttpResponse("success")
