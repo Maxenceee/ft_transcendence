@@ -49,6 +49,7 @@ jobs:
       with:
         context: ./srcs
         file: ./srcs/Dockerfile
+        platform: linux/amd64
         build-args: |
           APP_RELEASE=${{ github.sha }}
         push: ${{ github.event_name != 'pull_request' }}
@@ -58,7 +59,8 @@ jobs:
     - name: Deploy the new image
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.SSH_HOST }}
+        # host: ${{ secrets.SSH_HOST }}
+        host: 89.168.33.243
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
