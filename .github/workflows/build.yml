@@ -63,7 +63,7 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd ${{ secrets.WORKDIR }}
+          cd ${{ env.WORKDIR }}
           docker compose down --rmi all
           docker compose pull
           docker compose up -d
