@@ -101,7 +101,6 @@ function parseHTMLElement(node, level = 1) {
 		content = buffer.toString();
 	} else {
 		content = args[0];
-
 	}
 
     const root = parse(content);
