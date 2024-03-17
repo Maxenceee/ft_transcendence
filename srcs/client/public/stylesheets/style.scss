@@ -210,6 +210,16 @@ body {
 // 	}
 // }
 
+.link {
+	color: var(--href-color) !important;
+	font-size: 14px;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
 .relative {
 	position: relative;
 }
@@ -2116,6 +2126,8 @@ body:has(.connection-page) {
 
 .history-card {
 	.history-card-content {
+		max-height: 65vh;
+		overflow-y: scroll;
 	}
 }
 

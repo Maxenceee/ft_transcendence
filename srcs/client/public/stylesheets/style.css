@@ -204,6 +204,15 @@ body.variant {
   --color-fg-default: #3a3c5e;
 }
 
+.link {
+  color: var(--href-color) !important;
+  font-size: 14px;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
 .relative {
   position: relative;
 }
@@ -1829,6 +1838,11 @@ body:has(.connection-page) {
   left: var(--value);
   width: calc(100% - var(--value));
   background-color: red;
+}
+
+.history-card .history-card-content {
+  max-height: 65vh;
+  overflow-y: scroll;
 }
 
 .history-row {

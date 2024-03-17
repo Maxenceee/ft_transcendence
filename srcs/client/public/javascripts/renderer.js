@@ -310,7 +310,8 @@ const Go = {
 
 			xhr.onload = function() {
 				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
-				const transformResponse = function (t) {
+				const transformResponse = function(t) {
+					console.log(this);
 					const r = this.transitional,
 						i = r && r.forcedJSONParsing,
 						a = this.responseType === "json";
@@ -748,7 +749,7 @@ function route({ path, element }) {
 
 
 function link(props) {
-	const { to, children } = props;
+	const { to } = props;
 
 	if (to === void 0) throw new Error('Missing `to` prop');
 
@@ -761,7 +762,7 @@ function link(props) {
 		window.dispatchEvent(new Event('popstate'));
 	};
 
-	return createElement('a', { href: to, onClick: handleClick, children });
+	return createElement('a', { href: to, onClick: handleClick, ...props });
 }
 
 let renderer = function() {
@@ -1257,7 +1258,7 @@ class NotFound extends Component {
 				createElement("p", {children:
 					"Page not found"
 				}),
-				link({to: "/", children: "Go back to home"})
+				link({to: "/", class: "link", children: "Go back to home"})
 			]
 		});
 	}
