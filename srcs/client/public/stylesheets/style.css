@@ -958,6 +958,11 @@ main .gr-container {
   pointer-events: none;
   z-index: -1;
 }
+body.chrome .lobby-container .lobby-card .card-container::before {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: #000;
+}
 .lobby-container .lobby-card .play-button {
   border-radius: 50px;
   aspect-ratio: 1/1;
@@ -1065,26 +1070,6 @@ progress[value]::-moz-progress-bar {
   width: var(--progress-value-percent) !important;
   background-color: var(--progress-value-color);
   border-radius: var(--border-radius);
-}
-
-progress[value]::after {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --size: 32px;
-  width: var(--size);
-  height: var(--size);
-  position: absolute;
-  left: var(--progress-value-percent);
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--progress-value-color);
-  border-radius: 50%;
-  content: attr(value);
-  content: var(--progress-value-string, var(--value));
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
 }
 
 @keyframes progress {
