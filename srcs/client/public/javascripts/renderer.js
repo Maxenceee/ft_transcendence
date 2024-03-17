@@ -624,10 +624,11 @@ class Component {
 
 function Is(e) {
 	switch (e) {
-		case "svg":
-			return "http://www.w3.org/2000/svg";
 		case "math":
 			return "http://www.w3.org/1998/Math/MathML";
+		case "foreignObject":
+			return "http://www.w3.org/1999/xhtml";
+		case "svg":
 		default:
 			return "http://www.w3.org/2000/svg";
 	}
@@ -640,7 +641,7 @@ function createElement(type, props = {}) {
 		return new type(props);
 	} else {
 		type = type.toLowerCase();
-		let element = (["svg", "path", "circle", "text", "g"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
+		let element = (["svg", "path", "circle", "text", "line", "g"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
 		let jv = function(c) {
 			if (c instanceof HTMLElement) {
 				console.log("c instanceof HTMLElement", c instanceof HTMLElement, c);
