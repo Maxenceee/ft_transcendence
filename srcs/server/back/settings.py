@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 	'game_local',
 	'tournament',
 	'channels',
+	'corsheaders',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',
 	'django.contrib.auth',
@@ -68,6 +69,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',

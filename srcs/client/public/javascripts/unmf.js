@@ -12681,6 +12681,7 @@ const i1 = {
     }
     ],
     transformResponse: [function(t) {
+        console.log(t, this)
         const r = this.transitional || i1.transitional
           , i = r && r.forcedJSONParsing
           , a = this.responseType === "json";
@@ -13389,6 +13390,7 @@ class Oa {
         this.interceptors.response.forEach(function(x) {
             u.push(x.fulfilled, x.rejected)
         });
+        console.log(this)
         let h, f = 0, y;
         if (!d) {
             const N = [Pc.bind(this), void 0];
