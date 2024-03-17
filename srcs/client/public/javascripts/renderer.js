@@ -310,7 +310,7 @@ const Go = {
 
 			xhr.onload = function() {
 				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
-				const transformResponse = (t) => {
+				const transformResponse = function (t) {
 					const r = this.transitional,
 						i = r && r.forcedJSONParsing,
 						a = this.responseType === "json";
@@ -1676,25 +1676,26 @@ class GameView extends Component {
 	}
 
 	componentDidMount() {
-		this.setState({game_render: game_render()});
+		// this.setState({game_render: game_render()});
 		console.log("componentDidMount GameView", this);
 	}
 
 	componentDidUpdate() {
 		console.log("componentDidUpdate GameView", this);
-		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		this.state.game_render.start(this.state);
+		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		// this.state.game_render.start(this.state);
 	}
 
 	componentWillUnmount() {
-		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		// this.state.game_render.socket.close();
 		console.log("game view unmounted");
-		this.state.game_render.socket.close();
 	}
 
 	render() {
-		console.log("render GameView", this.state.game_render && this.state.game_render.renderer);
-		return createElement('div', {children: this.state.game_render && this.state.game_render.renderer.domElement});
+		// console.log("render GameView", this.state.game_render && this.state.game_render.renderer);
+		// return createElement('div', {children: this.state.game_render && this.state.game_render.renderer.domElement});
+		return createElement('div', {children: "game view"});
 	}
 }
 
