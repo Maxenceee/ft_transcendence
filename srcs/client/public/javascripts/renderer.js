@@ -1711,10 +1711,10 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 				createText(data.player[0].score + " : " + data.player[1].score);
 			}
 		}
-		await sleep(25);
+		// await sleep(25);
 	}
 
-	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+	// const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	function setcam (x, y, z) {
 		camera.position.set(x, y, z);
 	}
@@ -1737,6 +1737,11 @@ class GameView extends Component {
 		console.log("componentDidMount GameView", this);
 		// let size = this.element.getBoundingClientRect();
 		// console.log(size);
+		window.onbeforeunload = (e) => {
+			// display a message to the user
+			// e.preventDefault();
+			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
+		}
 		this.setState({game_render: game_render({width: window.innerWidth - 168, height: window.innerHeight})});
 	}
 
@@ -1750,6 +1755,7 @@ class GameView extends Component {
 		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
 		this.state.game_render.socket.close();
 		// console.log("game view unmounted", this.state.game_render);
+		window.onbeforeunload = null;
 	}
 
 	render() {
