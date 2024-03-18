@@ -6,7 +6,7 @@ from index.decorators import *
 
 @login_required
 def tournament(request):
-	return render(request, 'views/game.html')
+	return render(request, 'views/gameTournament.html')
 
 @login_required
 def not_found(request, url):
