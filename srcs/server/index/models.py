@@ -89,7 +89,10 @@ class Game_history(models.Model):
 
 #starting code
 
-for user in User.objects.all():
-	user.is_online = False
-	user.is_ingame = False
-	user.save()
+try:
+	for user in User.objects.all():
+		user.is_online = False
+		user.is_ingame = False
+		user.save()
+except:
+	pass
