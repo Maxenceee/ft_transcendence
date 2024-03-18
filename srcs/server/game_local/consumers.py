@@ -1,5 +1,6 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
+from django.http import HttpResponse
 from index.models import *
 import json
 import logging
@@ -200,23 +201,29 @@ class websocket_client(WebsocketConsumer):
 		# ft_getGameType(self) 								?????????????????????????
 		
 		cookies = {}
-		data = self.scope['headers']
+		try:
+			data = self.scope['headers']
+		except:
+			return HttpResponse(401, "error")
 		for i in data:
-			if b'cookie' in i:
+			if 'cookie' in i:
 				cookie = i[1].decode('utf-8')
 				cookie = cookie.split(';')
 				for j in cookie:
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		token = cookies['token']
+		try :
+			token = cookies['token']
+		except:
+			return HttpResponse(401, "error")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return HttpResponse(401, "error")
 		token = Token.objects.get(token=token)
 		if token.is_valid:
 			self.accept()
 		else:
-			return
+			return HttpResponse(401, "error")
 		user = token.user
 
 		logging.info(user.id)
@@ -242,27 +249,30 @@ class websocket_client(WebsocketConsumer):
 				return
 		receive_package = json.loads(text_data)
 
-		if receive_package['type'] == "keyCode":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([0, "left"])
+		try:
+			if receive_package['type'] == "keyCode":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([0, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([0, "right"])
+						return
+				except:
 					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([0, "right"])
+			if receive_package['type'] == "keyCode2P":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([1, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([1, "right"])
+						return
+				except:
 					return
-			except:
-				return
-		if receive_package['type'] == "keyCode2P":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([1, "left"])
-					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([1, "right"])
-					return
-			except:
-				return
-		return
+			return
+		except:
+			return HttpResponse(401, "error")
 
 	def disconnect(self, code):
 		print("server says disconnected")

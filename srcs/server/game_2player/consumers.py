@@ -1,5 +1,6 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
+from django.http import HttpResponse
 from index.models import *
 import json
 import logging
@@ -178,72 +179,35 @@ def game_master(game):
 				game.end_game()
 				return
 
-
-# _____________________
-# tournamentList= {} 		
-# game_list_tournament = []										# make a map please
-# def start_gameTournament(name, size):
-# 	if tournamentList.find(name) == False :
-# 			tournamentList.append(Tournament(size, name))
-# 	else :
-# 			target =  tournamentList.find(name)
-# 	if target.full:
-# 		# pass
-# 		it = 0
-# 		tmp = []
-# 		while it < target.size + 1 :
-# 			tmp[0] = target.players[it]
-# 			tmp[1] = target.players[it + 1]
-# 			it += 2
-# 			game_list_tournament.append(Game(tmp))
-# 		target.size /= 2
-# 		return
-# 	else :
-# 		return
-
-
-# class Tournament :
-# 	players = []
-# 	size = 0
-# 	name = "default"
-
-# 	def __init__(self, size, name):
-# 		self.size = size
-# 		self.name = name
-# 		pass
-	
-# 	def add(self, player):
-# 		self.players.append(player)
-	
-# 	def full(self):
-# 		if (len(self.players) == self.size):
-# 			return True
-# 		return False
-# _______________________
-
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
 		# ft_getGameType(self) 								?????????????????????????
 		
 		cookies = {}
-		data = self.scope['headers']
+		try:
+			data = self.scope['headers']
+		except:
+			return HttpResponse(401, "error")
 		for i in data:
-			if b'cookie' in i:
+			if 'cookie' in i:
 				cookie = i[1].decode('utf-8')
 				cookie = cookie.split(';')
 				for j in cookie:
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		token = cookies['token']
+		try :
+			token = cookies['token']
+		except:
+			return HttpResponse(401, "error")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return HttpResponse(401, "error")
 		token = Token.objects.get(token=token)
 		if token.is_valid:
 			self.accept()
 		else:
-			return
+			return HttpResponse(401, "error")
 		user = token.user
 
 		logging.info(user.id)
@@ -269,17 +233,16 @@ class websocket_client(WebsocketConsumer):
 				return
 		receive_package = json.loads(text_data)
 
-		if receive_package['type'] == "keyCode":
-			try:
+		try:
+			if receive_package['type'] == "keyCode":
 				if receive_package['move'] == "left":
 					self.data.queue.put([self.playerID, "left"])
 					return
 				elif receive_package['move'] == "right":
 					self.data.queue.put([self.playerID, "right"])
 					return
-			except:
-				return
-		return
+		except:
+			return HttpResponse(401, "error")
 
 	def disconnect(self, code):
 		print("server says disconnected")
