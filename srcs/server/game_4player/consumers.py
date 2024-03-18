@@ -58,6 +58,8 @@ class Game:
 			return
 		for player in self.players:
 			try:
+				player.token.user.is_ingame = False
+				player.token.user.save()
 				player.socket.close()
 			except:
 				continue
@@ -286,7 +288,12 @@ class websocket_client(WebsocketConsumer):
 			return
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
-			self.accept()
+			if token.user.is_ingame == False:
+				token.user.is_ingame = True
+				token.user.save()
+				self.accept()
+			else:
+				return
 		else:
 			return
 		user = token.user
@@ -334,4 +341,8 @@ class websocket_client(WebsocketConsumer):
 		else:
 			for player in waiting_list:
 				if player.socket == self:
+					if User.objects.filter(id=player.id).exists():
+						user = User.objects.get(id=player.id)
+						user.is_ingame = False
+						user.save()
 					waiting_list.remove(player)
