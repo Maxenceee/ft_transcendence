@@ -160,7 +160,7 @@ class Game:
 			elif (playerID == 0 and self.players[0].score >= 1) :
 				self.ball.direction_x = (self.ball.x - self.players[playerID].pad_x)/4.5
 				self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -172,7 +172,7 @@ class Game:
 			elif playerID == 2 and self.players[2].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
 				self.ball.direction_x = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -262,7 +262,7 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		
+
 		cookies = {}
 		try:
 			data = self.scope['headers']

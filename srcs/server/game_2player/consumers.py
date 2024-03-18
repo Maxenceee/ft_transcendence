@@ -129,7 +129,7 @@ class Game:
 			else :
 				self.ball.direction_x = (self.ball.x - self.players[playerID].pad_x)/4.5
 				self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 

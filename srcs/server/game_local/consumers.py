@@ -119,11 +119,11 @@ class Game:
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_x)/4.5
 			self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		elif (self.ball.z < -27 ) and (self.ball.x < (self.players[1].pad_xP2 + 4.5)  and self.ball.x > (self.players[1].pad_xP2 - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_xP2)/4.5
 			self.ball.direction_z = 1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
