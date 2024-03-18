@@ -2047,3 +2047,8 @@ body:has(.connection-page) {
     stroke: #ffa700;
   }
 }
+.render-context {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}/*# sourceMappingURL=style.css.map */

@@ -540,12 +540,12 @@ class Component {
 		this._mounted = false;
 		this._moised = null;
 
-		this._handleUnmount = this._handleUnmount.bind(this);
+		this._unmountComponent = this._unmountComponent.bind(this);
 	}
 
 	setState(newState, callback) {
 		this._pendingState = Object.assign({}, this.state, newState);
-		console.log("this._pendingState", this._pendingState);
+		// console.log("this._pendingState", this._pendingState);
 		if (callback) {
 			this._pendingStateCallbacks.push(callback);
 		}
@@ -557,12 +557,15 @@ class Component {
 	}
 
 	_renderComponent() {
-		console.log("render component", this);
+		// console.log("render component", this);
 		let render = this.render();
+		// if (render instanceof Component) {
+		// 	this._moised = render;
+		// }
+		this._mounted = true;
 		this._element = render;
 		this.componentDidMount();
-		this._mounted = true;
-		return render;
+		return this._element;
 	}
 
 	_updateComponent() {
@@ -572,21 +575,22 @@ class Component {
 		this.state = this._pendingState;
 		this._pendingState = null;
 
-		console.log("this.state, this._pendingState", this.state, this._pendingState, this);
+		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
 
 		const oldElement = this._element && this._element || null;
-		console.log("oldElement, this._moised", oldElement, this._moised);
-		// if (oldElement && this._moised instanceof Component) {
-		// 	this._moised._handleUnmount();
-		// }
-		let newElement = this._moised = this.render();
-		console.log("new element before", newElement);
+		// console.log("oldElement", oldElement);
+		if (oldElement) {
+			oldElement._unmountComponent();
+		}
+		let newElement = this.render();
+		// console.log("new element before", newElement, this);
 		if (newElement instanceof Component) {
+			// this._moised = newElement;
 			newElement = newElement._renderComponent();
 		}
-		console.log("reloading element", this, oldElement, newElement);
+		console.log("reloading element", oldElement, newElement, this);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("node", node, oldElement, newElement);
+			// console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
 				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
@@ -601,19 +605,25 @@ class Component {
 		this._pendingStateCallbacks.forEach(callback => callback());
 		this._pendingStateCallbacks = [];
 
-		this.componentDidUpdate();
+		if (this._mounted)
+			this.componentDidUpdate();
 		this._element = newElement;
 	}
 
-	_handleUnmount() {
-        if (this._mounted) {
-            this.componentWillUnmount();
-            this._mounted = false;
-        }
+	_unmountComponent() {
+		if (!this._mounted) return;
+		this._mounted = false;
+		// console.log("component will unmount", this);
+		this.componentWillUnmount();
+		this._element && typeof this._element.data === "object" && typeof this._element.data._unmountComponent === "function" && this._element.data._unmountComponent();
     }
 
 	render() {
 		throw new Error('Render method must be implemented');
+	}
+
+	get element() {
+		return this._element && this._element._element || null;
 	}
 
 	componentDidMount() {}
@@ -645,11 +655,11 @@ function createElement(type, props = {}) {
 		let element = (["svg", "path", "circle", "text", "line", "g"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
 		let jv = function(c) {
 			if (c instanceof HTMLElement) {
-				console.log("c instanceof HTMLElement", c instanceof HTMLElement, c);
+				// console.log("c instanceof HTMLElement", c instanceof HTMLElement, c, element);
 				return element.appendChild(c), c;
 			}
 			if (c instanceof Component) {
-				console.log("=== c ===", c);
+				// console.log("=== c ===", c);
 				c = c._renderComponent();
 			}
 			if (typeof c === 'string') {
@@ -678,7 +688,16 @@ function createElement(type, props = {}) {
 			_element: element,
 			render() {
 				return element;
-			}
+			},
+			_unmountComponent() {
+				if (!this.data || !this.data.children) return;
+				let k = e => e && typeof e === "object" && typeof e._unmountComponent === "function";
+				if (Array.isArray(this.data.children)) {
+					this.data.children.forEach(child => k(child) && child._unmountComponent());
+				} else {
+					k(this.data.children) && this.data.children._unmountComponent();
+				}
+			},
 		};
 	}
 }
@@ -686,7 +705,7 @@ function createElement(type, props = {}) {
 class Router extends Component {
 	constructor(props) {
 		super(props);
-		console.log(this);
+		// console.log(this);
 		this.state = { route: window.location.pathname };
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
@@ -698,12 +717,35 @@ class Router extends Component {
 		});
 	}
 
+	componentDidMount() {
+		console.log("====== Router Mounted ======");
+	}
+
+	componentDidUpdate() {
+		console.log("====== Router Updated ======");
+	}
+
+	componentWillUnmount() {
+		console.log("====== Router Unmounted ======");
+	}
+
 	render() {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		const currentRoute = children.find(child => child.canRoute(route));
-		console.log("router", currentRoute, this);
+		let currentRoute = null;
+		children.forEach(child => {
+			if (!currentRoute && child.canRoute(route)) {
+				currentRoute = child;
+			} else {
+				if (child.active) {
+					// console.log("propagateUnmount on child route", child);
+					child.propagateUnmount();
+					child.active = false;
+				}
+			}
+		});
+		// console.log("router", currentRoute, this);
 		if (currentRoute) {
 			currentRoute.active = true;
 			this._element = currentRoute.render();
@@ -725,9 +767,14 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
+		// console.log("^" + this.state.route.replace(/\*/g, '.*') + "$");
 		const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
-		console.log(regex.test(route));
 		return regex.test(route);
+	}
+
+	propagateUnmount() {
+		// console.log("propagateUnmount from route", this._element);
+		this.props.element._unmountComponent();
 	}
 
 	render() {
@@ -765,6 +812,11 @@ function link(props) {
 	return createElement('a', { href: to, onClick: handleClick, ...props });
 }
 
+function navigate(path) {
+	window.history.pushState({}, '', path);
+	window.dispatchEvent(new Event('popstate'));
+}
+
 let renderer = function() {
 	this._internalRoot = root;
 }
@@ -772,7 +824,7 @@ renderer.prototype.render = function(elem) {
 	this._children = elem;
 	if (this._internalRoot === null) throw Error('Unable to find root node');
 	let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
-	console.log("root element", this, element);
+	// console.log("root element", this, element);
 	this._children._element = element;
 	// console.log(JSON.stringify(element));
 	// setParentToComponents(element);
@@ -840,6 +892,14 @@ class HomePage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
+	}
+
+	componentDidMount() {
+		console.log("this.componentDidMount HomePage Page");
+	}
+
+	componentWillUnmount() {
+		console.log("this.componentWillUnmount HomePage Page");
 	}
 
 	render() {
@@ -1035,7 +1095,6 @@ class UserPagePlayerStats extends Component {
 	}
 
 	render() {
-		console.log("user data", this.state.user);
 		let data = this.getWinRate(this.state.user.game_history);
 		return createElement('div', {
 			class: "stat-card-content", children: [
@@ -1101,11 +1160,11 @@ class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
-		console.log(this.state);
+		// console.log(this.state);
 	}
 	
 	componentDidUpdate() {
-		console.log("this.componentDidUpdate");
+		// console.log("this.componentDidUpdate");
 	}
 
 	render() {
@@ -1171,6 +1230,18 @@ class UserPage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
+	}
+
+	componentDidMount() {
+		console.log("this.componentDidMount UserPage Page");
+	}
+
+	componentDidUpdate() {
+		console.log("this.componentDidUpdate UserPage Page");
+	}
+
+	componentWillUnmount() {
+		console.log("this.componentWillUnmount UserPage Page");
 	}
 
 	render() {
@@ -1334,12 +1405,12 @@ class BadConnection extends Component {
 	}
 }
 
-let game_render = function() {
-	console.log("call of game_render");
-	let counter = 0
-	let socket = new Socket({path: "/game_2player"});
+let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+	console.log("game_render", width, height);
+	let counter = 0;
 	let playerNumber = -1;
 	let connectionStatus = 0;
+	let socket = new Socket({path: "/game_2player"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1348,58 +1419,55 @@ let game_render = function() {
 	socket.onclose(() => {
 		console.info("Connection closed");
 		connectionStatus = 2;
-		window.location.replace("/");
+		navigate("/");
 	});
 	socket.use((msg) =>{
-			if (msg.type == "gameState")
-			{	
-				data = msg.data;
-				data.type = msg.type
-				ball.position.x = data.ball.x;			
-				ball.position.z = data.ball.z;			
-				palletPlayer1.position.x = data.player[0].x;
-				palletPlayer2.position.x = data.player[1].x;
-			}
-			else if (msg.type == "resetCam")
-				setcam(10, 69, 0);
-			else if (msg.type == "setCam")
-				setcam(msg.data.x, msg.data.y, msg.data.z);
+		if (msg.type == "gameState")
+		{	
+			data = msg.data;
+			data.type = msg.type
+			ball.position.x = data.ball.x;			
+			ball.position.z = data.ball.z;			
+			palletPlayer1.position.x = data.player[0].x;
+			palletPlayer2.position.x = data.player[1].x;
+		}
+		else if (msg.type == "resetCam")
+			setcam(10, 69, 0);
+		else if (msg.type == "setCam")
+			setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	// document.body.appendChild( renderer.domElement );
-	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize(width, height);
+	renderer.setPixelRatio(window.devicePixelRatio);
 
-	var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-	camera.position.set( 15, 15, 20 );
+	var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200);
+	camera.position.set(15, 15, 20);
 
-	const controls = new OrbitControls( camera, renderer.domElement );
+	const controls = new OrbitControls(camera, renderer.domElement);
 	const scene = new THREE.Scene();
 	const sceneError = new THREE.Scene;
 	controls.maxDistance = 90;
-	controls.target.set( 0, 0, 0 );
+	controls.target.set(0, 0, 0);
 	controls.update();
 
 	const Alight = new THREE.AmbientLight({color:0xffffff});
-	scene.add( Alight );
+	scene.add(Alight);
 
-	let font, textGeo, textMesh2
-
+	let font, textGeo, textMesh2;
 	var score = {
 		scoreP1: 0,
 		scoreP2: 0,
 	};
 
 	function loadFont() {
-
 		const loader = new FontLoader();
-		loader.load( '/static/javascripts/font.json', function ( response ) {
+		loader.load('/static/fonts/font.json', function (response) {
 			font = response;
 			createText("");
-		} );
+		});
 	}
 
 	let palletPlayer1 = 0;
@@ -1410,8 +1478,8 @@ let game_render = function() {
 	{
 		mapLenth = 60;
 		mapWidth = 40;
-		palletPlayer1 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 6, 1, 1 ), 
+		palletPlayer1 = new THREE.Mesh(
+			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 					color:0xffffff, 
@@ -1420,8 +1488,8 @@ let game_render = function() {
 					side : THREE.DoubleSide,
 				})
 			);
-		palletPlayer2 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 6, 1, 1 ), 
+		palletPlayer2 = new THREE.Mesh(
+			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1431,7 +1499,7 @@ let game_render = function() {
 			})
 		);
 		let wallLeft = new THREE.Mesh(
-			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
+			new THREE.BoxGeometry(1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1441,7 +1509,7 @@ let game_render = function() {
 			})
 		);
 		let wallRight = new THREE.Mesh(
-			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
+			new THREE.BoxGeometry(1 , 1,  mapLenth + 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1453,7 +1521,7 @@ let game_render = function() {
 		wallRight.position.x += mapWidth/2;
 		wallLeft.position.x -= mapWidth/2;
 		let wallP2 = new THREE.Mesh(
-			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
+			new THREE.BoxGeometry(mapWidth - 1, 1, 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xff00ff, 
@@ -1463,7 +1531,7 @@ let game_render = function() {
 			})
 		);	
 		let wallP1 = new THREE.Mesh(
-			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
+			new THREE.BoxGeometry(mapWidth - 1, 1 , 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false,
 				color:0x00ffff, 
@@ -1475,7 +1543,7 @@ let game_render = function() {
 		wallP1.position.z += mapLenth/2
 		wallP2.position.z -= mapLenth/2
 
-		const geometryBall = new THREE.BoxGeometry( 1, 1, 1 );
+		const geometryBall = new THREE.BoxGeometry(1, 1, 1);
 		const materialBall = new THREE.MeshPhysicalMaterial({
 			wireframe:false, 
 			color:0xff0000, 
@@ -1483,7 +1551,7 @@ let game_render = function() {
 			iridescence :1,
 			side : THREE.DoubleSide,
 		});
-		ball = new THREE.Mesh( geometryBall, materialBall );
+		ball = new THREE.Mesh(geometryBall, materialBall);
 
 		palletPlayer1.position.z += (mapLenth/2) - 1.5;
 		palletPlayer2.position.z -= (mapLenth/2) - 1.5;
@@ -1491,84 +1559,73 @@ let game_render = function() {
 		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
 	}
 
-		const params = {
+	const params = {
 		threshold: 0,
 		strength: 0.35,
 		radius: 0,
-		exposure: 1
+		exposure: 1,
 	};
 
-	const renderScene = new RenderPass( scene, camera );
+	const renderScene = new RenderPass(scene, camera);
 
-	const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+	const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
 	bloomPass.threshold = params.threshold;
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
 	const outputPass = new OutputPass();
-	let composer
-	composer = new EffectComposer( renderer );
-	composer.addPass( renderScene );
-	composer.addPass( bloomPass );
-	composer.addPass( outputPass );
+	let composer = new EffectComposer(renderer);
+	composer.addPass(renderScene);
+	composer.addPass(bloomPass);
+	composer.addPass(outputPass);
 
-	let moveSpeed = 1.05
+	let moveSpeed = 1.05;
 
-	initiateMapTwoPlayer({})
+	initiateMapTwoPlayer({});
 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-		keyCode.right = 0
-		keyCode.left = 0
+		keyCode.right = 0;
+		keyCode.left = 0;
 		if (keyVar == 68)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
-			// socket.send({type : 'keyCode', move : "right"});
-		}
-		if (keyVar == 65)
-		{
-			keyCode.left = 1
-			keyCode.right = 0
-			// socket.send({type : 'keyCode', move : "left"});
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
 		if (keyVar == 39)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
+			keyCode.left = 0;
+			keyCode.right = 1;
 			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
-			keyCode.left = 1
-			keyCode.right = 0
+			keyCode.left = 1;
+			keyCode.right = 0;
 			// socket.send({type : 'keyCode', move : "left"})
 		}
 		if (keyVar == 82)
 		{
-			setcam(10, 69, 0)
-			controls.target.set( 0, 0, 0 );
+			setcam(10, 69, 0);
+			controls.target.set(0, 0, 0);
 		}
 		if (keyCode.right == 1 && keyCode.left == 0)
 			socket.send({type : 'keyCode', move : "right"});
 		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"})
-		else
-			;
+			socket.send({type : 'keyCode', move : "left"});
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
 // 
-// 
 		if (keyVar == 68)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 65)
-			keyCode.left = 0
+			keyCode.left = 0;
 		if (keyVar == 39)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 37)
-			keyCode.left = 0
+			keyCode.left = 0;
 	}
 
 	let ballDirection = {
@@ -1577,16 +1634,15 @@ let game_render = function() {
 	};
 
 	const 	materials = [
-		new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-		new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-		];
+		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
+		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
+	];
 	if (palletPlayer1 != 0)
 		scene.add(palletPlayer1, palletPlayer2);
 
 	function createText(msg) {
 		scene.remove(textMesh2);
-		textGeo = new TextGeometry( msg , {
-
+		textGeo = new TextGeometry(msg , {
 			font: font,
 
 			size: 10,
@@ -1596,10 +1652,9 @@ let game_render = function() {
 			bevelThickness: 0.1,
 			bevelSize: 0.01,
 			bevelEnabled: true
-
 		});
 
-		textMesh2 = new THREE.Mesh( textGeo, materials);
+		textMesh2 = new THREE.Mesh(textGeo, materials);
 		textMesh2.rotateX(-Math.PI * 0.5);
 		textMesh2.rotateZ(Math.PI * 0.5);
 		textMesh2.position.z += 12.5;
@@ -1634,11 +1689,12 @@ let game_render = function() {
 	let animationid = null;
 	const animate = async () => {
 		if (composer){
-			renderer.render( scene, camera );
+			renderer.render(scene, camera);
 			composer.render();	
 		}
 		else
-			renderer.render( sceneError, camera );
+			renderer.render(sceneError, camera);
+
 		controls.update();
 		animationid = requestAnimationFrame(animate);
 		if (data.type == "gameState")
@@ -1667,6 +1723,7 @@ let game_render = function() {
 		socket: socket,
 		renderer: renderer,
 		animationid: () => animationid,
+		render: () => renderer.domElement
 	};
 };
 
@@ -1677,26 +1734,28 @@ class GameView extends Component {
 	}
 
 	componentDidMount() {
-		// this.setState({game_render: game_render()});
 		console.log("componentDidMount GameView", this);
+		// let size = this.element.getBoundingClientRect();
+		// console.log(size);
+		this.setState({game_render: game_render({width: window.innerWidth - 168, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
-		console.log("componentDidUpdate GameView", this);
-		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		// this.state.game_render.start(this.state);
+		// console.log("componentDidUpdate GameView", this.state.game_render);
+		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		this.state.game_render.start(this.state);
 	}
 
 	componentWillUnmount() {
-		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		// this.state.game_render.socket.close();
-		console.log("game view unmounted");
+		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		this.state.game_render.socket.close();
+		// console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
-		// console.log("render GameView", this.state.game_render && this.state.game_render.renderer);
-		// return createElement('div', {children: this.state.game_render && this.state.game_render.renderer.domElement});
-		return createElement('div', {children: "game view"});
+		console.log("render GameView",this.state.game_render);
+		return createElement('div', {class: "render-context", children: this.state.game_render && this.state.game_render.render()});
+		// return createElement('div', {children: "game view"});
 	}
 }
 
