@@ -114,6 +114,10 @@ class Game:
 			self.ball.speed = 1.05
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
+		if (self.ball.x < -18.5):
+			self.ball.x = -18.49
+		if (self.ball.x > 18.5):
+			self.ball.x = 18.49
 
 	def rebound_x(self):
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
