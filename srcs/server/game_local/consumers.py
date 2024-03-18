@@ -60,21 +60,23 @@ class Game:
 		except:
 			return
 		for player in self.players:
-			player.socket.close()
-		resume_data = []
-		for player in self.players:
-			resume_data.append({"id": player.id, "score": player.score})
-		resume_data = str(resume_data)
-		resume_data = resume_data.replace("'", '"')
-		# Game_history.objects.create(type="2v2", data=resume_data)
-		logging.info("game ended TODO revove from game list")
+			try:
+				player.socket.close()
+			except:
+				continue
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(json.dumps({"type" : type, "data" : data}))
+			try:
+				player.socket.send(json.dumps({"type" : type, "data" : data}))
+			except:
+				continue
 	
 	def send(self, player, type, data):
-		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		try:
+			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		except:
+			return
 
 	def to_json(self):
 		players = []
@@ -183,6 +185,9 @@ def game_master(game):
 					game.players[1].pad_xP2 += 0.8
 					if game.players[1].pad_xP2  > 16.0 :
 						game.players[1].pad_xP2 = 16
+			elif action == "disconnect":
+				game.end_game()
+				return
 		time.sleep(0.05)
 		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
 		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
@@ -204,26 +209,28 @@ class websocket_client(WebsocketConsumer):
 		try:
 			data = self.scope['headers']
 		except:
-			return HttpResponse(401, "error")
+			return
 		for i in data:
-			if 'cookie' in i:
+			if b'cookie' in i:
 				cookie = i[1].decode('utf-8')
 				cookie = cookie.split(';')
 				for j in cookie:
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		try :
+		
+		logging.info("new player connected")
+		try:
 			token = cookies['token']
 		except:
-			return HttpResponse(401, "error")
+			return
 		if not Token.objects.filter(token=token).exists():
-			return HttpResponse(401, "error")
+			return
 		token = Token.objects.get(token=token)
-		if token.is_valid:
+		if token.is_valid == True:
 			self.accept()
 		else:
-			return HttpResponse(401, "error")
+			return
 		user = token.user
 
 		logging.info(user.id)
@@ -242,7 +249,7 @@ class websocket_client(WebsocketConsumer):
 					return
 
 
-	def receive(self, text_data=None, bytes_data=None):
+	def receive(self, text_data=None):
 		if not hasattr(self, "data"):
 			self.find_game()
 			if not hasattr(self, "data"):
@@ -272,12 +279,14 @@ class websocket_client(WebsocketConsumer):
 					return
 			return
 		except:
-			return HttpResponse(401, "error")
+			pass
 
 	def disconnect(self, code):
-		print("server says disconnected")
+		super().disconnect(code)
+		self.find_game()
 		if hasattr(self, "data"):
-			self.data.end_game()
+			logging.info(f"server says disconnected : {code}")
+			self.data.queue.put([self.playerID, "disconnect"])
 		else:
 			for player in waiting_list:
 				if player.socket == self:
