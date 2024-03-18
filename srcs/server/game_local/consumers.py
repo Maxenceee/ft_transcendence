@@ -61,6 +61,8 @@ class Game:
 			return
 		for player in self.players:
 			try:
+				player.token.user.is_ingame = False
+				player.token.user.save()
 				player.socket.close()
 			except:
 				continue
@@ -230,7 +232,12 @@ class websocket_client(WebsocketConsumer):
 			return
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
-			self.accept()
+			if token.user.is_ingame == False:
+				token.user.is_ingame = True
+				token.user.save()
+				self.accept()
+			else:
+				return
 		else:
 			return
 		user = token.user
@@ -239,7 +246,7 @@ class websocket_client(WebsocketConsumer):
 		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
 		start_game(1)
-	
+
 	def find_game(self):
 		global game_list
 		for current in game_list:
@@ -290,6 +297,11 @@ class websocket_client(WebsocketConsumer):
 			logging.info(f"server says disconnected : {code}")
 			self.data.queue.put([self.playerID, "disconnect"])
 		else:
+			logging.info("player not in game")
 			for player in waiting_list:
 				if player.socket == self:
+					if User.objects.filter(id=player.id).exists():
+						user = User.objects.get(id=player.id)
+						user.is_ingame = False
+						user.save()
 					waiting_list.remove(player)

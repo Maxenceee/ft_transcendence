@@ -10,6 +10,7 @@ class User(models.Model):
 	id = models.CharField(max_length=10)
 	nickname = models.CharField(max_length=100)
 	is_online = models.BooleanField(default=False)
+	is_ingame = models.BooleanField(default=False)
 	game_history = models.ManyToManyField('Game_history', related_name='game_history')
 	
 	username = models.CharField(max_length=100)
