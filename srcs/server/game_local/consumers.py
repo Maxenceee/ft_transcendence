@@ -61,9 +61,10 @@ class Game:
 			return
 		for player in self.players:
 			try:
-				player.token.user.is_ingame = False
-				player.token.user.save()
-				player.socket.close()
+				if User.objects.filter(id=player.id).exists():
+					user = User.objects.get(id=player.id)
+					user.is_ingame = False
+					user.save()
 			except:
 				continue
 
