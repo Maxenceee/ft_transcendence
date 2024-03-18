@@ -101,6 +101,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	var score = {
 		scoreP1: 0,
 		scoreP2: 0,
+		scoreP3: 0,
+		scoreP4: 0,
+		scoreP5: 0,
+		scoreP6: 0,
+		scoreP7: 0,
+		scoreP8: 0,
 	};
 
 	function loadFont() {
@@ -305,7 +311,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	if (pallet[0] != 0)
 		scene.add(pallet[0], pallet[1], pallet[2], pallet[3], pallet[4], pallet[5], pallet[6], pallet[7]);
 
-	function createText(msg) {
+	function createText(msg, offset_x, offset_z) {
 		scene.remove(textMesh2);
 		textGeo = new TextGeometry( msg , {
 
@@ -324,8 +330,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		textMesh2 = new THREE.Mesh( textGeo, materials);
 		textMesh2.rotateX(-Math.PI * 0.5);
 		textMesh2.rotateZ(Math.PI * 0.5);
-		textMesh2.position.z += 12.5;
-		textMesh2.position.x += 2.5;
+		textMesh2.position.z += 12.5 + offset_z;
+		textMesh2.position.x += 2.5 + offset_x;
 		textMesh2.position.y -= 2;
 		
 		scene.add(textMesh2);
@@ -354,14 +360,24 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		{
 			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
-				scene.remove(ball);
+				scene.remove(ball[0]);
+				scene.remove(ball[1]);
+				scene.remove(ball[2]);
+				scene.remove(ball[3]);
+				scene.remove(ball[4]);
 				return;
 			}
 			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
 			{
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score);
+				score.scoreP1 = data.player[1].score;
+				score.scoreP2 = data.player[2].score;
+				score.scoreP3 = data.player[3].score;
+				score.scoreP4 = data.player[4].score;
+				score.scoreP5 = data.player[5].score;
+				score.scoreP6 = data.player[6].score;
+				score.scoreP7 = data.player[7].score;
+				score.scoreP8 = data.player[8].score;
+				createText(data.player[0].score + " : " + data.player[1].score, 0, 0);
 			}
 		}
 		await sleep(25);
