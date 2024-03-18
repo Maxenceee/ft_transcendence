@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 	'game_2player',
 	'game_4player',
 	'game_local',
+	'game_AI',
 	'tournament',
 	'channels',
 	'corsheaders',
