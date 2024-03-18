@@ -32,32 +32,32 @@ class AIPlayer:
 		self.running = False
 		self.thread.join()
 
-	def runEasy(self):
-		while self.running:
-			ball_x = self.game.ball.x
-			dir_z = self.game.ball.direction_z
-			pad_x = self.game.players[1].pad_xP2
-			dif = pad_x - ball_x
+	# def runEasy(self):
+	# 	while self.running:
+	# 		ball_x = self.game.ball.x
+	# 		dir_z = self.game.ball.direction_z
+	# 		pad_x = self.game.players[1].pad_xP2
+	# 		dif = pad_x - ball_x
 			
-			if int(dif) >= 0 and dir_z == -1:
-				for i in range(int(dif)):
-					self.game.queue.put([1, "right"])
-					time.sleep(0.1)
-			elif dir_z == -1:
-				for i in range(int(-dif)):
-					self.game.queue.put([1, "left"])
-					time.sleep(0.1)
-			else:
-				if int(pad_x) >= 0:
-					for i in range (int(pad_x)):
-						self.game.queue.put([1, "right"])
-						time.sleep(0.1)
-				else:
-					for i in range (int(-pad_x)):
-						self.game.queue.put([1, "left"])
-						time.sleep(0.1)
+	# 		if int(dif) >= 0 and dir_z == -1:
+	# 			for i in range(int(dif)):
+	# 				self.game.queue.put([1, "right"])
+	# 				time.sleep(0.1)
+	# 		elif dir_z == -1:
+	# 			for i in range(int(-dif)):
+	# 				self.game.queue.put([1, "left"])
+	# 				time.sleep(0.1)
+	# 		else:
+	# 			if int(pad_x) >= 0:
+	# 				for i in range (int(pad_x)):
+	# 					self.game.queue.put([1, "right"])
+	# 					time.sleep(0.1)
+	# 			else:
+	# 				for i in range (int(-pad_x)):
+	# 					self.game.queue.put([1, "left"])
+	# 					time.sleep(0.1)
 
-			time.sleep(1)
+	# 		time.sleep(1)
 
 	def run(self):
 		while self.running:
@@ -79,35 +79,35 @@ class AIPlayer:
 					if future_ball_x > 18.5 or future_ball_x <  -18.5:
 						tmp *=-1
 					i += 1
-
+				future_ball_x += random.uniform(-3.5, 3.5)
 			dif = pad_x - future_ball_x
 			if int(dif) >= 0 and dir_z == -1:
 				for i in range(int(dif)):
 					self.game.queue.put([1, "right"])
-					time.sleep(0.1)
+					time.sleep(0.05)
 			elif dir_z == -1:
 				for i in range(int(-dif)):
 					self.game.queue.put([1, "left"])
-					time.sleep(0.1)
+					time.sleep(0.05)
 			else:
 				if int(pad_x) >= 0:
 					for i in range (int(pad_x)):
 						self.game.queue.put([1, "right"])
-						time.sleep(0.1)
+						time.sleep(0.05)
 				else:
 					for i in range (int(-pad_x)):
 						self.game.queue.put([1, "left"])
-						time.sleep(0.1)
+						time.sleep(0.05)
 
 			time.sleep(1)
 
 
 class Ball:
 	def __init__(self) -> None:
-		self.x = 0 # abscisse
-		self.z = 0 # ordonne
+		self.x = 0
+		self.z = 0
 		self.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-		self.direction_z = 1 # -1 = balle vers l'ia
+		self.direction_z = 1
 		self.speed = 1.05
 
 		
@@ -201,11 +201,11 @@ class Game:
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_x)/4.5
 			self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		elif (self.ball.z < -27 ) and (self.ball.x < (self.players[1].pad_xP2 + 4.5)  and self.ball.x > (self.players[1].pad_xP2 - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_xP2)/4.5
 			self.ball.direction_z = 1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -285,7 +285,6 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		# ft_getGameType(self) 								?????????????????????????
 		
 		cookies = {}
 		data = self.scope['headers']
@@ -343,10 +342,10 @@ class websocket_client(WebsocketConsumer):
 		if receive_package['type'] == "keyCode2P":
 			try:
 				if receive_package['move'] == "left":
-					self.data.queue.put([1, "left"])
+					self.data.queue.put([0, "left"])
 					return
 				elif receive_package['move'] == "right":
-					self.data.queue.put([1, "right"])
+					self.data.queue.put([0, "right"])
 					return
 			except:
 				return
