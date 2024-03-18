@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timedelta
 import logging
 
+
 class User(models.Model):
 	index = models.AutoField(primary_key=True)
 	id = models.CharField(max_length=10)
@@ -84,3 +85,11 @@ class Game_history(models.Model):
 					user.game_history.add(self)
 				except:
 					pass
+
+
+#starting code
+
+for user in User.objects.all():
+	user.is_online = False
+	user.is_ingame = False
+	user.save()
