@@ -18,10 +18,9 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		connectionStatus = 1;
 	});
 	socket.onclose(() => {
-
 		console.info("Connection closed");
 		connectionStatus = 2;
-		window.location.replace("/")				//url of end game
+		window.location.replace("/");
 	});
 	socket.use((msg) =>{
 			if (msg.type == "gameState")
@@ -317,7 +316,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	loadFont();
 
 	const animate = async () => {
-
 		if (composer){
 			renderer.render( scene, camera );
 			composer.render();	
@@ -326,21 +324,21 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			renderer.render( sceneError, camera );
 		controls.update();
 		requestAnimationFrame(animate);
-			if (data.type == "gameState")
+		if (data.type == "gameState")
+		{
+			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
-				if (score.scoreP1 > 9 || score.scoreP2 > 9)
-				{
-					scene.remove(ball);
-					return;
-				}
-				if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
-				{
-					score.scoreP1 = data.player[0].score;
-					score.scoreP2 = data.player[1].score;
-					createText(data.player[0].score + " : " + data.player[1].score);
-				}
+				scene.remove(ball);
+				return;
 			}
-		await sleep(25)
+			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+			{
+				score.scoreP1 = data.player[0].score;
+				score.scoreP2 = data.player[1].score;
+				createText(data.player[0].score + " : " + data.player[1].score);
+			}
+		}
+		await sleep(25);
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));

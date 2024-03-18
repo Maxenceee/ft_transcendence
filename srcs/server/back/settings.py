@@ -29,9 +29,24 @@ SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "website", "trace.maxencegama.dev", "tracendance.tech"]
+ALLOWED_HOSTS = [
+	"localhost",
+	"website",
+	"trace.maxencegama.dev",
+	"tracendance.tech"
+]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://website:3000", "https://trace.maxencegama.dev", "https://tracendance.tech"]
+CSRF_TRUSTED_ORIGINS = [
+	"http://localhost:3000",
+	"http://website:3000",
+	"https://trace.maxencegama.dev",
+	"https://tracendance.tech"
+]
+
+CORS_ALLOWED_ORIGINS = [
+	"http://localhost:3000",
+	"http://localhost:3001",
+]
 
 # Application definition
 
@@ -41,7 +56,9 @@ INSTALLED_APPS = [
 	'game_4player',
 	'game_local',
 	'game_AI',
+	'tournament',
 	'channels',
+	'corsheaders',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',
 	'django.contrib.auth',
@@ -53,6 +70,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',

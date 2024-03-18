@@ -204,6 +204,15 @@ body.variant {
   --color-fg-default: #3a3c5e;
 }
 
+.link {
+  color: var(--href-color) !important;
+  font-size: 14px;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+
 .relative {
   position: relative;
 }
@@ -958,6 +967,11 @@ main .gr-container {
   pointer-events: none;
   z-index: -1;
 }
+body.chrome .lobby-container .lobby-card .card-container::before {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: #000;
+}
 .lobby-container .lobby-card .play-button {
   border-radius: 50px;
   aspect-ratio: 1/1;
@@ -1065,26 +1079,6 @@ progress[value]::-moz-progress-bar {
   width: var(--progress-value-percent) !important;
   background-color: var(--progress-value-color);
   border-radius: var(--border-radius);
-}
-
-progress[value]::after {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  --size: 32px;
-  width: var(--size);
-  height: var(--size);
-  position: absolute;
-  left: var(--progress-value-percent);
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--progress-value-color);
-  border-radius: 50%;
-  content: attr(value);
-  content: var(--progress-value-string, var(--value));
-  font-size: 12px;
-  font-weight: 700;
-  color: #fff;
 }
 
 @keyframes progress {
@@ -1846,6 +1840,11 @@ body:has(.connection-page) {
   background-color: red;
 }
 
+.history-card .history-card-content {
+  max-height: 65vh;
+  overflow-y: scroll;
+}
+
 .history-row {
   width: 100%;
   display: inline-flex;
@@ -1855,6 +1854,7 @@ body:has(.connection-page) {
 }
 .history-row .win,
 .history-row .lost,
+.history-row .draw,
 .history-row .type {
   font-size: 16px;
   font-weight: 500;
@@ -1865,6 +1865,185 @@ body:has(.connection-page) {
 .history-row .lost {
   color: red;
 }
+.history-row .draw {
+  color: blue;
+}
 .history-row .score {
   font-size: 15px;
+}
+
+.inner-loader {
+  position: relative;
+  width: 2.5em;
+  height: 2.5em;
+  transform: rotate(165deg);
+}
+.inner-loader:before, .inner-loader:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.25em;
+  transform: translate(-50%, -50%);
+}
+.inner-loader:before {
+  animation: before 2s infinite;
+}
+.inner-loader:after {
+  animation: after 2s infinite;
+}
+
+@keyframes before {
+  0% {
+    width: 0.5em;
+    box-shadow: 1em -0.5em hsla(337, 84%, 48%, 0.75), -1em 0.5em hsla(190, 61%, 65%, 0.75);
+  }
+  35% {
+    width: 2.5em;
+    box-shadow: 0 -0.5em hsla(337, 84%, 48%, 0.75), 0 0.5em hsla(190, 61%, 65%, 0.75);
+  }
+  70% {
+    width: 0.5em;
+    box-shadow: -1em -0.5em hsla(337, 84%, 48%, 0.75), 1em 0.5em hsla(190, 61%, 65%, 0.75);
+  }
+  100% {
+    box-shadow: 1em -0.5em hsla(337, 84%, 48%, 0.75), -1em 0.5em hsla(190, 61%, 65%, 0.75);
+  }
+}
+@keyframes after {
+  0% {
+    height: 0.5em;
+    box-shadow: 0.5em 1em hsla(160, 50%, 48%, 0.75), -0.5em -1em hsla(41, 82%, 52%, 0.75);
+  }
+  35% {
+    height: 2.5em;
+    box-shadow: 0.5em 0 hsla(160, 50%, 48%, 0.75), -0.5em 0 hsla(41, 82%, 52%, 0.75);
+  }
+  70% {
+    height: 0.5em;
+    box-shadow: 0.5em -1em hsla(160, 50%, 48%, 0.75), -0.5em 1em hsla(41, 82%, 52%, 0.75);
+  }
+  100% {
+    box-shadow: 0.5em 1em hsla(160, 50%, 48%, 0.75), -0.5em -1em hsla(41, 82%, 52%, 0.75);
+  }
+}
+.ad-up-box-loader, .dot-box {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  display: -webkit-flex;
+  justify-content: center;
+  align-items: center;
+}
+.ad-up-box-loader.blured:not(:has(.global)), .dot-box.blured:not(:has(.global)) {
+  background-color: var(--loader-bg-blur);
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+}
+.ad-up-box-loader:not(.mini-loader) .loader, .dot-box:not(.mini-loader) .loader {
+  position: absolute !important;
+  top: min(50vh, 50%);
+  transform: translateY(-50%);
+}
+.ad-up-box-loader .loader, .dot-box .loader {
+  position: relative;
+  margin: 0 auto;
+}
+.ad-up-box-loader .loader:has(.circular)::before, .dot-box .loader:has(.circular)::before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+.ad-up-box-loader .loader.global, .dot-box .loader.global {
+  aspect-ratio: 1/1;
+  width: 100px;
+  border-radius: 8px;
+  background-color: var(--loader-bg-blur);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ad-up-box-loader .circular, .dot-box .circular {
+  animation: rotate 2s linear infinite;
+  height: 100%;
+  transform-origin: center center;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+.ad-up-box-loader .path:not(.ad-up-box-loader.mini-loader .path), .dot-box .path:not(.ad-up-box-loader.mini-loader .path) {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+  stroke-linecap: round;
+  stroke: #000;
+}
+.ad-up-box-loader.mini-loader, .dot-box.mini-loader {
+  -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+}
+.ad-up-box-loader.mini-loader .loader, .dot-box.mini-loader .loader {
+  width: 28px;
+  margin: 4px;
+}
+.ad-up-box-loader.mini-loader .path, .dot-box.mini-loader .path {
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  animation: dash 1.5s ease-in-out infinite;
+  stroke-linecap: round;
+  stroke: #000;
+}
+.ad-up-box-loader.global-main, .dot-box.global-main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
+}
+@keyframes color {
+  100%, 0% {
+    stroke: #d62d20;
+  }
+  40% {
+    stroke: #0057e7;
+  }
+  66% {
+    stroke: #008744;
+  }
+  80%, 90% {
+    stroke: #ffa700;
+  }
 }

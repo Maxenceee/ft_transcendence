@@ -1,5 +1,6 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
+from django.http import HttpResponse
 from index.models import *
 import json
 import logging
@@ -59,21 +60,23 @@ class Game:
 		except:
 			return
 		for player in self.players:
-			player.socket.close()
-		resume_data = []
-		for player in self.players:
-			resume_data.append({"id": player.id, "score": player.score})
-		resume_data = str(resume_data)
-		resume_data = resume_data.replace("'", '"')
-		# Game_history.objects.create(type="2v2", data=resume_data)
-		logging.info("game ended TODO revove from game list")
+			try:
+				player.socket.close()
+			except:
+				continue
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(json.dumps({"type" : type, "data" : data}))
+			try:
+				player.socket.send(json.dumps({"type" : type, "data" : data}))
+			except:
+				continue
 	
 	def send(self, player, type, data):
-		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		try:
+			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		except:
+			return
 
 	def to_json(self):
 		players = []
@@ -89,9 +92,9 @@ class Game:
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
-			self.ball.direction_x = 1 #naive version
+			self.ball.direction_x *= -1 #naive version
 		elif self.ball.x > 18.5 :
-			self.ball.direction_x = -1 #naive version
+			self.ball.direction_x *= -1 #naive version
 		if self.ball.z < -29:
 			self.players[0].score += 1
 			self.ball.x = 0
@@ -111,16 +114,20 @@ class Game:
 			self.ball.speed = 1.05
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
+		if (self.ball.x < -18.5):
+			self.ball.x = -18.49
+		if (self.ball.x > 18.5):
+			self.ball.x = 18.49
 
 	def rebound_x(self):
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_x)/4.5
 			self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		elif (self.ball.z < -27 ) and (self.ball.x < (self.players[1].pad_xP2 + 4.5)  and self.ball.x > (self.players[1].pad_xP2 - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_xP2)/4.5
 			self.ball.direction_z = 1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -158,7 +165,6 @@ def start_game(num):
 
 def game_master(game):
 	game.send_all("gameState", game.to_json())
-	time.sleep(0.05)
 	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 	while True:
@@ -182,6 +188,9 @@ def game_master(game):
 					game.players[1].pad_xP2 += 0.8
 					if game.players[1].pad_xP2  > 16.0 :
 						game.players[1].pad_xP2 = 16
+			elif action == "disconnect":
+				game.end_game()
+				return
 		time.sleep(0.05)
 		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
 		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
@@ -197,10 +206,12 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		# ft_getGameType(self) 								?????????????????????????
-		
+
 		cookies = {}
-		data = self.scope['headers']
+		try:
+			data = self.scope['headers']
+		except:
+			return
 		for i in data:
 			if b'cookie' in i:
 				cookie = i[1].decode('utf-8')
@@ -209,11 +220,16 @@ class websocket_client(WebsocketConsumer):
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		token = cookies['token']
+		
+		logging.info("new player connected")
+		try:
+			token = cookies['token']
+		except:
+			return
 		if not Token.objects.filter(token=token).exists():
 			return
 		token = Token.objects.get(token=token)
-		if token.is_valid:
+		if token.is_valid == True:
 			self.accept()
 		else:
 			return
@@ -235,39 +251,44 @@ class websocket_client(WebsocketConsumer):
 					return
 
 
-	def receive(self, text_data=None, bytes_data=None):
+	def receive(self, text_data=None):
 		if not hasattr(self, "data"):
 			self.find_game()
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
 
-		if receive_package['type'] == "keyCode":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([0, "left"])
+		try:
+			if receive_package['type'] == "keyCode":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([0, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([0, "right"])
+						return
+				except:
 					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([0, "right"])
+			if receive_package['type'] == "keyCode2P":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([1, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([1, "right"])
+						return
+				except:
 					return
-			except:
-				return
-		if receive_package['type'] == "keyCode2P":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([1, "left"])
-					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([1, "right"])
-					return
-			except:
-				return
-		return
+			return
+		except:
+			pass
 
 	def disconnect(self, code):
-		print("server says disconnected")
+		super().disconnect(code)
+		self.find_game()
 		if hasattr(self, "data"):
-			self.data.end_game()
+			logging.info(f"server says disconnected : {code}")
+			self.data.queue.put([self.playerID, "disconnect"])
 		else:
 			for player in waiting_list:
 				if player.socket == self:

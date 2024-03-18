@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 	<meta charset="UTF-8">
@@ -10,11 +11,39 @@
 	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
 	<link rel="preload" as="image" href="/static/images/favicon.ico">
 	<link rel="stylesheet" href="/static/stylesheets/style.css">
+	<!-- <script type="module" src="/static/javascripts/three/three.module.min.js"></script> -->
+	<script type="importmap">
+		{
+		  "imports": {
+			"three": "https://unpkg.com/three@0.160.1/build/three.module.js",
+			"three/addons/": "https://unpkg.com/three@0.160.1/examples/jsm/"
+			}
+		}
+	</script>
+	<style>
+		body {
+			margin: 0;
+		}
+		.preload {
+			position: relative; height: 100vh; width: 100vw; flex-direction: column; display: flex; align-items: center; justify-content: center;
+		}
+		.preload .icon {
+			position: relative; height: 100px; width: 100px; border-radius: 5px; color: #24292f;
+		}
+		@media (prefers-color-scheme: dark) {
+			.preload .icon {
+				color: #c9d1d9 !important;
+			}
+		}
+		.cls-1 {
+			fill: currentColor !important;
+		}
+	</style>
 </head>
 <body class="variant">
 	<div id="root">
 		<!-- // -->
-		<div class="home">
+		<!-- <div class="home">
 			<div class="nav-bar">
 				<nav>
 					<div class="nav-container">
@@ -66,7 +95,7 @@
 									<div class="fa-list">
 										<div class="fa-list-row">
 											<div class="lobby-card">
-												<div class="content" style="background-image: url('/static/images/pong_visal_2.png');">
+												<div class="content" style="background-image: url('/static/images/pong_visual_2.png');">
 													<div class="card-container">
 														<a href="/game/2">
 															<div class="play-button">
@@ -84,7 +113,7 @@
 										</div>
 										<div class="fa-list-row">
 											<div class="lobby-card">
-												<div class="content" style="background-image: url('/static/images/pong_visal_3.png');">
+												<div class="content" style="background-image: url('/static/images/pong_visual_3.png');">
 													<div class="card-container">
 														<a href="/game/4">
 															<div class="play-button">
@@ -102,7 +131,7 @@
 										</div>
 										<div class="fa-list-row">
 											<div class="lobby-card">
-												<div class="content" style="background-image: url('/static/images/pong_visal_1.png');">
+												<div class="content" style="background-image: url('/static/images/pong_visual_1.png');">
 													<div class="card-container">
 														<div class="play-button">
 															<svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -152,10 +181,10 @@
 					</div>
 				</div>
 			</main>
-		</div>
+		</div> -->
 		<!-- // -->
 	</div>
-	<script src="/static/javascripts/renderer.js"></script>
+	<script type="module" src="/static/javascripts/renderer.js"></script>
 	<!-- <script src="/static/javascripts/unmf.js"></script> -->
 	<!-- <script>
 		document.querySelectorAll('a').forEach((e) => {
