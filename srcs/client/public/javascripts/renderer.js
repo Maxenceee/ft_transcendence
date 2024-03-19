@@ -1739,7 +1739,7 @@ class GameView extends Component {
 		// console.log(size);
 		window.onbeforeunload = (e) => {
 			// display a message to the user
-			// e.preventDefault();
+			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
 		this.setState({game_render: game_render({width: window.innerWidth - 168, height: window.innerHeight})});
