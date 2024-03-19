@@ -50,6 +50,7 @@ class Game:
 		self.queue = queue.Queue()
 
 	def end_game(self):
+		logging.info(f"game ended called: {self.id}")
 		try:
 			game_list.remove(self)
 		except:
@@ -61,6 +62,7 @@ class Game:
 					user.is_ingame = False
 					user.save()
 					player.socket.close()
+					logging.info(f"socket closed: {player.id}")
 			except:
 				continue
 		if self.players[0].score == 0 and self.players[1].score == 0:
