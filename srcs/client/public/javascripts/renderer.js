@@ -1453,7 +1453,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	controls.target.set(0, 0, 0);
 	controls.update();
 
-	const Alight = new THREE.AmbientLight({color:0xffffff});
+	const Alight = new THREE.AmbientLight({ color: 0xffffff });
 	scene.add(Alight);
 
 	let font, textGeo, textMesh2;
@@ -1617,7 +1617,6 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
-// 
 		if (keyVar == 68)
 			keyCode.right = 0;
 		if (keyVar == 65)
@@ -1633,7 +1632,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		z : 0.5 + Math.random(),
 	};
 
-	const 	materials = [
+	const materials = [
 		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
 		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
 	];
@@ -1683,7 +1682,6 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		gameID : 0,
 		keyCode : keyCode
 	};
-	// socket.send({type : 0, data : data});
 	loadFont();
 
 	let animationid = null;
