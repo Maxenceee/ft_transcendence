@@ -60,6 +60,7 @@ class Game:
 					user = User.objects.get(id=player.id)
 					user.is_ingame = False
 					user.save()
+					player.socket.close()
 			except:
 				continue
 		if self.players[0].score == 0 and self.players[1].score == 0:
@@ -156,7 +157,6 @@ def start_game(num):
 		logging.info(f"game created: {game.id}")
 	else:
 		logging.info(f"pas assez de joueurs: {len(waiting_list)}")
-
 
 
 def game_master(game):
