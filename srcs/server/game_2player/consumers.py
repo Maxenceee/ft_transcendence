@@ -43,9 +43,7 @@ class Game:
 	id = ""
 	players = []
 
-
 	def __init__(self, players) -> None:
-		logging.info("new game created")
 		self.id = makeid(15)
 		self.players = players
 		self.ball = Ball()
@@ -72,20 +70,20 @@ class Game:
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type="2p", data=resume_data)
-		logging.info("game ended TODO revove from game list")
+		logging.info(f"game ended: {self.id}")
 
 	def send_all(self, type, data):
 		for player in self.players:
 			try:
 				player.socket.send(json.dumps({"type" : type, "data" : data}))
 			except:
-				continue
+				logging.info(f"error send all: {player.id}")
 	
 	def send(self, player, type, data):
 		try:
 			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
 		except:
-			return
+			logging.info(f"error send: {self.players[player].id}")
 
 	def to_json(self):
 		players = []
@@ -155,9 +153,9 @@ def start_game(num):
 		game = Game(players)
 		game_list.append(game)
 		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created")
+		logging.info(f"game created: {game.id}")
 	else:
-		logging.info("pas assez de joueurs")
+		logging.info(f"pas assez de joueurs: {len(waiting_list)}")
 
 
 
@@ -187,6 +185,7 @@ def game_master(game):
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 			elif action == "disconnect":
+				logging.info(f"player disconnected : {game.players[playerID].id} ({str(playerID)})")
 				game.players[playerID].score = 0
 				game.end_game()
 				return
@@ -206,7 +205,6 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-
 		cookies = {}
 		try:
 			data = self.scope['headers']
@@ -225,9 +223,9 @@ class websocket_client(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
-			return
+			return logging.info("user connection rejected token not found")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return logging.info("user connection rejected token not found")
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
 			if token.user.is_ingame == False:
@@ -235,12 +233,13 @@ class websocket_client(WebsocketConsumer):
 				token.user.save()
 				self.accept()
 			else:
-				return
+				return logging.info("user connection rejected user already in game")
 		else:
-			return
+			return logging.info("user connection rejected token not valid")
 		user = token.user
 		waiting_list.append(Player(user.id, self))
 		start_game(2)
+		logging.info(f"user connected : {user.id}")
 
 	def find_game(self):
 		global game_list
@@ -252,15 +251,19 @@ class websocket_client(WebsocketConsumer):
 					self.data = current
 					return
 
-
 	def receive(self, text_data=None):
 		if not hasattr(self, "data"):
 			self.find_game()
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
+		if "PING" in receive_package:
+			self.send(json.dumps({"PING": "PONG"}))
+			return
 
 		try:
+			if "type" not in receive_package:
+				return
 			if receive_package['type'] == "keyCode":
 				if receive_package['move'] == "left":
 					self.data.queue.put([self.playerID, "left"])
@@ -272,10 +275,10 @@ class websocket_client(WebsocketConsumer):
 			pass
 
 	def disconnect(self, code):
+		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
 		self.find_game()
 		if hasattr(self, "data"):
-			logging.info(f"server says disconnected : {code}")
 			self.data.queue.put([self.playerID, "disconnect"])
 		else:
 			for player in waiting_list:

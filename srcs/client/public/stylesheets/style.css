@@ -2047,6 +2047,47 @@ body:has(.connection-page) {
     stroke: #ffa700;
   }
 }
+.ws-server-p {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  background-color: #555;
+  padding: 5px 10px;
+  z-index: 8000;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  overflow: hidden;
+}
+.ws-server-p > div {
+  position: relative;
+  margin-right: 5px;
+  display: flex;
+  align-items: center;
+}
+.ws-server-p > div svg {
+  position: relative;
+  height: 100%;
+}
+.ws-server-p > div svg path {
+  fill: #FFF;
+}
+.ws-server-p p {
+  line-height: 35px;
+  font-size: 15px;
+  line-break: anywhere;
+  color: #FFF;
+}
+.ws-server-p .progression {
+  margin: 0;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #FFF;
+  height: 3px;
+}
+
 .render-context {
   position: relative;
   width: 100%;
