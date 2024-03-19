@@ -16,7 +16,6 @@ def makeid(len):
 		res += str[random.randint(0, 35)]
 	return res
 
-waiting_list = []
 game_list = []
 
 class Ball:
@@ -46,15 +45,14 @@ class Game:
 	id = ""
 	players = []
 
-
 	def __init__(self, players) -> None:
-		logging.info("new game created")
 		self.id = makeid(15)
 		self.players = players
 		self.ball = Ball()
 		self.queue = queue.Queue()
 
 	def end_game(self):
+		logging.info(f"game ended called: {self.id} (local)")
 		try:
 			game_list.remove(self)
 		except:
@@ -65,8 +63,12 @@ class Game:
 					user = User.objects.get(id=player.id)
 					user.is_ingame = False
 					user.save()
+					player.socket.close()
+					logging.info(f"socket closed: {player.id}")
 			except:
 				continue
+		logging.info(f"game ended: {self.id}")
+
 
 	def send_all(self, type, data):
 		for player in self.players:
@@ -74,12 +76,14 @@ class Game:
 				player.socket.send(json.dumps({"type" : type, "data" : data}))
 			except:
 				continue
-	
+
+
 	def send(self, player, type, data):
 		try:
 			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
 		except:
 			return
+
 
 	def to_json(self):
 		players = []
@@ -91,7 +95,8 @@ class Game:
 			"moveSpeed": self.ball.speed
 		}
 		return response
-	
+
+
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
@@ -122,6 +127,7 @@ class Game:
 		if (self.ball.x > 18.5):
 			self.ball.x = 18.49
 
+
 	def rebound_x(self):
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_x)/4.5
@@ -134,36 +140,16 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
-def start_game(num):
-	logging.info(f"waiting list {len(waiting_list)}")
-	if num == 1 :
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			players.append(player)
-			logging.info(f"player added to game")
-		waiting_list.remove(player)
-		logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created")
-		return
-	elif len(waiting_list) == num:
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			logging.info(f"player added to game")
-		for player in players:
-			waiting_list.remove(player)
-			logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created")
-	else:
-		logging.info("pas assez de joueurs")
 
+def start_game(player):
+	players = []
+	players.append(player)
+	players.append(player)
+	logging.info(f"player added to game (ai)")
+	game = Game(players)
+	game_list.append(game)
+	threading.Thread(target=game_master, args=(game,)).start()
+	logging.info(f"game created (ai)")
 
 
 def game_master(game):
@@ -209,7 +195,6 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-
 		cookies = {}
 		try:
 			data = self.scope['headers']
@@ -228,9 +213,9 @@ class websocket_client(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
-			return
+			return logging.info("user connection rejected token not found")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return logging.info("user connection rejected token not found")
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
 			if token.user.is_ingame == False:
@@ -238,15 +223,13 @@ class websocket_client(WebsocketConsumer):
 				token.user.save()
 				self.accept()
 			else:
-				return
+				return logging.info("user connection rejected user already in game")
 		else:
-			return
+			return logging.info("user connection rejected token not valid")
 		user = token.user
 
-		logging.info(user.id)
-		logging.info("new player connected")
-		waiting_list.append(Player(user.id, self))
-		start_game(1)
+		logging.info(f"new player connected {user.id}")
+		start_game(Player(user.id, self))
 
 	def find_game(self):
 		global game_list
@@ -297,12 +280,3 @@ class websocket_client(WebsocketConsumer):
 		if hasattr(self, "data"):
 			logging.info(f"server says disconnected : {code}")
 			self.data.queue.put([self.playerID, "disconnect"])
-		else:
-			logging.info("player not in game")
-			for player in waiting_list:
-				if player.socket == self:
-					if User.objects.filter(id=player.id).exists():
-						user = User.objects.get(id=player.id)
-						user.is_ingame = False
-						user.save()
-					waiting_list.remove(player)

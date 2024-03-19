@@ -1540,7 +1540,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	let counter = 0;
 	let playerNumber = -1;
 	let connectionStatus = 0;
-	let socket = new Socket({path: "/game_2player"});
+	let socket = new Socket({path: "/game_AI"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});

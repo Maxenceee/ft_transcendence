@@ -52,6 +52,7 @@ class Game:
 		self.queue = queue.Queue()
 
 	def end_game(self):
+		logging.info(f"game ended called: {self.id} (4p)")
 		try:
 			game_list.remove(self)
 		except:
@@ -62,6 +63,7 @@ class Game:
 					user = User.objects.get(id=player.id)
 					user.is_ingame = False
 					user.save()
+					player.socket.close()
 			except:
 				continue
 		if self.players[0].score == 0 and self.players[1].score == 0 and self.players[2].score == 0 and self.players[3].score == 0:
@@ -265,7 +267,6 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-
 		cookies = {}
 		try:
 			data = self.scope['headers']
@@ -284,9 +285,9 @@ class websocket_client(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
-			return
+			return logging.info("user connection rejected token not found")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return logging.info("user connection rejected token not found")
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
 			if token.user.is_ingame == False:
@@ -294,14 +295,13 @@ class websocket_client(WebsocketConsumer):
 				token.user.save()
 				self.accept()
 			else:
-				return
+				return logging.info("user connection rejected user already in game")
 		else:
-			return
+			return logging.info("user connection rejected token not valid")
 		user = token.user
 
-		logging.info(user.id)
-		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
+		logging.info(f"new player connected {user.id}")
 		start_game(4)
 	
 	def find_game(self):
