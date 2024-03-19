@@ -310,7 +310,8 @@ const Go = {
 
 			xhr.onload = function() {
 				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
-				const transformResponse = function (t) {
+				const transformResponse = function(t) {
+					console.log(this);
 					const r = this.transitional,
 						i = r && r.forcedJSONParsing,
 						a = this.responseType === "json";
@@ -539,12 +540,12 @@ class Component {
 		this._mounted = false;
 		this._moised = null;
 
-		this._handleUnmount = this._handleUnmount.bind(this);
+		this._unmountComponent = this._unmountComponent.bind(this);
 	}
 
 	setState(newState, callback) {
 		this._pendingState = Object.assign({}, this.state, newState);
-		console.log("this._pendingState", this._pendingState);
+		// console.log("this._pendingState", this._pendingState);
 		if (callback) {
 			this._pendingStateCallbacks.push(callback);
 		}
@@ -556,12 +557,15 @@ class Component {
 	}
 
 	_renderComponent() {
-		console.log("render component", this);
+		// console.log("render component", this);
 		let render = this.render();
+		// if (render instanceof Component) {
+		// 	this._moised = render;
+		// }
+		this._mounted = true;
 		this._element = render;
 		this.componentDidMount();
-		this._mounted = true;
-		return render;
+		return this._element;
 	}
 
 	_updateComponent() {
@@ -571,21 +575,22 @@ class Component {
 		this.state = this._pendingState;
 		this._pendingState = null;
 
-		console.log("this.state, this._pendingState", this.state, this._pendingState, this);
+		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
 
 		const oldElement = this._element && this._element || null;
-		console.log("oldElement, this._moised", oldElement, this._moised);
-		// if (oldElement && this._moised instanceof Component) {
-		// 	this._moised._handleUnmount();
-		// }
-		let newElement = this._moised = this.render();
-		console.log("new element before", newElement);
+		// console.log("oldElement", oldElement);
+		if (oldElement) {
+			oldElement._unmountComponent();
+		}
+		let newElement = this.render();
+		// console.log("new element before", newElement, this);
 		if (newElement instanceof Component) {
+			// this._moised = newElement;
 			newElement = newElement._renderComponent();
 		}
-		console.log("reloading element", this, oldElement, newElement);
+		console.log("reloading element", oldElement, newElement, this);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("node", node, oldElement, newElement);
+			// console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
 				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
@@ -600,19 +605,25 @@ class Component {
 		this._pendingStateCallbacks.forEach(callback => callback());
 		this._pendingStateCallbacks = [];
 
-		this.componentDidUpdate();
+		if (this._mounted)
+			this.componentDidUpdate();
 		this._element = newElement;
 	}
 
-	_handleUnmount() {
-        if (this._mounted) {
-            this.componentWillUnmount();
-            this._mounted = false;
-        }
+	_unmountComponent() {
+		if (!this._mounted) return;
+		this._mounted = false;
+		// console.log("component will unmount", this);
+		this.componentWillUnmount();
+		this._element && typeof this._element.data === "object" && typeof this._element.data._unmountComponent === "function" && this._element.data._unmountComponent();
     }
 
 	render() {
 		throw new Error('Render method must be implemented');
+	}
+
+	get element() {
+		return this._element && this._element._element || null;
 	}
 
 	componentDidMount() {}
@@ -644,11 +655,11 @@ function createElement(type, props = {}) {
 		let element = (["svg", "path", "circle", "text", "line", "g"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
 		let jv = function(c) {
 			if (c instanceof HTMLElement) {
-				console.log("c instanceof HTMLElement", c instanceof HTMLElement, c);
+				// console.log("c instanceof HTMLElement", c instanceof HTMLElement, c, element);
 				return element.appendChild(c), c;
 			}
 			if (c instanceof Component) {
-				console.log("=== c ===", c);
+				// console.log("=== c ===", c);
 				c = c._renderComponent();
 			}
 			if (typeof c === 'string') {
@@ -677,7 +688,16 @@ function createElement(type, props = {}) {
 			_element: element,
 			render() {
 				return element;
-			}
+			},
+			_unmountComponent() {
+				if (!this.data || !this.data.children) return;
+				let k = e => e && typeof e === "object" && typeof e._unmountComponent === "function";
+				if (Array.isArray(this.data.children)) {
+					this.data.children.forEach(child => k(child) && child._unmountComponent());
+				} else {
+					k(this.data.children) && this.data.children._unmountComponent();
+				}
+			},
 		};
 	}
 }
@@ -685,7 +705,7 @@ function createElement(type, props = {}) {
 class Router extends Component {
 	constructor(props) {
 		super(props);
-		console.log(this);
+		// console.log(this);
 		this.state = { route: window.location.pathname };
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
@@ -697,12 +717,35 @@ class Router extends Component {
 		});
 	}
 
+	componentDidMount() {
+		console.log("====== Router Mounted ======");
+	}
+
+	componentDidUpdate() {
+		console.log("====== Router Updated ======");
+	}
+
+	componentWillUnmount() {
+		console.log("====== Router Unmounted ======");
+	}
+
 	render() {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		const currentRoute = children.find(child => child.canRoute(route));
-		console.log("router", currentRoute, this);
+		let currentRoute = null;
+		children.forEach(child => {
+			if (!currentRoute && child.canRoute(route)) {
+				currentRoute = child;
+			} else {
+				if (child.active) {
+					// console.log("propagateUnmount on child route", child);
+					child.propagateUnmount();
+					child.active = false;
+				}
+			}
+		});
+		// console.log("router", currentRoute, this);
 		if (currentRoute) {
 			currentRoute.active = true;
 			this._element = currentRoute.render();
@@ -724,9 +767,14 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
+		// console.log("^" + this.state.route.replace(/\*/g, '.*') + "$");
 		const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
-		console.log(regex.test(route));
 		return regex.test(route);
+	}
+
+	propagateUnmount() {
+		// console.log("propagateUnmount from route", this._element);
+		this.props.element._unmountComponent();
 	}
 
 	render() {
@@ -748,7 +796,7 @@ function route({ path, element }) {
 
 
 function link(props) {
-	const { to, children } = props;
+	const { to } = props;
 
 	if (to === void 0) throw new Error('Missing `to` prop');
 
@@ -761,21 +809,32 @@ function link(props) {
 		window.dispatchEvent(new Event('popstate'));
 	};
 
-	return createElement('a', { href: to, onClick: handleClick, children });
+	return createElement('a', { href: to, onClick: handleClick, ...props });
+}
+
+function navigate(path) {
+	window.history.pushState({}, '', path);
+	window.dispatchEvent(new Event('popstate'));
 }
 
 let renderer = function() {
 	this._internalRoot = root;
 }
 renderer.prototype.render = function(elem) {
+	if (typeof elem !== "object" || (typeof elem.render !== "function" && typeof elem._renderComponent !== "function"))
+		throw new TypeError('Cannot mount invalid element');
 	this._children = elem;
+	// console.log(elem);
 	if (this._internalRoot === null) throw Error('Unable to find root node');
 	let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
-	console.log("root element", this, element);
+	console.log("root element", element);
 	this._children._element = element;
-	// console.log(JSON.stringify(element));
-	// setParentToComponents(element);
-	this._internalRoot.appendChild(element.render());
+	if (typeof element === "object" && !(element instanceof HTMLElement)) {
+		element = element.render();
+	} else if (!(element instanceof HTMLElement)) {
+		throw new TypeError('Cannot mount invalid element', element);
+	}
+	this._internalRoot.appendChild(element);
 }
 
 function setParentToComponents(obj) {
@@ -839,6 +898,14 @@ class HomePage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
+	}
+
+	componentDidMount() {
+		console.log("this.componentDidMount HomePage Page");
+	}
+
+	componentWillUnmount() {
+		console.log("this.componentWillUnmount HomePage Page");
 	}
 
 	render() {
@@ -1034,7 +1101,6 @@ class UserPagePlayerStats extends Component {
 	}
 
 	render() {
-		console.log("user data", this.state.user);
 		let data = this.getWinRate(this.state.user.game_history);
 		return createElement('div', {
 			class: "stat-card-content", children: [
@@ -1100,11 +1166,11 @@ class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
-		console.log(this.state);
+		// console.log(this.state);
 	}
 	
 	componentDidUpdate() {
-		console.log("this.componentDidUpdate");
+		// console.log("this.componentDidUpdate");
 	}
 
 	render() {
@@ -1170,6 +1236,18 @@ class UserPage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
+	}
+
+	componentDidMount() {
+		console.log("this.componentDidMount UserPage Page");
+	}
+
+	componentDidUpdate() {
+		console.log("this.componentDidUpdate UserPage Page");
+	}
+
+	componentWillUnmount() {
+		console.log("this.componentWillUnmount UserPage Page");
 	}
 
 	render() {
@@ -1257,7 +1335,7 @@ class NotFound extends Component {
 				createElement("p", {children:
 					"Page not found"
 				}),
-				link({to: "/", children: "Go back to home"})
+				link({to: "/", class: "link", children: "Go back to home"})
 			]
 		});
 	}
@@ -1333,12 +1411,12 @@ class BadConnection extends Component {
 	}
 }
 
-let game_render = function() {
-	console.log("call of game_render");
-	let counter = 0
-	let socket = new Socket({path: "/game_2player"});
+let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+	console.log("game_render", width, height);
+	let counter = 0;
 	let playerNumber = -1;
 	let connectionStatus = 0;
+	let socket = new Socket({path: "/game_2player"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1347,58 +1425,55 @@ let game_render = function() {
 	socket.onclose(() => {
 		console.info("Connection closed");
 		connectionStatus = 2;
-		window.location.replace("/");
+		navigate("/");
 	});
 	socket.use((msg) =>{
-			if (msg.type == "gameState")
-			{	
-				data = msg.data;
-				data.type = msg.type
-				ball.position.x = data.ball.x;			
-				ball.position.z = data.ball.z;			
-				palletPlayer1.position.x = data.player[0].x;
-				palletPlayer2.position.x = data.player[1].x;
-			}
-			else if (msg.type == "resetCam")
-				setcam(10, 69, 0);
-			else if (msg.type == "setCam")
-				setcam(msg.data.x, msg.data.y, msg.data.z);
+		if (msg.type == "gameState")
+		{	
+			data = msg.data;
+			data.type = msg.type
+			ball.position.x = data.ball.x;			
+			ball.position.z = data.ball.z;			
+			palletPlayer1.position.x = data.player[0].x;
+			palletPlayer2.position.x = data.player[1].x;
+		}
+		else if (msg.type == "resetCam")
+			setcam(10, 69, 0);
+		else if (msg.type == "setCam")
+			setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	// document.body.appendChild( renderer.domElement );
-	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize(width, height);
+	renderer.setPixelRatio(window.devicePixelRatio);
 
-	var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-	camera.position.set( 15, 15, 20 );
+	var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200);
+	camera.position.set(15, 15, 20);
 
-	const controls = new OrbitControls( camera, renderer.domElement );
+	const controls = new OrbitControls(camera, renderer.domElement);
 	const scene = new THREE.Scene();
 	const sceneError = new THREE.Scene;
 	controls.maxDistance = 90;
-	controls.target.set( 0, 0, 0 );
+	controls.target.set(0, 0, 0);
 	controls.update();
 
-	const Alight = new THREE.AmbientLight({color:0xffffff});
-	scene.add( Alight );
+	const Alight = new THREE.AmbientLight({ color: 0xffffff });
+	scene.add(Alight);
 
-	let font, textGeo, textMesh2
-
+	let font, textGeo, textMesh2;
 	var score = {
 		scoreP1: 0,
 		scoreP2: 0,
 	};
 
 	function loadFont() {
-
 		const loader = new FontLoader();
-		loader.load( '/static/javascripts/font.json', function ( response ) {
+		loader.load('/static/fonts/font.json', function (response) {
 			font = response;
 			createText("");
-		} );
+		});
 	}
 
 	let palletPlayer1 = 0;
@@ -1409,8 +1484,8 @@ let game_render = function() {
 	{
 		mapLenth = 60;
 		mapWidth = 40;
-		palletPlayer1 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 6, 1, 1 ), 
+		palletPlayer1 = new THREE.Mesh(
+			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 					color:0xffffff, 
@@ -1419,8 +1494,8 @@ let game_render = function() {
 					side : THREE.DoubleSide,
 				})
 			);
-		palletPlayer2 = new THREE.Mesh( 
-			new THREE.BoxGeometry( 6, 1, 1 ), 
+		palletPlayer2 = new THREE.Mesh(
+			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1430,7 +1505,7 @@ let game_render = function() {
 			})
 		);
 		let wallLeft = new THREE.Mesh(
-			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
+			new THREE.BoxGeometry(1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1440,7 +1515,7 @@ let game_render = function() {
 			})
 		);
 		let wallRight = new THREE.Mesh(
-			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
+			new THREE.BoxGeometry(1 , 1,  mapLenth + 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xffffff, 
@@ -1452,7 +1527,7 @@ let game_render = function() {
 		wallRight.position.x += mapWidth/2;
 		wallLeft.position.x -= mapWidth/2;
 		let wallP2 = new THREE.Mesh(
-			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
+			new THREE.BoxGeometry(mapWidth - 1, 1, 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
 				color:0xff00ff, 
@@ -1462,7 +1537,7 @@ let game_render = function() {
 			})
 		);	
 		let wallP1 = new THREE.Mesh(
-			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
+			new THREE.BoxGeometry(mapWidth - 1, 1 , 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false,
 				color:0x00ffff, 
@@ -1474,7 +1549,7 @@ let game_render = function() {
 		wallP1.position.z += mapLenth/2
 		wallP2.position.z -= mapLenth/2
 
-		const geometryBall = new THREE.BoxGeometry( 1, 1, 1 );
+		const geometryBall = new THREE.BoxGeometry(1, 1, 1);
 		const materialBall = new THREE.MeshPhysicalMaterial({
 			wireframe:false, 
 			color:0xff0000, 
@@ -1482,7 +1557,7 @@ let game_render = function() {
 			iridescence :1,
 			side : THREE.DoubleSide,
 		});
-		ball = new THREE.Mesh( geometryBall, materialBall );
+		ball = new THREE.Mesh(geometryBall, materialBall);
 
 		palletPlayer1.position.z += (mapLenth/2) - 1.5;
 		palletPlayer2.position.z -= (mapLenth/2) - 1.5;
@@ -1490,84 +1565,72 @@ let game_render = function() {
 		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
 	}
 
-		const params = {
+	const params = {
 		threshold: 0,
 		strength: 0.35,
 		radius: 0,
-		exposure: 1
+		exposure: 1,
 	};
 
-	const renderScene = new RenderPass( scene, camera );
+	const renderScene = new RenderPass(scene, camera);
 
-	const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+	const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
 	bloomPass.threshold = params.threshold;
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
 	const outputPass = new OutputPass();
-	let composer
-	composer = new EffectComposer( renderer );
-	composer.addPass( renderScene );
-	composer.addPass( bloomPass );
-	composer.addPass( outputPass );
+	let composer = new EffectComposer(renderer);
+	composer.addPass(renderScene);
+	composer.addPass(bloomPass);
+	composer.addPass(outputPass);
 
-	let moveSpeed = 1.05
+	let moveSpeed = 1.05;
 
-	initiateMapTwoPlayer({})
+	initiateMapTwoPlayer({});
 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true)
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-		keyCode.right = 0
-		keyCode.left = 0
+		keyCode.right = 0;
+		keyCode.left = 0;
 		if (keyVar == 68)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
-			// socket.send({type : 'keyCode', move : "right"});
-		}
-		if (keyVar == 65)
-		{
-			keyCode.left = 1
-			keyCode.right = 0
-			// socket.send({type : 'keyCode', move : "left"});
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
 		if (keyVar == 39)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
+			keyCode.left = 0;
+			keyCode.right = 1;
 			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
-			keyCode.left = 1
-			keyCode.right = 0
+			keyCode.left = 1;
+			keyCode.right = 0;
 			// socket.send({type : 'keyCode', move : "left"})
 		}
 		if (keyVar == 82)
 		{
-			setcam(10, 69, 0)
-			controls.target.set( 0, 0, 0 );
+			setcam(10, 69, 0);
+			controls.target.set(0, 0, 0);
 		}
 		if (keyCode.right == 1 && keyCode.left == 0)
 			socket.send({type : 'keyCode', move : "right"});
 		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"})
-		else
-			;
+			socket.send({type : 'keyCode', move : "left"});
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
-// 
-// 
 		if (keyVar == 68)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 65)
-			keyCode.left = 0
+			keyCode.left = 0;
 		if (keyVar == 39)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 37)
-			keyCode.left = 0
+			keyCode.left = 0;
 	}
 
 	let ballDirection = {
@@ -1575,17 +1638,16 @@ let game_render = function() {
 		z : 0.5 + Math.random(),
 	};
 
-	const 	materials = [
-		new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
-		new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-		];
+	const materials = [
+		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
+		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
+	];
 	if (palletPlayer1 != 0)
 		scene.add(palletPlayer1, palletPlayer2);
 
 	function createText(msg) {
 		scene.remove(textMesh2);
-		textGeo = new TextGeometry( msg , {
-
+		textGeo = new TextGeometry(msg , {
 			font: font,
 
 			size: 10,
@@ -1595,10 +1657,9 @@ let game_render = function() {
 			bevelThickness: 0.1,
 			bevelSize: 0.01,
 			bevelEnabled: true
-
 		});
 
-		textMesh2 = new THREE.Mesh( textGeo, materials);
+		textMesh2 = new THREE.Mesh(textGeo, materials);
 		textMesh2.rotateX(-Math.PI * 0.5);
 		textMesh2.rotateZ(Math.PI * 0.5);
 		textMesh2.position.z += 12.5;
@@ -1627,17 +1688,17 @@ let game_render = function() {
 		gameID : 0,
 		keyCode : keyCode
 	};
-	// socket.send({type : 0, data : data});
 	loadFont();
 
 	let animationid = null;
 	const animate = async () => {
 		if (composer){
-			renderer.render( scene, camera );
+			renderer.render(scene, camera);
 			composer.render();	
 		}
 		else
-			renderer.render( sceneError, camera );
+			renderer.render(sceneError, camera);
+
 		controls.update();
 		animationid = requestAnimationFrame(animate);
 		if (data.type == "gameState")
@@ -1654,10 +1715,10 @@ let game_render = function() {
 				createText(data.player[0].score + " : " + data.player[1].score);
 			}
 		}
-		await sleep(25);
+		// await sleep(25);
 	}
 
-	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+	// const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	function setcam (x, y, z) {
 		camera.position.set(x, y, z);
 	}
@@ -1666,6 +1727,7 @@ let game_render = function() {
 		socket: socket,
 		renderer: renderer,
 		animationid: () => animationid,
+		render: () => renderer.domElement
 	};
 };
 
@@ -1676,26 +1738,33 @@ class GameView extends Component {
 	}
 
 	componentDidMount() {
-		// this.setState({game_render: game_render()});
 		console.log("componentDidMount GameView", this);
+		// let size = this.element.getBoundingClientRect();
+		// console.log(size);
+		window.onbeforeunload = (e) => {
+			// display a message to the user
+			e.preventDefault();
+			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
+		}
+		this.setState({game_render: game_render({width: window.innerWidth - 168, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
-		console.log("componentDidUpdate GameView", this);
-		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		// this.state.game_render.start(this.state);
+		// console.log("componentDidUpdate GameView", this.state.game_render);
+		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		this.state.game_render.start(this.state);
 	}
 
 	componentWillUnmount() {
-		// this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		// this.state.game_render.socket.close();
-		console.log("game view unmounted");
+		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		this.state.game_render.socket.close();
+		// console.log("game view unmounted", this.state.game_render);
+		window.onbeforeunload = null;
 	}
 
 	render() {
-		// console.log("render GameView", this.state.game_render && this.state.game_render.renderer);
-		// return createElement('div', {children: this.state.game_render && this.state.game_render.renderer.domElement});
-		return createElement('div', {children: "game view"});
+		console.log("render GameView",this.state.game_render);
+		return createElement('div', {class: "render-context", children: this.state.game_render && this.state.game_render.render()});
 	}
 }
 
@@ -1720,74 +1789,94 @@ class Main extends Component {
 
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
-		this.loadUser();
+		// this.loadUser();
 	}
 
+	// render() {
+	// 	console.log("main state on render", this.state);
+	// 	return (
+	// 		this.state.loading ?
+	// 		createElement(Loader)
+	// 		:
+	// 		this.state.error != null ?
+	// 		createElement(BadConnection)
+	// 		:
+	// 		createElement('div', {
+	// 			class: "home", children: [
+	// 				createElement('div', {
+	// 					class: "nav-bar", children: createElement('nav', {
+	// 						children: [
+	// 							createElement('div', {
+	// 								class: "nav-container", children: [
+	// 									link({
+	// 										to: "/", children: createElement('div', {
+	// 											class: "icon-container", children: createElement('svg', {
+	// 												class: "icon", width: "29", height: "28", viewBox: "0 0 29 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
+	// 													d: "M17.3688 22.7488H11.2228V15.1419C11.2228 14.5944 11.5903 14.2386 12.1378 14.2386H16.4655C17.013 14.2386 17.3688 14.5944 17.3688 15.1419V22.7488ZM3.78914 22.3431C3.78914 24.0268 4.84734 25.0447 6.58194 25.0447H22.0364C23.771 25.0447 24.8175 24.0268 24.8175 22.3431V13.4141L15.0286 5.20275C14.5727 4.81931 14.0306 4.82892 13.5844 5.20275L3.78914 13.4141V22.3431ZM0 11.814C0 12.4189 0.455153 12.935 1.19765 12.935C1.56163 12.935 1.886 12.7466 2.17217 12.5115L13.8119 2.7458C14.1267 2.46713 14.4958 2.46713 14.8127 2.7458L26.4462 12.5115C26.7248 12.7466 27.0492 12.935 27.4132 12.935C28.0863 12.935 28.6012 12.5171 28.6012 11.8428C28.6012 11.447 28.4482 11.1409 28.1515 10.8878L15.9544 0.635973C14.9522 -0.211991 13.6821 -0.211991 12.6703 0.635973L0.459372 10.8899C0.153045 11.1451 0 11.4875 0 11.814ZM21.547 6.13864L24.8576 8.92464V3.26801C24.8576 2.73973 24.521 2.40317 23.9927 2.40317H22.414C21.8953 2.40317 21.547 2.73973 21.547 3.26801V6.13864Z"
+	// 												})
+	// 											})
+	// 										})
+	// 									}),
+	// 									link({
+	// 										to: "/user/me", children: createElement('div', {
+	// 											class: "icon-container", children: createElement('svg', {
+	// 												class: "icon", width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
+	// 													d: "M14.105 26.21C20.7369 26.21 26.2121 20.7273 26.2121 14.105C26.2121 7.47312 20.7273 2 14.0954 2C7.47523 2 2 7.47312 2 14.105C2 20.7273 7.48484 26.21 14.105 26.21ZM14.105 23.8255C8.71085 23.8255 4.39412 19.4991 4.39412 14.105C4.39412 8.71085 8.70124 4.38452 14.0954 4.38452C19.4895 4.38452 23.8276 8.71085 23.8276 14.105C23.8276 19.4991 19.4991 23.8255 14.105 23.8255ZM21.9181 21.8361L21.8766 21.6418C21.14 19.9212 18.196 18.1442 14.105 18.1442C10.0257 18.1442 7.07959 19.9212 6.33545 21.6322L6.29397 21.8361C8.49826 23.8651 11.8683 24.9826 14.105 24.9826C16.3534 24.9826 19.6946 23.8747 21.9181 21.8361ZM14.105 16.2132C16.3794 16.2324 18.1414 14.2979 18.1414 11.7847C18.1414 9.4196 16.3655 7.4478 14.105 7.4478C11.8466 7.4478 10.059 9.4196 10.0707 11.7847C10.0803 14.2979 11.8423 16.194 14.105 16.2132Z"
+	// 												})
+	// 											})
+	// 										})
+	// 									})
+	// 								]
+	// 							}),
+	// 							createElement('div', {
+	// 								class: "nav-bottom", children: createElement('a', {
+	// 									href: "/logout", children: createElement('div', {
+	// 										class: "icon-container", children: createElement('svg', {
+	// 											class: "icon", width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
+	// 												createElement('path', {
+	// 													d: "M7.41333 16.5205V23.4008C7.41333 25.3365 8.76661 26.6312 10.7865 26.6312H19.9953C21.9856 26.6312 23.3135 25.3365 23.3135 23.3987V4.23249C23.3135 2.29258 21.9856 1 19.9953 1H10.7865C8.76661 1 7.41333 2.29258 7.41333 4.23038V11.1309H9.71136V4.75866C9.71136 3.86545 10.2411 3.36131 11.1802 3.36131H19.5605C20.4879 3.36131 21.0176 3.86967 21.0176 4.76076V22.8705C21.0176 23.7615 20.4879 24.2699 19.5605 24.2699H11.1802C10.2411 24.2699 9.71136 23.7658 9.71136 22.8726V16.5205H7.41333Z"
+	// 												}),
+	// 												createElement('path', {
+	// 													d: "M4.99257 14.7958H12.6859L14.9498 14.6807L12.644 16.7265L11.9992 17.3755C11.8279 17.5607 11.7013 17.8213 11.7013 18.099C11.7013 18.6533 12.1098 19.0384 12.647 19.0384C12.9215 19.0384 13.1694 18.9362 13.3525 18.7511L17.4934 14.6144C17.755 14.3624 17.8858 14.0807 17.8858 13.8161C17.8858 13.5494 17.755 13.2505 17.4934 13.0061L13.3525 8.87895C13.1694 8.69379 12.9215 8.59161 12.647 8.59161C12.1098 8.59161 11.7013 8.97668 11.7013 9.52348C11.7013 9.81082 11.8237 10.0597 11.9992 10.2449L12.644 10.9056L14.9498 12.9419L12.6859 12.8247H4.99257C4.39562 12.8247 4 13.2918 4 13.8161C4 14.3383 4.39562 14.7958 4.99257 14.7958Z"
+	// 												})
+	// 											]
+	// 										})
+	// 									})
+	// 								})
+	// 							})
+	// 						]
+	// 					})
+	// 				}),
+	// 				createElement('header', {}),
+	// 				createElement('main', {children:
+	// 					router(
+	// 						route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+	// 						route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+	// 						route({path: "/game/2", element: createElement(GameView)}),
+	// 						route({path: "*", element: createElement(NotFound)})
+	// 					)
+	// 				})
+	// 			]
+	// 		})
+	// 	)
+	// }
+
 	render() {
-		console.log("main state on render", this.state);
+		console.log("main state  on render", this.state);
 		return (
-			this.state.loading ?
-			createElement(Loader)
-			:
-			this.state.error != null ?
-			createElement(BadConnection)
-			:
-			createElement('div', {
-				class: "home", children: [
-					createElement('div', {
-						class: "nav-bar", children: createElement('nav', {
-							children: [
-								createElement('div', {
-									class: "nav-container", children: [
-										link({
-											to: "/", children: createElement('div', {
-												class: "icon-container", children: createElement('svg', {
-													class: "icon", width: "29", height: "28", viewBox: "0 0 29 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
-														d: "M17.3688 22.7488H11.2228V15.1419C11.2228 14.5944 11.5903 14.2386 12.1378 14.2386H16.4655C17.013 14.2386 17.3688 14.5944 17.3688 15.1419V22.7488ZM3.78914 22.3431C3.78914 24.0268 4.84734 25.0447 6.58194 25.0447H22.0364C23.771 25.0447 24.8175 24.0268 24.8175 22.3431V13.4141L15.0286 5.20275C14.5727 4.81931 14.0306 4.82892 13.5844 5.20275L3.78914 13.4141V22.3431ZM0 11.814C0 12.4189 0.455153 12.935 1.19765 12.935C1.56163 12.935 1.886 12.7466 2.17217 12.5115L13.8119 2.7458C14.1267 2.46713 14.4958 2.46713 14.8127 2.7458L26.4462 12.5115C26.7248 12.7466 27.0492 12.935 27.4132 12.935C28.0863 12.935 28.6012 12.5171 28.6012 11.8428C28.6012 11.447 28.4482 11.1409 28.1515 10.8878L15.9544 0.635973C14.9522 -0.211991 13.6821 -0.211991 12.6703 0.635973L0.459372 10.8899C0.153045 11.1451 0 11.4875 0 11.814ZM21.547 6.13864L24.8576 8.92464V3.26801C24.8576 2.73973 24.521 2.40317 23.9927 2.40317H22.414C21.8953 2.40317 21.547 2.73973 21.547 3.26801V6.13864Z"
-													})
-												})
-											})
-										}),
-										link({
-											to: "/user/me", children: createElement('div', {
-												class: "icon-container", children: createElement('svg', {
-													class: "icon", width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
-														d: "M14.105 26.21C20.7369 26.21 26.2121 20.7273 26.2121 14.105C26.2121 7.47312 20.7273 2 14.0954 2C7.47523 2 2 7.47312 2 14.105C2 20.7273 7.48484 26.21 14.105 26.21ZM14.105 23.8255C8.71085 23.8255 4.39412 19.4991 4.39412 14.105C4.39412 8.71085 8.70124 4.38452 14.0954 4.38452C19.4895 4.38452 23.8276 8.71085 23.8276 14.105C23.8276 19.4991 19.4991 23.8255 14.105 23.8255ZM21.9181 21.8361L21.8766 21.6418C21.14 19.9212 18.196 18.1442 14.105 18.1442C10.0257 18.1442 7.07959 19.9212 6.33545 21.6322L6.29397 21.8361C8.49826 23.8651 11.8683 24.9826 14.105 24.9826C16.3534 24.9826 19.6946 23.8747 21.9181 21.8361ZM14.105 16.2132C16.3794 16.2324 18.1414 14.2979 18.1414 11.7847C18.1414 9.4196 16.3655 7.4478 14.105 7.4478C11.8466 7.4478 10.059 9.4196 10.0707 11.7847C10.0803 14.2979 11.8423 16.194 14.105 16.2132Z"
-													})
-												})
-											})
-										})
-									]
-								}),
-								createElement('div', {
-									class: "nav-bottom", children: createElement('a', {
-										href: "/logout", children: createElement('div', {
-											class: "icon-container", children: createElement('svg', {
-												class: "icon", width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: [
-													createElement('path', {
-														d: "M7.41333 16.5205V23.4008C7.41333 25.3365 8.76661 26.6312 10.7865 26.6312H19.9953C21.9856 26.6312 23.3135 25.3365 23.3135 23.3987V4.23249C23.3135 2.29258 21.9856 1 19.9953 1H10.7865C8.76661 1 7.41333 2.29258 7.41333 4.23038V11.1309H9.71136V4.75866C9.71136 3.86545 10.2411 3.36131 11.1802 3.36131H19.5605C20.4879 3.36131 21.0176 3.86967 21.0176 4.76076V22.8705C21.0176 23.7615 20.4879 24.2699 19.5605 24.2699H11.1802C10.2411 24.2699 9.71136 23.7658 9.71136 22.8726V16.5205H7.41333Z"
-													}),
-													createElement('path', {
-														d: "M4.99257 14.7958H12.6859L14.9498 14.6807L12.644 16.7265L11.9992 17.3755C11.8279 17.5607 11.7013 17.8213 11.7013 18.099C11.7013 18.6533 12.1098 19.0384 12.647 19.0384C12.9215 19.0384 13.1694 18.9362 13.3525 18.7511L17.4934 14.6144C17.755 14.3624 17.8858 14.0807 17.8858 13.8161C17.8858 13.5494 17.755 13.2505 17.4934 13.0061L13.3525 8.87895C13.1694 8.69379 12.9215 8.59161 12.647 8.59161C12.1098 8.59161 11.7013 8.97668 11.7013 9.52348C11.7013 9.81082 11.8237 10.0597 11.9992 10.2449L12.644 10.9056L14.9498 12.9419L12.6859 12.8247H4.99257C4.39562 12.8247 4 13.2918 4 13.8161C4 14.3383 4.39562 14.7958 4.99257 14.7958Z"
-													})
-												]
-											})
-										})
-									})
-								})
-							]
-						})
-					}),
-					createElement('header', {}),
-					createElement('main', {children:
-						router(
-							route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
-							route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.loadUser.bind(this)})}),
-							route({path: "/game/2", element: createElement(GameView)}),
-							route({path: "*", element: createElement(NotFound)})
-						)
-					})
-				]
+			createElement('div', {children: "main"
+				// router(
+				// 	route({path: "/", element: createElement("div", {children: ["home", link({to: "/1", children: "go to page 1", class: "link"})]})}),
+				// 	route({path: "/1", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
+				// 	route({path: "/2/*", element: createElement("div", {children: [
+				// 		"page 2", link({to: "/", children: "go to home", class: "link"}),
+				// 		// router(
+				// 		// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
+				// 		// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
+				// 		// )
+				// 	]})}),
+				// 	route({path: "*", element: createElement(NotFound)})
+				// )
 			})
 		)
 	}
