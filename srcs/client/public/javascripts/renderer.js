@@ -439,6 +439,65 @@ const xhr = xhrsum;
 
 /**
  * TODO:
+ * degage cette merde
+ */
+
+var Me = function(a, b, c) {
+	return Le(document, arguments)
+},
+Le = function(a, b) {
+	var c = String(b[0]),
+		d = b[1],
+		e = b[2] || null;
+	c = (["svg", "path", "circle", "text"].includes(c.toLowerCase()) ? a.createElementNS("http://www.w3.org/2000/svg", c) : a.createElement(c));
+	// c = a.createElement(c);
+	if (e && e.in) c.innerHTML = e.in;
+	if (e && e.style) c.style = e.style;
+
+	b && (d && typeof e !== "object" && !je(d) ? Na(c, d, e) : (e && e.type ? c.setAttribute(e.type, d) : d && (c.className = d)));
+	return c
+},
+Na = function(b, c, d) {
+	function e(h, i) {
+		b.setAttribute(h, i);
+	}
+	for (var i = 0; i < Math.min(c.length, d.length); i++) {
+		e(c[i], d[i]);
+	}
+},
+Mc = function(a, b) {
+	a.classList.add(b);
+},
+Mr = function(a, b) {
+	a.classList.remove(b);
+},
+jl = function(a) {
+	return ("string" == typeof a);
+},
+Ms = function(a, b, c) {
+	jl(b) ? a.setAttribute(b, c !== undefined ? c : "") : Na(a, b, c)
+	return (a);
+},
+Md = function(a, b) {
+	(b instanceof Node) ? a.appendChild(b) : dj(a, b)
+	return (a);
+},
+Mg = function(a, b) {
+	return (a.getElementsByClassName(b));
+},
+Mqa = function(a, b) {
+	return (a.querySelectorAll(b));
+},
+Mq = function(a, b) {
+	return (a.querySelector(b));
+},
+dj = function(a, b) {
+	for(var i = 0; i < b.length; i++) 
+		(a && b[i]) && a.appendChild(b[i]);
+}
+
+/**
+ * TODO:
  * Improve the code
  */
 var Socket = function({port = 3000, host = window.location.hostname, path = "/"}) {
