@@ -67,6 +67,9 @@ class Game:
 		Game_history.objects.create(type="2v2", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
+	def next_game(self):
+		return False
+
 	def send_all(self, type, data):
 		for player in self.players:
 			player.socket.send(json.dumps({"type" : type, "data" : data}))
@@ -89,13 +92,13 @@ class Game:
 	
 	def wallCollideTwoPlayer(self):
 		i = 0
-		while i < 1:
+		while i < 4:
 			if self.ball[i].x < -18.5 :
 				self.ball[i].direction_x *= -1
 			elif self.ball[i].x > 18.5 :
 				self.ball[i].direction_x *= -1
 			if self.ball[i].z < -29:
-				self.players[i * 2].score += 1
+				self.players[i * 2].score += 1					#	not enought player to turn it on
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -103,7 +106,7 @@ class Game:
 				self.ball[i].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 				self.ball[i].speed = 1.05
 			elif self.ball[i].z > 29:
-				self.players[i * 2 + 1].score +=1
+				self.players[i * 2 + 1].score +=1				#		not enought player to turn it on
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -193,7 +196,8 @@ def game_master(game):
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
-				game.end_game()
+				if game.next_game() == False:
+					game.end_game()
 				return
 
 
@@ -267,7 +271,7 @@ class websocket_tournament(WebsocketConsumer):
 		logging.info(user.id)
 		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
-		start_game(2)
+		start_game(8)
 	
 	def find_game(self):
 		global game_list

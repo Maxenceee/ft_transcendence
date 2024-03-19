@@ -41,13 +41,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				// ball[6].position.z = data.ball.z + 200;		
 				pallet[0].position.x = data.player[0].x;
 				pallet[1].position.x = data.player[1].x;
-				// pallet[2].position.x = data.player[2].x;
-				// pallet[3].position.x = data.player[3].x;
-				// pallet[4].position.x = data.player[4].x;
-				// pallet[5].position.x = data.player[5].x;
-				// pallet[6].position.x = data.player[6].x;
-				// pallet[7].position.x = data.player[7].x;
-				console.log(ball);
+				pallet[2].position.x = data.player[2].x;
+				pallet[3].position.x = data.player[3].x;
+				pallet[4].position.x = data.player[4].x;
+				pallet[5].position.x = data.player[5].x;
+				pallet[6].position.x = data.player[6].x;
+				pallet[7].position.x = data.player[7].x;
 			}
 			else if (msg.type == "resetCam")
 				// setcam(10, 69, 0);
@@ -97,6 +96,9 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	// const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 	let font, textGeo, textMesh2
+	textGeo = []
+	textMesh2 = []
+	
 
 	var score = {
 		scoreP1: 0,
@@ -311,9 +313,9 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	if (pallet[0] != 0)
 		scene.add(pallet[0], pallet[1], pallet[2], pallet[3], pallet[4], pallet[5], pallet[6], pallet[7]);
 
-	function createText(msg, offset_x, offset_z) {
-		scene.remove(textMesh2);
-		textGeo = new TextGeometry( msg , {
+	function createText(msg, offset_x, offset_z, game) {
+		scene.remove(textMesh2[game]);
+		textGeo[game] = new TextGeometry( msg , {
 
 			font: font,
 
@@ -326,16 +328,15 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			bevelEnabled: true
 
 		});
-
-		textMesh2 = new THREE.Mesh( textGeo, materials);
-		textMesh2.rotateX(-Math.PI * 0.5);
-		textMesh2.rotateZ(Math.PI * 0.5);
-		textMesh2.position.z += 12.5 + offset_z;
-		textMesh2.position.x += 2.5 + offset_x;
-		textMesh2.position.y -= 2;
+		textMesh2[game] = new THREE.Mesh( textGeo[game], materials);
+		textMesh2[game].rotateX(-Math.PI * 0.5);
+		textMesh2[game].rotateZ(Math.PI * 0.5);
+		textMesh2[game].position.z += 12.5 + offset_z;
+		textMesh2[game].position.x += 2.5 + offset_x;
+		textMesh2[game].position.y -= 2;
 		
-		scene.add(textMesh2);
-		textGeo.dispose();
+		scene.add(textMesh2[game]);
+		textGeo[game].dispose();
 	}
 
 	var keyCode = {
@@ -361,23 +362,42 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			if (score.scoreP1 > 9 || score.scoreP2 > 9)
 			{
 				scene.remove(ball[0]);
+				// return;
+			}
+			if (score.scoreP3 > 9 || score.scoreP4 > 9)
+			{
 				scene.remove(ball[1]);
-				scene.remove(ball[2]);
-				scene.remove(ball[3]);
-				scene.remove(ball[4]);
 				return;
 			}
-			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+			if (score.scoreP5 > 9 || score.scoreP6 > 9)
 			{
-				score.scoreP1 = data.player[1].score;
-				score.scoreP2 = data.player[2].score;
-				score.scoreP3 = data.player[3].score;
-				score.scoreP4 = data.player[4].score;
-				score.scoreP5 = data.player[5].score;
-				score.scoreP6 = data.player[6].score;
-				score.scoreP7 = data.player[7].score;
-				score.scoreP8 = data.player[8].score;
-				createText(data.player[0].score + " : " + data.player[1].score, 0, 0);
+				scene.remove(ball[2]);
+				return;
+			}
+			if (score.scoreP7 > 9 || score.scoreP8 > 9)
+			{
+				scene.remove(ball[3]);
+				return;
+			}
+			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
+				score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
+				|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score  
+				|| score.scoreP7 != data.player[6].score  || score.scoreP8 != data.player[7].score ))
+			{
+
+				score.scoreP1 = data.player[0].score;
+				score.scoreP2 = data.player[1].score;
+				createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
+				score.scoreP3 = data.player[2].score;
+				score.scoreP4 = data.player[3].score;
+				createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
+				score.scoreP5 = data.player[4].score;
+				score.scoreP6 = data.player[5].score;
+				createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
+				score.scoreP7 = data.player[6].score;
+				score.scoreP8 = data.player[7].score;
+				createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
+				console.log(textMesh2);
 			}
 		}
 		await sleep(25);
