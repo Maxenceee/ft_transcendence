@@ -554,9 +554,9 @@ s.pingServer = function() {
 	this.socket.send(this.j({PING: this.ps}));
 };
 s.formatServerPing = function(a) {
-	if (a > 150 && a < 250)
+	if (a > 50 && a < 150)
 		return (1);
-	else if (a > 250)
+	else if (a > 150)
 		return (2);
 	else
 		return (0);
