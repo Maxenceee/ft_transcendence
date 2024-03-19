@@ -705,7 +705,7 @@ function createElement(type, props = {}) {
 class Router extends Component {
 	constructor(props) {
 		super(props);
-		// console.log(this);
+		console.log(this);
 		this.state = { route: window.location.pathname };
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
@@ -1864,19 +1864,19 @@ class Main extends Component {
 	render() {
 		console.log("main state  on render", this.state);
 		return (
-			createElement('div', {children: "main"
-				// router(
-				// 	route({path: "/", element: createElement("div", {children: ["home", link({to: "/1", children: "go to page 1", class: "link"})]})}),
-				// 	route({path: "/1", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
-				// 	route({path: "/2/*", element: createElement("div", {children: [
-				// 		"page 2", link({to: "/", children: "go to home", class: "link"}),
-				// 		// router(
-				// 		// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
-				// 		// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
-				// 		// )
-				// 	]})}),
-				// 	route({path: "*", element: createElement(NotFound)})
-				// )
+			createElement('div', {children: 
+				router(
+					route({path: "/", element: createElement("div", {children: "home"})}),
+					// route({path: "/1", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
+					// route({path: "/2/*", element: createElement("div", {children: [
+					// 	"page 2", link({to: "/", children: "go to home", class: "link"}),
+					// 	// router(
+					// 	// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
+					// 	// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
+					// 	// )
+					// ]})}),
+					// route({path: "*", element: createElement(NotFound)})
+				)
 			})
 		)
 	}
