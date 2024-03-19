@@ -131,7 +131,6 @@ class Game:
 	id = ""
 	players = []
 
-
 	def __init__(self, players) -> None:
 		logging.info("new game created")
 		self.id = makeid(15)
