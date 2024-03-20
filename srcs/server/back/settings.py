@@ -52,11 +52,14 @@ CORS_ALLOWED_ORIGINS = [
 
 INSTALLED_APPS = [
 	'index',
+	'game',
+
 	'game_2player',
 	'game_4player',
 	'game_local',
 	'game_AI',
 	'tournament',
+	
 	'channels',
 	'corsheaders',
 	'django.contrib.admin',

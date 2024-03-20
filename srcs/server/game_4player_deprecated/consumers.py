@@ -52,6 +52,7 @@ class Game:
 		self.queue = queue.Queue()
 
 	def end_game(self):
+		logging.info(f"game ended called: {self.id} (4p)")
 		try:
 			game_list.remove(self)
 		except:
@@ -62,6 +63,7 @@ class Game:
 					user = User.objects.get(id=player.id)
 					user.is_ingame = False
 					user.save()
+					player.socket.close()
 			except:
 				continue
 		if self.players[0].score == 0 and self.players[1].score == 0 and self.players[2].score == 0 and self.players[3].score == 0:
@@ -72,7 +74,6 @@ class Game:
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type="4p", data=resume_data)
-		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
 		for player in self.players:
@@ -99,7 +100,6 @@ class Game:
 		return response
 	
 	def wallCollideFourPlayer(self):
-
 		if self.ball.x < -29 :
 			if self.players[2].score <= 0 :
 				self.ball.direction_x *=-1
@@ -176,7 +176,7 @@ class Game:
 				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
 				self.ball.direction_x = -1
 			self.ball.speed *= 1.1
-		if (self.ball.speed > 5) :
+		if (self.ball.speed > 5):
 			self.ball.speed = 5
 
 def start_game(num):
@@ -265,7 +265,6 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-
 		cookies = {}
 		try:
 			data = self.scope['headers']
@@ -284,9 +283,9 @@ class websocket_client(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
-			return
+			return logging.info("user connection rejected token not found")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return logging.info("user connection rejected token not found")
 		token = Token.objects.get(token=token)
 		if token.is_valid == True:
 			if token.user.is_ingame == False:
@@ -294,14 +293,13 @@ class websocket_client(WebsocketConsumer):
 				token.user.save()
 				self.accept()
 			else:
-				return
+				return logging.info("user connection rejected user already in game")
 		else:
-			return
+			return logging.info("user connection rejected token not valid")
 		user = token.user
 
-		logging.info(user.id)
-		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
+		logging.info(f"new player connected {user.id}")
 		start_game(4)
 	
 	def find_game(self):

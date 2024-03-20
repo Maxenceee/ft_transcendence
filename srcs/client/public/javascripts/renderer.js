@@ -1537,10 +1537,9 @@ class BadConnection extends Component {
 
 let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
-	let counter = 0;
 	let playerNumber = -1;
 	let connectionStatus = 0;
-	let socket = new Socket({path: "/game_2player"});
+	let socket = new Socket({path: "/game/2p"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1551,20 +1550,26 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		connectionStatus = 2;
 		navigate("/");
 	});
-	socket.use((msg) =>{
-		if (msg.type == "gameState")
-		{	
-			data = msg.data;
-			data.type = msg.type
-			ball.position.x = data.ball.x;			
-			ball.position.z = data.ball.z;			
-			palletPlayer1.position.x = data.player[0].x;
-			palletPlayer2.position.x = data.player[1].x;
+	socket.use((msg) => {
+		switch (msg.type) {
+			case "initGame":
+				createText("");
+				break;
+			case "gameState": {	
+				data = msg.data;
+				data.type = msg.type
+				ball.position.x = data.ball.x;			
+				ball.position.z = data.ball.z;			
+				palletPlayer1.position.x = data.players[0].x;
+				palletPlayer2.position.x = data.players[1].x;
+			} break;
+			case "resetCam":
+				setcam(10, 69, 0);
+				break;
+			case "setCam":
+				setcam(msg.data.x, msg.data.y, msg.data.z);
+				break;
 		}
-		else if (msg.type == "resetCam")
-			setcam(10, 69, 0);
-		else if (msg.type == "setCam")
-			setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
@@ -1596,7 +1601,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		const loader = new FontLoader();
 		loader.load('/static/fonts/font.json', function (response) {
 			font = response;
-			createText("");
+			createText("Waiting for opponent");
 		});
 	}
 
@@ -1713,7 +1718,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	initiateMapTwoPlayer({});
 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
-	document.addEventListener("keyup", onDocumentKeyUp, true)
+	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
 		keyCode.right = 0;
@@ -1832,11 +1837,11 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 				scene.remove(ball);
 				return;
 			}
-			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score))
+			if ((score.scoreP2 != data.players[1].score || score.scoreP1 != data.players[0].score))
 			{
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score);
+				score.scoreP1 = data.players[0].score;
+				score.scoreP2 = data.players[1].score;
+				createText(data.players[0].score + " : " + data.players[1].score);
 			}
 		}
 		// await sleep(25);
@@ -1851,7 +1856,11 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		socket: socket,
 		renderer: renderer,
 		animationid: () => animationid,
-		render: () => renderer.domElement
+		render: () => renderer.domElement,
+		unmount: () => {
+			document.removeEventListener("keydown", onDocumentKeyDown, true);
+			document.removeEventListener("keyup", onDocumentKeyUp, true);
+		}
 	};
 };
 
@@ -1882,6 +1891,7 @@ class GameView extends Component {
 	componentWillUnmount() {
 		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
 		this.state.game_render.socket.close();
+		this.state.game_render.unmount();
 		// console.log("game view unmounted", this.state.game_render);
 		window.onbeforeunload = null;
 	}

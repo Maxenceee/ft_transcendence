@@ -37,7 +37,8 @@ class Player:
 		self.pad_z = 0
 		self.keyCode = {}
 		self.keyCode['left'] = 0
-		self.keyCode ['right'] = 0 
+		self.keyCode ['right'] = 0
+
 
 class Game:
 	id = ""
@@ -50,7 +51,7 @@ class Game:
 		self.queue = queue.Queue()
 
 	def end_game(self):
-		logging.info(f"game ended called: {self.id}")
+		logging.info(f"game ended called: {self.id} (2p)")
 		try:
 			game_list.remove(self)
 		except:
@@ -131,6 +132,7 @@ class Game:
 		if (self.ball.x > 18.5):
 			self.ball.x = 18.49
 
+
 	def rebound_x(self, playerID):
 		if ((self.ball.z < -27 and playerID == 1) or (self.ball.z > 27 and playerID == 0)) and (self.ball.x < (self.players[playerID].pad_x + 4.5)  and self.ball.x > (self.players[playerID].pad_x - 4.5)):
 			if (playerID == 1) :
@@ -143,22 +145,24 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
-	if len(waiting_list) == num:
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			logging.info(f"player added to game")
-		for player in players:
-			waiting_list.remove(player)
-			logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created: {game.id}")
-	else:
+	if len(waiting_list) != num:
 		logging.info(f"pas assez de joueurs: {len(waiting_list)}")
+		return
+
+	players = []
+	for player in waiting_list:
+		players.append(player)
+		logging.info(f"player added to game (2p)")
+	for player in players:
+		waiting_list.remove(player)
+		logging.info(f"player remove from waiting list")
+	game = Game(players)
+	game_list.append(game)
+	threading.Thread(target=game_master, args=(game,)).start()
+	logging.info(f"game created: {game.id} (2p)")
 
 
 def game_master(game):
@@ -239,9 +243,10 @@ class websocket_client(WebsocketConsumer):
 		else:
 			return logging.info("user connection rejected token not valid")
 		user = token.user
+	
 		waiting_list.append(Player(user.id, self))
+		logging.info(f"new player connected {user.id}")
 		start_game(2)
-		logging.info(f"user connected : {user.id}")
 
 	def find_game(self):
 		global game_list
