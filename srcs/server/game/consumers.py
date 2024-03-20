@@ -35,7 +35,6 @@ class Tinder: # Matchmaking
 			}
 		self.games = []
 		self.thread = threading.Thread(target=self.run, args=()).start()
-		# TODO: handle disconnect
 
 
 	def find_game(self, id, socket, type): 
@@ -43,12 +42,17 @@ class Tinder: # Matchmaking
 		if not check_type(type):
 			socket.close(1003)
 			return
+		
+		user = User.objects.get(id=id)
+		if user.is_ingame == False:
+			user.is_ingame = True
+			user.save()
+		else:
+			logging.info("user connection rejected user already in game")
+			socket.close()
+			return
 
 		self.queue.put(["join", id, socket, type])
-
-
-	def	quit_game(self, id, type):
-		self.queue.put(["quit", id, type])
 
 
 	def lauch_games(self):
@@ -62,6 +66,10 @@ class Tinder: # Matchmaking
 				logging.info(f"game created : {game}")
 				self.games.append(game)
 				game.start()
+
+
+	def delete_game(self, id):
+		self.queue.put(["end_game", id])
 
 
 	def run(self):
@@ -78,8 +86,22 @@ class Tinder: # Matchmaking
 						if player.id == id:
 							self.player_list[type]["list"].remove(player)
 							break
+				elif action[0] == "end_game":
+					for game in self.games:
+						if game.id == action[1]:
+							self.games.remove(game)
+							del game
+							break
 			self.lauch_games()
 			time.sleep(1)
+
+
+	def	quit_game(self, id, type):
+		logging.info(f"quit game called : {id} {type}")
+		self.queue.put(["quit", id, type])
+		user = User.objects.get(id=id)
+		user.is_ingame = False
+		user.save()
 
 
 class Ball:
@@ -110,7 +132,7 @@ class Player:
 		self.index = index
 
 	def push_to_game(self, action):
-		logging.info(f"push to game: {self.index} {action}")
+		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 	def send(self, data):
@@ -137,6 +159,10 @@ class AIPlayer:
 		self.pad_z = 0
 
 
+	def __del__(self):
+		self.stop()
+
+
 	def set_game(self, game, index):
 		self.game = game
 		self.index = index
@@ -150,11 +176,12 @@ class AIPlayer:
 
 	def stop(self):
 		self.running = False
-		self.thread.join()
+		if self.thread is not None:
+			self.thread.join()
 
 
 	def push_to_game(self, action):
-		logging.info(f"push to game: {self.index} {action}")
+		# logging.info(f"push to game from ai: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 
@@ -171,12 +198,11 @@ class AIPlayer:
 		while self.running:
 			while not self.queue.empty():
 				action = self.queue.get()
-				if action.type == "disconnect":
+				if action["type"] == "disconnect":
 					self.stop()
 					return
-				elif action.type == "gameState":
-					data = json.loads(action.data)
-					logging.info(f"data in ai: {data}")
+				elif action["type"] == "gameState":
+					data = action["data"]
 
 			if not data:
 				continue
@@ -186,11 +212,12 @@ class AIPlayer:
 			last_update = time.time()
 
 			i = 1
-			ball_x = data.ball.x
-			ball_z = data.ball.z
-			dir_x = data.ball.direction_x
-			dir_z = data.ball.direction_z
-			pad_x = data.players[1].pad_x
+			ball = data["ball"]
+			ball_x = ball["x"]
+			ball_z = ball["z"]
+			dir_x = ball["direction_x"]
+			dir_z = ball["direction_z"]
+			pad_x = self.pad_x
 			future_ball_x = ball_x
 			future_ball_z = ball_z
 			if (dir_z == -1):
@@ -198,8 +225,8 @@ class AIPlayer:
 			if i == 0:
 				tmp = 1
 				while (future_ball_z >= -27):
-					future_ball_x += data.ball.speed * dir_x * tmp
-					future_ball_z -= data.ball.speed
+					future_ball_x += data["moveSpeed"] * dir_x * tmp
+					future_ball_z -= data["moveSpeed"]
 					if future_ball_x > 18.5 or future_ball_x <  -18.5:
 						tmp *=-1
 					i += 1
@@ -215,11 +242,11 @@ class AIPlayer:
 					time.sleep(0.05)
 			else:
 				if int(pad_x) >= 0:
-					for i in range (int(pad_x)):
+					for i in range(int(pad_x)):
 						self.push_to_game("right")
 						time.sleep(0.05)
 				else:
-					for i in range (int(-pad_x)):
+					for i in range(int(-pad_x)):
 						self.push_to_game("left")
 						time.sleep(0.05)
 
@@ -246,19 +273,21 @@ class Game:
 	def __str__(self) -> str:
 		return f"game {self.id} ({self.type}): {format(self.players)}"
 
+	
+	def __del__(self):
+		if self.thread is not None:
+			self.thread.join()
+
 
 	def end_game(self):
 		logging.info(f"game ended called: {self.id}")
-		try:
-			game_list.remove(self)
-		except:
-			return
 		for player in self.players:
 			if User.objects.filter(id=player.id).exists():
 				user = User.objects.get(id=player.id)
 				user.is_ingame = False
 				user.save()
 			try:
+				logging.info(f"close socket for player {player.id}")
 				player.socket.close()
 			except:
 				# logging.error("error close socket")
@@ -266,11 +295,14 @@ class Game:
 
 		logging.info(f"game {self.id} ended")
 		scores_all_zero = all(player.score == 0 for player in self.players)
-		if scores_all_zero:
-			return
-		if self.type == "ai" or self.type == "local":
-			return
+		if not scores_all_zero and not self.type == "ai" and not self.type == "local":
+			self.save_history()
 
+		logging.info("destroying game " + self.id)
+		matchmaker.delete_game(self.id)
+
+
+	def save_history(self):
 		resume_data = []
 		for player in self.players:
 			resume_data.append({"id": player.id, "score": player.score})
@@ -294,10 +326,10 @@ class Game:
 		for player in self.players:
 			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
 		response = {
-			"player": players,
+			"players": players,
 			# "type": self.type,
 			"ball": {"x": self.ball.x, "z": self.ball.z, "direction_x": self.ball.direction_x, "direction_z": self.ball.direction_z},
-			# "moveSpeed": self.ball.speed
+			"moveSpeed": self.ball.speed
 		}
 		return response
 
@@ -321,13 +353,13 @@ class Game:
 
 	def game_master_2p(self):
 		logging.info("game master 2p")
+		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				logging.info(f"game_master_2p action: {player_idx} {action}")
 				if action == "right":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 0.8
@@ -367,6 +399,7 @@ class Game:
 
 	def game_master_4p(self):
 		logging.info("game master 4p")
+		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
@@ -437,6 +470,7 @@ class Game:
 	def game_master_ai(self):
 		logging.info("game master ai")
 		self.ai_player.start()
+		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
@@ -459,18 +493,24 @@ class Game:
 								self.players[0].pad_x = -16
 					if self.players[1].pad_x  < 16.5 and player_idx == 1:
 						self.players[1].pad_x += 0.8
-						if self.players[1].pad_x  > 16.0 :
+						if self.players[1].pad_x  > 16.0:
 							self.players[1].pad_x = 16
+				elif action == "disconnect":
+					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
+					self.ai_player.stop()
+					self.end_game()
+					return
+
 			time.sleep(0.05)
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_two_player()
-			self.pad_collision_x()
+			self.pad_collision_x(0)
+			self.pad_collision_x(1)
 			self.send_all("gameState", self.to_json())
 			for player in self.players:
-				# logging.info(f"game_master score check: {player.score} {player.id}")
-				if player.score  > 9:
-					# self.ai_player.stop()
+				if player.score > 9:
+					self.ai_player.stop()
 					self.end_game()
 					return
 
@@ -609,6 +649,12 @@ def create_game(num):
 
 
 class WebsocketClient(WebsocketConsumer):
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.user = None
+		self.type = None
+		self.player = None
+
 	def connect(self):
 		logging.info("new player connected in new version <=============================")
 		cookies = {}
@@ -630,19 +676,15 @@ class WebsocketClient(WebsocketConsumer):
 			token = cookies['token']
 		except:
 			return logging.info("user connection rejected token not found")
+
 		if not Token.objects.filter(token=token).exists():
 			return logging.info("user connection rejected token not found")
 
 		token = Token.objects.get(token=token)
-		if token.is_valid == True:
-			if token.user.is_ingame == False:
-				token.user.is_ingame = True
-				token.user.save()
-				self.accept()
-			else:
-				return logging.info("user connection rejected user already in game")
-		else:
+		if token.is_valid == False:
 			return logging.info("user connection rejected token not valid")
+
+		self.accept()
 
 		try:
 			self.type = self.scope['url_route']['kwargs']['type']
@@ -677,17 +719,9 @@ class WebsocketClient(WebsocketConsumer):
 	def disconnect(self, code):
 		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
-		# self.find_game()
-		# if hasattr(self, "data"):
-		# 	self.data.queue.put([self.playerID, "disconnect"])
-		# else:
-		# 	for player in waiting_list:
-		# 		if player.socket == self:
-		# 			if User.objects.filter(id=player.id).exists():
-		# 				user = User.objects.get(id=player.id)
-		# 				user.is_ingame = False
-		# 				user.save()
-		# 			waiting_list.remove(player)
+		matchmaker.quit_game(self.user.id, self.type)
+		if self.player is not None:
+			self.player.push_to_game("disconnect")
 
 
 #####################################################
