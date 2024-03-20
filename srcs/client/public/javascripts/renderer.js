@@ -658,13 +658,14 @@ function createElement(type, props = {}) {
 				// console.log("c instanceof HTMLElement", c instanceof HTMLElement, c, element);
 				return element.appendChild(c), c;
 			}
+			console.log("=== c ===", c);
 			if (c instanceof Component) {
-				// console.log("=== c ===", c);
 				c = c._renderComponent();
 			}
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
+				console.log(c);
 				c && element.appendChild(c.render());
 			}
 		}
@@ -767,8 +768,10 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
-		// console.log("^" + this.state.route.replace(/\*/g, '.*') + "$");
+		// see fucntion eh in unmf.js
+		console.log("^" + this.state.route.replace(/\*/g, '.*') + "$");
 		const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
+		console.log("test for route:", regex.test(route));
 		return regex.test(route);
 	}
 
@@ -780,8 +783,8 @@ class Route extends Component {
 	render() {
 		const { element } = this.props;
 
-		this._element = (element instanceof Component ? element._renderComponent() : element.render());
-		// console.log("in render route", this, this._element);
+		this._element = (element instanceof Component ? element._renderComponent() : element);
+		console.log("in render route", this, this._element);
 		return this._element;
 	}
 }
@@ -1866,16 +1869,15 @@ class Main extends Component {
 		return (
 			createElement('div', {children: 
 				router(
-					route({path: "/", element: createElement("div", {children: "home"})}),
-					// route({path: "/1", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
-					// route({path: "/2/*", element: createElement("div", {children: [
-					// 	"page 2", link({to: "/", children: "go to home", class: "link"}),
-					// 	// router(
-					// 	// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
-					// 	// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
-					// 	// )
-					// ]})}),
-					// route({path: "*", element: createElement(NotFound)})
+					route({path: "/", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
+					route({path: "/2/*", element: createElement("div", {children: [
+						"page 2", link({to: "/", children: "go to home", class: "link"}),
+						// router(
+						// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
+						// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
+						// )
+					]})}),
+					route({path: "*", element: createElement(NotFound)})
 				)
 			})
 		)
