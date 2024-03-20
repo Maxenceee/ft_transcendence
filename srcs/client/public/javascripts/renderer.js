@@ -311,7 +311,6 @@ const Go = {
 			xhr.onload = function() {
 				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
 				const transformResponse = function(t) {
-					console.log(this);
 					const r = this.transitional,
 						i = r && r.forcedJSONParsing,
 						a = this.responseType === "json";
@@ -588,7 +587,7 @@ class Component {
 			// this._moised = newElement;
 			newElement = newElement._renderComponent();
 		}
-		console.log("reloading element", oldElement, newElement, this);
+		// console.log("reloading element", oldElement, newElement, this);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
 			// console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
@@ -644,7 +643,17 @@ function Is(e) {
 			return "http://www.w3.org/2000/svg";
 	}
 }
-
+/**
+ * 
+ * @param {string|Component} type 
+ * @param {{}} props 
+ * @returns {new Component|{
+ * data: string,
+ * _element: HTMLElement,
+ * render(),
+ * _unmountComponent(),
+ * }}
+ */
 function createElement(type, props = {}) {
 	let t;
 	if (typeof props != "object") throw new Error('`props` must be an object.');
@@ -665,7 +674,7 @@ function createElement(type, props = {}) {
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
-				console.log(c);
+				// console.log(c);
 				c && element.appendChild(c.render());
 			}
 		}
@@ -706,7 +715,7 @@ function createElement(type, props = {}) {
 class Router extends Component {
 	constructor(props) {
 		super(props);
-		console.log(this);
+		// console.log(this);
 		this.state = { route: window.location.pathname };
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
@@ -832,7 +841,7 @@ class Route extends Component {
 
 	canRoute(route) {
 		const regex = Ia(this.state.route, route);
-		// console.log("regex result on route", this.state, regex);
+		console.log("regex result on route", this.state, regex);
 		return regex;
 	}
 
@@ -1926,7 +1935,6 @@ class Main extends Component {
 	// }
 
 	render() {
-		console.log("main state  on render", this.state);
 		return (
 			createElement('div', {children: 
 				router(
