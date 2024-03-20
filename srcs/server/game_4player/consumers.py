@@ -74,7 +74,6 @@ class Game:
 		resume_data = str(resume_data)
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type="4p", data=resume_data)
-		logging.info("game ended TODO revove from game list")
 
 	def send_all(self, type, data):
 		for player in self.players:
@@ -101,7 +100,6 @@ class Game:
 		return response
 	
 	def wallCollideFourPlayer(self):
-
 		if self.ball.x < -29 :
 			if self.players[2].score <= 0 :
 				self.ball.direction_x *=-1
@@ -178,7 +176,7 @@ class Game:
 				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
 				self.ball.direction_x = -1
 			self.ball.speed *= 1.1
-		if (self.ball.speed > 5) :
+		if (self.ball.speed > 5):
 			self.ball.speed = 5
 
 def start_game(num):

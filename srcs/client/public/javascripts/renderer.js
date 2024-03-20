@@ -1537,10 +1537,9 @@ class BadConnection extends Component {
 
 let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
-	let counter = 0;
 	let playerNumber = -1;
 	let connectionStatus = 0;
-	let socket = new Socket({path: "/game_AI"});
+	let socket = new Socket({path: "/game/ai"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1551,20 +1550,23 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		connectionStatus = 2;
 		navigate("/");
 	});
-	socket.use((msg) =>{
-		if (msg.type == "gameState")
-		{	
-			data = msg.data;
-			data.type = msg.type
-			ball.position.x = data.ball.x;			
-			ball.position.z = data.ball.z;			
-			palletPlayer1.position.x = data.player[0].x;
-			palletPlayer2.position.x = data.player[1].x;
+	socket.use((msg) => {
+		switch (msg.type) {
+			case "gameState": {	
+				data = msg.data;
+				data.type = msg.type
+				ball.position.x = data.ball.x;			
+				ball.position.z = data.ball.z;			
+				palletPlayer1.position.x = data.player[0].x;
+				palletPlayer2.position.x = data.player[1].x;
+			} break;
+			case "resetCam":
+				setcam(10, 69, 0);
+				break;
+			case "setCam":
+				setcam(msg.data.x, msg.data.y, msg.data.z);
+				break;
 		}
-		else if (msg.type == "resetCam")
-			setcam(10, 69, 0);
-		else if (msg.type == "setCam")
-			setcam(msg.data.x, msg.data.y, msg.data.z);
 	});
 
 	let ball;
@@ -1596,7 +1598,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		const loader = new FontLoader();
 		loader.load('/static/fonts/font.json', function (response) {
 			font = response;
-			createText("");
+			createText("Waiting for opponent");
 		});
 	}
 
