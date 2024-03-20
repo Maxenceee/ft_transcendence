@@ -82,9 +82,9 @@ class Tinder: # Matchmaking
 					self.player_list[type]["list"].append([id, socket])
 				elif action[0] == "quit":
 					id, type = action[1:]
-					for player in self.player_list[type]["list"]:
-						if player.id == id:
-							self.player_list[type]["list"].remove(player)
+					for client in self.player_list[type]["list"]:
+						if client[0] == id:
+							self.player_list[type]["list"].remove(client)
 							break
 				elif action[0] == "end_game":
 					for game in self.games:
@@ -651,6 +651,7 @@ def create_game(num):
 class WebsocketClient(WebsocketConsumer):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
+		self.id = None
 		self.user = None
 		self.type = None
 		self.player = None
@@ -697,12 +698,17 @@ class WebsocketClient(WebsocketConsumer):
 			return
 
 		self.user = token.user
-		matchmaker.find_game(self.user.id, self, self.type)
-		logging.info("user connected : " + str(self.user.id))
+		self.id = self.user.id
+		matchmaker.find_game(self.id, self, self.type)
+		logging.info("user connected : " + str(self.id))
 
 
 	def receive(self, text_data=None):
 		receive_package = json.loads(text_data)
+
+		if "PING" in receive_package:
+			self.send(json.dumps({"PING": "PONG"}))
+			return
 
 		try:
 			if receive_package['type'] == "keyCode":
@@ -719,7 +725,7 @@ class WebsocketClient(WebsocketConsumer):
 	def disconnect(self, code):
 		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
-		matchmaker.quit_game(self.user.id, self.type)
+		matchmaker.quit_game(self.id, self.type)
 		if self.player is not None:
 			self.player.push_to_game("disconnect")
 
