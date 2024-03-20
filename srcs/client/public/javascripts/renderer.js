@@ -658,7 +658,7 @@ function createElement(type, props = {}) {
 				// console.log("c instanceof HTMLElement", c instanceof HTMLElement, c, element);
 				return element.appendChild(c), c;
 			}
-			console.log("=== c ===", c);
+			// console.log("=== c ===", c);
 			if (c instanceof Component) {
 				c = c._renderComponent();
 			}
@@ -711,10 +711,10 @@ class Router extends Component {
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', () => {
 			const newRoute = window.location.pathname;
-			if (newRoute !== this.previousRoute) {
+			// if (newRoute !== this.previousRoute) {
 				this.setState({ route: newRoute });
 				this.previousRoute = newRoute;
-			}
+			// }
 		});
 	}
 
@@ -734,28 +734,91 @@ class Router extends Component {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		let currentRoute = null;
+		let currentRoute = {route: null, params: null},
+			t;
 		children.forEach(child => {
-			if (!currentRoute && child.canRoute(route)) {
-				currentRoute = child;
+			if (!currentRoute.route && (t = child.canRoute(route)) !== null) {
+				currentRoute.route = child;
+				currentRoute.params = t.params;
 			} else {
 				if (child.active) {
-					// console.log("propagateUnmount on child route", child);
 					child.propagateUnmount();
 					child.active = false;
 				}
 			}
 		});
-		// console.log("router", currentRoute, this);
-		if (currentRoute) {
-			currentRoute.active = true;
-			this._element = currentRoute.render();
+		// console.log("router", currentRoute);
+		if (currentRoute.route !== null) {
+			currentRoute.route.active = true;
+			this._element = currentRoute.route.render();
 		} else {
 			this._element = null;
 		}
 		// console.log("in render router", this, this._element);
 		return (this._element && this._element || null);
 	}
+}
+
+function Ia(e, t) {
+    typeof e == "string" && (e = {
+        path: e,
+        caseSensitive: !1,
+        end: !0
+    });
+    let[r, i] = eh(e.path, e.caseSensitive, e.end),
+		a = t.match(r);
+    if (!a)
+        return null;
+    let l = a[0],
+	  o = l.replace(/(.)\/+$/, "$1"),
+	  s = a.slice(1);
+    return {
+        params: i.reduce((u,h,f)=>{
+            let {paramName: y, isOptional: v} = h;
+            if (y === "*") {
+                let x = s[f] || "";
+                o = l.slice(0, l.length - x.length).replace(/(.)\/+$/, "$1")
+            }
+            const N = s[f];
+            return v && !N ? u[y] = void 0 : u[y] = nh(N || "", y),
+            u
+        }, {}),
+        pathname: l,
+        pathnameBase: o,
+        pattern: e
+    }
+}
+function nh(e, t) {
+    try {
+        return decodeURIComponent(e)
+    } catch (r) {
+        return Xs(!1, 'The value for the URL param "' + t + '" will not be decoded because' + (' the string "' + e + '" is a malformed URL segment. This is probably') + (" due to a bad percent encoding (" + r + ").")),
+        e
+    }
+}
+function Xs(e, t) {
+    if (!e) {
+        typeof console < "u" && console.warn(t);
+        try {
+            throw new Error(t)
+        } catch {}
+    }
+}
+function eh(e, t, r) {
+    t === void 0 && (t = !1),
+    r === void 0 && (r = !0),
+    Xs(e === "*" || !e.endsWith("*") || e.endsWith("/*"), 'Route path "' + e + '" will be treated as if it were ' + ('"' + e.replace(/\*$/, "/*") + '" because the `*` character must ') + "always follow a `/` in the pattern. To get rid of this warning, " + ('please change the route path to "' + e.replace(/\*$/, "/*") + '".'));
+    let i = [],
+		a = "^" + e.replace(/\/*\*?$/, "").replace(/^\/*/, "/").replace(/[\\.*+^${}|()[\]]/g, "\\$&").replace(/\/:(\w+)(\?)?/g, (o, s, d)=>(i.push({
+        paramName: s,
+        isOptional: d != null
+    }),
+    d ? "/?([^\\/]+)?" : "/([^\\/]+)"));
+    return e.endsWith("*") ? (i.push({
+        paramName: "*"
+    }),
+    a += e === "*" || e === "/*" ? "(.*)$" : "(?:\\/(.+)|\\/*)$") : r ? a += "\\/*$" : e !== "" && e !== "/" && (a += "(?:(?=\\/|$))"),
+    [new RegExp(a, t ? void 0 : "i"), i]
 }
 
 class Route extends Component {
@@ -768,11 +831,9 @@ class Route extends Component {
 	}
 
 	canRoute(route) {
-		// see fucntion eh in unmf.js
-		console.log("^" + this.state.route.replace(/\*/g, '.*') + "$");
-		const regex = new RegExp("^" + this.state.route.replace(/\*/g, '.*') + "$");
-		console.log("test for route:", regex.test(route));
-		return regex.test(route);
+		const regex = Ia(this.state.route, route);
+		// console.log("regex result on route", this.state, regex);
+		return regex;
 	}
 
 	propagateUnmount() {
@@ -1869,13 +1930,13 @@ class Main extends Component {
 		return (
 			createElement('div', {children: 
 				router(
-					route({path: "/", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
+					route({path: "/", element: createElement("div", {children: ["page 1 ", link({to: "/2", children: "go to page 2", class: "link"})]})}),
 					route({path: "/2/*", element: createElement("div", {children: [
-						"page 2", link({to: "/", children: "go to home", class: "link"}),
-						// router(
-						// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
-						// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
-						// )
+						"page 2 ", link({to: "/", children: "go to home", class: "link"}),
+						router(
+							route({path: "/2", element: createElement('p', {children: ['page 2 home ', link({to: "/2/game", children: "go to game", class: "link"})]})}),
+							route({path: "/2/game", element: createElement('p', {children: ['game ', link({to: "/2", children: "go to page 2", class: "link"})]})}),
+						)
 					]})}),
 					route({path: "*", element: createElement(NotFound)})
 				)
