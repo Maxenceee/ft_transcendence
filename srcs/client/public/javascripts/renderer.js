@@ -867,17 +867,17 @@ class Router extends Component {
 	componentDidMount() {
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', this.event);
-		console.log("====== Router Mounted (%s) ======", this);
+		console.log("====== Router Mounted ======", this);
 	}
 
 	componentDidUpdate() {
-		console.log("====== Router Updated (%s) ======", this);
+		console.log("====== Router Updated ======", this);
 	}
 
 	componentWillUnmount() {
 		this.event && window.removeEventListener('popstate', this.event);
 		this.props.children.forEach(child => child.active && child.propagateUnmount());
-		console.log("====== Router Unmounted (%s) ======", this);
+		console.log("====== Router Unmounted ======", this);
 	}
 
 	render() {
@@ -2027,9 +2027,11 @@ class GameView extends Component {
 
 class GameRouter extends Component {
 	render() {
-		return router(
-			route({path: "/game/:type", element: createElement(GameView)}),
-		)
+		return createElement('div', {
+			children: router(
+				route({path: "/game/:type", element: createElement(GameView)}),
+			)
+		});
 	}
 }
 
