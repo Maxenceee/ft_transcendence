@@ -699,8 +699,8 @@ class WebsocketClient(WebsocketConsumer):
 
 		self.user = token.user
 		self.id = self.user.id
-		matchmaker.find_game(self.id, self, self.type)
 		logging.info("user connected : " + str(self.id))
+		matchmaker.find_game(self.id, self, self.type)
 
 
 	def receive(self, text_data=None):

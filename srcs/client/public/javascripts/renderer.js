@@ -570,7 +570,7 @@ s.p = function(a) {
 	return JSON.parse(a);
 };
 s.close = function() {
-	this.delete();
+	this.socket.close();
 };
 s.send = function(a) {
 	if (this.socket.readyState !== WebSocket.OPEN) {
@@ -580,10 +580,6 @@ s.send = function(a) {
 	this.pingServer();
 	this.socket.send(this.j(a));
 };
-s.delete = function() {
-	this.socket.close();
-	delete this
-}
 s.onconnection = function(a) {
 	if (typeof a !== "function") {
 		throw new Error("Callback must be a function, not "+typeof a);
@@ -1979,9 +1975,9 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		unmount: () => {
 			console.log("calling unmount game_render");
 			animationid && cancelAnimationFrame(animationid);
-			socket.close();
 			document.removeEventListener("keydown", onDocumentKeyDown, true);
 			document.removeEventListener("keyup", onDocumentKeyUp, true);
+			socket.close();
 		}
 	};
 };
@@ -2005,7 +2001,7 @@ class GameView extends Component {
 	}
 
 	componentDidUpdate() {
-		// console.log("componentDidUpdate GameView", this.state.game_render);
+		console.log("componentDidUpdate GameView", this.state.game_render);
 		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
 		this.state.game_render.start(this.state);
 	}
