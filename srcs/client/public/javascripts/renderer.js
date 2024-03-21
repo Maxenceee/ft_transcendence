@@ -822,7 +822,8 @@ function createElement(type, props = {}) {
 		return new type(props);
 	} else {
 		type = type.toLowerCase();
-		let element = (["svg", "path", "circle", "text", "line", "g"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
+		// TODO: find a better way to handle svg elements using NS not list
+		let element = (["svg", "path", "circle", "text", "line", "g", "polygon"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
 		let jv = function(c) {
 			if (typeof c === "function" && !(c instanceof Component))
 				throw new Error('Route component must be instanciated with new keyword');
@@ -1597,11 +1598,26 @@ class UserPage extends Component {
 class Loader extends Component {
 	render() {
 		return createElement('div', {
-			class: "ad-up-box-loader", children: createElement('div', {
-				class: "loader", children: createElement('div', {
-					class: "inner-loader"
-				})
-			})
+			class: "ad-up-box-loader", children: [
+				createElement('div', {
+					class: "loader", children: createElement('div', {
+						class: "inner-loader"
+					})
+				}),
+				createElement('div', {
+					class: "loader ellipse"
+				}),
+				createElement('div', {
+					class: "loader square"
+				}),
+				createElement('div', {
+					class: "loader triangle", children: createElement('svg', {
+						viewBox: "0 0 86 80", children: createElement('polygon', {
+							points: "43 8 79 72 7 72"
+						})
+					})
+				})				
+			]
 		})		
 	}
 }
@@ -2156,7 +2172,7 @@ class Main extends Component {
 
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
-		this.loadUser();
+		// this.loadUser();
 	}
 
 	render() {
