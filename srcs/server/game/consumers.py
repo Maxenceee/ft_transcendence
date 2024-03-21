@@ -234,20 +234,20 @@ class AIPlayer:
 			dif = pad_x - future_ball_x
 			if int(dif) >= 0 and dir_z == -1:
 				for i in range(int(dif)):
-					self.push_to_game("right")
+					self.push_to_game("right_arrow_key")
 					time.sleep(0.05)
 			elif dir_z == -1:
 				for i in range(int(-dif)):
-					self.push_to_game("left")
+					self.push_to_game("left_arrow_key")
 					time.sleep(0.05)
 			else:
 				if int(pad_x) >= 0:
 					for i in range(int(pad_x)):
-						self.push_to_game("right")
+						self.push_to_game("right_arrow_key")
 						time.sleep(0.05)
 				else:
 					for i in range(int(-pad_x)):
-						self.push_to_game("left")
+						self.push_to_game("left_arrow_key")
 						time.sleep(0.05)
 
 
@@ -359,7 +359,7 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "right":
+				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 0.8
 						if self.players[player_idx].pad_x  > 16.0 :
@@ -368,7 +368,7 @@ class Game:
 						self.players[player_idx].pad_x -= 0.8
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
-				elif action == "left":
+				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
 						self.players[player_idx].pad_x -= 0.8
 						if self.players[player_idx].pad_x  < -16.0:
@@ -407,7 +407,7 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "right":
+				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 0.8
 						if self.players[player_idx].pad_x  > 27 :
@@ -424,7 +424,7 @@ class Game:
 						self.players[player_idx].pad_z -= 0.8
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
-				elif action == "left":
+				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 0:
 						self.players[player_idx].pad_x -= 0.8
 						if self.players[player_idx].pad_x  < -27:
@@ -464,6 +464,49 @@ class Game:
 
 	def game_master_local(self):
 		logging.info("game master local")
+		# self.send(0, "initGame", "")
+		# self.send(0, "gameState", self.to_json())
+		# self.send(0, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
+		# while True:
+		# 	while not self.queue.empty():
+		# 		player_idx, action = self.queue.get()
+		# 		if action == "d_key":
+		# 			if self.players[0].pad_x  < 16.5:
+		# 				self.players[0].pad_x += 0.8
+		# 				if self.players[0].pad_x  > 16.0 :
+		# 						self.players[0].pad_x = 16
+		# 		elif action == "a_key":
+		# 			if self.players[0].pad_x  > -16.5:
+		# 				self.players[0].pad_x -= 0.8
+		# 				if self.players[0].pad_x  < -16.0:
+		# 						self.players[0].pad_x = -16
+		# 		if action == "right_arrow_key":
+		# 			if self.players[1].pad_x  > -16.5:
+		# 				self.players[1].pad_x -= 0.8
+		# 				if self.players[1].pad_x  < -16.0:
+		# 						self.players[1].pad_x = -16
+		# 		elif action == "left_arrow_key":
+		# 			if self.players[1].pad_x  < 16.5:
+		# 				self.players[1].pad_x += 0.8
+		# 				if self.players[1].pad_x  > 16.0 :
+		# 					self.players[1].pad_x = 16
+		# 		elif action == "disconnect":
+		# 			logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
+		# 			self.players[player_idx].score = 0
+		# 			self.end_game()
+		# 			return
+
+		# 	time.sleep(0.05)
+		# 	self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
+		# 	self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
+		# 	self.wall_collide_two_player()
+		# 	self.pad_collision_x(0)
+		# 	self.pad_collision_x(1)
+		# 	self.send(0, "gameState", self.to_json())
+		# 	for player in self.players:
+		# 		if player.score  > 9 :
+		# 			self.end_game()
+		# 			return
 
 	
 	def game_master_ai(self):
@@ -479,7 +522,7 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "right":
+				if action == "d_key" or action == "right_arrow_key":
 					if self.players[0].pad_x  < 16.5 and player_idx == 0:
 						self.players[0].pad_x += 0.8
 						if self.players[0].pad_x  > 16.0 :
@@ -488,7 +531,7 @@ class Game:
 						self.players[1].pad_x -= 0.8
 						if self.players[1].pad_x  < -16.0:
 								self.players[1].pad_x = -16
-				elif action == "left":
+				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[0].pad_x  > -16.5 and player_idx == 0:
 						self.players[0].pad_x -= 0.8
 						if self.players[0].pad_x  < -16.0:
@@ -714,12 +757,8 @@ class WebsocketClient(WebsocketConsumer):
 
 		try:
 			if receive_package['type'] == "keyCode":
-				if receive_package['move'] == "left":
-					self.player.push_to_game("left")
-					return
-				elif receive_package['move'] == "right":
-					self.player.push_to_game("right")
-					return
+				self.player.push_to_game(receive_package['move'])
+				return
 		except:
 			pass
 
