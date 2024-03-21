@@ -1691,7 +1691,7 @@ class BadConnection extends Component {
 let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let playerNumber = -1;
-	let socket = new Socket({path: "/game/ai"});
+	let socket = new Socket({path: "/game/2p"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1871,32 +1871,19 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-		keyCode.right = 0;
-		keyCode.left = 0;
 		if (keyVar == 68)
-		{
-			keyCode.left = 0;
-			keyCode.right = 1;
-		}
+			socket.send({type : 'keyCode', move : "d_key"});
 		if (keyVar == 39)
-		{
-			keyCode.left = 0;
-			keyCode.right = 1;
-		}
+			socket.send({type : 'keyCode', move : "right_arrow_key"});
+		if (keyVar == 65)
+			socket.send({type : 'keyCode', move : "a_key"});
 		if (keyVar == 37)
-		{
-			keyCode.left = 1;
-			keyCode.right = 0;
-		}
+			socket.send({type : 'keyCode', move : "left_arrow_key"});
 		if (keyVar == 82)
 		{
 			setcam(10, 69, 0);
 			controls.target.set(0, 0, 0);
 		}
-		if (keyCode.right == 1 && keyCode.left == 0)
-			socket.send({type : 'keyCode', move : "right"});
-		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"});
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which;
