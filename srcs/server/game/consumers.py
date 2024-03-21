@@ -207,7 +207,7 @@ class AIPlayer:
 			if not data:
 				continue
 
-			if time.time() - last_update < 1:
+			if time.time() - last_update < 1: # seconde between each update
 				continue
 			last_update = time.time()
 
@@ -324,12 +324,11 @@ class Game:
 	def to_json(self):
 		players = []
 		for player in self.players:
-			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
+			players.append({"id": self.players.index(player), "x": round(player.pad_x, 2), "z": round(player.pad_z, 2), "score": player.score})
 		response = {
 			"players": players,
-			# "type": self.type,
-			"ball": {"x": self.ball.x, "z": self.ball.z, "direction_x": self.ball.direction_x, "direction_z": self.ball.direction_z},
-			"moveSpeed": self.ball.speed
+			"ball": {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)},
+			"moveSpeed": round(self.ball.speed, 2)
 		}
 		return response
 
@@ -472,8 +471,11 @@ class Game:
 		self.ai_player.start()
 		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
-		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
-		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+		# TODO:
+		# set la position de la camera proprement 
+		# eviter les index fixes pour les joueurs
+		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+		# self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
