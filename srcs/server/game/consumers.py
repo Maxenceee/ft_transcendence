@@ -472,6 +472,9 @@ class Game:
 		self.ai_player.start()
 		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
+		# TODO:
+		# set la position de la camera proprement 
+		# eviter les index fixes pour les joueurs
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		# self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		while True:
