@@ -2172,6 +2172,9 @@ class Main extends Component {
 
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
+		/**
+		 * TODO: remove setTimeout
+		 */
 		setTimeout(() => {
 			this.loadUser();	
 		}, 1000);
