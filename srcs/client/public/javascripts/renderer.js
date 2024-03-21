@@ -1886,44 +1886,39 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
-		let keyVar = event.which;
-		keyCode.right = 0;
-		keyCode.left = 0;
-		if (keyVar == 68)
-		{
-			keyCode.left = 0;
-			keyCode.right = 1;
+		switch (event.which) {
+			case 68:
+			case 39:
+				socket.send({type : 'keyCode', move : "right"});
+				break;
+			case 37:
+				socket.send({type : 'keyCode', move : "left"});
+				break;
+			case 82:
+				setcam(10, 69, 0);
+				controls.target.set(0, 0, 0);
+				break;
 		}
-		if (keyVar == 39)
-		{
-			keyCode.left = 0;
-			keyCode.right = 1;
-		}
-		if (keyVar == 37)
-		{
-			keyCode.left = 1;
-			keyCode.right = 0;
-		}
-		if (keyVar == 82)
-		{
-			setcam(10, 69, 0);
-			controls.target.set(0, 0, 0);
-		}
-		if (keyCode.right == 1 && keyCode.left == 0)
-			socket.send({type : 'keyCode', move : "right"});
-		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"});
 	}
 	function onDocumentKeyUp(event) {
-	    let keyVar = event.which;
-		if (keyVar == 68)
-			keyCode.right = 0;
-		if (keyVar == 65)
-			keyCode.left = 0;
-		if (keyVar == 39)
-			keyCode.right = 0;
-		if (keyVar == 37)
-			keyCode.left = 0;
+		/**
+		 * Ceci ne sert à rien !!! C'est bien ce qu'il me semblait !
+		 * Puisque le keycode est seulement envoyé lorsqu'on appuie sur une touche (keydown) !
+		 * C'est pour ça que les inputs sont lents à réagir.
+		 * 
+		 * TODO:
+		 * regler le probleme des inputs et remplacer le key-autorepeat par un keydown/keyup et
+		 * envoyer au server à chaque frame (?) tant que la touche n'est pas relaché
+		 */
+	    // let keyVar = event.which;
+		// if (keyVar == 68)
+		// 	keyCode.right = 0;
+		// if (keyVar == 65)
+		// 	keyCode.left = 0;
+		// if (keyVar == 39)
+		// 	keyCode.right = 0;
+		// if (keyVar == 37)
+		// 	keyCode.left = 0;
 	}
 
 	let ballDirection = {
