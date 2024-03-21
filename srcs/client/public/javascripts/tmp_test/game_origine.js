@@ -78,7 +78,7 @@ let P1score = 0, P2score, P3score, P4score
 function loadFont() {
 
 	const loader = new FontLoader();
-	loader.load( '/static/javascripts/font.json', function ( response ) {
+	loader.load( '/static/fonts/font.json', function ( response ) {
 
 		font = response;
 

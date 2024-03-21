@@ -1,5 +1,6 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
+from django.http import HttpResponse
 from index.models import *
 import json
 import logging
@@ -15,7 +16,6 @@ def makeid(len):
 		res += str[random.randint(0, 35)]
 	return res
 
-waiting_list = []
 game_list = []
 
 class Ball:
@@ -45,35 +45,45 @@ class Game:
 	id = ""
 	players = []
 
-
 	def __init__(self, players) -> None:
-		logging.info("new game created")
 		self.id = makeid(15)
 		self.players = players
 		self.ball = Ball()
 		self.queue = queue.Queue()
 
 	def end_game(self):
+		logging.info(f"game ended called: {self.id} (local)")
 		try:
 			game_list.remove(self)
 		except:
 			return
 		for player in self.players:
-			player.socket.close()
-		resume_data = []
-		for player in self.players:
-			resume_data.append({"id": player.id, "score": player.score})
-		resume_data = str(resume_data)
-		resume_data = resume_data.replace("'", '"')
-		# Game_history.objects.create(type="2v2", data=resume_data)
-		logging.info("game ended TODO revove from game list")
+			try:
+				if User.objects.filter(id=player.id).exists():
+					user = User.objects.get(id=player.id)
+					user.is_ingame = False
+					user.save()
+					player.socket.close()
+					logging.info(f"socket closed: {player.id}")
+			except:
+				continue
+		logging.info(f"game ended: {self.id}")
+
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(json.dumps({"type" : type, "data" : data}))
-	
+			try:
+				player.socket.send(json.dumps({"type" : type, "data" : data}))
+			except:
+				continue
+
+
 	def send(self, player, type, data):
-		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		try:
+			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		except:
+			return
+
 
 	def to_json(self):
 		players = []
@@ -85,7 +95,8 @@ class Game:
 			"moveSpeed": self.ball.speed
 		}
 		return response
-	
+
+
 	def wallCollideTwoPlayer(self):
 
 		if self.ball.x < -18.5 :
@@ -111,54 +122,38 @@ class Game:
 			self.ball.speed = 1.05
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
+		if (self.ball.x < -18.5):
+			self.ball.x = -18.49
+		if (self.ball.x > 18.5):
+			self.ball.x = 18.49
+
 
 	def rebound_x(self):
 		if (self.ball.z > 27 ) and (self.ball.x < (self.players[1].pad_x + 4.5)  and self.ball.x > (self.players[1].pad_x - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_x)/4.5
 			self.ball.direction_z = -1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		elif (self.ball.z < -27 ) and (self.ball.x < (self.players[1].pad_xP2 + 4.5)  and self.ball.x > (self.players[1].pad_xP2 - 4.5)):
 			self.ball.direction_x = (self.ball.x - self.players[1].pad_xP2)/4.5
 			self.ball.direction_z = 1
-			self.ball.speed += 0.1
+			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
-def start_game(num):
-	logging.info(f"waiting list {len(waiting_list)}")
-	if num == 1 :
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			players.append(player)
-			logging.info(f"player added to game")
-		waiting_list.remove(player)
-		logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created")
-		return
-	elif len(waiting_list) == num:
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			logging.info(f"player added to game")
-		for player in players:
-			waiting_list.remove(player)
-			logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created")
-	else:
-		logging.info("pas assez de joueurs")
 
+def start_game(player):
+	players = []
+	players.append(player)
+	players.append(player)
+	logging.info(f"player added to game (ai)")
+	game = Game(players)
+	game_list.append(game)
+	threading.Thread(target=game_master, args=(game,)).start()
+	logging.info(f"game created (ai)")
 
 
 def game_master(game):
 	game.send_all("gameState", game.to_json())
-	time.sleep(0.05)
 	game.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 	game.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 	while True:
@@ -182,6 +177,9 @@ def game_master(game):
 					game.players[1].pad_xP2 += 0.8
 					if game.players[1].pad_xP2  > 16.0 :
 						game.players[1].pad_xP2 = 16
+			elif action == "disconnect":
+				game.end_game()
+				return
 		time.sleep(0.05)
 		game.ball.x += game.ball.direction_x * 0.4 * game.ball.speed
 		game.ball.z += game.ball.direction_z * 0.4 * game.ball.speed
@@ -197,10 +195,11 @@ def game_master(game):
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		# ft_getGameType(self) 								?????????????????????????
-		
 		cookies = {}
-		data = self.scope['headers']
+		try:
+			data = self.scope['headers']
+		except:
+			return
 		for i in data:
 			if b'cookie' in i:
 				cookie = i[1].decode('utf-8')
@@ -209,21 +208,29 @@ class websocket_client(WebsocketConsumer):
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		token = cookies['token']
+		
+		logging.info("new player connected")
+		try:
+			token = cookies['token']
+		except:
+			return logging.info("user connection rejected token not found")
 		if not Token.objects.filter(token=token).exists():
-			return
+			return logging.info("user connection rejected token not found")
 		token = Token.objects.get(token=token)
-		if token.is_valid:
-			self.accept()
+		if token.is_valid == True:
+			if token.user.is_ingame == False:
+				token.user.is_ingame = True
+				token.user.save()
+				self.accept()
+			else:
+				return logging.info("user connection rejected user already in game")
 		else:
-			return
+			return logging.info("user connection rejected token not valid")
 		user = token.user
 
-		logging.info(user.id)
-		logging.info("new player connected")
-		waiting_list.append(Player(user.id, self))
-		start_game(1)
-	
+		logging.info(f"new player connected {user.id}")
+		start_game(Player(user.id, self))
+
 	def find_game(self):
 		global game_list
 		for current in game_list:
@@ -235,40 +242,41 @@ class websocket_client(WebsocketConsumer):
 					return
 
 
-	def receive(self, text_data=None, bytes_data=None):
+	def receive(self, text_data=None):
 		if not hasattr(self, "data"):
 			self.find_game()
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
 
-		if receive_package['type'] == "keyCode":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([0, "left"])
+		try:
+			if receive_package['type'] == "keyCode":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([0, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([0, "right"])
+						return
+				except:
 					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([0, "right"])
+			if receive_package['type'] == "keyCode2P":
+				try:
+					if receive_package['move'] == "left":
+						self.data.queue.put([1, "left"])
+						return
+					elif receive_package['move'] == "right":
+						self.data.queue.put([1, "right"])
+						return
+				except:
 					return
-			except:
-				return
-		if receive_package['type'] == "keyCode2P":
-			try:
-				if receive_package['move'] == "left":
-					self.data.queue.put([1, "left"])
-					return
-				elif receive_package['move'] == "right":
-					self.data.queue.put([1, "right"])
-					return
-			except:
-				return
-		return
+			return
+		except:
+			pass
 
 	def disconnect(self, code):
-		print("server says disconnected")
+		super().disconnect(code)
+		self.find_game()
 		if hasattr(self, "data"):
-			self.data.end_game()
-		else:
-			for player in waiting_list:
-				if player.socket == self:
-					waiting_list.remove(player)
+			logging.info(f"server says disconnected : {code}")
+			self.data.queue.put([self.playerID, "disconnect"])

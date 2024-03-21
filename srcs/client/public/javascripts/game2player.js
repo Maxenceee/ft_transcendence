@@ -76,13 +76,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	function loadFont() {
 
 		const loader = new FontLoader();
-		loader.load( '/static/javascripts/font.json', function ( response ) {
-
+		loader.load( '/static/fonts/font.json', function ( response ) {
 			font = response;
-
 			createText("");
-
-		} );
+		});
 	}
 
 	let palletPlayer1 = 0;
