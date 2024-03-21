@@ -1991,7 +1991,6 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		socket: socket,
 		renderer: renderer,
 		animationid: () => animationid,
-		render: () => renderer.domElement
 		render: () => renderer.domElement,
 		unmount: () => {
 			document.removeEventListener("keydown", onDocumentKeyDown, true);
