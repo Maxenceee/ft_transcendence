@@ -472,8 +472,8 @@ class Game:
 		self.ai_player.start()
 		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
-		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
-		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+		# self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
