@@ -1757,12 +1757,10 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 
 	let palletPlayer1 = 0;
 	let palletPlayer2 = 0;
-	let mapLenth
-	let mapWidth
 	function initiateMapTwoPlayer(data)
 	{
-		mapLenth = 60;
-		mapWidth = 40;
+		let mapWidth = 60;
+		let mapLenth = 40;
 		palletPlayer1 = new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
