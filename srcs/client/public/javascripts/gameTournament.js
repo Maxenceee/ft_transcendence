@@ -38,15 +38,16 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball[3].position.z = data.ball4.z;
 				// ball[4].position.z = data.ball.z + 100;
 				// ball[5].position.z = data.ball.z + 100;
-				// ball[6].position.z = data.ball.z + 200;		
-				pallet[0].position.x = data.player[0].x;
-				pallet[1].position.x = data.player[1].x;
-				pallet[2].position.x = data.player[2].x;
-				pallet[3].position.x = data.player[3].x;
-				pallet[4].position.x = data.player[4].x;
-				pallet[5].position.x = data.player[5].x;
-				pallet[6].position.x = data.player[6].x;
-				pallet[7].position.x = data.player[7].x;
+				// ball[6].position.z = data.ball.z + 200;
+				console.log(data.player);
+				pallet[0].position.x = data.player[0].x + data.player[0].gameNumber * 80;
+				pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
+				pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
+				pallet[3].position.x = data.player[3].x + data.player[3].gameNumber * 80;
+				pallet[4].position.x = data.player[4].x + data.player[4].gameNumber * 80;
+				pallet[5].position.x = data.player[5].x + data.player[5].gameNumber * 80;
+				pallet[6].position.x = data.player[6].x + data.player[6].gameNumber * 80;
+				pallet[7].position.x = data.player[7].x + data.player[7].gameNumber * 80;
 			}
 			else if (msg.type == "resetCam")
 				// setcam(10, 69, 0);
@@ -92,7 +93,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	// const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
 	// const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
 	// const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-	// const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
+
 	// const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
 
 	let font, textGeo, textMesh2
@@ -301,10 +302,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			keyCode.left = 0
 	}
 
-	let ballDirection = {
-		x : 0.5 + Math.random(),
-		z : 0.5 + Math.random(),
-	};
 
 	const 	materials = [
 		new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
@@ -343,9 +340,18 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		left : 0,
 		right : 0
 	}
-	
 
-	// socket.send({type : 0, data : data});
+	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky6.jpg" );
+	const skyboxGeo		 = new THREE.SphereGeometry( 300 );
+	const materialSky = new THREE.MeshPhysicalMaterial({
+		wireframe:false, 
+		opacity: 1,
+		side : THREE.BackSide,
+		map  : sky
+	});
+	const skybox = new THREE.Mesh(skyboxGeo, materialSky)
+	scene.add(skybox)
+
 	loadFont();
 
 	const animate = async () => {
@@ -397,7 +403,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				score.scoreP7 = data.player[6].score;
 				score.scoreP8 = data.player[7].score;
 				createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
-				console.log(textMesh2);
+				// console.log(textMesh2);
 			}
 		}
 		await sleep(25);

@@ -80,7 +80,7 @@ class Game:
 	def to_json(self):
 		players = []
 		for player in self.players:
-			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
+			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score, "gameNumber" : player.gameNumber})
 		response = {
 			"player": players,
 			"ball" : {"x": self.ball[0].x, "z": self.ball[0].z, "direction_x": self.ball[0].direction_x, "direction_z":self.ball[0].direction_z},
@@ -142,9 +142,10 @@ def start_game(num):
 		players = []
 		i = 0
 		for player in waiting_list:
-			player.gameNumber = i / 2
+			player.gameNumber = int(i / 2)
 			players.append(player)
 			logging.info(f"player added to game")
+			i += 1
 		for player in players:
 			waiting_list.remove(player)
 			logging.info(f"player remove from waiting list")
@@ -167,21 +168,25 @@ def game_master(game):
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
 			if action == "right":
-				if game.players[playerID].pad_x  < 16.5 and playerID == 0:
+				if game.players[playerID].pad_x  < 16.5:
 					game.players[playerID].pad_x += 0.8
+					logging.info("right move")
 					if game.players[playerID].pad_x  > 16.0 :
 							game.players[playerID].pad_x = 16
-				if game.players[playerID].pad_x  > -16.5 and playerID == 1:
+				if game.players[playerID].pad_x  > -16.5:
 					game.players[playerID].pad_x -= 0.8
+					logging.info("right move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 			elif action == "left":
-				if game.players[playerID].pad_x  > -16.5 and playerID == 0:
+				if game.players[playerID].pad_x  > -16.5:
 					game.players[playerID].pad_x -= 0.8
+					logging.info("left move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
-				if game.players[playerID].pad_x  < 16.5 and playerID == 1:
+				if game.players[playerID].pad_x  < 16.5:
 					game.players[playerID].pad_x += 0.8
+					logging.info("left move")
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 		time.sleep(0.05)
