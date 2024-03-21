@@ -1707,7 +1707,7 @@ class BadConnection extends Component {
 let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let playerNumber = -1;
-	let socket = new Socket({path: "/game/ai"});
+	let socket = new Socket({path: "/game/2p"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
@@ -1898,7 +1898,6 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 				setcam(10, 69, 0);
 				controls.target.set(0, 0, 0);
 				break;
-		}
 	}
 	function onDocumentKeyUp(event) {
 		/**
