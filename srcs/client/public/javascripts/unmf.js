@@ -9865,6 +9865,7 @@ function St() {
 function hh(e) {
     Fn() || _e(!1);
     let {pathname: t} = St();
+    console.log(e, t, al, g.useContext, g.useContext(al));
     return g.useMemo(()=>Ia(e, t), [t, e])
 }
 function yu(e) {
@@ -12681,7 +12682,6 @@ const i1 = {
     }
     ],
     transformResponse: [function(t) {
-        console.log(t, this)
         const r = this.transitional || i1.transitional
           , i = r && r.forcedJSONParsing
           , a = this.responseType === "json";
@@ -13161,7 +13161,7 @@ const r4 = typeof XMLHttpRequest < "u",
     http: M5,
     xhr: i4
 };
-console.log("i4", i4);
+
 j.forEach(Go, (e,t)=>{
     if (e) {
         try {
@@ -13230,7 +13230,6 @@ function Pc(e) {
 }
 const jc = e=>e instanceof Bt ? e.toJSON() : e;
 function wr(e, t) {
-    console.log("e", e, t);
     t = t || {};
     const r = {};
     function i(u, h, f) {
@@ -13297,9 +13296,9 @@ function wr(e, t) {
         const f = d[h] || a
           , y = f(e[h], t[h], h);
         j.isUndefined(y) && f !== s || (r[h] = y)
-        console.log("f, y", f, y);
+        // console.log("f, y", f, y);
     }),
-    console.log("r", r),
+    // console.log("r", r),
     r
 }
 const Uu = "1.6.2"
@@ -13357,7 +13356,6 @@ class Oa {
         }
     }
     request(t, r) {
-        console.log("request opt", t, r);
         typeof t == "string" ? (r = r || {},
         r.url = t) : r = t || {},
         r = wr(this.defaults, r);
@@ -13390,7 +13388,6 @@ class Oa {
         this.interceptors.response.forEach(function(x) {
             u.push(x.fulfilled, x.rejected)
         });
-        console.log(this)
         let h, f = 0, y;
         if (!d) {
             const N = [Pc.bind(this), void 0];
@@ -13431,7 +13428,6 @@ class Oa {
 }
 j.forEach(["delete", "get", "head", "options"], function(t) {
     Oa.prototype[t] = function(r, i) {
-        console.log("this", this);
         return this.request(wr(i || {}, {
             method: t,
             url: r,
@@ -13604,9 +13600,6 @@ const d4 = Xo;
 function Bu(e) {
     const t = new sa(e),
         r = xu(sa.prototype.request, t);
-       console.log("sa", t, r);
-       console.log("sa", sa.prototype)
-       console.log("request", sa.prototype.request);
     return j.extend(r, sa.prototype, t, {
         allOwnKeys: !0
     }),
@@ -13640,10 +13633,8 @@ ze.formToJSON = e=>Ou(j.isHTMLForm(e) ? new FormData(e) : e);
 ze.getAdapter = ju.getAdapter;
 ze.HttpStatusCode = d4;
 ze.default = ze;
-console.log("xhrsum", ze);
 const P = ze;
 
-console.log("P.get", P.get);
 function K(e, t, r) {
     return r && r(),
     t.data.redirect ? window.location.replace(t.data.redirect) : t.data.status && t.data.status != 200 ? Y(t, e) : t.data
@@ -27548,7 +27539,6 @@ Attention une fois terminé seul le dernier devis généré sera gardé. Pensez 
         }, {
             withCredentials: !0
         }).then(v=>(s(!1),
-        console.log(v),
         K(t, v, void 0))).then(v=>{
             if (v) {
                 if (typeof v != "object")
@@ -32579,7 +32569,6 @@ const n8 = ()=>{
     }
     , []);
     const S = (b,k=!1)=>{
-        console.log(P, P.get);
         (b || k) && a(!0),
         Jc.get("__nid_rl_mg_ldwawt") && (f(!0),
         v(!0)),
@@ -33803,8 +33792,7 @@ const n8 = ()=>{
     })
 }
 ;
-P.defaults.baseURL = "https://cdn.maxencegama.dev";
-console.log(P);
+P.defaults.baseURL = "http://localhost:3500/cdn";
 function l8() {
     return n(L, {
         children: n(Ih, {

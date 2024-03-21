@@ -2360,39 +2360,58 @@ $offset: $lat - $thickness;
 }
 
 @keyframes rotate {
-    100% {
-      transform: rotate(360deg);
-    }
+	100% {
+	transform: rotate(360deg);
+	}
 }
-  
+
 @keyframes dash {
-    0% {
-      stroke-dasharray: 1, 200;
-      stroke-dashoffset: 0;
-    }
-    50% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -35px;
-    }
-    100% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -124px;
-    }
+	0% {
+	stroke-dasharray: 1, 200;
+	stroke-dashoffset: 0;
+	}
+	50% {
+	stroke-dasharray: 89, 200;
+	stroke-dashoffset: -35px;
+	}
+	100% {
+	stroke-dasharray: 89, 200;
+	stroke-dashoffset: -124px;
+	}
 }
   
 @keyframes color {
-    100%,
-    0% {
-      stroke: #d62d20;
-    }
-    40% {
-      stroke: #0057e7;
-    }
-    66% {
-      stroke: #008744;
-    }
-    80%,
-    90% {
-      stroke: #ffa700;
-    }
+	100%,
+	0% {
+	stroke: #d62d20;
+	}
+	40% {
+	stroke: #0057e7;
+	}
+	66% {
+	stroke: #008744;
+	}
+	80%,
+	90% {
+	stroke: #ffa700;
+	}
+}
+
+.back-button {
+	position: fixed;
+	left: 20px;
+	top: 20px;
+	padding: 15px 20px;
+	border-radius: 8px;
+	backdrop-filter: blur(10px);
+	color: #FFF;
+	background-color: rgba(255, 255, 255, 0.1);
+	font-size: 18px;
+	line-height: 100%;
+	text-align: center;
+	border: solid transparent 0.5px;
+	
+	&:hover {
+		border-color: rgba(255, 255, 255, 0.8);
+	}
 }
