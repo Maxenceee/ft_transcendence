@@ -573,7 +573,7 @@ s.close = function() {
 	this.delete();
 };
 s.send = function(a) {
-	if (this.socket.readyState !== 1) {
+	if (this.socket.readyState !== WebSocket.OPEN) {
 		console.error("Socket is not ready to send data");
 		return;
 	}
@@ -618,7 +618,7 @@ s.pingServer = function() {
 	this.ps = Date.now();
 	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return ;
 	this.lastPing = this.ps;
-	this.socket.send(this.j({PING: this.ps}));
+	this.send(this.j({PING: this.ps}));
 };
 s.formatServerPing = function(a) {
 	if (a > 50 && a < 150)
@@ -743,7 +743,7 @@ class Component {
 	_unmountComponent() {
 		if (!this._mounted) return;
 		this._mounted = false;
-		// console.log("component will unmount", this);
+		console.log("component will unmount", this);
 		this.componentWillUnmount();
 		this._element && typeof this._element.data === "object" && typeof this._element.data._unmountComponent === "function" && this._element.data._unmountComponent();
     }
@@ -854,6 +854,7 @@ class Router extends Component {
 	constructor(props) {
 		super(props);
 		if (!props.children || !Array.isArray(props.children)) throw new Error('Router must have children');
+		if (!props.children.every(child => child instanceof Route)) throw new Error('Router children must be Route components');
 
 		this.state = { route: window.location.pathname };
 		this.event = this.event.bind(this);
@@ -869,7 +870,7 @@ class Router extends Component {
 
 	componentDidMount() {
 		this.previousRoute = window.location.pathname;
-		window.addEventListener('popstate', this.event.bind(this));
+		window.addEventListener('popstate', this.event);
 		console.log("====== Router Mounted (%s) ======", this);
 	}
 
@@ -879,19 +880,8 @@ class Router extends Component {
 
 	componentWillUnmount() {
 		this.event && window.removeEventListener('popstate', this.event);
+		this.props.children.forEach(child => child.active && child.propagateUnmount());
 		console.log("====== Router Unmounted (%s) ======", this);
-	}
-
-	componentDidMount() {
-		console.log("====== Router Mounted ======");
-	}
-
-	componentDidUpdate() {
-		console.log("====== Router Updated ======");
-	}
-
-	componentWillUnmount() {
-		console.log("====== Router Unmounted ======");
 	}
 
 	render() {
@@ -908,7 +898,6 @@ class Router extends Component {
 			} else {
 				if (child.active) {
 					child.propagateUnmount();
-					child.active = false;
 				}
 			}
 		});
@@ -1008,11 +997,7 @@ class Route extends Component {
 	propagateUnmount() {
 		// console.log("propagateUnmount from route", this._element);
 		this.props.element._unmountComponent();
-	}
-
-	propagateUnmount() {
-		// console.log("propagateUnmount from route", this._element);
-		this.props.element._unmountComponent();
+		this.active = false;
 	}
 
 	render() {
@@ -1070,6 +1055,10 @@ function link(props) {
 	return createElement('a', { href: to, onClick: handleClick, ...props });
 }
 
+/**
+ * 
+ * @param {string} path 
+ */
 function navigate(path) {
 	if (typeof path !== "string") throw new Error('Path must be a string, not '+typeof path);
 	window.history.pushState({}, '', path);
@@ -1673,16 +1662,13 @@ class BadConnection extends Component {
 let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let playerNumber = -1;
-	let connectionStatus = 0;
-	let socket = new Socket({path: "/game/2p"});
+	let socket = new Socket({path: "/game/ai"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
-		connectionStatus = 1;
 	});
 	socket.onclose(() => {
 		console.info("Connection closed");
-		connectionStatus = 2;
 		navigate("/");
 	});
 	socket.use((msg) => {
@@ -1867,13 +1853,11 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		{
 			keyCode.left = 0;
 			keyCode.right = 1;
-			// socket.send({type : 'keyCode', move : "right"});
 		}
 		if (keyVar == 37)
 		{
 			keyCode.left = 1;
 			keyCode.right = 0;
-			// socket.send({type : 'keyCode', move : "left"})
 		}
 		if (keyVar == 82)
 		{
@@ -1993,6 +1977,9 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 		animationid: () => animationid,
 		render: () => renderer.domElement,
 		unmount: () => {
+			console.log("calling unmount game_render");
+			animationid && cancelAnimationFrame(animationid);
+			socket.close();
 			document.removeEventListener("keydown", onDocumentKeyDown, true);
 			document.removeEventListener("keyup", onDocumentKeyUp, true);
 		}
@@ -2024,10 +2011,8 @@ class GameView extends Component {
 	}
 
 	componentWillUnmount() {
-		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		this.state.game_render.socket.close();
 		this.state.game_render.unmount();
-		// console.log("game view unmounted", this.state.game_render);
+		console.log("game view unmounted", this.state.game_render);
 		window.onbeforeunload = null;
 	}
 
@@ -2110,6 +2095,7 @@ class MainRouter extends Component {
 					router(
 						route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.loadUser})}),
 						route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.loadUser})}),
+						route({path: "*", element: createElement(NotFound)})
 					)
 				})
 			]
@@ -2151,33 +2137,11 @@ class Main extends Component {
 			createElement(BadConnection)
 			:
 			router(
-				route({path: "/", element: createElement(MainRouter, {user: this.state.user, loadUser: this.loadUser.bind(this)})}),
 				route({path: "/game/*", element: createElement(GameRouter)}),
-				route({path: "*", element: createElement(NotFound)})
+				route({path: "*", element: createElement(MainRouter, {user: this.state.user, loadUser: this.loadUser.bind(this)})}),
 			)
 		)
 	}
-
-	// render() {
-	// 	console.log("main state  on render", this.state);
-	// 	return (
-	// 		createElement(Loader)
-	// 		// createElement('div', {children: "main"
-	// 			// router(
-	// 			// 	route({path: "/", element: createElement("div", {children: ["home", link({to: "/1", children: "go to page 1", class: "link"})]})}),
-	// 			// 	route({path: "/1", element: createElement("div", {children: ["page 1", link({to: "/2", children: "go to page 2", class: "link"})]})}),
-	// 			// 	route({path: "/2/*", element: createElement("div", {children: [
-	// 			// 		"page 2", link({to: "/", children: "go to home", class: "link"}),
-	// 			// 		// router(
-	// 			// 		// 	route({path: "/2", element: createElement('p', {children: ['page 2 home', link({to: "/2/game", children: "go to game", class: "link"})]})}),
-	// 			// 		// 	route({path: "/2/game", element: createElement('p', {children: "game"})}),
-	// 			// 		// )
-	// 			// 	]})}),
-	// 			// 	route({path: "*", element: createElement(NotFound)})
-	// 			// )
-	// 		// })
-	// 	)
-	// }
 }
 
 xhr.defaults.baseURL = (window.location.hostname == "localhost" ? "http://localhost:3000" : "");
