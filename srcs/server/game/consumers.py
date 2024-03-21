@@ -207,7 +207,7 @@ class AIPlayer:
 			if not data:
 				continue
 
-			if time.time() - last_update < 1:
+			if time.time() - last_update < 1: # seconde between each update
 				continue
 			last_update = time.time()
 
