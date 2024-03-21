@@ -324,12 +324,11 @@ class Game:
 	def to_json(self):
 		players = []
 		for player in self.players:
-			players.append({"id": self.players.index(player), "x": player.pad_x, "z": player.pad_z, "score": player.score})
+			players.append({"id": self.players.index(player), "x": round(player.pad_x, 2), "z": round(player.pad_z, 2), "score": player.score})
 		response = {
 			"players": players,
-			# "type": self.type,
-			"ball": {"x": self.ball.x, "z": self.ball.z, "direction_x": self.ball.direction_x, "direction_z": self.ball.direction_z},
-			"moveSpeed": self.ball.speed
+			"ball": {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)},
+			"moveSpeed": round(self.ball.speed, 2)
 		}
 		return response
 
