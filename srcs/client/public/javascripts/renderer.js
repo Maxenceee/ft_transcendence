@@ -2172,7 +2172,9 @@ class Main extends Component {
 
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
-		// this.loadUser();
+		setTimeout(() => {
+			this.loadUser();	
+		}, 1000);
 	}
 
 	render() {
