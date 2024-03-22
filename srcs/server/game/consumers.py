@@ -123,9 +123,6 @@ class Player:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
-		self.keyCode = {}
-		self.keyCode['left'] = 0
-		self.keyCode ['right'] = 0
 
 	def set_game(self, game, index):
 		self.game = game
@@ -143,8 +140,25 @@ class Player:
 
 	def __str__(self) -> str:
 		return f"player {self.id} index in game {self.index}"
+	
+class LocalPlayer:
+	def __init__(self) -> None:
+		self.id = "local_" + makeid(15)
+		self.index = -1
+		self.game = None
+		self.score = 0
+		self.pad_x = 0
+		self.pad_z = 0
 
+	def set_game(self, game, index):
+		self.game = game
+		self.index = index
 
+	def push_to_game(self, action):
+		self.game.queue.put([self.index, action])
+
+	def send(self, data):
+		pass
 
 class AIPlayer:
 	def __init__(self):
@@ -181,7 +195,6 @@ class AIPlayer:
 
 
 	def push_to_game(self, action):
-		# logging.info(f"push to game from ai: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 
@@ -266,6 +279,8 @@ class Game:
 		if self.type == "ai":
 			self.ai_player = AIPlayer()
 			self.players.append(self.ai_player)
+		if self.type == "local":
+			self.players.append(LocalPlayer())
 		for i, player in enumerate(self.players):
 			player.set_game(self, i)
 
@@ -464,49 +479,49 @@ class Game:
 
 	def game_master_local(self):
 		logging.info("game master local")
-		# self.send(0, "initGame", "")
-		# self.send(0, "gameState", self.to_json())
-		# self.send(0, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
-		# while True:
-		# 	while not self.queue.empty():
-		# 		player_idx, action = self.queue.get()
-		# 		if action == "d_key":
-		# 			if self.players[0].pad_x  < 16.5:
-		# 				self.players[0].pad_x += 0.8
-		# 				if self.players[0].pad_x  > 16.0 :
-		# 						self.players[0].pad_x = 16
-		# 		elif action == "a_key":
-		# 			if self.players[0].pad_x  > -16.5:
-		# 				self.players[0].pad_x -= 0.8
-		# 				if self.players[0].pad_x  < -16.0:
-		# 						self.players[0].pad_x = -16
-		# 		if action == "right_arrow_key":
-		# 			if self.players[1].pad_x  > -16.5:
-		# 				self.players[1].pad_x -= 0.8
-		# 				if self.players[1].pad_x  < -16.0:
-		# 						self.players[1].pad_x = -16
-		# 		elif action == "left_arrow_key":
-		# 			if self.players[1].pad_x  < 16.5:
-		# 				self.players[1].pad_x += 0.8
-		# 				if self.players[1].pad_x  > 16.0 :
-		# 					self.players[1].pad_x = 16
-		# 		elif action == "disconnect":
-		# 			logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
-		# 			self.players[player_idx].score = 0
-		# 			self.end_game()
-		# 			return
+		self.send(0, "initGame", "")
+		self.send(0, "gameState", self.to_json())
+		self.send(0, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
+		while True:
+			while not self.queue.empty():
+				player_idx, action = self.queue.get()
+				if action == "d_key":
+					if self.players[0].pad_x  < 16.5:
+						self.players[0].pad_x += 0.8
+						if self.players[0].pad_x  > 16.0 :
+								self.players[0].pad_x = 16
+				elif action == "a_key":
+					if self.players[0].pad_x  > -16.5:
+						self.players[0].pad_x -= 0.8
+						if self.players[0].pad_x  < -16.0:
+								self.players[0].pad_x = -16
+				if action == "right_arrow_key":
+					if self.players[1].pad_x  > -16.5:
+						self.players[1].pad_x -= 0.8
+						if self.players[1].pad_x  < -16.0:
+								self.players[1].pad_x = -16
+				elif action == "left_arrow_key":
+					if self.players[1].pad_x  < 16.5:
+						self.players[1].pad_x += 0.8
+						if self.players[1].pad_x  > 16.0 :
+							self.players[1].pad_x = 16
+				elif action == "disconnect":
+					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
+					self.players[player_idx].score = 0
+					self.end_game()
+					return
 
-		# 	time.sleep(0.05)
-		# 	self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
-		# 	self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
-		# 	self.wall_collide_two_player()
-		# 	self.pad_collision_x(0)
-		# 	self.pad_collision_x(1)
-		# 	self.send(0, "gameState", self.to_json())
-		# 	for player in self.players:
-		# 		if player.score  > 9 :
-		# 			self.end_game()
-		# 			return
+			time.sleep(0.05)
+			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
+			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
+			self.wall_collide_two_player()
+			self.pad_collision_x(0)
+			self.pad_collision_x(1)
+			self.send(0, "gameState", self.to_json())
+			for player in self.players:
+				if player.score  > 9 :
+					self.end_game()
+					return
 
 	
 	def game_master_ai(self):
