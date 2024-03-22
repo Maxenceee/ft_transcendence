@@ -1,7 +1,7 @@
 createElement('div', {
-    class: "ad-up-box-loader", children: createElement('div', {
-        class: "loader", children: createElement('div', {
-            class: "inner-loader"
+    class: "loader triangle", children: createElement('svg', {
+        viewBox: "0 0 86 80", children: createElement('polygon', {
+            points: "43 8 79 72 7 72"
         })
     })
 })
