@@ -84,8 +84,14 @@ class Tinder: # Matchmaking
 					id, type = action[1:]
 					for client in self.player_list[type]["list"]:
 						if client[0] == id:
-							self.player_list[type]["list"].remove(client)
-							break
+							if self.player_list[type]["list"].count(client) > 0:
+								user = User.objects.get(id=id)
+								user.is_ingame = False
+								user.save()
+
+								self.player_list[type]["list"].remove(client)
+								break
+
 				elif action[0] == "end_game":
 					for game in self.games:
 						if game.id == action[1]:
@@ -99,9 +105,6 @@ class Tinder: # Matchmaking
 	def	quit_game(self, id, type):
 		logging.info(f"quit game called : {id} {type}")
 		self.queue.put(["quit", id, type])
-		user = User.objects.get(id=id)
-		user.is_ingame = False
-		user.save()
 
 
 class Ball:
@@ -664,48 +667,30 @@ class Game:
 			self.ball.speed = 5
 
 
-	def pad_collision_x(self, player_idx):
-		if ((self.ball.z < -27 and player_idx == 1) or (self.ball.z > 27 and player_idx == 0)) and (self.ball.x < (self.players[player_idx].pad_x + 4.5)  and self.ball.x > (self.players[player_idx].pad_x - 4.5)):
-			if (player_idx == 1) :
-				self.ball.direction_x = (self.ball.x - self.players[player_idx].pad_x)/4.5
+	def pad_collision_x(self, player_id):
+		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
+			if (player_id == 1) :
+				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = 1
 			else :
-				self.ball.direction_x = (self.ball.x - self.players[player_idx].pad_x)/4.5
+				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = -1
 			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
 
-	def pad_collision_z(self, player_idx):
-		if ((self.ball.x < -27 and player_idx == 3) or (self.ball.x > 27 and playerID == 2)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
-			if (playerID == 3 and self.players[3].score >= 1) :
-				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+	def pad_collision_z(self, player_id):
+		if ((self.ball.x < -27 and player_id == 3) or (self.ball.x > 27 and player_id == 2)) and (self.ball.z < (self.players[player_id].pad_z + 4.5)  and self.ball.z > (self.players[player_id].pad_z - 4.5)):
+			if (player_id == 3 and self.players[3].score >= 1) :
+				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = 1
-			elif playerID == 2 and self.players[2].score >= 1 :
-				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+			elif player_id == 2 and self.players[2].score >= 1 :
+				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
 			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
-
-
-def create_game(num):
-	logging.info(f"waiting list {len(waiting_list)}")
-	if len(waiting_list) == num:
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			logging.info(f"player added to game")
-		for player in players:
-			waiting_list.remove(player)
-			logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created" + game.id)
-	else:
-		logging.info("pas assez de joueurs :" + len(waiting_list))
 
 
 class WebsocketClient(WebsocketConsumer):
