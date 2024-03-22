@@ -14,9 +14,8 @@ urlpatterns = [
 	path('callback/swivel', views.callback_swivel, name='callback_swivel'),
 
 	path('api/user/<str:id>/get', views.api_get_user, name='get_user'),
-	path('api/user/<str:id>/update/<str:type>', views.api_update_user, name='update_user'),
-	# path('api/home/get/lobbies', views.get_lobies, name='get_lobies'),
+	path('api/user/update/nickname', views.api_update_user, name='update_user'),
+	path('api/user/update/picture', views.api_update_picture, name='update_picture'),
 
 	path('<path:url>', views.not_found, name='redirect'),
 ]
-
