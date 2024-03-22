@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.core.files.storage import FileSystemStorage
 from .models import *
 from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
@@ -204,21 +205,25 @@ def api_get_user(request, id):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-def api_update_user(request, id, type):
-	cookie = request.COOKIES.get('token')
+@login_required
+def api_update_user(request):
 
-	if not cookie or not Token.objects.filter(token=cookie).exists():
-		return HttpResponse("Forbidden", status=403)
-	if not Token.objects.get(token=cookie).is_valid:
-		return HttpResponse("Forbidden", status=403)
-	if Token.objects.get(token=cookie).user.id != id:
-		return HttpResponse("Forbidden", status=403)
-
-	user = get_object_or_404(User, id=id)
-	if type == "nickname":
-		user.nickname = request.POST['nickname']
-	elif type == "password":
-		user.password = pbkdf2.hash(request.POST['password'])
+	id = request.COOKIES.get('token')
+	user = Token.objects.get(token=id).user
+	user.nickname = request.POST['nickname']
 	user.save()
-
 	return HttpResponse("success")
+
+@login_required
+def api_update_picture(request):
+	if request.method == 'POST':
+		id = request.COOKIES.get('token')
+		user = Token.objects.get(token=id).user
+
+		profile_picture = request.FILES['profile_picture']
+		fs = FileSystemStorage()
+		filename = fs.save(profile_picture.name, profile_picture)
+		uploaded_file_url = fs.url(filename)
+		user.default_profile_picture = uploaded_file_url
+		user.save()
+		return HttpResponse("success")
