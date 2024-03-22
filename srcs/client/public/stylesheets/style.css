@@ -2248,3 +2248,73 @@ Loader 4
     transform: translate(-10px, -18px);
   }
 }
+/**
+Loader 4
+*/
+.loader {
+  display: block;
+}
+.loader .paddle, .loader .player_two, .loader .player_one {
+  height: 40px;
+  width: 3px;
+  background-color: rgb(0, 0, 0);
+  position: relative;
+}
+.loader .player_one {
+  left: -180px;
+  animation: movePaddleOne 4s infinite;
+}
+.loader .player_two {
+  left: 20px;
+  animation: movePaddleTwo 4s infinite;
+}
+.loader .ball {
+  position: relative;
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background-color: rgb(0, 0, 0);
+  animation: moveBall 4s infinite linear;
+}
+@keyframes movePaddleOne {
+  0%, 100% {
+    transform: translate(0px, 100px);
+  }
+  25% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(0px, 0px);
+  }
+  75% {
+    transform: translate(0px, 100px);
+  }
+}
+@keyframes movePaddleTwo {
+  0%, 100% {
+    transform: translate(0px, -50px);
+  }
+  25% {
+    transform: translate(0px, 10px);
+  }
+  50% {
+    transform: translate(0px, 0px);
+  }
+  75% {
+    transform: translate(0px, 50px);
+  }
+}
+@keyframes moveBall {
+  0%, 100% {
+    transform: translate(-180px, 30px);
+  }
+  25% {
+    transform: translate(18px, -25px);
+  }
+  50% {
+    transform: translate(-180px, -55px);
+  }
+  75% {
+    transform: translate(18px, 15px);
+  }
+}/*# sourceMappingURL=style.css.map */

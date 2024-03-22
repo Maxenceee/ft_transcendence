@@ -1623,24 +1623,37 @@ class Loader extends Component {
 	render() {
 		return createElement('div', {
 			class: "ad-up-box-loader", children: [
+				// createElement('div', {
+				// 	class: "loader", children: createElement('div', {
+				// 		class: "inner-loader"
+				// 	})
+				// }),
+				// createElement('div', {
+				// 	class: "loader ellipse"
+				// }),
+				// createElement('div', {
+				// 	class: "loader square"
+				// }),
+				// createElement('div', {
+				// 	class: "loader triangle", children: createElement('svg', {
+				// 		viewBox: "0 0 86 80", children: createElement('polygon', {
+				// 			points: "43 8 79 72 7 72"
+				// 		})
+				// 	})
+				// })
 				createElement('div', {
-					class: "loader", children: createElement('div', {
-						class: "inner-loader"
-					})
-				}),
-				createElement('div', {
-					class: "loader ellipse"
-				}),
-				createElement('div', {
-					class: "loader square"
-				}),
-				createElement('div', {
-					class: "loader triangle", children: createElement('svg', {
-						viewBox: "0 0 86 80", children: createElement('polygon', {
-							points: "43 8 79 72 7 72"
+					class: "loader", children: [
+						createElement('div', {
+							class: "player_one"
+						}),
+						createElement('div', {
+							class: "player_two"
+						}),
+						createElement('div', {
+							class: "ball"
 						})
-					})
-				})				
+					]
+				})					
 			]
 		})		
 	}
@@ -2210,7 +2223,7 @@ class Main extends Component {
 		 * TODO: remove setTimeout
 		 */
 		setTimeout(() => {
-			this.loadUser();	
+			this.loadUser();
 		}, 1000);
 	}
 

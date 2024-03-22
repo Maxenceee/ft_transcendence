@@ -1,7 +1,13 @@
 createElement('div', {
-    class: "loader triangle", children: createElement('svg', {
-        viewBox: "0 0 86 80", children: createElement('polygon', {
-            points: "43 8 79 72 7 72"
+    class: "loader", children: [
+        createElement('div', {
+            class: "player_one"
+        }),
+        createElement('div', {
+            class: "player_two"
+        }),
+        createElement('div', {
+            class: "ball"
         })
-    })
+    ]
 })
