@@ -1707,7 +1707,7 @@ class BadConnection extends Component {
 let game_render = function(c, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let playerNumber = -1;
-	let socket = new Socket({path: "/game/ai"});
+	let socket = new Socket({path: "/game/local"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
