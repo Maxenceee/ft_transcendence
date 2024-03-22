@@ -748,7 +748,7 @@ class Component {
 			newElement = newElement._renderComponent();
 		}
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			// console.log("node", node, oldElement, newElement);
+			console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
 				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
@@ -1175,7 +1175,7 @@ const App = {
 class HomePage extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: props.user };
+		this.state = { user: props.user, reload: props.reload };
 	}
 
 	componentDidMount() {
@@ -1704,18 +1704,15 @@ class BadConnection extends Component {
 	}
 }
 
-let game_render = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let game_render = function(c, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let playerNumber = -1;
-	let socket = new Socket({path: "/game/2p"});
+	let socket = new Socket({path: "/game/ai"});
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
 	});
-	socket.onclose(() => {
-		console.info("Connection closed");
-		navigate("/");
-	});
+	socket.onclose(c);
 	socket.use((msg) => {
 		switch (msg.type) {
 			case "initGame":
@@ -1773,12 +1770,10 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 
 	let palletPlayer1 = 0;
 	let palletPlayer2 = 0;
-	let mapLenth
-	let mapWidth
 	function initiateMapTwoPlayer(data)
 	{
-		mapLenth = 60;
-		mapWidth = 40;
+		let mapWidth = 40;
+		let mapLenth = 60;
 		palletPlayer1 = new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
@@ -1888,36 +1883,42 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 	function onDocumentKeyDown(event) {
 		switch (event.which) {
 			case 68:
+				socket.send({type : 'keyCode', move : "d_key"});
+				break;
 			case 39:
-				socket.send({type : 'keyCode', move : "right"});
+				socket.send({type : 'keyCode', move : "right_arrow_key"});
+				break;
+			case 65:
+				socket.send({type : 'keyCode', move : "a_key"});
 				break;
 			case 37:
-				socket.send({type : 'keyCode', move : "left"});
+				socket.send({type : 'keyCode', move : "left_arrow_key"});
 				break;
 			case 82:
 				setcam(10, 69, 0);
 				controls.target.set(0, 0, 0);
 				break;
+		}
 	}
 	function onDocumentKeyUp(event) {
-		/**
-		 * Ceci ne sert à rien !!! C'est bien ce qu'il me semblait !
-		 * Puisque le keycode est seulement envoyé lorsqu'on appuie sur une touche (keydown) !
-		 * C'est pour ça que les inputs sont lents à réagir.
-		 * 
-		 * TODO:
-		 * regler le probleme des inputs et remplacer le key-autorepeat par un keydown/keyup et
-		 * envoyer au server à chaque frame (?) tant que la touche n'est pas relaché
-		 */
-	    // let keyVar = event.which;
-		// if (keyVar == 68)
-		// 	keyCode.right = 0;
-		// if (keyVar == 65)
-		// 	keyCode.left = 0;
-		// if (keyVar == 39)
-		// 	keyCode.right = 0;
-		// if (keyVar == 37)
-		// 	keyCode.left = 0;
+	    /**
+ 		 * Ceci ne sert à rien !!! C'est bien ce qu'il me semblait !
+ 		 * Puisque le keycode est seulement envoyé lorsqu'on appuie sur une touche (keydown) !
+ 		 * C'est pour ça que les inputs sont lents à réagir.
+ 		 * 
+ 		 * TODO:
+ 		 * regler le probleme des inputs et remplacer le key-autorepeat par un keydown/keyup et
+ 		 * envoyer au server à chaque frame (?) tant que la touche n'est pas relaché
+ 		 */
+ 	    // let keyVar = event.which;
+ 		// if (keyVar == 68)
+ 		// 	keyCode.right = 0;
+ 		// if (keyVar == 65)
+ 		// 	keyCode.left = 0;
+ 		// if (keyVar == 39)
+ 		// 	keyCode.right = 0;
+ 		// if (keyVar == 37)
+ 		// 	keyCode.left = 0;
 	}
 
 	let ballDirection = {
@@ -2028,7 +2029,7 @@ let game_render = function({width, height} = {width: window.innerWidth, height: 
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {game_render: null, animationid: null};
+		this.state = {game_render: null, animationid: null, reload: props.reload};
 	}
 
 	componentDidMount() {
@@ -2040,7 +2041,12 @@ class GameView extends Component {
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		this.setState({game_render: game_render({width: window.innerWidth, height: window.innerHeight})});
+		let callback = () => {
+			navigate("/");
+			// this.state.reload();
+		}
+
+		this.setState({game_render: game_render(callback, {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -2069,10 +2075,15 @@ class GameView extends Component {
 }
 
 class GameRouter extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {reload: props.reload};
+	}
+
 	render() {
 		return createElement('div', {
 			children: router(
-				route({path: "/game/:type", element: createElement(GameView)}),
+				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
 			)
 		});
 	}
@@ -2081,7 +2092,7 @@ class GameRouter extends Component {
 class MainRouter extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: props.user, loadUser: props.loadUser };
+		this.state = { user: props.user, reload: props.reload };
 	}
 
 	render() {
@@ -2134,8 +2145,8 @@ class MainRouter extends Component {
 				createElement('header', {}),
 				createElement('main', {children:
 					router(
-						route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.loadUser})}),
-						route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.loadUser})}),
+						route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.state.reload})}),
+						route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.state.reload})}),
 						route({path: "*", element: createElement(NotFound)})
 					)
 				})
@@ -2174,6 +2185,10 @@ class Main extends Component {
 		}, 1000);
 	}
 
+	componentDidUpdate() {
+		console.log("==================== Main updated ====================");
+	}
+
 	render() {
 		return (
 			this.state.loading ?
@@ -2183,8 +2198,8 @@ class Main extends Component {
 			createElement(BadConnection)
 			:
 			router(
-				route({path: "/game/*", element: createElement(GameRouter)}),
-				route({path: "*", element: createElement(MainRouter, {user: this.state.user, loadUser: this.loadUser.bind(this)})}),
+				route({path: "/game/*", element: createElement(GameRouter, {reload: this.loadUser.bind(this)})}),
+				route({path: "*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 			)
 		)
 	}
