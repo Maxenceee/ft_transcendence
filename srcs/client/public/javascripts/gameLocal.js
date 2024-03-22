@@ -342,7 +342,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					createText(score.scoreP1 + " : " + score.scoreP2);
 				}
 			}
-		await sleep(25)
+		// await sleep(25)
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
