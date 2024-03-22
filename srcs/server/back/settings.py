@@ -52,11 +52,16 @@ CORS_ALLOWED_ORIGINS = [
 
 INSTALLED_APPS = [
 	'index',
-	'game_2player',
-	'game_4player',
-	'game_local',
-	'tournament',
+	'game',
+
+	# 'game_2player',
+	# 'game_4player',
+	# 'game_local',
+	# 'game_AI',
+	# 'tournament',
+	
 	'channels',
+	'corsheaders',
 	'django.contrib.admin',
 	'django.contrib.contenttypes',
 	'django.contrib.auth',
@@ -68,6 +73,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'corsheaders.middleware.CorsMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',

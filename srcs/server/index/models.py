@@ -5,11 +5,13 @@ import json
 from datetime import datetime, timedelta
 import logging
 
+
 class User(models.Model):
 	index = models.AutoField(primary_key=True)
 	id = models.CharField(max_length=10)
 	nickname = models.CharField(max_length=100)
 	is_online = models.BooleanField(default=False)
+	is_ingame = models.BooleanField(default=False)
 	game_history = models.ManyToManyField('Game_history', related_name='game_history')
 	
 	username = models.CharField(max_length=100)
@@ -83,3 +85,14 @@ class Game_history(models.Model):
 					user.game_history.add(self)
 				except:
 					pass
+
+
+#starting code
+
+try:
+	for user in User.objects.all():
+		user.is_online = False
+		user.is_ingame = False
+		user.save()
+except:
+	pass

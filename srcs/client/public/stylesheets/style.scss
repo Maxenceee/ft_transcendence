@@ -210,6 +210,16 @@ body {
 // 	}
 // }
 
+.link {
+	color: var(--href-color) !important;
+	font-size: 14px;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
 .relative {
 	position: relative;
 }
@@ -1065,9 +1075,15 @@ main {
 			width: 100%;
 			height: 100%;
 			mask: linear-gradient(to bottom, transparent 50%, black);
-			// mask: conic-gradient(from 90deg at 0px 0px, #0000 25%, #000 0) 0px 0px, linear-gradient(#000 70%, #0000 95%);
 			backdrop-filter: blur(30px);
 			-webkit-backdrop-filter: blur(30px);
+
+			body.chrome & {
+				backdrop-filter: none !important;
+				-webkit-backdrop-filter: none !important;
+				background-color: #000;
+			}
+
 			pointer-events: none;
 			z-index: -1;
 		}
@@ -1192,25 +1208,25 @@ progress[value]::-moz-progress-bar {
 	border-radius: var(--border-radius);
 }
 
-progress[value]::after {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	--size: 32px;
-	width: var(--size);
-	height: var(--size);
-	position: absolute;
-	left: var(--progress-value-percent);
-	top: 50%;
-	transform: translate(-50%, -50%);
-	background-color: var(--progress-value-color);
-	border-radius: 50%;
-	content: attr(value);
-	content: var(--progress-value-string, var(--value));
-	font-size: 12px;
-	font-weight: 700;
-	color: #fff;
-}
+// progress[value]::after {
+// 	display: flex;
+// 	align-items: center;
+// 	justify-content: center;
+// 	--size: 32px;
+// 	width: var(--size);
+// 	height: var(--size);
+// 	position: absolute;
+// 	left: var(--progress-value-percent);
+// 	top: 50%;
+// 	transform: translate(-50%, -50%);
+// 	background-color: var(--progress-value-color);
+// 	border-radius: 50%;
+// 	content: attr(value);
+// 	content: var(--progress-value-string, var(--value));
+// 	font-size: 12px;
+// 	font-weight: 700;
+// 	color: #fff;
+// }
 
 @keyframes progress {
 	from {
@@ -2110,6 +2126,8 @@ body:has(.connection-page) {
 
 .history-card {
 	.history-card-content {
+		max-height: 65vh;
+		overflow-y: scroll;
 	}
 }
 
@@ -2122,6 +2140,7 @@ body:has(.connection-page) {
 
 	.win,
 	.lost,
+	.draw,
 	.type {
 		font-size: 16px;
 		font-weight: 500;
@@ -2132,257 +2151,84 @@ body:has(.connection-page) {
 	.lost {
 		color: red;
 	}
+	.draw {
+		color: blue;
+	}
 
 	.score {
 		font-size: 15px;
 	}
 }
 
-
-$colors:
-	hsla(337, 84%, 48%, 0.75)
-	hsla(160, 50%, 48%, 0.75)
-	hsla(190, 61%, 65%, 0.75)
-	hsla( 41, 82%, 52%, 0.75);
-$size: 2.5em;
-$thickness: 0.5em;
-
-// Calculated variables.
-$lat: calc(($size - $thickness) / 2);
-$offset: $lat - $thickness;
-
-.inner-loader {
-	position: relative;
-	width: $size;
-	height: $size;
-	transform: rotate(165deg);
+.back-button {
+	position: fixed;
+	left: 20px;
+	top: 20px;
+	padding: 15px 20px;
+	border-radius: 8px;
+	backdrop-filter: blur(10px);
+	color: #FFF;
+	background-color: rgba(255, 255, 255, 0.1);
+	font-size: 18px;
+	line-height: 100%;
+	text-align: center;
+	border: solid transparent 0.5px;
 	
-	&:before,
-	&:after {
-		content: '';
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		display: block;
-		width: $thickness;
-		height: $thickness;
-		border-radius: calc($thickness / 2);
-		transform: translate(-50%, -50%);
-	}
-	
-	&:before {
-		animation: before 2s infinite;
-	}
-	
-	&:after {
-		animation: after 2s infinite;
+	&:hover {
+		border-color: rgba(255, 255, 255, 0.8);
 	}
 }
 
-@keyframes before {
-	0% {
-		width: $thickness;
-		box-shadow:
-		$lat (-$offset) nth($colors, 1),
-		(-$lat) $offset nth($colors, 3);
-	}
-	35% {
-		width: $size;
-		box-shadow:
-		0 (-$offset) nth($colors, 1),
-		0   $offset  nth($colors, 3);
-	}
-	70% {
-		width: $thickness;
-		box-shadow:
-		(-$lat) (-$offset) nth($colors, 1),
-		$lat $offset nth($colors, 3);
-	}
-	100% {
-		box-shadow:
-		$lat (-$offset) nth($colors, 1),
-		(-$lat) $offset nth($colors, 3);
-	}
-}
+.ws-server-p {
+	position: fixed;
+	bottom: 10px;
+	right: 20px;
+	background-color: #555;
+	padding: 5px 10px;
+	z-index: 8000;
+	border-radius: 8px;
+	display: flex;
+	flex-direction: row;
+	align-content: center;
+	overflow: hidden;
 
-@keyframes after {
-	0% {
-		height: $thickness;
-		box-shadow:
-		$offset $lat nth($colors, 2),
-		(-$offset) (-$lat) nth($colors, 4);
-	}
-	35% {
-		height: $size;
-		box-shadow:
-			$offset  0 nth($colors, 2),
-		(-$offset) 0 nth($colors, 4);
-	}
-	70% {
-		height: $thickness;
-		box-shadow:
-		$offset (-$lat) nth($colors, 2),
-		(-$offset) $lat nth($colors, 4);
-	}
-	100% {
-		box-shadow:
-		$offset $lat nth($colors, 2),
-		(-$offset) (-$lat) nth($colors, 4);
-	}
-}
-
-.ad-up-box-loader, .dot-box {
-    position: absolute;
-    z-index: 1000;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-	// padding: 5px;
-	// max-width: 100vw;
-	// max-height: 100vh;
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
-    align-items: center;
-
-	&.blured:not(:has(.global)) {
-		// background-color: rgba(67, 74, 83, 0.108);
-		background-color: var(--loader-bg-blur);
-		-webkit-backdrop-filter: blur(1px);
-		backdrop-filter: blur(1px);
-	}
-
-	&:not(.mini-loader) {
-		.loader {
-			position: absolute !important;
-			top: min(50vh, 50%);
-			transform: translateY(-50%);
-		}
-	}
-	
-	.loader {
+	& > div {
 		position: relative;
-		margin: 0 auto;
-		// width: 50px;
-		
-		&:has(.circular)::before {
-			content: '';
-			display: block;
-			padding-top: 100%;
-		}
+		margin-right: 5px;
+		display: flex;
+		align-items: center;
 
-		&.global {
-			aspect-ratio: 1 / 1;
-			width: 100px;
-			border-radius: 8px;
-			background-color: var(--loader-bg-blur);
-			-webkit-backdrop-filter: blur(5px);
-			backdrop-filter: blur(5px);
-			display: flex;
-			justify-content: center;
-			align-items: center;
+		svg {
+			position: relative;
+			height: 100%;
 
-			// .inner-loader {
-			// 	display: inline-block;
-			// }
+			path {
+				fill: #FFF;
+			}
 		}
 	}
 
-	// &::after {
-	// 	position: absolute;
-	// 	// opacity: 1;
-	// 	content: 'Poor connection...';
-	// 	opacity: 0.5;
-	// 	line-break: strict;
-	// 	width: 150px;
-	// 	text-align: center;
-	// 	left: 50%;
-	// 	top: 50%;
-	// 	transform: translate(-50%, 100%);
-	// }
-	
-	.circular {
-		animation: rotate 2s linear infinite;
-		height: 100%;
-		transform-origin: center center;
-		width: 100%;
+	p {
+		line-height: 35px;
+		font-size: 15px;
+		line-break: anywhere;
+		color: #FFF;
+	}
+
+	.progression {
+		margin: 0;
 		position: absolute;
-		top: 0;
 		bottom: 0;
 		left: 0;
-		right: 0;
-		margin: auto;
-	}
-	  
-	.path:not(.ad-up-box-loader.mini-loader .path) {
-		stroke-dasharray: 1, 200;
-		stroke-dashoffset: 0;
-		animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
-		stroke-linecap: round;
-		stroke: #000;
-	}
-
-	&.mini-loader {
-		backdrop-filter: none;
-
-		.loader {
-			width: 28px;
-			margin: 4px;
-		}
-
-		.path {
-			stroke-dasharray: 1, 200;
-			stroke-dashoffset: 0;
-			animation: dash 1.5s ease-in-out infinite;
-			stroke-linecap: round;
-			stroke: #000;
-		}
-	}
-
-	&.global-main {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100vh;
+		background-color: #FFF;
+		height: 3px;
 	}
 }
 
-@keyframes rotate {
-    100% {
-      transform: rotate(360deg);
-    }
+.render-context {
+	position: relative;
+	width: 100%;
+	height: 100%;
 }
-  
-@keyframes dash {
-    0% {
-      stroke-dasharray: 1, 200;
-      stroke-dashoffset: 0;
-    }
-    50% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -35px;
-    }
-    100% {
-      stroke-dasharray: 89, 200;
-      stroke-dashoffset: -124px;
-    }
-}
-  
-@keyframes color {
-    100%,
-    0% {
-      stroke: #d62d20;
-    }
-    40% {
-      stroke: #0057e7;
-    }
-    66% {
-      stroke: #008744;
-    }
-    80%,
-    90% {
-      stroke: #ffa700;
-    }
-}
+
+@import 'loaders.scss';

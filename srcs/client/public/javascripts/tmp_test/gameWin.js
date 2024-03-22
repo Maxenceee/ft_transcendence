@@ -200,7 +200,7 @@ function createText(msg) {
 const loader = new FontLoader();
 function loadFont() {
 
-	loader.load( '/static/javascripts/font.json', function ( response ) {
+	loader.load( '/static/fonts/font.json', function ( response ) {
 
 		font = response;
 
