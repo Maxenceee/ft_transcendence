@@ -1,9 +1,10 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.files.storage import FileSystemStorage
 from .models import *
 from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
+from .forms import UserProfilePictureForm
 import logging
 import string
 import os
@@ -207,7 +208,6 @@ def api_get_user(request, id):
 
 @login_required
 def api_update_user(request):
-
 	id = request.COOKIES.get('token')
 	user = Token.objects.get(token=id).user
 	user.nickname = request.POST['nickname']
@@ -220,10 +220,23 @@ def api_update_picture(request):
 		id = request.COOKIES.get('token')
 		user = Token.objects.get(token=id).user
 
-		profile_picture = request.FILES['profile_picture']
-		fs = FileSystemStorage()
-		filename = fs.save(profile_picture.name, profile_picture)
-		uploaded_file_url = fs.url(filename)
-		user.default_profile_picture = uploaded_file_url
-		user.save()
+		# profile_picture = request.FILES['file']
+		# logging.error(profile_picture)
+
+		# fs = FileSystemStorage()
+		# filename = fs.save(profile_picture.name, profile_picture)
+		# uploaded_file_url = fs.url(filename)
+		# user.default_profile_picture = uploaded_file_url
+		# user.save()
+		# return HttpResponse("success")
+		logging.error(request.POST, request.FILES)
+
+		if 'file' in request.FILES:
+			file_data = request.FILES['file'].read()
+			user.save_image(file_data)
+			return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
+		else:
+			return JsonResponse({'error': 'Aucun fichier téléchargé.'}, status=400)
+
+
 		return HttpResponse("success")

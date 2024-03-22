@@ -4,6 +4,7 @@ import random
 import json
 from datetime import datetime, timedelta
 import logging
+import base64
 
 
 class User(models.Model):
@@ -21,6 +22,12 @@ class User(models.Model):
 	swivel_id = models.CharField(max_length=100)
 
 	default_profile_picture = models.CharField(max_length=100)
+	profile_picture_image = models.ImageField(null=True, upload_to='avatars/')
+
+	def save_image(self, image_data):
+		encoded_image_data = base64.b64encode(image_data)
+		self.profile_picture_image = encoded_image_data
+		self.save()
 
 	def __str__(self):
 		return str(self.username)
