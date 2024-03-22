@@ -39,7 +39,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				// ball[4].position.z = data.ball.z + 100;
 				// ball[5].position.z = data.ball.z + 100;
 				// ball[6].position.z = data.ball.z + 200;
-				console.log(data.player);
+				// console.log(data.player);
 				pallet[0].position.x = data.player[0].x + data.player[0].gameNumber * 80;
 				pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
 				pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;

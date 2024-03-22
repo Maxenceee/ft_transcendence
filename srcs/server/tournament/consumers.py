@@ -170,23 +170,23 @@ def game_master(game):
 			if action == "right":
 				if game.players[playerID].pad_x  < 16.5:
 					game.players[playerID].pad_x += 0.8
-					logging.info("right move")
+					# logging.info("right move")
 					if game.players[playerID].pad_x  > 16.0 :
 							game.players[playerID].pad_x = 16
 				if game.players[playerID].pad_x  > -16.5:
 					game.players[playerID].pad_x -= 0.8
-					logging.info("right move")
+					# logging.info("right move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 			elif action == "left":
 				if game.players[playerID].pad_x  > -16.5:
 					game.players[playerID].pad_x -= 0.8
-					logging.info("left move")
+					# logging.info("left move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 				if game.players[playerID].pad_x  < 16.5:
 					game.players[playerID].pad_x += 0.8
-					logging.info("left move")
+					# logging.info("left move")
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 		time.sleep(0.05)
@@ -198,7 +198,7 @@ def game_master(game):
 		game.wallCollideTwoPlayer()
 		game.rebound_x(0)
 		game.rebound_x(1)
-		game.send_all("gameState", game.to_json())
+		logging.info(game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
 				if game.next_game() == False:
