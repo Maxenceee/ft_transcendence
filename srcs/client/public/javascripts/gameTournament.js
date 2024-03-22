@@ -29,17 +29,16 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball[1].position.x = data.ball2.x + 80;
 				ball[2].position.x = data.ball3.x + 160;
 				ball[3].position.x = data.ball4.x + 240;
-				// ball[4].position.x = data.ball.x + 80;
-				// ball[5].position.x = data.ball.x + 160;
-				// ball[6].position.x = data.ball.x + 120;		
+				ball[4].position.x = data.ball.x + 80;
+				ball[5].position.x = data.ball.x + 160;
+				ball[6].position.x = data.ball.x + 120;
 				ball[0].position.z = data.ball.z;
 				ball[1].position.z = data.ball2.z;
 				ball[2].position.z = data.ball3.z;
 				ball[3].position.z = data.ball4.z;
-				// ball[4].position.z = data.ball.z + 100;
-				// ball[5].position.z = data.ball.z + 100;
-				// ball[6].position.z = data.ball.z + 200;
-				// console.log(data.player);
+				ball[4].position.z = data.ball.z + 100;
+				ball[5].position.z = data.ball.z + 100;
+				ball[6].position.z = data.ball.z + 200;
 				pallet[0].position.x = data.player[0].x + data.player[0].gameNumber * 80;
 				pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
 				pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
@@ -115,7 +114,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	function loadFont() {
 
 		const loader = new FontLoader();
-		loader.load( '/static/javascripts/font.json', function ( response ) {
+		loader.load( '/static/fonts/font.json', function ( response ) {
 
 			font = response;
 
@@ -342,7 +341,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky6.jpg" );
-	const skyboxGeo		 = new THREE.SphereGeometry( 300 );
+	const skyboxGeo		 = new THREE.SphereGeometry( 450 );
 	const materialSky = new THREE.MeshPhysicalMaterial({
 		wireframe:false, 
 		opacity: 1,
@@ -390,7 +389,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score  
 				|| score.scoreP7 != data.player[6].score  || score.scoreP8 != data.player[7].score ))
 			{
-
 				score.scoreP1 = data.player[0].score;
 				score.scoreP2 = data.player[1].score;
 				createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
@@ -403,10 +401,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				score.scoreP7 = data.player[6].score;
 				score.scoreP8 = data.player[7].score;
 				createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
-				// console.log(textMesh2);
 			}
 		}
-		await sleep(25);
 	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));

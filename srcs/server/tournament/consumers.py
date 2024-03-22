@@ -122,19 +122,19 @@ class Game:
 			i +=1
 
 	def rebound_x(self, playerID):
-		i = 0
-		while i < 4 :
-			if ((self.ball[i].z < -27 and playerID == 1) or (self.ball[i].z > 27 and playerID == 0)) and (self.ball[i].x < (self.players[playerID].pad_x + 4.5)  and self.ball[i].x > (self.players[playerID].pad_x - 4.5)):
-				if (playerID == 1) :
-					self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
-					self.ball[i].direction_z = 1
-				else :
-					self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
-					self.ball[i].direction_z = -1
-				self.ball[i].speed *= 1.1
-			if (self.ball[i].speed > 5) :
-				self.ball[i].speed = 5
-			i += 1
+		i = int(playerID/2)
+		# while i < 4 :
+		if ((self.ball[i].z < -27 and playerID%2 == 1) or (self.ball[i].z > 27 and playerID%2 == 0)) and (self.ball[i].x < (self.players[playerID].pad_x + 4.5)  and self.ball[i].x > (self.players[playerID].pad_x - 4.5)):
+			if (playerID%2== 1) :
+				self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
+				self.ball[i].direction_z = 1
+			else :
+				self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
+				self.ball[i].direction_z = -1
+			self.ball[i].speed *= 1.1
+		if (self.ball[i].speed > 5) :
+			self.ball[i].speed = 5
+			# i += 1
 
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
@@ -168,37 +168,42 @@ def game_master(game):
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
 			if action == "right":
-				if game.players[playerID].pad_x  < 16.5:
+				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 0:
 					game.players[playerID].pad_x += 0.8
 					# logging.info("right move")
 					if game.players[playerID].pad_x  > 16.0 :
 							game.players[playerID].pad_x = 16
-				if game.players[playerID].pad_x  > -16.5:
+				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 1:
 					game.players[playerID].pad_x -= 0.8
 					# logging.info("right move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 			elif action == "left":
-				if game.players[playerID].pad_x  > -16.5:
+				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 0:
 					game.players[playerID].pad_x -= 0.8
 					# logging.info("left move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
-				if game.players[playerID].pad_x  < 16.5:
+				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 1:
 					game.players[playerID].pad_x += 0.8
 					# logging.info("left move")
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
+			logging.info(game.players[playerID].pad_x)
 		time.sleep(0.05)
 		i = 0
 		while i < 4 :
 			game.ball[i].x += game.ball[i].direction_x * 0.4 * game.ball[i].speed
 			game.ball[i].z += game.ball[i].direction_z * 0.4 * game.ball[i].speed
 			i += 1
+		i = 0
 		game.wallCollideTwoPlayer()
-		game.rebound_x(0)
-		game.rebound_x(1)
-		logging.info(game.to_json())
+		for player in game.players :
+			game.rebound_x(i)
+			i += 1
+		# logging.info(game.players[7].pad_x)
+		# logging.info(game.ball[i - 1].x)
+		game.send_all("gameState", game.to_json())
 		for player in game.players:
 			if player.score  > 9 :
 				if game.next_game() == False:
