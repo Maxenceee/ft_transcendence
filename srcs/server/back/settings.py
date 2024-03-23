@@ -27,6 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+BASE_URL = 'http://localhost:3000'
 DEBUG = False
 
 ALLOWED_HOSTS = [
