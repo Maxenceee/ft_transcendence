@@ -1287,7 +1287,7 @@ class HomePage extends Component {
 															class: "card-container", children: [
 																link({
 																	// to: "/game/tournament", children: createElement('div', {
-																	to: "/game/local", children: createElement('div', {
+																	to: "/game/4p", children: createElement('div', {
 																		class: "play-button", children: createElement('svg', {
 																			width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
 																				d: "M5.32789 25.4892H23.4434C25.4884 25.4892 26.7692 24.0199 26.7692 22.1784C26.7692 21.6108 26.6073 21.0197 26.3037 20.4851L17.2332 4.67086C16.5964 3.55805 15.5091 3 14.3867 3C13.2622 3 12.159 3.56227 11.536 4.67086L2.46547 20.4872C2.14484 21.0293 2 21.6108 2 22.1784C2 24.0199 3.28086 25.4892 5.32789 25.4892Z"
@@ -1743,7 +1743,17 @@ class BadConnection extends Component {
 
 let game_render = function(c, type, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
-	let playerNumber = -1;
+	let render_data = {
+		pallet: [],
+		ball: null,
+		ballDirection: {
+			x : 0.5 + Math.random(),
+			z : 0.5 + Math.random(),
+		},
+		keyCodes: {},
+		updateScore: 0,
+		queue: [],
+	}
 	let socket = new Socket({path: "/game/"+type});
 	socket.onconnection(() => {
 		console.info("Connection opened");
@@ -1752,66 +1762,63 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 	socket.onclose(c);
 	socket.use((msg) => {
 		switch (msg.type) {
-			case "initGame":
-				createText("");
-				break;
-			case "gameState": {	
-				data = msg.data;
-				data.type = msg.type
-				ball.position.x = data.ball.x;			
-				ball.position.z = data.ball.z;			
-				palletPlayer1.position.x = data.players[0].x;
-				palletPlayer2.position.x = data.players[1].x;
-			} break;
 			case "resetCam":
 				setcam(10, 69, 0);
 				break;
 			case "setCam":
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
+			default:
+				render_data.queue.push(msg);
 		}
 	});
 
-	let ball;
+	let setcam = (x, y, z) => {
+		camera.position.set(x, y, z);
+	}
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(width, height);
 	renderer.setPixelRatio(window.devicePixelRatio);
 
-	var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 200);
-	camera.position.set(15, 15, 20);
+	let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+	setcam(10, 80, 0);
 
 	const controls = new OrbitControls(camera, renderer.domElement);
 	const scene = new THREE.Scene();
-	const sceneError = new THREE.Scene;
-	controls.maxDistance = 90;
+	controls.maxDistance = 100;
 	controls.target.set(0, 0, 0);
 	controls.update();
 
 	const Alight = new THREE.AmbientLight({ color: 0xffffff });
 	scene.add(Alight);
 
-	let font, textGeo, textMesh2;
-	var score = {
-		scoreP1: 0,
-		scoreP2: 0,
-	};
+	const sky = new THREE.TextureLoader().load("/static/images/background_sky_box.jpg");
+	const skyboxGeo = new THREE.SphereGeometry(700);
+	const materialSky = new THREE.MeshPhysicalMaterial({
+		wireframe:false, 
+		opacity: 1,
+		side: THREE.BackSide,
+		map: sky,
+	});
+	const skybox = new THREE.Mesh(skyboxGeo, materialSky)
+	scene.add(skybox)
 
-	function loadFont() {
-		const loader = new FontLoader();
-		loader.load('/static/fonts/font.json', function (response) {
+	let font,
+		textGeo,
+		textMesh;
+
+	(function() {
+		new FontLoader().load('/static/fonts/font.json', function (response) {
 			font = response;
-			createText("Waiting for opponent");
+			createText("Waiting for opponent", 2.5);
 		});
-	}
+	}());
 
-	let palletPlayer1 = 0;
-	let palletPlayer2 = 0;
-	function initiateMapTwoPlayer(data)
-	{
+	(function() {
 		let mapWidth = 40;
 		let mapLenth = 60;
-		palletPlayer1 = new THREE.Mesh(
+		render_data.pallet.push(new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
@@ -1820,8 +1827,8 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 					emissive:0xffffff,
 					side : THREE.DoubleSide,
 				})
-			);
-		palletPlayer2 = new THREE.Mesh(
+			));
+		render_data.pallet.push(new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
@@ -1830,7 +1837,7 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
-		);
+		));
 		let wallLeft = new THREE.Mesh(
 			new THREE.BoxGeometry(1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial({
@@ -1851,8 +1858,8 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 				side : THREE.DoubleSide,
 			})
 		);
-		wallRight.position.x += mapWidth/2;
-		wallLeft.position.x -= mapWidth/2;
+		wallRight.position.x += mapWidth / 2;
+		wallLeft.position.x -= mapWidth / 2;
 		let wallP2 = new THREE.Mesh(
 			new THREE.BoxGeometry(mapWidth - 1, 1, 1),
 			new THREE.MeshStandardMaterial({
@@ -1873,8 +1880,8 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 				side : THREE.DoubleSide,
 			})
 		);
-		wallP1.position.z += mapLenth/2
-		wallP2.position.z -= mapLenth/2
+		wallP1.position.z += mapLenth / 2
+		wallP2.position.z -= mapLenth / 2
 
 		const geometryBall = new THREE.BoxGeometry(1, 1, 1);
 		const materialBall = new THREE.MeshPhysicalMaterial({
@@ -1884,13 +1891,14 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 			iridescence :1,
 			side : THREE.DoubleSide,
 		});
-		ball = new THREE.Mesh(geometryBall, materialBall);
+		render_data.ball = new THREE.Mesh(geometryBall, materialBall);
 
-		palletPlayer1.position.z += (mapLenth/2) - 1.5;
-		palletPlayer2.position.z -= (mapLenth/2) - 1.5;
+		render_data.pallet[0].position.z += (mapLenth / 2) - 1.5;
+		render_data.pallet[1].position.z -= (mapLenth / 2) - 1.5;
 		
-		scene.add(wallLeft, wallRight, wallP1, wallP2, ball);
-	}
+		scene.add(wallLeft, wallRight, wallP1, wallP2);
+		scene.add(...render_data.pallet);
+	}());
 
 	const params = {
 		threshold: 0,
@@ -1911,140 +1919,127 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
-	let moveSpeed = 1.05;
-
-	initiateMapTwoPlayer({});
-
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
 		switch (event.which) {
 			case 68:
-				socket.send({type : 'keyCode', move : "d_key"});
+				render_data.keyCodes["d_key"] = true;
 				break;
 			case 39:
-				socket.send({type : 'keyCode', move : "right_arrow_key"});
+				render_data.keyCodes["right_arrow_key"] = true;
 				break;
 			case 65:
-				socket.send({type : 'keyCode', move : "a_key"});
+				render_data.keyCodes["a_key"] = true;
 				break;
 			case 37:
-				socket.send({type : 'keyCode', move : "left_arrow_key"});
+				render_data.keyCodes["left_arrow_key"] = true;
 				break;
 			case 82:
-				setcam(10, 69, 0);
+				setcam(10, 80, 0);
 				controls.target.set(0, 0, 0);
 				break;
 		}
 	}
 	function onDocumentKeyUp(event) {
-	    /**
- 		 * Ceci ne sert à rien !!! C'est bien ce qu'il me semblait !
- 		 * Puisque le keycode est seulement envoyé lorsqu'on appuie sur une touche (keydown) !
- 		 * C'est pour ça que les inputs sont lents à réagir.
- 		 * 
- 		 * TODO:
- 		 * regler le probleme des inputs et remplacer le key-autorepeat par un keydown/keyup et
- 		 * envoyer au server à chaque frame (?) tant que la touche n'est pas relaché
- 		 */
- 	    // let keyVar = event.which;
- 		// if (keyVar == 68)
- 		// 	keyCode.right = 0;
- 		// if (keyVar == 65)
- 		// 	keyCode.left = 0;
- 		// if (keyVar == 39)
- 		// 	keyCode.right = 0;
- 		// if (keyVar == 37)
- 		// 	keyCode.left = 0;
+	    switch (event.which) {
+			case 68:
+				render_data.keyCodes["d_key"] = false;
+				break;
+			case 39:
+				render_data.keyCodes["right_arrow_key"] = false;
+				break;
+			case 65:
+				render_data.keyCodes["a_key"] = false;
+				break;
+			case 37:
+				render_data.keyCodes["left_arrow_key"] = false;
+				break;
+		}
 	}
-
-	let ballDirection = {
-		x : 0.5 + Math.random(),
-		z : 0.5 + Math.random(),
-	};
 
 	const materials = [
 		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
 		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
 	];
-	if (palletPlayer1 != 0)
-		scene.add(palletPlayer1, palletPlayer2);
 
-	function createText(msg) {
-		scene.remove(textMesh2);
-		textGeo = new TextGeometry(msg , {
+	function createText(msg, size = 10) {
+		scene.remove(textMesh);
+		textGeo = new TextGeometry(msg, {
 			font: font,
-
-			size: 10,
+			size: size,
 			height: 0.5,
 			curveSegments: 2,
-
 			bevelThickness: 0.1,
 			bevelSize: 0.01,
 			bevelEnabled: true
 		});
 
-		textMesh2 = new THREE.Mesh(textGeo, materials);
-		textMesh2.rotateX(-Math.PI * 0.5);
-		textMesh2.rotateZ(Math.PI * 0.5);
-		textMesh2.position.z += 12.5;
-		textMesh2.position.x += 2.5;
-		textMesh2.position.y -= 2;
+		textGeo.computeBoundingBox();
+		textGeo.center();
+		textMesh = new THREE.Mesh(textGeo, materials);
+		textMesh.rotateX(-Math.PI * 0.5);
+		textMesh.rotateZ(Math.PI * 0.5);
+		textMesh.position.y -= 2;
 		
-		scene.add(textMesh2);
+		scene.add(textMesh);
 		textGeo.dispose();
 	}
 
-	var keyCode = {
-		left : 0,
-		right : 0
-	}
-	
-	let data = {
-		number : [2],
-		ball : ball.position,
-		ballDirection : ballDirection,
-		P1position : palletPlayer1.position,
-		P2position : palletPlayer2.position,
-		score : score,
-		updateScore : 0,
-		moveSpeed : moveSpeed,
-		playerNumber : playerNumber,
-		gameID : 0,
-		keyCode : keyCode
-	};
-	loadFont();
-
-	let animationid = null;
+	let animationid = null,
+		ts = Date.now();
 	const animate = async () => {
-		if (composer){
-			renderer.render(scene, camera);
-			composer.render();	
-		}
-		else
-			renderer.render(sceneError, camera);
+		renderer.render(scene, camera);
+		composer.render();
 
 		controls.update();
 		animationid = requestAnimationFrame(animate);
-		if (data.type == "gameState")
+		while (render_data.queue.length > 0)
 		{
-			if (score.scoreP1 > 9 || score.scoreP2 > 9)
-			{
-				scene.remove(ball);
-				return;
+			let event = render_data.queue.shift(),
+				data = event.data;
+			
+			if (Date.now() - ts > 25) {
+				Object.keys(render_data.keyCodes).forEach((key) => {
+					if (render_data.keyCodes[key]) {
+						socket.send({type : 'keyCode', move : key});
+					}
+				});
+				ts = Date.now();
 			}
-			if ((score.scoreP2 != data.players[1].score || score.scoreP1 != data.players[0].score))
-			{
-				score.scoreP1 = data.players[0].score;
-				score.scoreP2 = data.players[1].score;
-				createText(data.players[0].score + " : " + data.players[1].score);
+
+			switch (event.type) {
+				case "initGame": {
+					createText("");
+					scene.add(render_data.ball);
+					for (let i = 0; i < render_data.pallet.length; i++) {
+						console.log(data.players[i]);
+						render_data.pallet[i].position.x = data.players[i].x;
+						render_data.pallet[i].score = data.players[i].score;
+						render_data.ball.position.x = data.ball.x;
+						render_data.ball.position.z = data.ball.z;
+					}
+				} break;
+				case "updateScore": {
+					render_data.pallet[data.n].score = data.score;
+					createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
+					if (render_data.pallet.some(e => e.score > 9))
+					{
+						scene.remove(ball);
+						return;
+					}
+				} break;
+				case "updatePlayer": {
+					render_data.pallet[data.n].position.x = data.x;
+				} break;
+				case "updateBall": {
+					render_data.ball.position.x = data.x;
+					render_data.ball.position.z = data.z;
+				} break;
 			}
 		}
 	}
 
-	function setcam (x, y, z) {
-		camera.position.set(x, y, z);
-	}
 	return {
 		start: animate,
 		socket: socket,

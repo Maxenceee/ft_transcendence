@@ -36,32 +36,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		score = msg.score;
 	});
 
-	let ball;
-
-	const renderer = new THREE.WebGLRenderer({ antialias: true });
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	document.body.appendChild( renderer.domElement );
-	renderer.setPixelRatio( window.devicePixelRatio );
-
-	var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-	camera.position.set( 15, 15, 20 );
-
-	const controls = new OrbitControls( camera, renderer.domElement );
-	const scene = new THREE.Scene();
-	const sceneError = new THREE.Scene
-	controls.maxDistance = 50
-	controls.target.set( 0, 0, 0 );
-	controls.update();
-
-	const Alight = new THREE.AmbientLight({color:0xffffff});
-	scene.add( Alight );
-
-	const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
-	const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
-	const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky3.jpg" );
-	const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
-
 	let font, textGeo, textMesh2
 
 	var score = {
@@ -70,14 +44,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		scoreP3: 0,
 		scoreP4: 0,
 	};
-
-	function loadFont() {
-		const loader = new FontLoader();
-		loader.load( '/static/fonts/font.json', function ( response ) {
-			font = response;
-			createText("");
-		});
-	}
 
 	let palletPlayer1 = 0;
 	let palletPlayer2 = 0;
@@ -422,26 +388,26 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 		if (P1score != 0)
 			scene.remove(P1score, P2score, P3score, P4score)
-		P1score = createTextObject("" + score.scoreP1 + "") //Red player
+		P1score = createTextObject(score.scoreP1) //Red player
 		P1score.position.z += 30
 		P1score.position.y += 6
 		P1score.position.x += 2.5
 		P1score.rotateY(Math.PI);
 
 		
-		P2score = createTextObject("" + score.scoreP2 + "") //Purple player
+		P2score = createTextObject(score.scoreP2.toString()) //Purple player
 		P2score.position.z -= 30
 		P2score.position.y += 6
 		P2score.position.x -= 5
 		
 		
-		P3score = createTextObject("" + score.scoreP3 + "") //Cyan player
+		P3score = createTextObject(score.scoreP3.toString()) //Cyan player
 		P3score.position.z += 2.5
 		P3score.position.y += 6
 		P3score.position.x -= 30
 		P3score.rotateY(Math.PI*0.5);
 		
-		P4score = createTextObject("" + score.scoreP4 + "") //Blue player
+		P4score = createTextObject(score.scoreP4.toString()) //Blue player
 		P4score.position.z -= 2.5
 		P4score.position.y += 6
 		P4score.position.x += 30
