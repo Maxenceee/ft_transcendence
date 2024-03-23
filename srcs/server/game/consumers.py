@@ -400,7 +400,7 @@ class Game:
 				
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"game {self.id} tps: {t}")
+				logging.info(f"game {self.id} => {l} tps: {t}")
 				t = 0
 				l = time.time()
 
@@ -524,7 +524,7 @@ class Game:
 				
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"game {self.id} tps: {t}")
+				logging.info(f"game {self.id} => {l} tps: {t}")
 				t = 0
 				l = time.time()
 
@@ -579,12 +579,11 @@ class Game:
 
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"game {self.id} tps: {t}")
+				logging.info(f"game {self.id} => {l} tps: {t}")
 				t = 0
 				l = time.time()
 
 			time.sleep(0.04)
-			logging.info(time.time())
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_two_player()
