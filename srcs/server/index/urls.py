@@ -18,6 +18,8 @@ urlpatterns = [
 	path('api/avatar/<str:id>', views.api_avatar, name='avatar'),
 	path('api/user/update/nickname', views.api_update_user, name='update_user'),
 	path('api/user/update/picture', views.api_update_picture, name='update_picture'),
+	path('api/follow/<str:id>', views.api_follow, name='follow'),
+	path('api/unfollow/<str:id>', views.api_unfollow, name='unfollow'),
 
 	path('<path:url>', views.not_found, name='redirect'),
 ]

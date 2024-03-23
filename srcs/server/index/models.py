@@ -15,15 +15,17 @@ class User(models.Model):
 	is_online = models.BooleanField(default=False)
 	is_ingame = models.BooleanField(default=False)
 	game_history = models.ManyToManyField('Game_history', related_name='game_history')
-	
+
+	default_profile_picture = models.CharField(max_length=100)
+	profile_picture_image = models.ImageField(null=True, upload_to='avatar/')
+
+	following = models.ManyToManyField('User', related_name='followers')
+
 	username = models.CharField(max_length=100)
 	password = models.CharField(max_length=100)
 
 	intra_id = models.CharField(max_length=100)
 	swivel_id = models.CharField(max_length=100)
-
-	default_profile_picture = models.CharField(max_length=100)
-	profile_picture_image = models.ImageField(null=True, upload_to='avatar/')
 
 	def __str__(self):
 		return str(self.username)
@@ -42,12 +44,16 @@ class User(models.Model):
 			profile_picture = self.default_profile_picture
 		else:
 			profile_picture = settings.BASE_URL + "/api" + self.profile_picture_image.url,
+		following = []
+		for user in self.following.all():
+			following.append(user.resume_to_json())
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
 			"is_online": self.is_online,
-			"game_history": game_history,
 			"profile_picture": profile_picture,
+			"following": following,
+			"game_history": game_history,
 		}
 		return response
 	
