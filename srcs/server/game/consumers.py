@@ -400,7 +400,7 @@ class Game:
 				
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"tps: {t}")
+				logging.info(f"game {self.id} tps: {t}")
 				t = 0
 				l = time.time()
 
@@ -524,7 +524,7 @@ class Game:
 				
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"tps: {t}")
+				logging.info(f"game {self.id} tps: {t}")
 				t = 0
 				l = time.time()
 
@@ -545,11 +545,7 @@ class Game:
 		logging.info("game master ai")
 		self.ai_player.start()
 		self.send_all("initGame", self.to_json())
-		# TODO:
-		# set la position de la camera proprement 
-		# eviter les index fixes pour les joueurs
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
-		# self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		t = 0
 		l = time.time()
 		while True:
@@ -583,7 +579,7 @@ class Game:
 
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"tps: {t}")
+				logging.info(f"game {self.id} tps: {t}")
 				t = 0
 				l = time.time()
 
