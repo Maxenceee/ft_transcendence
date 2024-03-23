@@ -29,24 +29,45 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball[1].position.x = data.ball2.x + 80;
 				ball[2].position.x = data.ball3.x + 160;
 				ball[3].position.x = data.ball4.x + 240;
-				ball[4].position.x = data.ball.x + 80;
-				ball[5].position.x = data.ball.x + 160;
-				ball[6].position.x = data.ball.x + 120;
+				ball[4].position.x = data.ball5.x + 80;
+				ball[5].position.x = data.ball6.x + 160;
+				ball[6].position.x = data.ball7.x + 120;
 				ball[0].position.z = data.ball.z;
 				ball[1].position.z = data.ball2.z;
 				ball[2].position.z = data.ball3.z;
 				ball[3].position.z = data.ball4.z;
-				ball[4].position.z = data.ball.z + 100;
-				ball[5].position.z = data.ball.z + 100;
-				ball[6].position.z = data.ball.z + 200;
-				pallet[0].position.x = data.player[0].x + data.player[0].gameNumber * 80;
-				pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
-				pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
-				pallet[3].position.x = data.player[3].x + data.player[3].gameNumber * 80;
-				pallet[4].position.x = data.player[4].x + data.player[4].gameNumber * 80;
-				pallet[5].position.x = data.player[5].x + data.player[5].gameNumber * 80;
-				pallet[6].position.x = data.player[6].x + data.player[6].gameNumber * 80;
-				pallet[7].position.x = data.player[7].x + data.player[7].gameNumber * 80;
+				ball[4].position.z = data.ball5.z + 100;
+				ball[5].position.z = data.ball6.z + 100;
+				ball[6].position.z = data.ball7.z + 200;
+				for( let i = 0; i < 8; i++){
+					if (data.player[i].gameNumber == -1)
+						scene.remove(pallet[i]);
+					else if (data.player[i].gameNumber < 4)
+						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
+					else if (data.player[i].gameNumber < 6){
+						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
+						pallet[i].position.z = data.player[i].z + 100;
+						if (i % 4 < 2)
+							pallet[i].position.z -= 28.5;
+						else
+							pallet[i].position.z += 28.5;
+					}
+					else{
+						pallet[i].position.x = data.player[i].x + 120;
+						pallet[i].position.z = data.player[i].z + 200;
+						if (i  < 4)
+							pallet[i].position.z -= 28.5;
+						else
+							pallet[i].position.z += 28.5;
+					}
+				}
+				// pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
+				// pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
+				// pallet[3].position.x = data.player[3].x + data.player[3].gameNumber * 80;
+				// pallet[4].position.x = data.player[4].x + data.player[4].gameNumber * 80;
+				// pallet[5].position.x = data.player[5].x + data.player[5].gameNumber * 80;
+				// pallet[6].position.x = data.player[6].x + data.player[6].gameNumber * 80;
+				// pallet[7].position.x = data.player[7].x + data.player[7].gameNumber * 80;
 			}
 			else if (msg.type == "resetCam")
 				// setcam(10, 69, 0);
@@ -349,6 +370,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		map  : sky
 	});
 	const skybox = new THREE.Mesh(skyboxGeo, materialSky)
+	skybox.position.x += 120;
 	scene.add(skybox)
 
 	loadFont();
@@ -364,25 +386,29 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 		if (data.type == "gameState")
 		{
-			if (score.scoreP1 > 9 || score.scoreP2 > 9)
+			if ((score.scoreP1 < 0 || score.scoreP2 < 0))
 			{
 				scene.remove(ball[0]);
+				scene.remove(textMesh2[0])
 				// return;
 			}
-			if (score.scoreP3 > 9 || score.scoreP4 > 9)
+			if ((score.scoreP3 < 0 || score.scoreP4 < 0))
 			{
 				scene.remove(ball[1]);
-				return;
+				scene.remove(textMesh2[1])
+				// return;
 			}
-			if (score.scoreP5 > 9 || score.scoreP6 > 9)
+			if ((score.scoreP5 < 0 || score.scoreP6 < 0))
 			{
 				scene.remove(ball[2]);
-				return;
+				scene.remove(textMesh2[2])
+				// return;
 			}
-			if (score.scoreP7 > 9 || score.scoreP8 > 9)
+			if ((score.scoreP7 < 0 || score.scoreP8 < 0))
 			{
 				scene.remove(ball[3]);
-				return;
+				scene.remove(textMesh2[3])
+				// return;
 			}
 			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
 				score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 

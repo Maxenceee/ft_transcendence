@@ -30,6 +30,7 @@ class Ball:
 class Player:
 	def __init__(self, id, socket) -> None:
 		self.id = id
+		self.playerNumber = 0
 		self.socket = socket
 		self.score = 0
 		self.pad_x = 0
@@ -49,7 +50,7 @@ class Game:
 		logging.info("new game created")
 		self.id = makeid(15)
 		self.players = players
-		self.ball = [Ball(),Ball(),Ball(),Ball()]
+		self.ball = [Ball(),Ball(),Ball(),Ball(), Ball(), Ball(), Ball()]
 		self.queue = queue.Queue()
 
 	def end_game(self):
@@ -67,8 +68,51 @@ class Game:
 		Game_history.objects.create(type="2p", data=resume_data)
 		logging.info("game ended TODO revove from game list")
 
-	def next_game(self):
-		return False
+	def next_game(self, player):
+		if (player.gameNumber == 6) :
+			return False
+		if player.score != 10 or player.gameNumber == -1 :
+			return True
+		logging.info(f"player win :{player.playerNumber}, from {player.gameNumber}")
+		if player.gameNumber == 0 or player.gameNumber == 1:
+			if (int(player.playerNumber)%2) == 1:
+				self.players[player.playerNumber - 1].score = -999
+				self.players[player.playerNumber - 1].gameNumber = -1
+			else :
+				self.players[player.playerNumber + 1].score = -999
+				self.players[player.playerNumber + 1].gameNumber = -1
+			player.playerNumber = player.gameNumber
+			player.gameNumber = 4
+			player.score = 0
+			self.ball[4].x = 0
+			self.ball[4].z = 0
+		elif player.gameNumber == 2 or player.gameNumber == 3:
+			if (int(player.playerNumber)%2) == 1:
+				self.players[player.playerNumber - 1].score = -999
+				self.players[player.playerNumber - 1].gameNumber = -1
+			else :
+				self.players[player.playerNumber + 1].score = -999
+				self.players[player.playerNumber + 1].gameNumber = -1
+			player.playerNumber = player.gameNumber
+			player.gameNumber = 5
+			player.score = 0
+			self.ball[5].x = 0
+			self.ball[5].z = 0
+		elif player.gameNumber == 4 or player.gameNumber == 5 :
+			if (int(player.playerNumber)%2) == 1:
+				self.players[player.playerNumber - 1].score = -999
+				self.players[player.playerNumber - 1].gameNumber = -1
+			else :
+				self.players[player.playerNumber + 1].score = -999
+				self.players[player.playerNumber + 1].gameNumber = -1
+			player.playerNumber = player.gameNumber
+			player.gameNumber = 6
+			player.score = 0
+			self.ball[6].x = 0
+			self.ball[6].z = 0
+		logging.info(f"player win :{player.playerNumber}, going to {player.gameNumber}, ball at {self.ball[player.gameNumber].x}")
+		return True
+			
 
 	def send_all(self, type, data):
 		for player in self.players:
@@ -87,18 +131,22 @@ class Game:
 			"ball2": {"x": self.ball[1].x, "z": self.ball[1].z, "direction_x": self.ball[1].direction_x, "direction_z":self.ball[1].direction_z},
 			"ball3": {"x": self.ball[2].x, "z": self.ball[2].z, "direction_x": self.ball[2].direction_x, "direction_z":self.ball[2].direction_z},
 			"ball4": {"x": self.ball[3].x, "z": self.ball[3].z, "direction_x": self.ball[3].direction_x, "direction_z":self.ball[3].direction_z},
+			"ball5": {"x": self.ball[4].x, "z": self.ball[4].z, "direction_x": self.ball[4].direction_x, "direction_z":self.ball[4].direction_z},
+			"ball6": {"x": self.ball[5].x, "z": self.ball[5].z, "direction_x": self.ball[5].direction_x, "direction_z":self.ball[5].direction_z},
+			"ball7": {"x": self.ball[6].x, "z": self.ball[6].z, "direction_x": self.ball[6].direction_x, "direction_z":self.ball[6].direction_z},
 		}
 		return response
 	
-	def wallCollideTwoPlayer(self):
-		i = 0
-		while i < 4:
+	def wallCollideTwoPlayer(self, i, playerNumber):
+		# i = 0
+		# while i < 7:
 			if self.ball[i].x < -18.5 :
 				self.ball[i].direction_x *= -1
 			elif self.ball[i].x > 18.5 :
 				self.ball[i].direction_x *= -1
 			if self.ball[i].z < -29:
-				self.players[i * 2].score += 1					#	not enought player to turn it on
+				if i < 4 :
+					self.players[playerNumber].score += 1					#		not enought player to turn it on
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -106,7 +154,8 @@ class Game:
 				self.ball[i].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 				self.ball[i].speed = 1.05
 			elif self.ball[i].z > 29:
-				self.players[i * 2 + 1].score +=1				#		not enought player to turn it on
+				if i < 4 :
+					self.players[playerNumber + 1].score +=1				#		not enought player to turn it on
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -119,21 +168,20 @@ class Game:
 				self.ball[i].x = -18.49
 			if (self.ball[i].x > 18.5):
 				self.ball[i].x = 18.49
-			i +=1
+			# i +=1
 
-	def rebound_x(self, playerID):
-		i = int(playerID/2)
+	def rebound_x(self, playerID, gameNumber ):
 		# while i < 4 :
-		if ((self.ball[i].z < -27 and playerID%2 == 1) or (self.ball[i].z > 27 and playerID%2 == 0)) and (self.ball[i].x < (self.players[playerID].pad_x + 4.5)  and self.ball[i].x > (self.players[playerID].pad_x - 4.5)):
+		if ((self.ball[gameNumber].z < -27 and playerID%2 == 1) or (self.ball[gameNumber].z > 27 and playerID%2 == 0)) and (self.ball[gameNumber].x < (self.players[playerID].pad_x + 4.5)  and self.ball[gameNumber].x > (self.players[playerID].pad_x - 4.5)):
 			if (playerID%2== 1) :
-				self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
-				self.ball[i].direction_z = 1
+				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerID].pad_x)/4.5
+				self.ball[gameNumber].direction_z = 1
 			else :
-				self.ball[i].direction_x = (self.ball[i].x - self.players[playerID].pad_x)/4.5
-				self.ball[i].direction_z = -1
-			self.ball[i].speed *= 1.1
-		if (self.ball[i].speed > 5) :
-			self.ball[i].speed = 5
+				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerID].pad_x)/4.5
+				self.ball[gameNumber].direction_z = -1
+			self.ball[gameNumber].speed *= 1.1
+		if (self.ball[gameNumber].speed > 5) :
+			self.ball[gameNumber].speed = 5
 			# i += 1
 
 def start_game(num):
@@ -143,6 +191,7 @@ def start_game(num):
 		i = 0
 		for player in waiting_list:
 			player.gameNumber = int(i / 2)
+			player.playerNumber = i
 			players.append(player)
 			logging.info(f"player added to game")
 			i += 1
@@ -170,93 +219,42 @@ def game_master(game):
 			if action == "right":
 				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 0:
 					game.players[playerID].pad_x += 0.8
-					# logging.info("right move")
 					if game.players[playerID].pad_x  > 16.0 :
 							game.players[playerID].pad_x = 16
 				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 1:
 					game.players[playerID].pad_x -= 0.8
-					# logging.info("right move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 			elif action == "left":
 				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 0:
 					game.players[playerID].pad_x -= 0.8
-					# logging.info("left move")
 					if game.players[playerID].pad_x  < -16.0:
 							game.players[playerID].pad_x = -16
 				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 1:
 					game.players[playerID].pad_x += 0.8
-					# logging.info("left move")
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
 			logging.info(game.players[playerID].pad_x)
 		time.sleep(0.05)
-		i = 0
-		while i < 4 :
-			game.ball[i].x += game.ball[i].direction_x * 0.4 * game.ball[i].speed
-			game.ball[i].z += game.ball[i].direction_z * 0.4 * game.ball[i].speed
-			i += 1
-		i = 0
-		game.wallCollideTwoPlayer()
 		for player in game.players :
-			game.rebound_x(i)
+			game.ball[player.gameNumber].x += game.ball[player.gameNumber].direction_x * 0.2 * game.ball[player.gameNumber].speed
+			game.ball[player.gameNumber].z += game.ball[player.gameNumber].direction_z * 0.2 * game.ball[player.gameNumber].speed
+		i = 0
+		for player in game.players :
+			game.wallCollideTwoPlayer(game.players[i].gameNumber, game.players[i].playerNumber)
+			game.rebound_x(i, game.players[i].gameNumber)
 			i += 1
-		# logging.info(game.players[7].pad_x)
-		# logging.info(game.ball[i - 1].x)
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
-			if player.score  > 9 :
-				if game.next_game() == False:
+			if player.score  > 9 and player.gameNumber != -1:
+				if game.next_game(player) == False:
 					game.end_game()
-				return
+					return
 
-
-# _____________________
-# tournamentList= {} 		
-# game_list_tournament = []										# make a map please
-# def start_gameTournament(name, size):
-# 	if tournamentList.find(name) == False :
-# 			tournamentList.append(Tournament(size, name))
-# 	else :
-# 			target =  tournamentList.find(name)
-# 	if target.full:
-# 		# pass
-# 		it = 0
-# 		tmp = []
-# 		while it < target.size + 1 :
-# 			tmp[0] = target.players[it]
-# 			tmp[1] = target.players[it + 1]
-# 			it += 2
-# 			game_list_tournament.append(Game(tmp))
-# 		target.size /= 2
-# 		return
-# 	else :
-# 		return
-
-
-# class Tournament :
-# 	players = []
-# 	size = 0
-# 	name = "default"
-
-# 	def __init__(self, size, name):
-# 		self.size = size
-# 		self.name = name
-# 		pass
-	
-# 	def add(self, player):
-# 		self.players.append(player)
-	
-# 	def full(self):
-# 		if (len(self.players) == self.size):
-# 			return True
-# 		return False
-# _______________________
 
 class websocket_tournament(WebsocketConsumer):
 
 	def connect(self):
-		# ft_getGameType(self) 								?????????????????????????
 		
 		cookies = {}
 		data = self.scope['headers']
