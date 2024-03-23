@@ -1,6 +1,5 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core.files.storage import FileSystemStorage
 from .models import *
 from .decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
@@ -10,6 +9,9 @@ import string
 import os
 import requests
 import urllib.parse
+from PIL import Image
+from django.http import HttpResponse
+from django.core.files.storage import default_storage
 
 def get_new_default_profile_picture():
 	try:
@@ -220,23 +222,29 @@ def api_update_picture(request):
 		id = request.COOKIES.get('token')
 		user = Token.objects.get(token=id).user
 
-		# profile_picture = request.FILES['file']
-		# logging.error(profile_picture)
-
-		# fs = FileSystemStorage()
-		# filename = fs.save(profile_picture.name, profile_picture)
-		# uploaded_file_url = fs.url(filename)
-		# user.default_profile_picture = uploaded_file_url
-		# user.save()
-		# return HttpResponse("success")
-		logging.error(request.POST, request.FILES)
-
 		if 'file' in request.FILES:
-			file_data = request.FILES['file'].read()
-			user.save_image(file_data)
+			profile_picture = request.FILES['file']
+			content_type = profile_picture.content_type
+
+			if content_type not in ['image/jpeg', 'image/png']:
+				return JsonResponse({'error': 'Format de fichier non supporté. Seuls les fichiers JPEG et PNG sont acceptés.'}, status=400)
+
+			user.profile_picture_image = profile_picture
+			user.save()
 			return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
 		else:
 			return JsonResponse({'error': 'Aucun fichier téléchargé.'}, status=400)
+		
 
-
-		return HttpResponse("success")
+@login_required
+def api_avatar(request, id):
+	try:
+		# Open the image file
+		logging.info(id)
+		with default_storage.open(f"avatar/{id}", 'rb') as img_file:
+			image = Image.open(img_file).convert("RGB")
+			response = HttpResponse(content_type="image/jpeg")
+			image.save(response, "JPEG")
+			return response
+	except FileNotFoundError:
+		return JsonResponse({'error': 'Image not found.'}, status=404)

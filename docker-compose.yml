@@ -24,6 +24,7 @@ services:
             - .env
         volumes:
             - shared_data:/var/www/static/
+            - images:/app/server/avatar
         networks:
             - transcendence
         depends_on:
@@ -55,6 +56,10 @@ networks:
 volumes:
     postgres_volume:
         name: postgres_volume
+        driver: local
+
+    images:
+        name: images
         driver: local
 
     shared_data:

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from datetime import datetime, timedelta
 import random
 import json
@@ -22,12 +23,7 @@ class User(models.Model):
 	swivel_id = models.CharField(max_length=100)
 
 	default_profile_picture = models.CharField(max_length=100)
-	profile_picture_image = models.ImageField(null=True, upload_to='avatars/')
-
-	def save_image(self, image_data):
-		encoded_image_data = base64.b64encode(image_data)
-		self.profile_picture_image = encoded_image_data
-		self.save()
+	profile_picture_image = models.ImageField(null=True, upload_to='avatar/')
 
 	def __str__(self):
 		return str(self.username)
@@ -42,12 +38,16 @@ class User(models.Model):
 				"data": json.loads(game.data),
 			}
 			game_history.append(json_game)
+		if not self.profile_picture_image:
+			profile_picture = self.default_profile_picture
+		else:
+			profile_picture = settings.BASE_URL + "/api" + self.profile_picture_image.url,
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
 			"is_online": self.is_online,
 			"game_history": game_history,
-			"profile_picture": self.default_profile_picture,
+			"profile_picture": profile_picture,
 		}
 		return response
 
