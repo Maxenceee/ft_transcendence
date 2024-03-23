@@ -256,3 +256,17 @@ def api_search_user(request, id):
 	for user in users:
 		response.append(user.resume_to_json())
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+@login_required
+def api_follow(request, id):
+	user = Token.objects.get(token=request.COOKIES.get('token')).user
+	user_to_follow = get_object_or_404(User, id=id)
+	user.following.add(user_to_follow)
+	return HttpResponse("success")
+
+@login_required
+def api_unfollow(request, id):
+	user = Token.objects.get(token=request.COOKIES.get('token')).user
+	user_to_unfollow = get_object_or_404(User, id=id)
+	user.following.remove(user_to_unfollow)
+	return HttpResponse("success")
