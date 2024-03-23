@@ -50,6 +50,18 @@ class User(models.Model):
 			"profile_picture": profile_picture,
 		}
 		return response
+	
+	def resume_to_json(self):
+		if not self.profile_picture_image:
+			profile_picture = self.default_profile_picture
+		else:
+			profile_picture = settings.BASE_URL + "/api" + self.profile_picture_image.url,
+		response = {
+			"id": self.id,
+			"nickname": self.nickname,
+			"profile_picture": profile_picture,
+		}
+		return response
 
 class Token(models.Model):
 	id = models.AutoField(primary_key=True)

@@ -248,3 +248,11 @@ def api_avatar(request, id):
 			return response
 	except FileNotFoundError:
 		return JsonResponse({'error': 'Image not found.'}, status=404)
+	
+@login_required
+def api_search_user(request, id):
+	users = User.objects.filter(nickname__contains=id)
+	response = []
+	for user in users:
+		response.append(user.resume_to_json())
+	return HttpResponse(json.dumps(response), content_type="application/json")
