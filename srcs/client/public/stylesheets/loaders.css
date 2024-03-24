@@ -321,11 +321,11 @@ Loader 4
   position: relative;
 }
 .loader .player_one {
-  left: -180px;
+  left: -100px;
   animation: movePaddleOne 4s infinite;
 }
 .loader .player_two {
-  left: 20px;
+  left: 100px;
   animation: movePaddleTwo 4s infinite;
 }
 .loader .ball {
@@ -366,15 +366,15 @@ Loader 4
 }
 @keyframes moveBall {
   0%, 100% {
-    transform: translate(-180px, 30px);
+    transform: translate(-100px, 30px);
   }
   25% {
-    transform: translate(18px, -25px);
+    transform: translate(98px, -25px);
   }
   50% {
-    transform: translate(-180px, -55px);
+    transform: translate(-100px, -55px);
   }
   75% {
-    transform: translate(18px, 15px);
+    transform: translate(98px, 15px);
   }
-}/*# sourceMappingURL=loaders.css.map */
+}
