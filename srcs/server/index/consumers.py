@@ -5,7 +5,7 @@ global status_manager
 
 class StatusManager():
 	def __init__(self):
-		self.user_list = {}
+		self.user_list = []
 
 	def add_user(self, socket):
 		user.is_online = True
