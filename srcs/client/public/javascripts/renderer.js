@@ -738,13 +738,14 @@ class Component {
 
 	_renderComponent() {
 		let render = this.render();
+		if (render == undefined) throw new Error('Render method must return a value');
 		// if (render instanceof Component) {
 		// 	this._moised = render;
 		// }
 		console.log("render component", this);
 		this._mounted = true;
 		this.data = render;
-		this._element = render._renderComponent();
+		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
 	}
@@ -778,7 +779,6 @@ class Component {
 			} else {
 				node.removeChild(oldElement._element);
 			}
-			// oldElement && (oldElement._element = null);
 			// console.log(node);
 		}
 
@@ -795,7 +795,7 @@ class Component {
 		console.log("component will unmount", this);
 		this.componentWillUnmount();
 		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
-	}
+    }
 
 	render() {
 		throw new Error('Render method must be implemented');
@@ -859,7 +859,6 @@ function createElement(type, props = {}) {
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
-				// console.log(c, c._renderComponent());
 				c && element.appendChild(c._renderComponent());
 			}
 		}
@@ -1032,16 +1031,16 @@ class Route extends Component {
 		super(props);
 		if (props.path === void 0 || !props.path.length) throw new Error('Route must have a `path` property');
 		if (props.element === void 0) throw new Error('Route must have an `element` property');
-		if (typeof props.element === "function" && !(props.element instanceof Component))
-			throw new Error('Route component must be instanciated with new keyword');
+		if (typeof props.element === "object" && Array.isArray(props.element))
+			throw new Error('Route component cannot be an array');
 
-		this.state = { route: props.path.replace(/^\/*/, "/") };
+		this.path = props.path.replace(/^\/*/, "/");
 		this.active = false;
 	}
 
 	canRoute(route) {
-		const regex = Ia(this.state.route, route);
-		// console.log("regex result on route", this.state, regex);
+		const regex = Ia(this.path, route);
+		console.log("regex result on route", this, regex);
 		return regex;
 	}
 
@@ -1054,9 +1053,9 @@ class Route extends Component {
 	render() {
 		const { element } = this.props;
 
-		this._element = element;
+		this.data = element;
 		// console.log("in render route", this, this._element);
-		return this._element;
+		return this.data;
 	}
 }
 
@@ -1126,7 +1125,10 @@ renderer.prototype.render = function(elem) {
 	// console.log(elem);
 	if (this._internalRoot === null) throw Error('Unable to find root node');
 	let element = this._children._renderComponent();
-	console.log("root element", element);
+	if (element == undefined) throw new Error('Cannot mount invalid element');
+	console.log("root element", element, this);
+	// let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
+	// console.log("root element", element);
 	// this._children._element = element;
 	// if (typeof element === "object" && !(element instanceof HTMLElement)) {
 	// 	element = element.render();
@@ -1920,42 +1922,28 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
-	document.addEventListener("keydown", onDocumentKeyDown, true);
-	document.addEventListener("keyup", onDocumentKeyUp, true);
-	function onDocumentKeyDown(event) {
-		console.log(event.which);
+	document.addEventListener("keydown", onDocumentKeyEvent, true);
+	document.addEventListener("keyup", onDocumentKeyEvent, true);
+	function onDocumentKeyEvent(event) {
+		console.log("down", event);
 		switch (event.which) {
 			case 68:
-				render_data.keyCodes["d_key"] = true;
+				render_data.keyCodes["d_key"] = (event.type === "keydown");
 				break;
 			case 39:
-				render_data.keyCodes["right_arrow_key"] = true;
+				render_data.keyCodes["right_arrow_key"] = (event.type === "keydown");
 				break;
 			case 65:
-				render_data.keyCodes["a_key"] = true;
+				render_data.keyCodes["a_key"] = (event.type === "keydown");
 				break;
 			case 37:
-				render_data.keyCodes["left_arrow_key"] = true;
+				render_data.keyCodes["left_arrow_key"] = (event.type === "keydown");
 				break;
 			case 82:
-				setcam(10, 80, 0);
-				controls.target.set(0, 0, 0);
-				break;
-		}
-	}
-	function onDocumentKeyUp(event) {
-	    switch (event.which) {
-			case 68:
-				render_data.keyCodes["d_key"] = false;
-				break;
-			case 39:
-				render_data.keyCodes["right_arrow_key"] = false;
-				break;
-			case 65:
-				render_data.keyCodes["a_key"] = false;
-				break;
-			case 37:
-				render_data.keyCodes["left_arrow_key"] = false;
+				(event.type === "keydown") && (
+					setcam(10, 80, 0),
+					controls.target.set(0, 0, 0)
+				)
 				break;
 		}
 	}
@@ -2027,7 +2015,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
 					if (render_data.pallet.some(e => e.score > 9))
 					{
-						scene.remove(ball);
+						scene.remove(render_data.ball);
 						return;
 					}
 				} break;
@@ -2050,8 +2038,8 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		render: () => renderer.domElement,
 		unmount: () => {
 			animationid && cancelAnimationFrame(animationid);
-			document.removeEventListener("keydown", onDocumentKeyDown, true);
-			document.removeEventListener("keyup", onDocumentKeyUp, true);
+			document.removeEventListener("keydown", onDocumentKeyEvent, true);
+			document.removeEventListener("keyup", onDocumentKeyEvent, true);
 			socket.close();
 		}
 	};
@@ -2080,7 +2068,7 @@ class GameView extends Component {
 		// let onload = () => this.setState({loading: false});
 		let onload = () => this.setState({loading: false});
 
-		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
+		// this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -2101,6 +2089,7 @@ class GameView extends Component {
 		// this.setState({loading: true});
 		// this.state.reload();
 		navigate("/");
+		console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
@@ -2236,7 +2225,7 @@ class Main extends Component {
 			:
 			router(
 				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
-				route({path: "*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+				route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 			)
 		)
 	}
