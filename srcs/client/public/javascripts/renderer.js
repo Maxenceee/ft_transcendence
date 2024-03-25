@@ -485,16 +485,15 @@ let S = {
 }
 
 let pushState = function(r) {
-	if (r && r !== S.location.pathname) {
+	if (r) {
 		S.location.pathname = r;
-		// console.log("pushState", r, S);
+		console.log("pushState", r, S);
 		window.history.pushState({}, '', r);
-		window.dispatchEvent(new Event('popstate'));
 	}
 }
 
 let hh = function(e) {
-	// console.log("hh", S);
+	console.log("hh", S);
 	let {pathname: t} = S.location;
 	return Ia(e, t);
 }
@@ -720,7 +719,6 @@ class Component {
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
-		this._owner = null;
 
 		this._unmountComponent = this._unmountComponent.bind(this);
 	}
@@ -747,15 +745,14 @@ class Component {
 		// console.log("render component", this);
 		this._mounted = true;
 		this.data = render;
-		this.data._owner = this;
 		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
 	}
 
 	_updateComponent() {
-		if (!this._pendingState || !this._mounted) return;
 		let node;
+		if (!this._pendingState) return;
 		
 		this.state = this._pendingState;
 		this._pendingState = null;
@@ -764,14 +761,17 @@ class Component {
 
 		const oldElement = this.data || null;
 		// console.log("oldElement", oldElement);
+		if (oldElement) {
+			oldElement._unmountComponent();
+		}
 		let newElement = this.render();
 		this.data = newElement;
 		this._element = newElement._renderComponent()
 		// console.log("new element before", newElement, this);
+		console.log("reload element", newElement, oldElement);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("reload element", this, newElement, newElement.element, oldElement, oldElement.element);
 			if (newElement && oldElement) {
-				node.replaceChild(newElement.element, oldElement.element);
+				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
 			} else if (newElement) {
 				node.appendChild(newElement._element);
@@ -779,36 +779,31 @@ class Component {
 			} else {
 				node.removeChild(oldElement._element);
 			}
-			this._owner && (this._owner.element = this._element);
-		}
-		if (oldElement) {
-			oldElement._unmountComponent();
+			// console.log(node);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
 		this._pendingStateCallbacks = [];
 
-		this.componentDidUpdate();
+		if (this._mounted)
+			this.componentDidUpdate();
 	}
 
 	_unmountComponent() {
 		if (!this._mounted) return;
 		this._mounted = false;
 		console.log("component will unmount", this);
-		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
 		this.componentWillUnmount();
-		this.data = null;
+		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
     }
 
 	render() {
 		throw new Error('Render method must be implemented');
 	}
-	
-	get element() {
-		return this._element;
-	}
 
-	set element(e) {}
+	get element() {
+		return this._element && this._element._element || null;
+	}
 
 	componentDidMount() {}
 
@@ -886,10 +881,6 @@ function createElement(type, props = {}) {
 			type,
 			data: props,
 			_element: element,
-			get element() {
-				return element;
-			},
-			set element(e) {},
 			_renderComponent() {
 				return element;
 			},
@@ -929,15 +920,6 @@ class Router extends Component {
 		}
 	}
 
-	get element() {
-		return this.currentRoute.route.element;
-	}
-
-	set element(e) {
-		console.log("set element in router", this);
-		this._element = e;
-	}
-
 	componentDidMount() {
 		this.previousRoute = window.location.pathname;
 		window.addEventListener('popstate', this.event);
@@ -950,8 +932,7 @@ class Router extends Component {
 
 	componentWillUnmount() {
 		this.event && window.removeEventListener('popstate', this.event);
-		console.log("router will unmount", this.currentRoute.route);
-		this.currentRoute.route && this.currentRoute.route.propagateUnmount();
+		this.props.children.forEach(child => child.active && child.propagateUnmount());
 		console.log("====== Router Unmounted ======", this);
 	}
 
@@ -963,7 +944,6 @@ class Router extends Component {
 		this.currentRoute = {route: null, params: null};
 		let t;
 		children.forEach(child => {
-			child._owner = this;
 			if (!this.currentRoute.route && (t = child.canRoute(route)) !== null) {
 				this.currentRoute.route = child;
 				this.currentRoute.params = t.params;
@@ -1058,16 +1038,6 @@ class Route extends Component {
 		this.active = false;
 	}
 
-	set element(e) {
-		console.log("set element in route", this);
-		this._element = e;
-		this._owner && (this._owner.element = e);
-	}
-
-	get element() {
-		return this.data.element;
-	}
-
 	canRoute(route) {
 		const regex = Ia(this.path, route);
 		// console.log("regex result on route", this, regex);
@@ -1075,9 +1045,9 @@ class Route extends Component {
 	}
 
 	propagateUnmount() {
+		console.log("propagateUnmount from route", this);
 		this.data._unmountComponent();
 		this.active = false;
-		console.log("propagateUnmount from route", this);
 	}
 
 	render() {
@@ -1129,6 +1099,7 @@ function link(props) {
 		}
 		event.preventDefault();
 		pushState(to);
+		window.dispatchEvent(new Event('popstate'));
 	};
 
 	return createElement('a', { href: to, onClick: handleClick, ...props });
@@ -1141,6 +1112,7 @@ function link(props) {
 function navigate(path) {
 	if (typeof path !== "string") throw new Error('Path must be a string, not '+typeof path);
 	pushState(path);
+	window.dispatchEvent(new Event('popstate'));
 }
 
 let renderer = function() {
@@ -2074,7 +2046,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {loading: true, game_render: null, animationid: null};
+		this.state = {loading: true, game_render: null, animationid: null, reload: props.reload};
 	}
 
 	componentDidMount() {
@@ -2084,20 +2056,15 @@ class GameView extends Component {
 		if (!type) {
 			navigate("/");
 		}
-		this.setState({loading: true, game_render: null, animationid: null});
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		// this.setState({loading: false});
-		let onload = () => this.setState({loading: false});
-		let onclose = () => {};
+		// let onload = () => this.setState({loading: false});
+		let onload = () => {};
 
-		setTimeout(() => {
-			onload();
-		}, 2000);
-		// this.setState({game_render: game_render(type, onload, onclose, {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -2109,7 +2076,7 @@ class GameView extends Component {
 	}
 
 	componentWillUnmount() {
-		this.state.game_render && this.state.game_render.unmount();
+		this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		console.log("game view unmounted", this.state.game_render);
 	}
@@ -2118,19 +2085,20 @@ class GameView extends Component {
 		// this.setState({loading: true});
 		// this.state.reload();
 		navigate("/");
+		console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
 		return (
-			this.state.loading ?
-			createElement(Loader)
-			:
+			// this.state.loading ?
+			// createElement(Loader)
+			// :
 			createElement('div', {
 				class: "render-context", children: [
 					createElement('div', {
-						class: "back-button", onclick: () => navigate("/"), children: "Go home", style: "color: black"
+						class: "back-button", onclick: () => this.endGame(), children: "Go home"
 					}),
-					// this.state.game_render && this.state.game_render.render()
+					this.state.game_render && this.state.game_render.render()
 				]
 			})
 		)
@@ -2211,7 +2179,21 @@ class MainRouter extends Component {
 class Main extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: null, loading: true, error: null };
+		this.state = { user: null, loading: true, error: null, socket: null};
+	}
+
+	connectSocket() {
+		let socket = new Socket({path: "/user"});
+		socket.onconnection(() => {
+			console.info("Connection opened");
+		});
+		socket.onclose(() => {
+			console.info("Connection closed");
+		});
+		socket.use((msg) => {
+			console.log(msg);
+		});
+		this.setState({socket: socket});
 	}
 
 	loadUser() {
@@ -2220,6 +2202,7 @@ class Main extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false });
+			this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
