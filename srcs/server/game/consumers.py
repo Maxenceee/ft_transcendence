@@ -722,6 +722,7 @@ class WebsocketClient(WebsocketConsumer):
 		self.user = None
 		self.type = None
 		self.player = None
+		self.oldmove = time.time()
 
 	def connect(self):
 		logging.info("new player connected in new version <=============================")
@@ -779,7 +780,9 @@ class WebsocketClient(WebsocketConsumer):
 
 		try:
 			if receive_package['type'] == "keyCode":
-				self.player.push_to_game(receive_package['move'])
+				if (time.time() - self.oldmove) > 0.005:
+					self.oldmove = time.time()
+					self.player.push_to_game(receive_package['move'])
 				return
 		except:
 			pass
