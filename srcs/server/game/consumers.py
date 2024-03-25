@@ -412,7 +412,7 @@ class Game:
 			self.pad_collision_x(1)
 			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			for player in self.players:
-				if player.score  > 9 :
+				if player.score  > 4 :
 					self.end_game()
 					return
 
@@ -536,7 +536,7 @@ class Game:
 			self.pad_collision_x(1)
 			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			for player in self.players:
-				if player.score  > 9 :
+				if player.score  > 4 :
 					self.end_game()
 					return
 
@@ -592,7 +592,7 @@ class Game:
 			self.send(0, "updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			self.send(1, "gameState", self.to_json())
 			for player in self.players:
-				if player.score > 9:
+				if player.score > 4:
 					self.ai_player.stop()
 					self.end_game()
 					return
