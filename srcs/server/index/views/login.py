@@ -1,17 +1,13 @@
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import *
-from .decorators import *
+from django.shortcuts import render, redirect
+from index.models import *
+from index.decorators import *
 from passlib.hash import django_pbkdf2_sha256 as pbkdf2
-from .forms import UserProfilePictureForm
 import logging
 import string
 import os
 import requests
 import urllib.parse
-from PIL import Image
-from django.http import HttpResponse
-from django.core.files.storage import default_storage
 
 def get_new_default_profile_picture():
 	try:
@@ -23,23 +19,6 @@ def get_new_default_profile_picture():
 
 def makeid(length):
 	return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
-
-# Create your views here.
-@login_required
-def index(request):
-	return render(request, 'views/index.html', {"username": request.user.nickname})
-
-@login_required
-def user_page(request, id):
-	return render(request, 'views/user.html', {"username": request.user.nickname, "user_profile_picture": request.user.default_profile_picture})
-
-@login_required
-def get_user(request, id):
-	return HttpResponse(f'user page {id}')
-
-@login_required
-def get_lobies(request):
-	return HttpResponse('lobies page')
 
 @login_forbiden
 def login(request):
@@ -72,9 +51,12 @@ def signup(request):
 		if not username or not password:
 			return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
 		
+		if len(username) < 3 or len(username) > 20 or len(password) < 3 or len(password) > 20:
+			return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
+		
 		if User.objects.filter(username=username).exists():
 			return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
-		
+
 		password = pbkdf2.hash(password)
 		id = makeid(10)
 		while User.objects.filter(id=id).exists():
@@ -179,11 +161,6 @@ def callback_swivel(request):
 	response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
 	return response
 
-
-@login_required
-def not_found(request, url):
-	return render(request, 'views/index.html', {"username": request.user.nickname})
-
 @login_required
 def logout(request):
 	cookie = request.COOKIES.get('token')
@@ -196,77 +173,3 @@ def logout(request):
 		token.is_valid = False
 		token.save()
 	return response
-
-@login_required
-def api_get_user(request, id):
-	if id == "me":
-		id = request.COOKIES.get('token')
-		user = Token.objects.get(token=id).user
-	else:
-		user = get_object_or_404(User, id=id)
-	response = user.to_json()
-
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
-@login_required
-def api_update_user(request):
-	id = request.COOKIES.get('token')
-	user = Token.objects.get(token=id).user
-	user.nickname = request.POST['nickname']
-	user.save()
-	return HttpResponse("success")
-
-@login_required
-def api_update_picture(request):
-	if request.method == 'POST':
-		id = request.COOKIES.get('token')
-		user = Token.objects.get(token=id).user
-
-		if 'file' in request.FILES:
-			profile_picture = request.FILES['file']
-			content_type = profile_picture.content_type
-
-			if content_type not in ['image/jpeg', 'image/png']:
-				return JsonResponse({'error': 'Format de fichier non supporté. Seuls les fichiers JPEG et PNG sont acceptés.'}, status=400)
-
-			user.profile_picture_image = profile_picture
-			user.save()
-			return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
-		else:
-			return JsonResponse({'error': 'Aucun fichier téléchargé.'}, status=400)
-		
-
-@login_required
-def api_avatar(request, id):
-	try:
-		# Open the image file
-		logging.info(id)
-		with default_storage.open(f"avatar/{id}", 'rb') as img_file:
-			image = Image.open(img_file).convert("RGB")
-			response = HttpResponse(content_type="image/jpeg")
-			image.save(response, "JPEG")
-			return response
-	except FileNotFoundError:
-		return JsonResponse({'error': 'Image not found.'}, status=404)
-	
-@login_required
-def api_search_user(request, id):
-	users = User.objects.filter(nickname__contains=id)
-	response = []
-	for user in users:
-		response.append(user.resume_to_json())
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
-@login_required
-def api_follow(request, id):
-	user = Token.objects.get(token=request.COOKIES.get('token')).user
-	user_to_follow = get_object_or_404(User, id=id)
-	user.following.add(user_to_follow)
-	return HttpResponse("success")
-
-@login_required
-def api_unfollow(request, id):
-	user = Token.objects.get(token=request.COOKIES.get('token')).user
-	user_to_unfollow = get_object_or_404(User, id=id)
-	user.following.remove(user_to_unfollow)
-	return HttpResponse("success")
