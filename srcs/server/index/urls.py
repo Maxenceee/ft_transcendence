@@ -1,25 +1,26 @@
 from django.urls import path
-from . import views
+
+from index.views.index import (index, not_found)
+from index.views.login import (login, signup, logout, callback_intra, callback_swivel)
+from index.views.api import (api_get_user, api_search_user, api_avatar, api_update_user, api_update_picture, api_follow, api_unfollow)
 
 urlpatterns = [
-	path('', views.index, name='index'),
-	# temporaire pour les tests
-	# path('user/<str:id>', views.user_page, name='user'),
+	path('', index, name='index'),
 	
-	path('login', views.login, name='login'),
-	path('signup', views.signup, name='signup'),
-	path('logout', views.logout, name='logout'),
+	path('login', login, name='login'),
+	path('signup', signup, name='signup'),
+	path('logout', logout, name='logout'),
 
-	path('callback/intra', views.callback_intra, name='callback_intra'),
-	path('callback/swivel', views.callback_swivel, name='callback_swivel'),
+	path('callback/intra', callback_intra, name='callback_intra'),
+	path('callback/swivel', callback_swivel, name='callback_swivel'),
 
-	path('api/user/<str:id>/get', views.api_get_user, name='get_user'),
-	path('api/user/<str:id>/search', views.api_search_user, name='search_user'),
-	path('api/avatar/<str:id>', views.api_avatar, name='avatar'),
-	path('api/user/update/nickname', views.api_update_user, name='update_user'),
-	path('api/user/update/picture', views.api_update_picture, name='update_picture'),
-	path('api/follow/<str:id>', views.api_follow, name='follow'),
-	path('api/unfollow/<str:id>', views.api_unfollow, name='unfollow'),
+	path('api/user/<str:id>/get', api_get_user, name='get_user'),
+	path('api/user/<str:id>/search', api_search_user, name='search_user'),
+	path('api/avatar/<str:id>', api_avatar, name='avatar'),
+	path('api/user/update/nickname', api_update_user, name='update_user'),
+	path('api/user/update/picture', api_update_picture, name='update_picture'),
+	path('api/follow/<str:id>', api_follow, name='follow'),
+	path('api/unfollow/<str:id>', api_unfollow, name='unfollow'),
 
-	path('<path:url>', views.not_found, name='redirect'),
+	path('<path:url>', not_found, name='redirect'),
 ]

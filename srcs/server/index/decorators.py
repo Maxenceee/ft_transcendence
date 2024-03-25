@@ -5,6 +5,8 @@ from django.utils import timezone
 
 def login_required(func):
 	def wrapper(request, *args, **kwargs):
+		if 'token' not in request.COOKIES:
+			return redirect("/login")
 		cookie = request.COOKIES.get('token')
 		if not cookie or not Token.objects.filter(token=cookie).exists():
 			return redirect("/login")
@@ -22,6 +24,8 @@ def login_required(func):
 
 def login_forbiden(func):
 	def wrapper(request, *args, **kwargs):
+		if 'token' not in request.COOKIES:
+			return func(request, *args, **kwargs)
 		cookie = request.COOKIES.get('token')
 		if cookie and Token.objects.filter(token=cookie).exists() and Token.objects.get(token=cookie).is_valid and Token.objects.get(token=cookie).expires_at > timezone.now():
 			return redirect("/")
