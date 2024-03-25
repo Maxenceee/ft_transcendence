@@ -9,8 +9,6 @@ class StatusManager():
 
 	def add_user(self, socket):
 		self.user_list.append(socket)
-		user.is_online = True
-		user.save()
 		i = 0
 		for current in self.user_list:
 			if current.user == socket.user:
@@ -22,11 +20,11 @@ class StatusManager():
 						'user': socket.user.id,
 						'status': 'online'
 					}))
+			user.is_online = True
+			user.save()
 	
 	def remove_user(self, socket):
 		self.user_list.remove(socket)
-		user.is_online = False
-		user.save()
 		i = 0
 		for current in self.user_list:
 			if current.user == socket.user:
@@ -38,6 +36,8 @@ class StatusManager():
 						'user': socket.user.id,
 						'status': 'offline'
 					}))
+			user.is_online = False
+			user.save()
 
 class websocket_client(WebsocketConsumer):
 
