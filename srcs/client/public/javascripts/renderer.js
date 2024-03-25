@@ -679,9 +679,9 @@ s.pingServer = function() {
 	this.send(this.j({PING: this.ps}));
 };
 s.formatServerPing = function(a) {
-	if (a > 50 && a < 150)
+	if (a > 100 && a < 200)
 		return (1);
-	else if (a > 150)
+	else if (a > 250)
 		return (2);
 	else
 		return (0);
@@ -922,9 +922,9 @@ class BrowserRouter extends Component {
 	event() {
 		console.log("i caught it first!!!!!!!!!!!!!!!!!!!!!", this);
 		// const newRoute = window.location.pathname
-		console.log(S.location.pathname, R.routers);
+		// console.log(S.location.pathname, R.routers);
 		for (let router of R.routers) {
-			console.log(router, router.evalRoute(S.location.pathname));
+			// console.log(router, router.evalRoute(S.location.pathname));
 			if (router.evalRoute(S.location.pathname)) {
 				router.setState({ route: S.location.pathname });
 				break; 
@@ -997,7 +997,7 @@ class Router extends Component {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		console.log("in render router", this, children, route);
+		// console.log("in render router", this, children, route);
 		this.currentRoute = {route: null, params: null};
 		let t;
 		children.forEach(child => {
