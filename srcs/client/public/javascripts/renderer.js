@@ -498,6 +498,7 @@ let pushState = function(r) {
 		S.location.pathname = r;
 		console.log("============ pushState", r, S);
 		window.history.pushState({}, '', r);
+		window.dispatchEvent(new Event('popstate'));
 	}
 }
 
@@ -741,9 +742,9 @@ class Component {
 		this._updateComponent();
 	}
 
-	setParent(parent) {
-		this._parent = parent;
-	}
+	// setParent(parent) {
+	// 	this._parent = parent;
+	// }
 
 	_renderComponent() {
 		let render = this.render();
@@ -814,7 +815,7 @@ class Component {
 	}
 
 	get element() {
-		return this._element && this._element._element || null;
+		return this._element;
 	}
 
 	componentDidMount() {}
@@ -1097,8 +1098,9 @@ class Route extends Component {
 	}
 
 	get element() {
-		return this._data && this._data._element || this.element;
+		return this._data && this._data._element || this._element;
 	}
+
 	canRoute(route) {
 		const regex = Ia(this.path, route);
 		// console.log("regex result on route", this, regex);
@@ -1160,7 +1162,6 @@ function link(props) {
 		}
 		event.preventDefault();
 		pushState(to);
-		window.dispatchEvent(new Event('popstate'));
 	};
 
 	return createElement('a', { href: to, onClick: handleClick, ...props });
@@ -1173,7 +1174,6 @@ function link(props) {
 function navigate(path) {
 	if (typeof path !== "string") throw new Error('Path must be a string, not '+typeof path);
 	pushState(path);
-	window.dispatchEvent(new Event('popstate'));
 }
 
 let renderer = function() {
@@ -2105,10 +2105,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 };
 
 class GameView extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {};
-	}
 
 	componentDidMount() {
 		console.log("componentDidMount GameView", this);
@@ -2152,9 +2148,9 @@ class GameView extends Component {
 	render() {
 		console.log("======================== GameView render ========================", this.state);
 		return (
-			// this.state.loading ?
-			// createElement(Loader)
-			// :
+			this.state.loading ?
+			createElement(Loader)
+			:
 			createElement('div', {
 				class: "render-context", children: [
 					createElement('div', {
@@ -2168,10 +2164,6 @@ class GameView extends Component {
 }
 
 class MainRouter extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { user: props.user, reload: props.reload };
-	}
 
 	componentDidMount() {
 		console.log("componentDidMount MainRouter", this);
@@ -2227,8 +2219,8 @@ class MainRouter extends Component {
 				createElement('header', {}),
 				createElement('main', {children:
 					router(
-						route({path: "/", element: createElement(HomePage, {user: this.state.user, reload: this.state.reload})}),
-						route({path: "/user/me", element: createElement(UserPage, {user: this.state.user, reload: this.state.reload})}),
+						route({path: "/", element: createElement(HomePage, {user: this.props.user, reload: this.props.reload})}),
+						route({path: "/user/me", element: createElement(UserPage, {user: this.props.user, reload: this.props.reload})}),
 						route({path: "*", element: createElement(NotFound)})
 					)
 				})
@@ -2244,19 +2236,19 @@ class Main extends Component {
 		this.state = { user: null, loading: true, error: null, socket: null};
 	}
 
-	connectSocket() {
-		let socket = new Socket({path: "/user"});
-		socket.onconnection(() => {
-			console.info("Connection opened");
-		});
-		socket.onclose(() => {
-			console.info("Connection closed");
-		});
-		socket.use((msg) => {
-			console.log(msg);
-		});
-		this.setState({socket: socket});
-	}
+	// connectSocket() {
+	// 	let socket = new Socket({path: "/user"});
+	// 	socket.onconnection(() => {
+	// 		console.info("Connection opened");
+	// 	});
+	// 	socket.onclose(() => {
+	// 		console.info("Connection closed");
+	// 	});
+	// 	socket.use((msg) => {
+	// 		console.log(msg);
+	// 	});
+	// 	this.setState({socket: socket});
+	// }
 
 	loadUser() {
 		xhr.get('/api/user/me/get')
@@ -2270,20 +2262,6 @@ class Main extends Component {
 			console.error("error", error);
 			this.setState({ loading: false, error: "An error occured" });
 		})
-	}
-
-	connectSocket() {
-		let socket = new Socket({path: "/user"});
-		socket.onconnection(() => {
-			console.info("Connection opened");
-		});
-		socket.onclose(() => {
-			console.info("Connection closed");
-		});
-		socket.use((msg) => {
-			console.log("msg", msg);
-		});
-		this.setState({socket: socket});
 	}
 
 	componentDidMount() {
@@ -2303,7 +2281,7 @@ class Main extends Component {
 
 	componentWillUnmount() {
 		console.log("==================== Main unmounted ====================");
-		this.state.socket.close();
+		// this.state.socket.close();
 	}
 
 	render() {
@@ -2327,21 +2305,3 @@ class Main extends Component {
 xhr.defaults.baseURL = (window.location.hostname == "localhost" ? "http://localhost:3000" : "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));
-
-// let a = createElement('div', {children:
-// 	createElement(Loader)
-// 	router(
-// 		route({path: "/", element: createElement('div', {children: "home"})}),
-// 		route({path: "*", element: createElement('div', {children: "other"})}),
-// 	)
-// })
-// let a = router(
-// 	route({path: "/", element: createElement('div', {children: [
-// 		link({to: "/game", children: "Pong", style: "z-index: 1000; position: absolute; top: 0px; left: 0px;"}),
-// 		createElement(Loader),
-// 	]})}),
-// 	route({path: "*", element: createElement('div', {children: "other"})}),
-// )
-// console.log(createElement(Loader));
-// console.log(a, a._renderComponent());
-// document.getElementById('root').appendChild(a._renderComponent());
