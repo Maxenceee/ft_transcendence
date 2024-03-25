@@ -49,7 +49,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 						else
 							pallet[i].position.z -= 28.5;
 					}
-					else{
+					else if (data.player[i].gameNumber == 6){
 						pallet[i].position.x = data.player[i].x + 120;
 						pallet[i].position.z = data.player[i].z + 200;
 						if (i  < 4)
@@ -384,8 +384,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			// if ((score.scoreP3 < 0 || score.scoreP4 < 0))
 			// {
 			// 	scene.remove(ball[1]);
-			// 	scene.remove(textMesh2[1])
-			// 	// return;
+			// 	scene.remove(textMesh2[1])			// 	// return;
 			// }
 			// if ((score.scoreP5 < 0 || score.scoreP6 < 0))
 			// {
@@ -409,8 +408,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] < data.player[i].score){
 						score[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].score;
 						scoreUpdate[data.player[i].gameNumber] = 1;
-						console.log(k);
-						console.log(scoreUpdate);
+						console.log("----")
+						console.log("update game : " + data.player[i].gameNumber);
 					}
 					if (data.player[i].gameNumber != -1){
 						k[data.player[i].gameNumber] += 1
@@ -418,8 +417,9 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					}
 					if (scoreUpdate[data.player[i].gameNumber] == 1){
 						scoreUpdate[data.player[i].gameNumber] = 0
-						display_score(i);
-
+						console.log("display" + data.player[i].gameNumber + " : " + score)
+						display_score(data.player[i].gameNumber + 1);
+						console.log("----")
 					}
 				}
 				// score.scoreP1 = data.player[0].score;
@@ -448,17 +448,15 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			else if (i == 4)
 				createText(score[3][0] + " : " + score[3][1], 240, 0, 3);
 			else if (i == 5)
-				;
-			else if (i == 4)
-				;
+				createText(score[4][0] + " : " + score[4][1], 160, 100, 4);
 			else if (i == 6)
-				;
+				createText(score[5][0] + " : " + score[5][1], 80, 100, 5);
 			else if (i == 7)
-				;
-			console.log(score[0][0] + " : " + score[0][1]);
-			console.log(score[1][0] + " : " + score[1][1]);
-			console.log(score[2][0] + " : " + score[2][1]);
-			console.log(score[3][0] + " : " + score[3][1]);
+				createText(score[6][0] + " : " + score[6][1], 120, 200, 6);
+			// console.log(score[0][0] + " : " + score[0][1]);
+			// console.log(score[1][0] + " : " + score[1][1]);
+			// console.log(score[2][0] + " : " + score[2][1]);
+			// console.log(score[3][0] + " : " + score[3][1]);
 		}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));

@@ -71,7 +71,7 @@ class Game:
 	def next_game(self, player):
 		if (player.gameNumber == 6) :
 			return False
-		if player.score != 10 or player.gameNumber == -1 :
+		if player.score != 5 or player.gameNumber == -1 :
 			return True
 		logging.info(f"player win :{player.playerNumber}, from {player.gameNumber}")
 		if player.gameNumber == 0 or player.gameNumber == 1:
@@ -110,6 +110,7 @@ class Game:
 			player.score = 0
 			self.ball[6].x = 0
 			self.ball[6].z = 0
+		
 		logging.info(f"player win :{player.playerNumber}, going to {player.gameNumber}, ball at {self.ball[player.gameNumber].x}")
 		return True
 			
@@ -145,8 +146,8 @@ class Game:
 			elif self.ball[i].x > 18.5 :
 				self.ball[i].direction_x *= -1
 			if self.ball[i].z < -29:
-				if i < 4 :
-					self.players[playerNumber].score += 1					#		not enought player to turn it on
+				self.players[playerNumber].score += 1	
+				logging.info(f"game {self.players[playerNumber].gameNumber} score {playerNumber} is {self.players[playerNumber].score}")
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -154,8 +155,8 @@ class Game:
 				self.ball[i].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
 				self.ball[i].speed = 1.05
 			elif self.ball[i].z > 29:
-				if i < 4 :
-					self.players[playerNumber + 1].score +=1				#		not enought player to turn it on
+				self.players[playerNumber + 1].score +=1
+				logging.info(f"game {self.players[playerNumber + 1].gameNumber} score {playerNumber + 1} is {self.players[playerNumber].score}")
 				self.ball[i].x = 0
 				self.ball[i].z = 0 
 				self.ball[i].y = 0
@@ -168,16 +169,15 @@ class Game:
 				self.ball[i].x = -18.49
 			if (self.ball[i].x > 18.5):
 				self.ball[i].x = 18.49
-			# i +=1
 
-	def rebound_x(self, playerID, gameNumber ):
+	def rebound_x(self, playerNumber, gameNumber ):
 		# while i < 4 :
-		if ((self.ball[gameNumber].z < -27 and playerID%2 == 1) or (self.ball[gameNumber].z > 27 and playerID%2 == 0)) and (self.ball[gameNumber].x < (self.players[playerID].pad_x + 4.5)  and self.ball[gameNumber].x > (self.players[playerID].pad_x - 4.5)):
-			if (playerID%2== 1) :
-				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerID].pad_x)/4.5
+		if ((self.ball[gameNumber].z < -27 and playerNumber%2 == 1) or (self.ball[gameNumber].z > 27 and playerNumber%2 == 0)) and (self.ball[gameNumber].x < (self.players[playerNumber].pad_x + 4.5)  and self.ball[gameNumber].x > (self.players[playerNumber].pad_x - 4.5)):
+			if (playerNumber%2== 1) :
+				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerNumber].pad_x)/4.5
 				self.ball[gameNumber].direction_z = 1
 			else :
-				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerID].pad_x)/4.5
+				self.ball[gameNumber].direction_x = (self.ball[gameNumber].x - self.players[playerNumber].pad_x)/4.5
 				self.ball[gameNumber].direction_z = -1
 			self.ball[gameNumber].speed *= 1.1
 		if (self.ball[gameNumber].speed > 5) :
@@ -240,12 +240,13 @@ def game_master(game):
 			game.ball[player.gameNumber].z += game.ball[player.gameNumber].direction_z * 0.2 * game.ball[player.gameNumber].speed
 		i = 0
 		for player in game.players :
-			game.wallCollideTwoPlayer(game.players[i].gameNumber, game.players[i].playerNumber)
-			game.rebound_x(i, game.players[i].gameNumber)
+			if player.gameNumber != -1:
+				game.wallCollideTwoPlayer(game.players[i].gameNumber, game.players[i].playerNumber)
+				game.rebound_x(game.players[i].playerNumber, game.players[i].gameNumber)
 			i += 1
 		game.send_all("gameState", game.to_json())
 		for player in game.players:
-			if player.score  > 9 and player.gameNumber != -1:
+			if player.score  > 4 and player.gameNumber != -1:
 				if game.next_game(player) == False:
 					game.end_game()
 					return
