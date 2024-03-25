@@ -483,18 +483,26 @@ let S = {
 		pathname: window.location.pathname,
 	}
 }
+let R = {
+	routers: [],
+	register: function(r) {
+		this.routers.push(r);
+	},
+	pop: function(r) {
+		this.routers = this.routers.filter(e => e !== r);
+	},
+}
 
 let pushState = function(r) {
 	if (r && r !== S.location.pathname) {
 		S.location.pathname = r;
-		// console.log("pushState", r, S);
+		console.log("============ pushState", r, S);
 		window.history.pushState({}, '', r);
-		window.dispatchEvent(new Event('popstate'));
 	}
 }
 
 let hh = function(e) {
-	// console.log("hh", S);
+	console.log("hh", S);
 	let {pathname: t} = S.location;
 	return Ia(e, t);
 }
@@ -716,11 +724,10 @@ class Component {
 		this._pendingState = null;
 		this._pendingStateCallbacks = [];
 		this._element = null;
-		this.data = null;
+		this._data = null;
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
-		this._owner = null;
 
 		this._unmountComponent = this._unmountComponent.bind(this);
 	}
@@ -746,69 +753,69 @@ class Component {
 		// }
 		// console.log("render component", this);
 		this._mounted = true;
-		this.data = render;
-		this.data._owner = this;
+		this._data = render;
 		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
 	}
 
 	_updateComponent() {
-		if (!this._pendingState || !this._mounted) return;
 		let node;
+		if (!this._pendingState || !this._mounted) return;
 		
 		this.state = this._pendingState;
 		this._pendingState = null;
 
 		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
 
-		const oldElement = this.data || null;
-		// console.log("oldElement", oldElement);
-		let newElement = this.render();
-		this.data = newElement;
-		this._element = newElement._renderComponent()
-		// console.log("new element before", newElement, this);
-		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("reload element", this, newElement, newElement.element, oldElement, oldElement.element);
-			if (newElement && oldElement) {
-				node.replaceChild(newElement.element, oldElement.element);
-				this._parent = newElement._element.parentNode
-			} else if (newElement) {
-				node.appendChild(newElement._element);
-				this._parent = newElement._element.parentNode
-			} else {
-				node.removeChild(oldElement._element);
-			}
-			this._owner && (this._owner.element = this._element);
-		}
+		const oldElement = this._data || null;
+		const oldElementData = oldElement && oldElement.element || null;
 		if (oldElement) {
 			oldElement._unmountComponent();
+		}
+		let newElement = this.render();
+		this._data = newElement;
+		this._element = newElement._renderComponent()
+		// console.log("new element before", newElement, this);
+		// console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
+		if ((node = (this._parent || (oldElementData && oldElementData.parentNode)))) {
+			if (newElement && oldElementData) {
+				node.replaceChild(newElement.element, oldElementData);
+				this._parent = newElement.element.parentNode
+			} else if (newElement) {
+				node.appendChild(newElement.element);
+				this._parent = newElement.element.parentNode
+			} else {
+				node.removeChild(oldElementData);
+			}
+			// console.log(node);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
 		this._pendingStateCallbacks = [];
 
-		this.componentDidUpdate();
+		if (this._mounted)
+			this.componentDidUpdate();
 	}
 
 	_unmountComponent() {
 		if (!this._mounted) return;
 		this._mounted = false;
 		console.log("component will unmount", this);
-		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
 		this.componentWillUnmount();
-		this.data = null;
+		this._data && typeof this._data._unmountComponent === "function" && this._data._unmountComponent();
+		this._data = null;
+		this._element = null;
+		this._parent = null;
     }
 
 	render() {
 		throw new Error('Render method must be implemented');
 	}
-	
+
 	get element() {
 		return this._element;
 	}
-
-	set element(e) {}
 
 	componentDidMount() {}
 
@@ -884,25 +891,60 @@ function createElement(type, props = {}) {
 		});
 		return {
 			type,
-			data: props,
+			_data: props,
 			_element: element,
 			get element() {
 				return element;
 			},
-			set element(e) {},
 			_renderComponent() {
 				return element;
 			},
 			_unmountComponent() {
-				if (!this.data || !this.data.children) return;
+				if (!this._data || !this._data.children) return;
 				let k = e => e && typeof e === "object" && typeof e._unmountComponent === "function";
-				if (Array.isArray(this.data.children)) {
-					this.data.children.forEach(child => k(child) && child._unmountComponent());
+				if (Array.isArray(this._data.children)) {
+					this._data.children.forEach(child => k(child) && child._unmountComponent());
 				} else {
-					k(this.data.children) && this.data.children._unmountComponent();
+					k(this._data.children) && this._data.children._unmountComponent();
 				}
 			},
 		};
+	}
+}
+
+class BrowserRouter extends Component {
+	constructor(props) {
+		super(props);
+
+		this.event = this.event.bind(this);
+	}
+
+	event() {
+		console.log("i caught it first!!!!!!!!!!!!!!!!!!!!!", this);
+		// const newRoute = window.location.pathname
+		console.log(S.location.pathname, R.routers);
+		for (let router of R.routers) {
+			console.log(router, router.evalRoute(S.location.pathname));
+			if (router.evalRoute(S.location.pathname)) {
+				router.setState({ route: S.location.pathname });
+				break; 
+			}
+		}
+	}
+
+	componentDidMount() {
+		window.addEventListener('popstate', this.event);
+		console.log("====== BrowserRouter Mounted ======", this);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener('popstate', this.event);
+		console.log("====== BrowserRouter Unmounted ======", this);
+	}
+
+	render() {
+		console.log("in render BrowserRouter", this);
+		return this.props.children;
 	}
 }
 
@@ -914,33 +956,22 @@ class Router extends Component {
 		if (!props.children || !Array.isArray(props.children)) throw new Error('Router must have children');
 		if (!props.children.every(child => child instanceof Route)) throw new Error('Router children must be Route components');
 
-		this.state = { route: window.location.pathname };
-		this.currentRoute = {route: null, params: null};
-		this.event = this.event.bind(this);
+		this.state = { route: S.location.pathname };
+		// this.currentRoute = {route: null, params: null};
+		// this.event = this.event.bind(this);
+		R.register(this);
 	}
 
-	event() {
-		const newRoute = window.location.pathname;
-		if (newRoute !== this.previousRoute) {
-			// if (this.currentRoute)
-			// 	this.data = this.currentRoute.route.data;
-			this.setState({ route: newRoute });
-			this.previousRoute = newRoute;
-		}
-	}
-
-	get element() {
-		return this.currentRoute.route.element;
-	}
-
-	set element(e) {
-		console.log("set element in router", this);
-		this._element = e;
-	}
+	// event() {
+	// 	console.log("i caught it first!!!!!!!!!!!!!!!!!!!!!", this);
+	// 	const newRoute = window.location.pathname;
+	// 	if (newRoute !== this.previousRoute) {
+	// 		this.setState({ route: newRoute });
+	// 		this.previousRoute = newRoute;
+	// 	}
+	// }
 
 	componentDidMount() {
-		this.previousRoute = window.location.pathname;
-		window.addEventListener('popstate', this.event);
 		console.log("====== Router Mounted ======", this);
 	}
 
@@ -949,23 +980,30 @@ class Router extends Component {
 	}
 
 	componentWillUnmount() {
-		this.event && window.removeEventListener('popstate', this.event);
-		console.log("router will unmount", this.currentRoute.route);
-		this.currentRoute.route && this.currentRoute.route.propagateUnmount();
+		R.pop(this);
+		this.props.children.forEach(child => child.propagateUnmount());
 		console.log("====== Router Unmounted ======", this);
+	}
+
+	evalRoute(route) {
+		// const newRoute = window.location.pathname;
+		// if (newRoute !== this.state.route) {
+		// 	this.setState({ route: newRoute });
+		// }
+		return this.props.children.some(child => child.canRoute(route));
 	}
 
 	render() {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		// console.log("in render router", this, children, route);
+		console.log("in render router", this, children, route);
 		this.currentRoute = {route: null, params: null};
 		let t;
 		children.forEach(child => {
-			child._owner = this;
 			if (!this.currentRoute.route && (t = child.canRoute(route)) !== null) {
 				this.currentRoute.route = child;
+				this.currentRoute.route.active = true;
 				this.currentRoute.params = t.params;
 			} else {
 				if (child.active) {
@@ -1058,14 +1096,8 @@ class Route extends Component {
 		this.active = false;
 	}
 
-	set element(e) {
-		console.log("set element in route", this);
-		this._element = e;
-		this._owner && (this._owner.element = e);
-	}
-
 	get element() {
-		return this.data.element;
+		return this._data && this._data._element || this.element;
 	}
 
 	canRoute(route) {
@@ -1075,17 +1107,17 @@ class Route extends Component {
 	}
 
 	propagateUnmount() {
-		this.data._unmountComponent();
-		this.active = false;
 		console.log("propagateUnmount from route", this);
+		this.active = false;
+		this._data && this._data._unmountComponent();
 	}
 
 	render() {
 		const { element } = this.props;
 
-		this.data = element;
+		this._data = element;
 		// console.log("in render route", this, this._element);
-		return this.data;
+		return this._data;
 	}
 }
 
@@ -1129,6 +1161,7 @@ function link(props) {
 		}
 		event.preventDefault();
 		pushState(to);
+		window.dispatchEvent(new Event('popstate'));
 	};
 
 	return createElement('a', { href: to, onClick: handleClick, ...props });
@@ -1141,6 +1174,7 @@ function link(props) {
 function navigate(path) {
 	if (typeof path !== "string") throw new Error('Path must be a string, not '+typeof path);
 	pushState(path);
+	window.dispatchEvent(new Event('popstate'));
 }
 
 let renderer = function() {
@@ -2074,7 +2108,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {loading: true, game_render: null, animationid: null};
+		this.state = {};
 	}
 
 	componentDidMount() {
@@ -2084,20 +2118,15 @@ class GameView extends Component {
 		if (!type) {
 			navigate("/");
 		}
-		this.setState({loading: true, game_render: null, animationid: null});
+		this.setState({loading: true, game_render: null});
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		// this.setState({loading: false});
 		let onload = () => this.setState({loading: false});
-		let onclose = () => {};
 
-		setTimeout(() => {
-			onload();
-		}, 2000);
-		// this.setState({game_render: game_render(type, onload, onclose, {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -2109,7 +2138,7 @@ class GameView extends Component {
 	}
 
 	componentWillUnmount() {
-		this.state.game_render && this.state.game_render.unmount();
+		this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		console.log("game view unmounted", this.state.game_render);
 	}
@@ -2118,9 +2147,11 @@ class GameView extends Component {
 		// this.setState({loading: true});
 		// this.state.reload();
 		navigate("/");
+		console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
+		console.log("======================== GameView render ========================", this.state);
 		return (
 			this.state.loading ?
 			createElement(Loader)
@@ -2128,9 +2159,9 @@ class GameView extends Component {
 			createElement('div', {
 				class: "render-context", children: [
 					createElement('div', {
-						class: "back-button", onclick: () => navigate("/"), children: "Go home", style: "color: black"
+						class: "back-button", onclick: () => this.endGame(), children: "Go home"
 					}),
-					// this.state.game_render && this.state.game_render.render()
+					this.state.game_render && this.state.game_render.render()
 				]
 			})
 		)
@@ -2144,7 +2175,7 @@ class MainRouter extends Component {
 	}
 
 	componentDidMount() {
-		console.log("componentDidMount MainRouter");
+		console.log("componentDidMount MainRouter", this);
 	}
 
 	render() {
@@ -2250,10 +2281,12 @@ class Main extends Component {
 			this.state.error != null ?
 			createElement(BadConnection)
 			:
-			router(
-				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
-				route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
-			)
+			createElement(BrowserRouter, {children:
+				router(
+					route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
+					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+				)
+			})
 		)
 	}
 }
