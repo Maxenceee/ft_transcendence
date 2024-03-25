@@ -5,11 +5,11 @@
 
 
 
- __  __                                                  ____
-|  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
+ __  __												  ____
+|  \/  |   __ _  __  __   ___   _ __	 ___	___	 / ___|   __ _   _ __ ___	 __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
-|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
+|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|	\____|  \__,_| |_| |_| |_|  \__,_|
 
 
 
@@ -715,6 +715,7 @@ class Component {
 		this._pendingState = null;
 		this._pendingStateCallbacks = [];
 		this._element = null;
+		this.data = null;
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
@@ -736,13 +737,14 @@ class Component {
 	}
 
 	_renderComponent() {
-		// console.log("render component", this);
 		let render = this.render();
 		// if (render instanceof Component) {
 		// 	this._moised = render;
 		// }
+		console.log("render component", this);
 		this._mounted = true;
-		this._element = render;
+		this.data = render;
+		this._element = render._renderComponent();
 		this.componentDidMount();
 		return this._element;
 	}
@@ -756,19 +758,17 @@ class Component {
 
 		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
 
-		const oldElement = this._element && this._element || null;
+		const oldElement = this.data || null;
 		// console.log("oldElement", oldElement);
 		if (oldElement) {
 			oldElement._unmountComponent();
 		}
 		let newElement = this.render();
+		this.data = newElement;
+		this._element = newElement._renderComponent()
 		// console.log("new element before", newElement, this);
-		if (newElement instanceof Component) {
-			// this._moised = newElement;
-			newElement = newElement._renderComponent();
-		}
+		// console.log("reload element", newElement, oldElement);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
 				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
@@ -778,7 +778,8 @@ class Component {
 			} else {
 				node.removeChild(oldElement._element);
 			}
-			console.log(node);
+			// oldElement && (oldElement._element = null);
+			// console.log(node);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
@@ -786,7 +787,6 @@ class Component {
 
 		if (this._mounted)
 			this.componentDidUpdate();
-		this._element = newElement;
 	}
 
 	_unmountComponent() {
@@ -794,8 +794,8 @@ class Component {
 		this._mounted = false;
 		console.log("component will unmount", this);
 		this.componentWillUnmount();
-		this._element && typeof this._element.data === "object" && typeof this._element.data._unmountComponent === "function" && this._element.data._unmountComponent();
-    }
+		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
+	}
 
 	render() {
 		throw new Error('Render method must be implemented');
@@ -853,14 +853,14 @@ function createElement(type, props = {}) {
 				return element.appendChild(c), c;
 			}
 			// console.log("=== c ===", c);
-			if (c instanceof Component) {
-				c = c._renderComponent();
-			}
+			// if (c instanceof Component) {
+			// 	c = c._renderComponent();
+			// }
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
-				// console.log(c);
-				c && element.appendChild(c.render());
+				// console.log(c, c._renderComponent());
+				c && element.appendChild(c._renderComponent());
 			}
 		}
 		Object.keys(props).forEach(key => {
@@ -882,7 +882,7 @@ function createElement(type, props = {}) {
 			type,
 			data: props,
 			_element: element,
-			render() {
+			_renderComponent() {
 				return element;
 			},
 			_unmountComponent() {
@@ -907,12 +907,15 @@ class Router extends Component {
 		if (!props.children.every(child => child instanceof Route)) throw new Error('Router children must be Route components');
 
 		this.state = { route: window.location.pathname };
+		this.currentRoute = {route: null, params: null};
 		this.event = this.event.bind(this);
 	}
 
 	event() {
 		const newRoute = window.location.pathname;
 		if (newRoute !== this.previousRoute) {
+			// if (this.currentRoute)
+			// 	this.data = this.currentRoute.route.data;
 			this.setState({ route: newRoute });
 			this.previousRoute = newRoute;
 		}
@@ -938,28 +941,27 @@ class Router extends Component {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		console.log("in render router", this, children, route);
-		let currentRoute = {route: null, params: null},
-			t;
+		// console.log("in render router", this, children, route);
+		this.currentRoute = {route: null, params: null};
+		let t;
 		children.forEach(child => {
-			if (!currentRoute.route && (t = child.canRoute(route)) !== null) {
-				currentRoute.route = child;
-				currentRoute.params = t.params;
+			if (!this.currentRoute.route && (t = child.canRoute(route)) !== null) {
+				this.currentRoute.route = child;
+				this.currentRoute.params = t.params;
 			} else {
 				if (child.active) {
 					child.propagateUnmount();
 				}
 			}
 		});
-		// console.log(currentRoute);
-		if (currentRoute.route !== null) {
-			currentRoute.route.active = true;
-			this._element = currentRoute.route.render();
-		} else {
-			this._element = null;
-		}
-		// console.log(this._element);
-		return (this._element && this._element || null);
+		// console.log("currentRoute", currentRoute);
+		// if (currentRoute.route !== null) {
+		// 	currentRoute.route.active = true;
+		// 	this._element = currentRoute.route;
+		// } else {
+		// 	this._element = null;
+		// });
+		return (this.currentRoute.route || null);
 	}
 }
 
@@ -1035,25 +1037,24 @@ class Route extends Component {
 
 		this.state = { route: props.path.replace(/^\/*/, "/") };
 		this.active = false;
-		this._mounted = null;
 	}
 
 	canRoute(route) {
 		const regex = Ia(this.state.route, route);
-		console.log("regex result on route", this.state, regex);
+		// console.log("regex result on route", this.state, regex);
 		return regex;
 	}
 
 	propagateUnmount() {
-		// console.log("propagateUnmount from route", this._element);
-		this.props.element._unmountComponent();
+		console.log("propagateUnmount from route", this);
+		this.data._unmountComponent();
 		this.active = false;
 	}
 
 	render() {
 		const { element } = this.props;
 
-		this._element = (element instanceof Component ? element._renderComponent() : element);
+		this._element = element;
 		// console.log("in render route", this, this._element);
 		return this._element;
 	}
@@ -1124,14 +1125,14 @@ renderer.prototype.render = function(elem) {
 	this._children = elem;
 	// console.log(elem);
 	if (this._internalRoot === null) throw Error('Unable to find root node');
-	let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
+	let element = this._children._renderComponent();
 	console.log("root element", element);
-	this._children._element = element;
-	if (typeof element === "object" && !(element instanceof HTMLElement)) {
-		element = element.render();
-	} else if (!(element instanceof HTMLElement)) {
-		throw new TypeError('Cannot mount invalid element', element);
-	}
+	// this._children._element = element;
+	// if (typeof element === "object" && !(element instanceof HTMLElement)) {
+	// 	element = element.render();
+	// } else if (!(element instanceof HTMLElement)) {
+	// 	throw new TypeError('Cannot mount invalid element', element);
+	// }
 	this._internalRoot.appendChild(element);
 }
 
@@ -1742,7 +1743,6 @@ class BadConnection extends Component {
 }
 
 let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
-	console.log("game_render", width, height);
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -1923,6 +1923,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	document.addEventListener("keydown", onDocumentKeyDown, true);
 	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
+		console.log(event.which);
 		switch (event.which) {
 			case 68:
 				render_data.keyCodes["d_key"] = true;
@@ -2048,7 +2049,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		animationid: () => animationid,
 		render: () => renderer.domElement,
 		unmount: () => {
-			console.log("calling unmount game_render");
 			animationid && cancelAnimationFrame(animationid);
 			document.removeEventListener("keydown", onDocumentKeyDown, true);
 			document.removeEventListener("keyup", onDocumentKeyUp, true);
@@ -2072,13 +2072,12 @@ class GameView extends Component {
 		if (!type) {
 			navigate("/");
 		}
-		// let size = this.element.getBoundingClientRect();
-		// console.log(size);
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
+		// let onload = () => this.setState({loading: false});
 		let onload = () => this.setState({loading: false});
 
 		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
@@ -2106,17 +2105,19 @@ class GameView extends Component {
 
 	render() {
 		console.log("render GameView", this.state.game_render);
-		return this.state.loading ?
+		return (
+			this.state.loading ?
 			createElement(Loader)
 			:
 			createElement('div', {
-			class: "render-context", children: [
-				createElement('div', {
-					class: "back-button", onclick: () => this.endGame(), children: "Go home"
-				}),
-				this.state.game_render && this.state.game_render.render()
-			]
-		});
+				class: "render-context", children: [
+					createElement('div', {
+						class: "back-button", onclick: () => this.endGame(), children: "Go home"
+					}),
+					this.state.game_render && this.state.game_render.render()
+				]
+			})
+		)
 	}
 }
 
@@ -2124,6 +2125,10 @@ class MainRouter extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user, reload: props.reload };
+	}
+
+	componentDidMount() {
+		console.log("componentDidMount MainRouter");
 	}
 
 	render() {
@@ -2212,6 +2217,7 @@ class Main extends Component {
 		 * TODO: remove setTimeout
 		 */
 		setTimeout(() => {
+			// this.setState({ loading: false });
 			this.loadUser();
 		}, 1000);
 	}
@@ -2239,3 +2245,21 @@ class Main extends Component {
 xhr.defaults.baseURL = (window.location.hostname == "localhost" ? "http://localhost:3000" : "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));
+
+// let a = createElement('div', {children:
+// 	createElement(Loader)
+// 	router(
+// 		route({path: "/", element: createElement('div', {children: "home"})}),
+// 		route({path: "*", element: createElement('div', {children: "other"})}),
+// 	)
+// })
+// let a = router(
+// 	route({path: "/", element: createElement('div', {children: [
+// 		link({to: "/game", children: "Pong", style: "z-index: 1000; position: absolute; top: 0px; left: 0px;"}),
+// 		createElement(Loader),
+// 	]})}),
+// 	route({path: "*", element: createElement('div', {children: "other"})}),
+// )
+// console.log(createElement(Loader));
+// console.log(a, a._renderComponent());
+// document.getElementById('root').appendChild(a._renderComponent());
