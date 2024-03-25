@@ -2210,6 +2210,20 @@ class Main extends Component {
 		})
 	}
 
+	connectSocket() {
+		let socket = new Socket({path: "/user"});
+		socket.onconnection(() => {
+			console.info("Connection opened");
+		});
+		socket.onclose(() => {
+			console.info("Connection closed");
+		});
+		socket.use((msg) => {
+			console.log("msg", msg);
+		});
+		this.setState({socket: socket});
+	}
+
 	componentDidMount() {
 		console.log("==================== Main mounted ====================");
 		/**
@@ -2223,6 +2237,11 @@ class Main extends Component {
 
 	componentDidUpdate() {
 		console.log("==================== Main updated ====================");
+	}
+
+	componentWillUnmount() {
+		console.log("==================== Main unmounted ====================");
+		this.state.socket.close();
 	}
 
 	render() {
