@@ -8,26 +8,36 @@ class StatusManager():
 		self.user_list = []
 
 	def add_user(self, socket):
+		self.user_list.append(socket)
 		user.is_online = True
 		user.save()
+		i = 0
 		for current in self.user_list:
-			if socket.user in current.user.following.all():
-				current.send(json.dumps({
-					'user': socket.user.id,
-					'status': 'online'
-				}))
-		self.user_list.append(socket)
+			if current.user == socket.user:
+				i += 1
+		if i == 1:
+			for current in self.user_list:
+				if socket.user in current.user.following.all():
+					current.send(json.dumps({
+						'user': socket.user.id,
+						'status': 'online'
+					}))
 	
 	def remove_user(self, socket):
+		self.user_list.remove(socket)
 		user.is_online = False
 		user.save()
+		i = 0
 		for current in self.user_list:
-			if socket.user in current.user.following.all():
-				current.send(json.dumps({
-					'user': socket.user.id,
-					'status': 'offline'
-				}))
-		self.user_list.remove(socket)
+			if current.user == socket.user:
+				i += 1
+		if i == 0:
+			for current in self.user_list:
+				if socket.user in current.user.following.all():
+					current.send(json.dumps({
+						'user': socket.user.id,
+						'status': 'offline'
+					}))
 
 class websocket_client(WebsocketConsumer):
 
