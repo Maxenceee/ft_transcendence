@@ -5,11 +5,11 @@
 
 
 
- __  __												  ____
-|  \/  |   __ _  __  __   ___   _ __	 ___	___	 / ___|   __ _   _ __ ___	 __ _ 
+ __  __                                                  ____
+|  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
-|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|	\____|  \__,_| |_| |_| |_|  \__,_|
+|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
 
 
 
@@ -715,6 +715,7 @@ class Component {
 		this._pendingState = null;
 		this._pendingStateCallbacks = [];
 		this._element = null;
+		this.data = null;
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
@@ -736,13 +737,15 @@ class Component {
 	}
 
 	_renderComponent() {
-		// console.log("render component", this);
 		let render = this.render();
+		if (render == undefined) throw new Error('Render method must return a value');
 		// if (render instanceof Component) {
 		// 	this._moised = render;
 		// }
+		// console.log("render component", this);
 		this._mounted = true;
-		this._element = render;
+		this.data = render;
+		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
 	}
@@ -756,19 +759,17 @@ class Component {
 
 		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
 
-		const oldElement = this._element && this._element || null;
+		const oldElement = this.data || null;
 		// console.log("oldElement", oldElement);
 		if (oldElement) {
 			oldElement._unmountComponent();
 		}
 		let newElement = this.render();
+		this.data = newElement;
+		this._element = newElement._renderComponent()
 		// console.log("new element before", newElement, this);
-		if (newElement instanceof Component) {
-			// this._moised = newElement;
-			newElement = newElement._renderComponent();
-		}
+		console.log("reload element", newElement, oldElement);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
-			console.log("node", node, oldElement, newElement);
 			if (newElement && oldElement) {
 				node.replaceChild(newElement._element, oldElement._element);
 				this._parent = newElement._element.parentNode
@@ -778,7 +779,7 @@ class Component {
 			} else {
 				node.removeChild(oldElement._element);
 			}
-			console.log(node);
+			// console.log(node);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
@@ -786,7 +787,6 @@ class Component {
 
 		if (this._mounted)
 			this.componentDidUpdate();
-		this._element = newElement;
 	}
 
 	_unmountComponent() {
@@ -794,7 +794,7 @@ class Component {
 		this._mounted = false;
 		console.log("component will unmount", this);
 		this.componentWillUnmount();
-		this._element && typeof this._element.data === "object" && typeof this._element.data._unmountComponent === "function" && this._element.data._unmountComponent();
+		this.data && typeof this.data._unmountComponent === "function" && this.data._unmountComponent();
     }
 
 	render() {
@@ -853,14 +853,13 @@ function createElement(type, props = {}) {
 				return element.appendChild(c), c;
 			}
 			// console.log("=== c ===", c);
-			if (c instanceof Component) {
-				c = c._renderComponent();
-			}
+			// if (c instanceof Component) {
+			// 	c = c._renderComponent();
+			// }
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {
-				// console.log(c);
-				c && element.appendChild(c.render());
+				c && element.appendChild(c._renderComponent());
 			}
 		}
 		Object.keys(props).forEach(key => {
@@ -882,7 +881,7 @@ function createElement(type, props = {}) {
 			type,
 			data: props,
 			_element: element,
-			render() {
+			_renderComponent() {
 				return element;
 			},
 			_unmountComponent() {
@@ -907,12 +906,15 @@ class Router extends Component {
 		if (!props.children.every(child => child instanceof Route)) throw new Error('Router children must be Route components');
 
 		this.state = { route: window.location.pathname };
+		this.currentRoute = {route: null, params: null};
 		this.event = this.event.bind(this);
 	}
 
 	event() {
 		const newRoute = window.location.pathname;
 		if (newRoute !== this.previousRoute) {
+			// if (this.currentRoute)
+			// 	this.data = this.currentRoute.route.data;
 			this.setState({ route: newRoute });
 			this.previousRoute = newRoute;
 		}
@@ -938,28 +940,27 @@ class Router extends Component {
 		const { children } = this.props;
 		const { route } = this.state;
 
-		console.log("in render router", this, children, route);
-		let currentRoute = {route: null, params: null},
-			t;
+		// console.log("in render router", this, children, route);
+		this.currentRoute = {route: null, params: null};
+		let t;
 		children.forEach(child => {
-			if (!currentRoute.route && (t = child.canRoute(route)) !== null) {
-				currentRoute.route = child;
-				currentRoute.params = t.params;
+			if (!this.currentRoute.route && (t = child.canRoute(route)) !== null) {
+				this.currentRoute.route = child;
+				this.currentRoute.params = t.params;
 			} else {
 				if (child.active) {
 					child.propagateUnmount();
 				}
 			}
 		});
-		// console.log(currentRoute);
-		if (currentRoute.route !== null) {
-			currentRoute.route.active = true;
-			this._element = currentRoute.route.render();
-		} else {
-			this._element = null;
-		}
-		// console.log(this._element);
-		return (this._element && this._element || null);
+		// console.log("currentRoute", currentRoute);
+		// if (currentRoute.route !== null) {
+		// 	currentRoute.route.active = true;
+		// 	this._element = currentRoute.route;
+		// } else {
+		// 	this._element = null;
+		// });
+		return (this.currentRoute.route || null);
 	}
 }
 
@@ -1030,32 +1031,31 @@ class Route extends Component {
 		super(props);
 		if (props.path === void 0 || !props.path.length) throw new Error('Route must have a `path` property');
 		if (props.element === void 0) throw new Error('Route must have an `element` property');
-		if (typeof props.element === "function" && !(props.element instanceof Component))
-			throw new Error('Route component must be instanciated with new keyword');
+		if (typeof props.element === "object" && Array.isArray(props.element))
+			throw new Error('Route component cannot be an array');
 
-		this.state = { route: props.path.replace(/^\/*/, "/") };
+		this.path = props.path.replace(/^\/*/, "/");
 		this.active = false;
-		this._mounted = null;
 	}
 
 	canRoute(route) {
-		const regex = Ia(this.state.route, route);
-		console.log("regex result on route", this.state, regex);
+		const regex = Ia(this.path, route);
+		// console.log("regex result on route", this, regex);
 		return regex;
 	}
 
 	propagateUnmount() {
-		// console.log("propagateUnmount from route", this._element);
-		this.props.element._unmountComponent();
+		console.log("propagateUnmount from route", this);
+		this.data._unmountComponent();
 		this.active = false;
 	}
 
 	render() {
 		const { element } = this.props;
 
-		this._element = (element instanceof Component ? element._renderComponent() : element);
+		this.data = element;
 		// console.log("in render route", this, this._element);
-		return this._element;
+		return this.data;
 	}
 }
 
@@ -1124,14 +1124,17 @@ renderer.prototype.render = function(elem) {
 	this._children = elem;
 	// console.log(elem);
 	if (this._internalRoot === null) throw Error('Unable to find root node');
-	let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
-	console.log("root element", element);
-	this._children._element = element;
-	if (typeof element === "object" && !(element instanceof HTMLElement)) {
-		element = element.render();
-	} else if (!(element instanceof HTMLElement)) {
-		throw new TypeError('Cannot mount invalid element', element);
-	}
+	let element = this._children._renderComponent();
+	if (element == undefined) throw new Error('Cannot mount invalid element');
+	console.log("root element", element, this);
+	// let element = (this._children instanceof Component ? this._children._renderComponent() : this._children).render();
+	// console.log("root element", element);
+	// this._children._element = element;
+	// if (typeof element === "object" && !(element instanceof HTMLElement)) {
+	// 	element = element.render();
+	// } else if (!(element instanceof HTMLElement)) {
+	// 	throw new TypeError('Cannot mount invalid element', element);
+	// }
 	this._internalRoot.appendChild(element);
 }
 
@@ -1741,8 +1744,7 @@ class BadConnection extends Component {
 	}
 }
 
-let game_render = function(c, type, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
-	console.log("game_render", width, height);
+let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -1758,8 +1760,9 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
+		onload();
 	});
-	socket.onclose(c);
+	socket.onclose(onclose);
 	socket.use((msg) => {
 		switch (msg.type) {
 			case "resetCam":
@@ -1919,41 +1922,27 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
-	document.addEventListener("keydown", onDocumentKeyDown, true);
-	document.addEventListener("keyup", onDocumentKeyUp, true);
-	function onDocumentKeyDown(event) {
+	document.addEventListener("keydown", onDocumentKeyEvent, true);
+	document.addEventListener("keyup", onDocumentKeyEvent, true);
+	function onDocumentKeyEvent(event) {
 		switch (event.which) {
 			case 68:
-				render_data.keyCodes["d_key"] = true;
+				render_data.keyCodes["d_key"] = (event.type === "keydown");
 				break;
 			case 39:
-				render_data.keyCodes["right_arrow_key"] = true;
+				render_data.keyCodes["right_arrow_key"] = (event.type === "keydown");
 				break;
 			case 65:
-				render_data.keyCodes["a_key"] = true;
+				render_data.keyCodes["a_key"] = (event.type === "keydown");
 				break;
 			case 37:
-				render_data.keyCodes["left_arrow_key"] = true;
+				render_data.keyCodes["left_arrow_key"] = (event.type === "keydown");
 				break;
 			case 82:
-				setcam(10, 80, 0);
-				controls.target.set(0, 0, 0);
-				break;
-		}
-	}
-	function onDocumentKeyUp(event) {
-	    switch (event.which) {
-			case 68:
-				render_data.keyCodes["d_key"] = false;
-				break;
-			case 39:
-				render_data.keyCodes["right_arrow_key"] = false;
-				break;
-			case 65:
-				render_data.keyCodes["a_key"] = false;
-				break;
-			case 37:
-				render_data.keyCodes["left_arrow_key"] = false;
+				(event.type === "keydown") && (
+					setcam(10, 80, 0),
+					controls.target.set(0, 0, 0)
+				)
 				break;
 		}
 	}
@@ -2013,7 +2002,6 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 					createText("");
 					scene.add(render_data.ball);
 					for (let i = 0; i < render_data.pallet.length; i++) {
-						console.log(data.players[i]);
 						render_data.pallet[i].position.x = data.players[i].x;
 						render_data.pallet[i].score = data.players[i].score;
 						render_data.ball.position.x = data.ball.x;
@@ -2025,7 +2013,7 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 					createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
 					if (render_data.pallet.some(e => e.score > 9))
 					{
-						scene.remove(ball);
+						scene.remove(render_data.ball);
 						return;
 					}
 				} break;
@@ -2047,10 +2035,9 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 		animationid: () => animationid,
 		render: () => renderer.domElement,
 		unmount: () => {
-			console.log("calling unmount game_render");
 			animationid && cancelAnimationFrame(animationid);
-			document.removeEventListener("keydown", onDocumentKeyDown, true);
-			document.removeEventListener("keyup", onDocumentKeyUp, true);
+			document.removeEventListener("keydown", onDocumentKeyEvent, true);
+			document.removeEventListener("keyup", onDocumentKeyEvent, true);
 			socket.close();
 		}
 	};
@@ -2059,70 +2046,62 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {game_render: null, animationid: null, reload: props.reload};
+		this.state = {loading: true, game_render: null, animationid: null, reload: props.reload};
 	}
 
 	componentDidMount() {
 		console.log("componentDidMount GameView", this);
-		let a = hh("/game/:type") ?? {params: {type: null}};
-		console.log("componentDidMount hh", a);
-		let {type} = a.params;
-		console.log("componentDidMount type", type);
+		let a = hh("/game/:type") ?? {params: {type: null}},
+			{type} = a.params;
 		if (!type) {
 			navigate("/");
 		}
-		// let size = this.element.getBoundingClientRect();
-		// console.log(size);
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		let callback = () => {
-			navigate("/");
-			// this.state.reload();
-		}
+		// let onload = () => this.setState({loading: false});
+		let onload = () => {};
 
-		this.setState({game_render: game_render(callback, type, {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
 		console.log("componentDidUpdate GameView", this.state.game_render);
-		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		this.state.game_render.start(this.state);
+		if (this.state.game_render) {
+			this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+			this.state.game_render.start(this.state);
+		}
 	}
 
 	componentWillUnmount() {
 		this.state.game_render.unmount();
-		console.log("game view unmounted", this.state.game_render);
 		window.onbeforeunload = null;
+		console.log("game view unmounted", this.state.game_render);
+	}
+
+	endGame() {
+		// this.setState({loading: true});
+		// this.state.reload();
+		navigate("/");
+		console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
-		console.log("render GameView", this.state.game_render);
-		return createElement('div', {
-			class: "render-context", children: [
-				createElement('div', {
-					class: "back-button", onclick: () => navigate("/"), children: "Go home"
-				}),
-				this.state.game_render && this.state.game_render.render()
-			]
-		});
-	}
-}
-
-class GameRouter extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {reload: props.reload};
-	}
-
-	render() {
-		return createElement('div', {
-			children: router(
-				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
-			)
-		});
+		return (
+			// this.state.loading ?
+			// createElement(Loader)
+			// :
+			createElement('div', {
+				class: "render-context", children: [
+					createElement('div', {
+						class: "back-button", onclick: () => this.endGame(), children: "Go home"
+					}),
+					this.state.game_render && this.state.game_render.render()
+				]
+			})
+		)
 	}
 }
 
@@ -2130,6 +2109,10 @@ class MainRouter extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user, reload: props.reload };
+	}
+
+	componentDidMount() {
+		console.log("componentDidMount MainRouter");
 	}
 
 	render() {
@@ -2196,7 +2179,21 @@ class MainRouter extends Component {
 class Main extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: null, loading: true, error: null, socket: null };
+		this.state = { user: null, loading: true, error: null, socket: null};
+	}
+
+	connectSocket() {
+		let socket = new Socket({path: "/user"});
+		socket.onconnection(() => {
+			console.info("Connection opened");
+		});
+		socket.onclose(() => {
+			console.info("Connection closed");
+		});
+		socket.use((msg) => {
+			console.log(msg);
+		});
+		this.setState({socket: socket});
 	}
 
 	loadUser() {
@@ -2233,6 +2230,7 @@ class Main extends Component {
 		 * TODO: remove setTimeout
 		 */
 		setTimeout(() => {
+			// this.setState({ loading: false });
 			this.loadUser();
 		}, 1000);
 	}
@@ -2255,8 +2253,8 @@ class Main extends Component {
 			createElement(BadConnection)
 			:
 			router(
-				route({path: "/game/*", element: createElement(GameRouter, {reload: this.loadUser.bind(this)})}),
-				route({path: "*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
+				route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 			)
 		)
 	}
@@ -2265,3 +2263,21 @@ class Main extends Component {
 xhr.defaults.baseURL = (window.location.hostname == "localhost" ? "http://localhost:3000" : "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));
+
+// let a = createElement('div', {children:
+// 	createElement(Loader)
+// 	router(
+// 		route({path: "/", element: createElement('div', {children: "home"})}),
+// 		route({path: "*", element: createElement('div', {children: "other"})}),
+// 	)
+// })
+// let a = router(
+// 	route({path: "/", element: createElement('div', {children: [
+// 		link({to: "/game", children: "Pong", style: "z-index: 1000; position: absolute; top: 0px; left: 0px;"}),
+// 		createElement(Loader),
+// 	]})}),
+// 	route({path: "*", element: createElement('div', {children: "other"})}),
+// )
+// console.log(createElement(Loader));
+// console.log(a, a._renderComponent());
+// document.getElementById('root').appendChild(a._renderComponent());

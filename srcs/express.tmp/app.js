@@ -136,6 +136,11 @@ app.ws('/socket', function(ws, req) {
 	});
 });
 
+app.use('/oui', (req, res) => {
+	console.log("body:", req.method, req.headers, req.body);
+	res.status(200).send(req.body);
+});
+
 
 /**
  * 
