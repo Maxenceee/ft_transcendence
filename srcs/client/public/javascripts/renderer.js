@@ -487,13 +487,14 @@ let S = {
 let pushState = function(r) {
 	if (r) {
 		S.location.pathname = r;
-		console.log("pushState", r, S);
+		// console.log("pushState", r, S);
 		window.history.pushState({}, '', r);
+		window.dispatchEvent(new Event('popstate'));
 	}
 }
 
 let hh = function(e) {
-	console.log("hh", S);
+	// console.log("hh", S);
 	let {pathname: t} = S.location;
 	return Ia(e, t);
 }
@@ -719,6 +720,7 @@ class Component {
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
+		this._owner = null;
 
 		this._unmountComponent = this._unmountComponent.bind(this);
 	}
@@ -742,9 +744,10 @@ class Component {
 		// if (render instanceof Component) {
 		// 	this._moised = render;
 		// }
-		console.log("render component", this);
+		// console.log("render component", this);
 		this._mounted = true;
 		this.data = render;
+		this.data._owner = this;
 		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
@@ -768,10 +771,10 @@ class Component {
 		this.data = newElement;
 		this._element = newElement._renderComponent()
 		// console.log("new element before", newElement, this);
-		// console.log("reload element", newElement, oldElement);
+		console.log("reload element", newElement, newElement.element, oldElement, oldElement.element);
 		if ((node = (this._parent || (oldElement && oldElement._element.parentNode)))) {
 			if (newElement && oldElement) {
-				node.replaceChild(newElement._element, oldElement._element);
+				node.replaceChild(newElement.element, oldElement.element);
 				this._parent = newElement._element.parentNode
 			} else if (newElement) {
 				node.appendChild(newElement._element);
@@ -780,6 +783,7 @@ class Component {
 				node.removeChild(oldElement._element);
 			}
 			// console.log(node);
+			// (this._owner && typeof this._owner.element == "function") && this._owner.element(this._element);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
@@ -800,9 +804,9 @@ class Component {
 	render() {
 		throw new Error('Render method must be implemented');
 	}
-
+	
 	get element() {
-		return this._element && this._element._element || null;
+		return this._element;
 	}
 
 	componentDidMount() {}
@@ -881,6 +885,9 @@ function createElement(type, props = {}) {
 			type,
 			data: props,
 			_element: element,
+			get element() {
+				return element;
+			},
 			_renderComponent() {
 				return element;
 			},
@@ -919,6 +926,15 @@ class Router extends Component {
 			this.previousRoute = newRoute;
 		}
 	}
+
+	get element() {
+		return this.currentRoute.route.element;
+	}
+
+	// set element(e) {
+	// 	console.log("set element in router", this);
+	// 	this._element = e;
+	// }
 
 	componentDidMount() {
 		this.previousRoute = window.location.pathname;
@@ -1038,9 +1054,19 @@ class Route extends Component {
 		this.active = false;
 	}
 
+	// set element(e) {
+	// 	console.log("set element in route", this);
+	// 	this._element = e;
+	// 	this._owner.element(e);
+	// }
+
+	get element() {
+		return this.data.element;
+	}
+
 	canRoute(route) {
 		const regex = Ia(this.path, route);
-		console.log("regex result on route", this, regex);
+		// console.log("regex result on route", this, regex);
 		return regex;
 	}
 
@@ -1099,7 +1125,6 @@ function link(props) {
 		}
 		event.preventDefault();
 		pushState(to);
-		window.dispatchEvent(new Event('popstate'));
 	};
 
 	return createElement('a', { href: to, onClick: handleClick, ...props });
@@ -1112,7 +1137,6 @@ function link(props) {
 function navigate(path) {
 	if (typeof path !== "string") throw new Error('Path must be a string, not '+typeof path);
 	pushState(path);
-	window.dispatchEvent(new Event('popstate'));
 }
 
 let renderer = function() {
@@ -1925,7 +1949,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
-		console.log("down", event);
 		switch (event.which) {
 			case 68:
 				render_data.keyCodes["d_key"] = (event.type === "keydown");
@@ -2003,7 +2026,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					createText("");
 					scene.add(render_data.ball);
 					for (let i = 0; i < render_data.pallet.length; i++) {
-						console.log(data.players[i]);
 						render_data.pallet[i].position.x = data.players[i].x;
 						render_data.pallet[i].score = data.players[i].score;
 						render_data.ball.position.x = data.ball.x;
@@ -2053,10 +2075,8 @@ class GameView extends Component {
 
 	componentDidMount() {
 		console.log("componentDidMount GameView", this);
-		let a = hh("/game/:type") ?? {params: {type: null}};
-		console.log("componentDidMount hh", a);
-		let {type} = a.params;
-		console.log("componentDidMount type", type);
+		let a = hh("/game/:type") ?? {params: {type: null}},
+			{type} = a.params;
 		if (!type) {
 			navigate("/");
 		}
@@ -2065,10 +2085,9 @@ class GameView extends Component {
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		// let onload = () => this.setState({loading: false});
 		let onload = () => this.setState({loading: false});
 
-		// this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -2093,7 +2112,6 @@ class GameView extends Component {
 	}
 
 	render() {
-		console.log("render GameView", this.state.game_render);
 		return (
 			this.state.loading ?
 			createElement(Loader)
