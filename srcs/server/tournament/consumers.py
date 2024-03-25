@@ -234,7 +234,6 @@ def game_master(game):
 					game.players[playerID].pad_x += 0.8
 					if game.players[playerID].pad_x  > 16.0 :
 						game.players[playerID].pad_x = 16
-			logging.info(game.players[playerID].pad_x)
 		time.sleep(0.05)
 		for player in game.players :
 			game.ball[player.gameNumber].x += game.ball[player.gameNumber].direction_x * 0.2 * game.ball[player.gameNumber].speed

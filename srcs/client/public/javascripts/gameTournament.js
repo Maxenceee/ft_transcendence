@@ -9,15 +9,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
 	let socket = new Socket({path: "/tournament"});
-	let connectionStatus = 0;
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
-		connectionStatus = 1;
 	});
 	socket.onclose(() => {
 		console.info("Connection closed");
-		connectionStatus = 2;
 		window.location.replace("/");
 	});
 	socket.use((msg) =>{
@@ -48,17 +45,17 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
 						pallet[i].position.z = data.player[i].z + 100;
 						if (i % 4 < 2)
-							pallet[i].position.z -= 28.5;
-						else
 							pallet[i].position.z += 28.5;
+						else
+							pallet[i].position.z -= 28.5;
 					}
 					else{
 						pallet[i].position.x = data.player[i].x + 120;
 						pallet[i].position.z = data.player[i].z + 200;
 						if (i  < 4)
-							pallet[i].position.z -= 28.5;
-						else
 							pallet[i].position.z += 28.5;
+						else
+							pallet[i].position.z -= 28.5;
 					}
 				}
 				// pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
@@ -95,7 +92,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	document.body.appendChild( renderer.domElement );
 	renderer.setPixelRatio( window.devicePixelRatio );
 
-	var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+	let camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.set( 15, 15, 20 );
 
 	const controls = new OrbitControls( camera, renderer.domElement );
@@ -121,16 +118,8 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	textMesh2 = []
 	
 
-	var score = {
-		scoreP1: 0,
-		scoreP2: 0,
-		scoreP3: 0,
-		scoreP4: 0,
-		scoreP5: 0,
-		scoreP6: 0,
-		scoreP7: 0,
-		scoreP8: 0,
-	};
+	let score = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+	let k = [0, 0, 0, 0, 0, 0, 0, 0]
 
 	function loadFont() {
 
@@ -356,7 +345,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		textGeo[game].dispose();
 	}
 
-	var keyCode = {
+	let keyCode = {
 		left : 0,
 		right : 0
 	}
@@ -374,7 +363,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	scene.add(skybox)
 
 	loadFont();
-
+	let scoreUpdate =[0, 0, 0, 0, 0, 0, 0];
 	const animate = async () => {
 		if (composer){
 			renderer.render( scene, camera );
@@ -386,50 +375,91 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 		if (data.type == "gameState")
 		{
-			if ((score.scoreP1 < 0 || score.scoreP2 < 0))
-			{
-				scene.remove(ball[0]);
-				scene.remove(textMesh2[0])
-				// return;
-			}
-			if ((score.scoreP3 < 0 || score.scoreP4 < 0))
-			{
-				scene.remove(ball[1]);
-				scene.remove(textMesh2[1])
-				// return;
-			}
-			if ((score.scoreP5 < 0 || score.scoreP6 < 0))
-			{
-				scene.remove(ball[2]);
-				scene.remove(textMesh2[2])
-				// return;
-			}
-			if ((score.scoreP7 < 0 || score.scoreP8 < 0))
-			{
-				scene.remove(ball[3]);
-				scene.remove(textMesh2[3])
-				// return;
-			}
-			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
-				score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
-				|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score  
-				|| score.scoreP7 != data.player[6].score  || score.scoreP8 != data.player[7].score ))
-			{
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
-				score.scoreP3 = data.player[2].score;
-				score.scoreP4 = data.player[3].score;
-				createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
-				score.scoreP5 = data.player[4].score;
-				score.scoreP6 = data.player[5].score;
-				createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
-				score.scoreP7 = data.player[6].score;
-				score.scoreP8 = data.player[7].score;
-				createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
-			}
+			// if ((score.scoreP1 < 0 || score.scoreP2 < 0))
+			// {
+			// 	scene.remove(ball[0]);
+			// 	scene.remove(textMesh2[0])
+			// 	// return;
+			// }
+			// if ((score.scoreP3 < 0 || score.scoreP4 < 0))
+			// {
+			// 	scene.remove(ball[1]);
+			// 	scene.remove(textMesh2[1])
+			// 	// return;
+			// }
+			// if ((score.scoreP5 < 0 || score.scoreP6 < 0))
+			// {
+			// 	scene.remove(ball[2]);
+			// 	scene.remove(textMesh2[2])
+			// 	// return;
+			// }
+			// if ((score.scoreP7 < 0 || score.scoreP8 < 0))
+			// {
+			// 	scene.remove(ball[3]);
+			// 	scene.remove(textMesh2[3])
+			// 	// return;
+			// }
+			// if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
+			// 	score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
+			// 	|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score ))
+			// 	{
+				
+				for (let i = 0; i < 8; i++)
+				{
+					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] < data.player[i].score){
+						score[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].score;
+						scoreUpdate[data.player[i].gameNumber] = 1;
+						console.log(k);
+						console.log(scoreUpdate);
+					}
+					if (data.player[i].gameNumber != -1){
+						k[data.player[i].gameNumber] += 1
+						k[data.player[i].gameNumber] %= 2
+					}
+					if (scoreUpdate[data.player[i].gameNumber] == 1){
+						scoreUpdate[data.player[i].gameNumber] = 0
+						display_score(i);
+
+					}
+				}
+				// score.scoreP1 = data.player[0].score;
+				// score.scoreP2 = data.player[1].score;
+				// score.scoreP3 = data.player[2].score;
+				// score.scoreP4 = data.player[3].score;
+				// score.scoreP5 = data.player[4].score;
+				// score.scoreP6 = data.player[5].score;
+				// score.scoreP7 = data.player[6].score;
+				// score.scoreP8 = data.player[7].score;
+				// createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
+				// createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
+				// createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
+				// createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
+			// }
 		}
 	}
+
+		function display_score(i){
+			if ( i == 1)
+				createText(score[0][0] + " : " + score[0][1], 0, 0, 0)
+			else if (i == 2)
+				createText(score[1][0] + " : " + score[1][1], 80, 0, 1);
+			else if (i == 3)
+				createText(score[2][0] + " : " + score[2][1], 160, 0, 2);
+			else if (i == 4)
+				createText(score[3][0] + " : " + score[3][1], 240, 0, 3);
+			else if (i == 5)
+				;
+			else if (i == 4)
+				;
+			else if (i == 6)
+				;
+			else if (i == 7)
+				;
+			console.log(score[0][0] + " : " + score[0][1]);
+			console.log(score[1][0] + " : " + score[1][1]);
+			console.log(score[2][0] + " : " + score[2][1]);
+			console.log(score[3][0] + " : " + score[3][1]);
+		}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
