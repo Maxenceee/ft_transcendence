@@ -66,7 +66,7 @@ def api_search_user(request, id):
 	response = []
 	for user in users:
 		response.append(user.resume_to_json())
-	return JsonResponse(response)
+	return JsonResponse(response, safe=False)
 
 @login_required
 def api_follow(request, id):

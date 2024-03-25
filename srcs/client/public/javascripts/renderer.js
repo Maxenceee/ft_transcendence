@@ -2196,7 +2196,7 @@ class MainRouter extends Component {
 class Main extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: null, loading: true, error: null };
+		this.state = { user: null, loading: true, error: null, socket: null };
 	}
 
 	loadUser() {
@@ -2205,11 +2205,26 @@ class Main extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false });
+			this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
 			this.setState({ loading: false, error: "An error occured" });
 		})
+	}
+
+	connectSocket() {
+		let socket = new Socket({path: "/user"});
+		socket.onconnection(() => {
+			console.info("Connection opened");
+		});
+		socket.onclose(() => {
+			console.info("Connection closed");
+		});
+		socket.use((msg) => {
+			console.log("msg", msg);
+		});
+		this.setState({socket: socket});
 	}
 
 	componentDidMount() {
@@ -2224,6 +2239,11 @@ class Main extends Component {
 
 	componentDidUpdate() {
 		console.log("==================== Main updated ====================");
+	}
+
+	componentWillUnmount() {
+		console.log("==================== Main unmounted ====================");
+		this.state.socket.close();
 	}
 
 	render() {
