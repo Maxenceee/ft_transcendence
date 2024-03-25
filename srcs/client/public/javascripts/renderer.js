@@ -2205,6 +2205,7 @@ class Main extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false });
+			this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
@@ -2239,6 +2240,11 @@ class Main extends Component {
 
 	componentDidUpdate() {
 		console.log("==================== Main updated ====================");
+	}
+
+	componentWillUnmount() {
+		console.log("==================== Main unmounted ====================");
+		this.state.socket.close();
 	}
 
 	render() {
