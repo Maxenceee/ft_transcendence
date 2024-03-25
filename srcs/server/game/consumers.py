@@ -780,7 +780,10 @@ class WebsocketClient(WebsocketConsumer):
 
 		try:
 			if receive_package['type'] == "keyCode":
-				if (time.time() - self.oldmove) > 0.005:
+				if (time.time() - self.oldmove) > 0.005 and self.type != "local":
+					self.oldmove = time.time()
+					self.player.push_to_game(receive_package['move'])
+				elif (time.time() - self.oldmove) > 0.001 and self.type == "local":
 					self.oldmove = time.time()
 					self.player.push_to_game(receive_package['move'])
 				return
