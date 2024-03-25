@@ -126,20 +126,25 @@ class Player:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
+
 
 	def set_game(self, game, index):
 		self.game = game
 		self.index = index
 
+
 	def push_to_game(self, action):
 		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
+
 
 	def send(self, data):
 		try:
 			self.socket.send(json.dumps(data))
 		except:
 			logging.info(f"error send: {self.id}")
+
 
 	def __str__(self) -> str:
 		return f"player {self.id} index in game {self.index}"
@@ -152,13 +157,17 @@ class LocalPlayer:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
+
 
 	def set_game(self, game, index):
 		self.game = game
 		self.index = index
 
+
 	def push_to_game(self, action):
 		self.game.queue.put([self.index, action])
+
 
 	def send(self, data):
 		pass
@@ -174,6 +183,7 @@ class AIPlayer:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
 
 
 	def __del__(self):
@@ -275,6 +285,8 @@ class Game:
 		self.type = game_type
 		self.queue = queue.Queue()
 		self.thread = None
+		self.players_ready = 0
+		self.active_players = len(players)
 		if self.type == "ai":
 			self.ai_player = AIPlayer()
 			self.players.append(self.ai_player)
@@ -330,6 +342,11 @@ class Game:
 			player.send({"type": type, "data": data})
 
 	
+	def send_text(self, text, size=10):
+		for player in self.players:
+			player.send({"type": "text", "data": {"text": text, "size": size}})
+
+	
 	def send(self, player, type, data):
 		self.players[player].send({"type": type, "data": data})
 
@@ -344,9 +361,53 @@ class Game:
 			"moveSpeed": round(self.ball.speed, 2)
 		}
 
+	
+	def send_start_message(self):
+		self.send_text("Players ready!", 5)
+		time.sleep(2)
+		for i in range(3, 0, -1):
+			self.send_text(str(i))
+			time.sleep(1)
+		self.send_text("GO!", 8)
+		time.sleep(0.5)
+		self.send_text("")
+
  
 	def start(self):
 		logging.info("game type : " + self.type)
+
+		#
+		# TODO:
+		#
+		# il faudrait attendre que tous les clients soient pret avant de commencer la game
+		# le probleme de cette approche c'est que si le client est pret et envoie son message avant d'etre mis dans une game
+		# alors son message est perdu et ne sera jamais consideré comme pret
+		# il faudrait un moyen de stocker dans les sockets les messages recus avant d'etre mis dans une game
+		# et les traiter une fois dans la game
+		#
+		#
+		#
+		# logging.info("active players in game : " + str(self.active_players))
+		# start = time.time()
+		# # wait for all players to be ready or 30 seconds
+		# while self.players_ready != self.active_players and time.time() - start < 30:
+		# 	while not self.queue.empty():
+		# 		player_idx, action = self.queue.get()
+		# 		if action == "ready":
+		# 			if self.players[player_idx].ready == False:
+		# 				self.players[player_idx].ready = True
+		# 				self.players_ready += 1
+		
+		# # kick all players if not all players are ready in 30 seconds
+		# if self.players_ready != self.active_players:
+		# 	logging.info("not all players ready")
+		# 	self.end_game()
+		# 	return
+
+		# send all players that the game is starting
+		self.send_start_message()
+
+		logging.info("all players ready")
 		match self.type:
 			case "2p":
 				self.thread = threading.Thread(target=self.game_master_2p, args=())
@@ -365,6 +426,10 @@ class Game:
 	def game_master_2p(self):
 		logging.info("game master 2p")
 		self.send_all("initGame", self.to_json())
+		# TODO:
+		# ajouter la possibilité d'ajouter une transition ou non lors de l'envoie d'un set cam
+		# notemment pour le changement au debut de partie qui est un peu brusque
+		# self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60", "transition": True})
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
 		t = 0
@@ -786,6 +851,8 @@ class WebsocketClient(WebsocketConsumer):
 				elif (time.time() - self.oldmove) > 0.001 and self.type == "local":
 					self.oldmove = time.time()
 					self.player.push_to_game(receive_package['move'])
+				return
+			elif receive_package['type'] == "ready":
 				return
 		except:
 			pass
