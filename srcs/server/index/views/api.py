@@ -22,6 +22,8 @@ def api_get_user(request, id):
 def api_update_user(request):
 	id = request.COOKIES.get('token')
 	user = Token.objects.get(token=id).user
+	if 'nickname' not in request.POST:
+		return JsonResponse({'error': 'Missing nickname'}, status=400)
 	user.nickname = request.POST['nickname']
 	user.save()
 	return JsonResponse({'message': 'Succes'}, status=200)

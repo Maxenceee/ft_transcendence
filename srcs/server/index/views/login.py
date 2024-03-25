@@ -25,6 +25,8 @@ def login(request):
 	if request.method == "GET":
 		return render(request, 'views/connection.html')
 	elif request.method == "POST":
+		if 'login' not in request.POST or 'password' not in request.POST:
+			return render(request, 'views/connection.html', {"is_invalid": True})
 		username = request.POST['login']
 		password = request.POST['password']
 		if not username or not password:
@@ -46,6 +48,8 @@ def signup(request):
 	if request.method == "GET":
 		return render(request, 'views/connection.html', { "is_signup": True, "action_url": "/signup"})
 	elif request.method == "POST":
+		if 'login' not in request.POST or 'password' not in request.POST:
+			return render(request, 'views/connection.html', {"is_invalid": True, "is_signup": True, "action_url": "/signup"})
 		username = request.POST['login']
 		password = request.POST['password']
 		if not username or not password:
