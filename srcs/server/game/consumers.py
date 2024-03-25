@@ -374,21 +374,21 @@ class Game:
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 								self.players[player_idx].pad_x = 16
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 1:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 1:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
@@ -430,36 +430,36 @@ class Game:
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 0:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 27 :
 								self.players[player_idx].pad_x = 27
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 1:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
 								self.players[player_idx].pad_x = -27
 					if  player_idx == 2:
-						self.players[player_idx].pad_z += 0.8
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z  > 27 :
 								self.players[player_idx].pad_z = 27
 					if  player_idx == 3:
-						self.players[player_idx].pad_z -= 0.8
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 0:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
 								self.players[player_idx].pad_x = -27
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 1:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 27 :
 							self.players[player_idx].pad_x = 27
 					if  player_idx == 2:
-						self.players[player_idx].pad_z -= 0.8
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
 					if  player_idx == 3:
-						self.players[player_idx].pad_z += 0.8
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z  > 27 :
 							self.players[player_idx].pad_z = 27
 				elif action == "disconnect":
@@ -494,25 +494,25 @@ class Game:
 				player_idx, action = self.queue.get()
 				if action == "d_key":
 					if self.players[0].pad_x  < 16.5:
-						self.players[0].pad_x += 0.8
+						self.players[0].pad_x += 1
 						if self.players[0].pad_x  > 16.0:
 								self.players[0].pad_x = 16
 					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
 				elif action == "a_key":
 					if self.players[0].pad_x  > -16.5:
-						self.players[0].pad_x -= 0.8
+						self.players[0].pad_x -= 1
 						if self.players[0].pad_x  < -16.0:
 								self.players[0].pad_x = -16
 					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
 				if action == "right_arrow_key":
 					if self.players[1].pad_x  > -16.5:
-						self.players[1].pad_x -= 0.8
+						self.players[1].pad_x -= 1
 						if self.players[1].pad_x  < -16.0:
 								self.players[1].pad_x = -16
 					self.send_all("updatePlayer", {"n": 1, "x": round(self.players[1].pad_x, 2)})
 				elif action == "left_arrow_key":
 					if self.players[1].pad_x  < 16.5:
-						self.players[1].pad_x += 0.8
+						self.players[1].pad_x += 1
 						if self.players[1].pad_x  > 16.0:
 							self.players[1].pad_x = 16
 					self.send_all("updatePlayer", {"n": 1, "x": round(self.players[1].pad_x, 2)})
@@ -553,21 +553,21 @@ class Game:
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0 :
 							self.players[player_idx].pad_x = 16
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 1:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 							self.players[player_idx].pad_x = -16
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 							self.players[player_idx].pad_x = -16
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 1:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
