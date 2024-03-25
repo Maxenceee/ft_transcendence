@@ -5,11 +5,11 @@
 
 
 
- __  __												  ____
-|  \/  |   __ _  __  __   ___   _ __	 ___	___	 / ___|   __ _   _ __ ___	 __ _ 
+ __  __                                                  ____
+|  \/  |   __ _  __  __   ___   _ __     ___    ___     / ___|   __ _   _ __ ___     __ _ 
 | |\/| |  / _` | \ \/ /  / _ \ | '_ \   / __|  / _ \   | |  _   / _` | | '_ ` _ \   / _` |
 | |  | | | (_| |  >  <  |  __/ | | | | | (__  |  __/   | |_| | | (_| | | | | | | | | (_| |
-|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|	\____|  \__,_| |_| |_| |_|  \__,_|
+|_|  |_|  \__,_| /_/\_\  \___| |_| |_|  \___|  \___|    \____|  \__,_| |_| |_| |_|  \__,_|
 
 
 
@@ -1741,7 +1741,7 @@ class BadConnection extends Component {
 	}
 }
 
-let game_render = function(c, type, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	console.log("game_render", width, height);
 	let render_data = {
 		pallet: [],
@@ -1758,8 +1758,9 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
+		onload();
 	});
-	socket.onclose(c);
+	socket.onclose(onclose);
 	socket.use((msg) => {
 		switch (msg.type) {
 			case "resetCam":
@@ -2059,7 +2060,7 @@ let game_render = function(c, type, {width, height} = {width: window.innerWidth,
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {game_render: null, animationid: null, reload: props.reload};
+		this.state = {loading: true, game_render: null, animationid: null, reload: props.reload};
 	}
 
 	componentDidMount() {
@@ -2078,50 +2079,43 @@ class GameView extends Component {
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
-		let callback = () => {
-			navigate("/");
-			// this.state.reload();
-		}
+		let onload = () => this.setState({loading: false});
 
-		this.setState({game_render: game_render(callback, type, {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
 		console.log("componentDidUpdate GameView", this.state.game_render);
-		this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-		this.state.game_render.start(this.state);
+		if (this.state.game_render) {
+			this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+			this.state.game_render.start(this.state);
+		}
 	}
 
 	componentWillUnmount() {
 		this.state.game_render.unmount();
-		console.log("game view unmounted", this.state.game_render);
 		window.onbeforeunload = null;
+		console.log("game view unmounted", this.state.game_render);
+	}
+
+	endGame() {
+		// this.setState({loading: true});
+		// this.state.reload();
+		navigate("/");
 	}
 
 	render() {
 		console.log("render GameView", this.state.game_render);
-		return createElement('div', {
+		return this.state.loading ?
+			createElement(Loader)
+			:
+			createElement('div', {
 			class: "render-context", children: [
 				createElement('div', {
-					class: "back-button", onclick: () => navigate("/"), children: "Go home"
+					class: "back-button", onclick: () => this.endGame(), children: "Go home"
 				}),
 				this.state.game_render && this.state.game_render.render()
 			]
-		});
-	}
-}
-
-class GameRouter extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {reload: props.reload};
-	}
-
-	render() {
-		return createElement('div', {
-			children: router(
-				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
-			)
 		});
 	}
 }
@@ -2235,7 +2229,7 @@ class Main extends Component {
 			createElement(BadConnection)
 			:
 			router(
-				route({path: "/game/*", element: createElement(GameRouter, {reload: this.loadUser.bind(this)})}),
+				route({path: "/game/:type", element: createElement(GameView, {reload: this.state.reload})}),
 				route({path: "*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 			)
 		)
