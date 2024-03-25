@@ -2217,7 +2217,6 @@ class Main extends Component {
 		let socket = new Socket({path: "/user"});
 		socket.onconnection(() => {
 			console.info("Connection opened");
-			socket.send({type : "init"});
 		});
 		socket.onclose(() => {
 			console.info("Connection closed");
