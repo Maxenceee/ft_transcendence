@@ -777,7 +777,7 @@ class Component {
 		this._data = newElement;
 		this._element = newElement._renderComponent()
 		// console.log("new element before", newElement, this);
-		// console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
+		console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
 		if ((node = (this._parent || (oldElementData && oldElementData.parentNode)))) {
 			if (newElement && oldElementData) {
 				node.replaceChild(newElement.element, oldElementData);
@@ -841,9 +841,9 @@ function Is(e) {
  * @param {{}} props 
  * @returns {new Component|{
  * 	type: string,
- * 	data: string,
+ * 	_data: string,
  * 	_element: HTMLElement,
- * 	render(),
+ * 	_renderComponent(),
  * 	_unmountComponent(),
  * }}
  */
@@ -2264,7 +2264,7 @@ class Main extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false });
-			this.connectSocket();
+			// this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
