@@ -37,8 +37,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball[5].position.z = data.ball6.z + 100;
 				ball[6].position.z = data.ball7.z + 200;
 				for( let i = 0; i < 8; i++){
-					if (data.player[i].gameNumber == -1)
+					if (data.player[i].gameNumber == -1){
+						scene.remove(ball[data.player[i].gameNumber])
 						scene.remove(pallet[i]);
+					}
 					else if (data.player[i].gameNumber < 4)
 						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
 					else if (data.player[i].gameNumber < 6){
@@ -58,19 +60,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 							pallet[i].position.z -= 28.5;
 					}
 				}
-				// pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
-				// pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
-				// pallet[3].position.x = data.player[3].x + data.player[3].gameNumber * 80;
-				// pallet[4].position.x = data.player[4].x + data.player[4].gameNumber * 80;
-				// pallet[5].position.x = data.player[5].x + data.player[5].gameNumber * 80;
-				// pallet[6].position.x = data.player[6].x + data.player[6].gameNumber * 80;
-				// pallet[7].position.x = data.player[7].x + data.player[7].gameNumber * 80;
 			}
 			else if (msg.type == "resetCam")
 				// setcam(10, 69, 0);
 				;
 			else if (msg.type == "setCam")
-				setcam(msg.data.x, msg.data.y, msg.data.z);
+				setcam(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 	});
 	let data = {
 		// number : [2],
@@ -405,7 +400,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				
 				for (let i = 0; i < 8; i++)
 				{
-					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] < data.player[i].score){
+					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
 						score[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].score;
 						scoreUpdate[data.player[i].gameNumber] = 1;
 						console.log("----")
@@ -418,7 +413,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					if (scoreUpdate[data.player[i].gameNumber] == 1){
 						scoreUpdate[data.player[i].gameNumber] = 0
 						console.log("display" + data.player[i].gameNumber + " : " + score)
-						display_score(data.player[i].gameNumber + 1);
+						display_score(data.player[i].gameNumber);
 						console.log("----")
 					}
 				}
@@ -439,19 +434,19 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 		function display_score(i){
-			if ( i == 1)
+			if ( i == 0)
 				createText(score[0][0] + " : " + score[0][1], 0, 0, 0)
-			else if (i == 2)
+			else if (i == 1)
 				createText(score[1][0] + " : " + score[1][1], 80, 0, 1);
-			else if (i == 3)
+			else if (i == 2)
 				createText(score[2][0] + " : " + score[2][1], 160, 0, 2);
-			else if (i == 4)
+			else if (i == 3)
 				createText(score[3][0] + " : " + score[3][1], 240, 0, 3);
+			else if (i == 4)
+				createText(score[4][0] + " : " + score[4][1], 80, 100, 4);
 			else if (i == 5)
-				createText(score[4][0] + " : " + score[4][1], 160, 100, 4);
+				createText(score[5][0] + " : " + score[5][1], 160, 100, 5);
 			else if (i == 6)
-				createText(score[5][0] + " : " + score[5][1], 80, 100, 5);
-			else if (i == 7)
 				createText(score[6][0] + " : " + score[6][1], 120, 200, 6);
 			// console.log(score[0][0] + " : " + score[0][1]);
 			// console.log(score[1][0] + " : " + score[1][1]);
@@ -461,8 +456,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
-	function setcam (x, y, z) {
+	function setcam (x, y, z, camx, camy, camz) {
+		controls.target.set(camx, camy, camz)
 		camera.position.set(x, y, z);
+		controls.update();
+
 	}
 	console.log("cookie");
 }();
