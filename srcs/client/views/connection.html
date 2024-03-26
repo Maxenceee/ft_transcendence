@@ -114,7 +114,7 @@
 		// test de connexion avec 42 (https://profile.intra.42.fr/oauth/applications/20463)
 		let redir_uri = encodeURIComponent(window.location.origin.concat("/callback/intra"));
 		document.getElementById("intra-button").onclick = () => {
-			window.location.replace("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&response_type=code&redirect_uri=".concat(redir_uri));
+			window.location.assign("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&response_type=code&redirect_uri=".concat(redir_uri));
 		};
 	</script>
 	<script>
