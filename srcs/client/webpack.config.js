@@ -1,70 +1,70 @@
 const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 
 module.exports = {
-    entry: './srcs/App.js',
-	mode: "production",
-    output: {
-        filename: 'bundle.js',
-        path: path.resolve(__dirname, './public/javascripts'),
+    entry: {
+        app: path.resolve(__dirname, './srcs/App.js'),
+        styles: path.resolve(__dirname, './srcs/styles/style.scss'),
     },
-	devServer: {
-		static: './public/javascripts',
-	},
+    mode: "production",
+    output: {
+        filename: '[name].min.js',
+        path: path.resolve(__dirname, './public'),
+    },
+    devServer: {
+        static: './public',
+    },
     module: {
         rules: [
             {
-                test: /\.(js|jsx)$/,
+                test: /\.(js)$/,
                 exclude: /node_modules/,
                 use: {
                     loader: 'babel-loader',
                 },
             },
-			{
-				test: /\.scss$/,
-				use: [
-					"style-loader",
-					"css-loader",
-					"sass-loader",
-				]
-			},
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                exclude: /\/static\/fonts\//,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[name].[ext]',
-                        outputPath: 'fonts/',
+            {    
+                test: /\.scss$/i,
+                exclude: /node_modules/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: true,
+                            url: false,
+                        },
                     },
-                },
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                include: /\/static\/fonts\//,
-                use: {
-                    loader: 'url-loader',
-                    options: {
-                        limit: 8192,
-                        name: '[name].[ext]',
-                        outputPath: 'fonts/',
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            sourceMap: true,
+                        },
                     },
-                },
+                ],
             },
         ],
     },
     resolve: {
-        extensions: ['.js', '.jsx'],
+        extensions: ['.js', '.css', '.scss'],
     },
-	optimization: {
-		minimize: true,
-		minimizer: [new TerserPlugin({
-			terserOptions: {
-				format: {
-					comments: /@license|@preserve|^!/i,
-				},
-			},
-			extractComments: false,
-		})],
-	},
+    plugins: [
+        new FixStyleOnlyEntriesPlugin(),
+        new MiniCssExtractPlugin({
+            filename: 'style.css',
+        }),
+    ],
+    optimization: {
+        minimize: true,
+        minimizer: [new TerserPlugin({
+            terserOptions: {
+                format: {
+                    comments: /@license|@preserve|^!/i,
+                },
+            },
+            extractComments: false,
+        })],
+    },
 };

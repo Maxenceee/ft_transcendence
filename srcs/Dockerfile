@@ -10,6 +10,7 @@ COPY ./client /app/client
 # Installez les dépendances et compilez l'application client avec Webpack
 WORKDIR /app/client
 RUN npm install
+RUN npm install node-sass@latest
 RUN npm run pack
 
 # Passez à la configuration du serveur Django
@@ -21,14 +22,21 @@ RUN pip install --upgrade pip
 
 RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv passlib requests django-cors-headers Twisted[tls,http2] Pillow
 
-RUN apt-get install -y curl wget
+RUN apt-get install -y curl wget 
+# nodejs npm
 
 # Copiez l'application serveur
 RUN mkdir /app
 COPY ./server /app/server
+# COPY ./client /app/client
 
 # Copiez les fichiers statiques compilés à partir de l'application client
 COPY --from=builder /app/client /app/client
+# WORKDIR /app/client
+
+# RUN npm install
+# RUN npm update
+# RUN npm run pack
 
 WORKDIR /app/server
 

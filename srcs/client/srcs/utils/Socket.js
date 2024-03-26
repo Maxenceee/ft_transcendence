@@ -15,7 +15,6 @@ Le = function(a, b) {
 		d = b[1],
 		e = b[2] || null;
 	c = (["svg", "path", "circle", "text"].includes(c.toLowerCase()) ? a.createElementNS("http://www.w3.org/2000/svg", c) : a.createElement(c));
-	// c = a.createElement(c);
 	if (e && e.in) c.innerHTML = e.in;
 	if (e && e.style) c.style = e.style;
 
@@ -147,7 +146,7 @@ s.onclose = function(a) {
 	}
 	this.on('close', a);
 };
-S.onerror = function(a) {
+s.onerror = function(a) {
 	if (typeof a !== "function") {
 		throw new Error("Callback must be a function, not "+typeof a);
 	}

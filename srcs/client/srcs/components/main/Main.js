@@ -1,4 +1,4 @@
-import { Component, xhr, Loader, BadConnection } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, xhr, Loader, BadConnection } from '..';
 
 class Main extends Component {
 	constructor(props) {

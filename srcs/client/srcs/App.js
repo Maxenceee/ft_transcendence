@@ -1,5 +1,4 @@
-import { createElement, Component, xhr } from './components';
-import './styles/style.scss';
+import { createElement, Component, xhr, Main } from './components';
 
 let renderer = function() {
 	this._internalRoot = root;

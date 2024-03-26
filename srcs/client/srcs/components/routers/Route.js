@@ -1,4 +1,4 @@
-import { Component, createElement } from '..';
+import { Component, createElement, useRoute } from '..';
 
 class Route extends Component {
 	constructor(props) {

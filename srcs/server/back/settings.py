@@ -158,7 +158,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-	BASE_DIR / "/static/"
+	BASE_DIR / "../client/public"
 ]
 
 STATIC_ROOT = "/var/www/static/"

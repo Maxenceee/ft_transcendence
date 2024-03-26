@@ -1,4 +1,4 @@
-import { Component, createElement } from '..';
+import { Component, createElement, link } from '..';
 
 class HomePage extends Component {
 	constructor(props) {

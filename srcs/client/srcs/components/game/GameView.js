@@ -1,14 +1,14 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
-import { Component, createElement, Loader, useParams, navigate } from '../..';
-import { Socket, LoadManager } from '../utils';
+import { Component, createElement, Loader, useParams, navigate } from '..';
+import { Socket, LoadManager } from '../../utils';
 
 let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
