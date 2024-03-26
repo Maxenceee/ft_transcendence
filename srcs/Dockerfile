@@ -1,5 +1,5 @@
 # Utilisez une image Node.js pour exécuter Webpack
-FROM node:latest AS builder
+FROM node AS builder
 
 # Définissez le répertoire de travail dans le conteneur
 WORKDIR /app
@@ -10,7 +10,6 @@ COPY ./client /app/client
 # Installez les dépendances et compilez l'application client avec Webpack
 WORKDIR /app/client
 RUN npm install
-RUN npm install node-sass@latest
 RUN npm run pack
 
 # Passez à la configuration du serveur Django
