@@ -42,6 +42,8 @@ def login(request):
 				return response
 
 		return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+	else :
+		return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @login_forbiden
 def signup(request):
@@ -77,6 +79,8 @@ def signup(request):
 		Token.objects.create(token=token, user=user)
 		response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
 		return response
+	else:
+		return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 @login_forbiden
 def callback_intra(request):

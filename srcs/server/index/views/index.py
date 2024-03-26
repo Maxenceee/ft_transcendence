@@ -6,8 +6,6 @@ from index.decorators import *
 # Create your views here.
 @login_required
 def index(request):
-	return render(request, 'views/index.html', {"username": request.user.nickname})
-
-@login_required
-def not_found(request, url):
-	return render(request, 'views/index.html', {"username": request.user.nickname})
+	if request.method != 'GET':
+		return JsonResponse({'error': 'Method not allowed'}, status=405)
+	return render(request, 'views/index.html')
