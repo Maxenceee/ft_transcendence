@@ -599,7 +599,7 @@ var Socket = function({port = 3000, host = window.location.hostname, path = "/"}
 	} catch (error) {
 		console.error("Could not open socket with server");
 	}
-	
+
 	this.initPing();
 
 	this.socket.onerror = (error) => this.emit('error', error);
@@ -645,7 +645,6 @@ s.onconnection = function(a) {
 	if (typeof a !== "function") {
 		throw new Error("Callback must be a function, not "+typeof a);
 	}
-	console.log(this, a);
 	this.on('connection', a);
 };
 s.onclose = function(a) {
@@ -680,7 +679,7 @@ s.initPing = function() {
 };
 s.pingServer = function() {
 	this.ps = Date.now();
-	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return ;
+	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return;
 	this.lastPing = this.ps;
 	this.send(this.j({PING: this.ps}));
 };
