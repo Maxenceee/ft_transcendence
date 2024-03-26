@@ -376,31 +376,15 @@ class Game:
 	def start(self):
 		logging.info("game type : " + self.type)
 
-		#
-		# TODO:
-		#
-		# il faudrait attendre que tous les clients soient pret avant de commencer la game
-		# le probleme de cette approche c'est que si le client est pret et envoie son message avant d'etre mis dans une game
-		# alors son message est perdu et ne sera jamais consideré comme pret
-		# il faudrait un moyen de stocker dans les sockets les messages recus avant d'etre mis dans une game
-		# et les traiter une fois dans la game
-		#
-		#
-		#
 		logging.info("active players in game : " + str(self.active_players))
 		start = time.time()
 		# wait for all players to be ready or 30 seconds
 		while self.players_ready != self.active_players and time.time() - start < 30:
-			if all(player.socket.ready for player in self.players):
-				self.players_ready = self.active_players
-				break
-			
-			# while not self.queue.empty():
-			# 	player_idx, action = self.queue.get()
-			# 	if action == "ready":
-			# 		if self.players[player_idx].ready == False:
-			# 			self.players[player_idx].ready = True
-			# 			self.players_ready += 1
+			for player in self.players:
+				if isinstance(player, AIPlayer) or isinstance(player, LocalPlayer):
+					continue
+				if player.socket.ready:
+					self.players_ready = self.active_players
 
 		# kick all players if not all players are ready in 30 seconds
 		if self.players_ready != self.active_players:
