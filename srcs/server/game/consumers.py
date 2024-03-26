@@ -387,24 +387,27 @@ class Game:
 		#
 		#
 		#
-		# logging.info("active players in game : " + str(self.active_players))
-		# start = time.time()
-		# # wait for all players to be ready or 30 seconds
-		# while self.players_ready != self.active_players and time.time() - start < 30:
-		# 	while not self.queue.empty():
-		# 		player_idx, action = self.queue.get()
-		# 		if action == "ready":
-		# 			if self.players[player_idx].ready == False:
-		# 				self.players[player_idx].ready = True
-		# 				self.players_ready += 1
-		
-		# # kick all players if not all players are ready in 30 seconds
-		# if self.players_ready != self.active_players:
-		# 	logging.info("not all players ready")
-		# 	self.end_game()
-		# 	return
+		logging.info("active players in game : " + str(self.active_players))
+		start = time.time()
+		# wait for all players to be ready or 30 seconds
+		while self.players_ready != self.active_players and time.time() - start < 30:
+			if all(player.socket.ready for player in self.players):
+				self.players_ready = self.active_players
+				break
+			
+			# while not self.queue.empty():
+			# 	player_idx, action = self.queue.get()
+			# 	if action == "ready":
+			# 		if self.players[player_idx].ready == False:
+			# 			self.players[player_idx].ready = True
+			# 			self.players_ready += 1
 
-		# send all players that the game is starting
+		# kick all players if not all players are ready in 30 seconds
+		if self.players_ready != self.active_players:
+			logging.info("not all players ready")
+			self.end_game()
+			return
+
 		self.send_start_message()
 
 		logging.info("all players ready")
@@ -787,6 +790,7 @@ class WebsocketClient(WebsocketConsumer):
 		self.user = None
 		self.type = None
 		self.player = None
+		self.ready = False
 		self.oldmove = time.time()
 
 	def connect(self):
@@ -853,6 +857,7 @@ class WebsocketClient(WebsocketConsumer):
 					self.player.push_to_game(receive_package['move'])
 				return
 			elif receive_package['type'] == "ready":
+				self.ready = True
 				return
 		except:
 			pass
