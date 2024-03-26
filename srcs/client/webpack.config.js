@@ -27,7 +27,30 @@ module.exports = {
 					"css-loader",
 					"sass-loader",
 				]
-			}
+			},
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                exclude: /\/static\/fonts\//,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[name].[ext]',
+                        outputPath: 'fonts/',
+                    },
+                },
+            },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                include: /\/static\/fonts\//,
+                use: {
+                    loader: 'url-loader',
+                    options: {
+                        limit: 8192,
+                        name: '[name].[ext]',
+                        outputPath: 'fonts/',
+                    },
+                },
+            },
         ],
     },
     resolve: {
