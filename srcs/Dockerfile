@@ -1,3 +1,18 @@
+# Utilisez une image Node.js pour exécuter Webpack
+FROM node:latest AS builder
+
+# Définissez le répertoire de travail dans le conteneur
+WORKDIR /app
+
+# Copiez les fichiers de l'application client
+COPY ./client /app/client
+
+# Installez les dépendances et compilez l'application client avec Webpack
+WORKDIR /app/client
+RUN npm install
+RUN npm run pack
+
+# Passez à la configuration du serveur Django
 FROM python:3.10-slim
 
 RUN apt-get update -y && apt-get upgrade -y
@@ -8,11 +23,12 @@ RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv pass
 
 RUN apt-get install -y curl wget
 
+# Copiez l'application serveur
 RUN mkdir /app
+COPY ./server /app/server
 
-COPY ./client /app/client
-
-COPY ./server/ /app/server
+# Copiez les fichiers statiques compilés à partir de l'application client
+COPY --from=builder /app/client /app/client
 
 WORKDIR /app/server
 
