@@ -599,12 +599,10 @@ var Socket = function({port = 3000, host = window.location.hostname, path = "/"}
 	} catch (error) {
 		console.error("Could not open socket with server");
 	}
-	
+
 	this.initPing();
 
-	this.socket.onerror = (error) => {
-		console.error("Server is not available, please try again later.");
-	}
+	this.socket.onerror = (error) => this.emit('error', error);
 
 	this.socket.onopen = () => this.emit('connection');
 
@@ -655,7 +653,13 @@ s.onclose = function(a) {
 	}
 	this.on('close', a);
 };
-s.use = function(fn) {
+S.onerror = function(a) {
+	if (typeof a !== "function") {
+		throw new Error("Callback must be a function, not "+typeof a);
+	}
+	this.on('error', a);
+};
+s.onmessage = function(fn) {
 	if (typeof fn !== "function") {
 		throw new Error("Callback must be a function, not "+typeof fn);
 	}
@@ -675,7 +679,7 @@ s.initPing = function() {
 };
 s.pingServer = function() {
 	this.ps = Date.now();
-	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return ;
+	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return;
 	this.lastPing = this.ps;
 	this.send(this.j({PING: this.ps}));
 };
@@ -729,6 +733,7 @@ class Component {
 		this._parent = null;
 		this._mounted = false;
 		this._moised = null;
+		this._owner = null;
 
 		this._unmountComponent = this._unmountComponent.bind(this);
 	}
@@ -755,6 +760,7 @@ class Component {
 		// console.log("render component", this);
 		this._mounted = true;
 		this._data = render;
+		// this._data._owner = this;
 		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
@@ -789,7 +795,6 @@ class Component {
 			} else {
 				node.removeChild(oldElementData);
 			}
-			// console.log(node);
 		}
 
 		this._pendingStateCallbacks.forEach(callback => callback());
@@ -815,8 +820,10 @@ class Component {
 	}
 
 	get element() {
-		return this._element;
+		return this._data && this._data.element || this._element;
 	}
+
+	set element(e) {}
 
 	componentDidMount() {}
 
@@ -943,6 +950,10 @@ class BrowserRouter extends Component {
 		console.log("====== BrowserRouter Unmounted ======", this);
 	}
 
+	// get element() {
+	// 	return this._data && this._data._element || this._element;
+	// }
+
 	render() {
 		console.log("in render BrowserRouter", this);
 		return this.props.children;
@@ -993,6 +1004,10 @@ class Router extends Component {
 		// }
 		return this.props.children.some(child => child.canRoute(route));
 	}
+
+	// get element() {
+	// 	return this._data && this._data._element || this._element;
+	// }
 
 	render() {
 		const { children } = this.props;
@@ -1097,9 +1112,13 @@ class Route extends Component {
 		this.active = false;
 	}
 
-	get element() {
-		return this._data && this._data._element || this._element;
-	}
+	// get element() {
+	// 	return this._data && this._data._element || this._element;
+	// }
+
+	// set element(e) {
+	// 	this._data && (this._element = e);
+	// }
 
 	canRoute(route) {
 		const regex = Ia(this.path, route);
@@ -1351,7 +1370,7 @@ class HomePage extends Component {
 															class: "card-container", children: [
 																link({
 																	// to: "/game/tournament", children: createElement('div', {
-																	to: "/game/4p", children: createElement('div', {
+																	to: "/game/local", children: createElement('div', {
 																		class: "play-button", children: createElement('svg', {
 																			width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
 																				d: "M5.32789 25.4892H23.4434C25.4884 25.4892 26.7692 24.0199 26.7692 22.1784C26.7692 21.6108 26.6073 21.0197 26.3037 20.4851L17.2332 4.67086C16.5964 3.55805 15.5091 3 14.3867 3C13.2622 3 12.159 3.56227 11.536 4.67086L2.46547 20.4872C2.14484 21.0293 2 21.6108 2 22.1784C2 24.0199 3.28086 25.4892 5.32789 25.4892Z"
@@ -1805,6 +1824,40 @@ class BadConnection extends Component {
 	}
 }
 
+let LoadManager = function() {
+	if (!(this instanceof LoadManager)) {
+		throw new Error("LoadManager is a constructor and should be called with the new keyword");
+	}
+}
+LoadManager.prototype = {
+	loaded: 0,
+	total: 0,
+	onload: function() {},
+	add: function(func, proto) {
+		console.log(func, proto, typeof func, typeof proto);
+		if (typeof func !== "object" && typeof func !== "function") {
+			throw new Error("LoadManager.add() expects a function as argument");
+		}
+		if (typeof proto !== "string") {
+			throw new Error("LoadManager.add() expects a string as second argument");
+		}
+		let t = this;
+		t.total++;
+		let c = () => {
+			t.loaded++;
+			if (t.loaded === t.total) {
+				t.onload();
+			}
+		};
+		if (!func[proto]) {
+			func[proto] = c.bind(func);
+		} else {
+			func[proto].call(func, c);
+		}
+		return (this);
+	},
+}
+
 let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
@@ -1817,14 +1870,10 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		updateScore: 0,
 		queue: [],
 	}
+
 	let socket = new Socket({path: "/game/"+type});
-	socket.onconnection(() => {
-		console.info("Connection opened");
-		socket.send({type : "init"});
-		onload();
-	});
 	socket.onclose(onclose);
-	socket.use((msg) => {
+	socket.onmessage((msg) => {
 		switch (msg.type) {
 			case "resetCam":
 				setcam(10, 69, 0);
@@ -1832,10 +1881,23 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 			case "setCam":
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
+			case "text":
+				createText(msg.data.text, msg.data.size);
 			default:
 				render_data.queue.push(msg);
 		}
 	});
+	
+	var loaderManager = new THREE.LoadingManager();
+	
+	let manager = new LoadManager();
+	manager.add(socket, "onconnection");
+	manager.add(loaderManager, "onLoad");
+	manager.onload = () => {
+		console.info("game ready");
+		socket.send({type : "ready"});
+		onload();
+	};
 
 	let setcam = (x, y, z) => {
 		camera.position.set(x, y, z);
@@ -1857,27 +1919,56 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	const Alight = new THREE.AmbientLight({ color: 0xffffff });
 	scene.add(Alight);
 
-	const sky = new THREE.TextureLoader().load("/static/images/background_sky_box.jpg");
-	const skyboxGeo = new THREE.SphereGeometry(700);
-	const materialSky = new THREE.MeshPhysicalMaterial({
-		wireframe:false, 
-		opacity: 1,
-		side: THREE.BackSide,
-		map: sky,
+	const skyLoader = new THREE.TextureLoader(loaderManager);
+	const sky = skyLoader.load("/static/images/background_sky_box.jpg", () => {
+		const skyboxGeo = new THREE.SphereGeometry(700);
+		const materialSky = new THREE.MeshPhysicalMaterial({
+			wireframe: false,
+			opacity: 1,
+			side: THREE.BackSide,
+			map: sky,
+		});
+		const skybox = new THREE.Mesh(skyboxGeo, materialSky);
+		scene.add(skybox);
 	});
-	const skybox = new THREE.Mesh(skyboxGeo, materialSky)
-	scene.add(skybox)
 
 	let font,
 		textGeo,
 		textMesh;
 
-	(function() {
-		new FontLoader().load('/static/fonts/font.json', function (response) {
-			font = response;
-			createText("Waiting for opponent", 2.5);
+	const fontLoader = new FontLoader(loaderManager);
+	fontLoader.load('/static/fonts/font.json', function (response) {
+		font = response;
+		createText("Waiting for opponent", 2.5);
+	});
+
+	const materials = [
+		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
+		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
+	];
+
+	function createText(msg, size = 10) {
+		scene.remove(textMesh);
+		textGeo = new TextGeometry(msg, {
+			font: font,
+			size: size,
+			height: 0.5,
+			curveSegments: 2,
+			bevelThickness: 0.1,
+			bevelSize: 0.01,
+			bevelEnabled: true
 		});
-	}());
+
+		textGeo.computeBoundingBox();
+		textGeo.center();
+		textMesh = new THREE.Mesh(textGeo, materials);
+		textMesh.rotateX(-Math.PI * 0.5);
+		textMesh.rotateZ(Math.PI * 0.5);
+		textMesh.position.y -= 2;
+		
+		scene.add(textMesh);
+		textGeo.dispose();
+	}
 
 	(function() {
 		let mapWidth = 40;
@@ -1986,54 +2077,27 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
+		let d = (event.type === "keydown");
 		switch (event.which) {
 			case 68:
-				render_data.keyCodes["d_key"] = (event.type === "keydown");
+				render_data.keyCodes["d_key"] = d;
 				break;
 			case 39:
-				render_data.keyCodes["right_arrow_key"] = (event.type === "keydown");
+				render_data.keyCodes["right_arrow_key"] = d;
 				break;
 			case 65:
-				render_data.keyCodes["a_key"] = (event.type === "keydown");
+				render_data.keyCodes["a_key"] = d;
 				break;
 			case 37:
-				render_data.keyCodes["left_arrow_key"] = (event.type === "keydown");
+				render_data.keyCodes["left_arrow_key"] = d;
 				break;
 			case 82:
-				(event.type === "keydown") && (
+				d && (
 					setcam(10, 80, 0),
 					controls.target.set(0, 0, 0)
 				)
 				break;
 		}
-	}
-
-	const materials = [
-		new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true }), // front
-		new THREE.MeshPhongMaterial({ color: 0xffffff }) // side
-	];
-
-	function createText(msg, size = 10) {
-		scene.remove(textMesh);
-		textGeo = new TextGeometry(msg, {
-			font: font,
-			size: size,
-			height: 0.5,
-			curveSegments: 2,
-			bevelThickness: 0.1,
-			bevelSize: 0.01,
-			bevelEnabled: true
-		});
-
-		textGeo.computeBoundingBox();
-		textGeo.center();
-		textMesh = new THREE.Mesh(textGeo, materials);
-		textMesh.rotateX(-Math.PI * 0.5);
-		textMesh.rotateZ(Math.PI * 0.5);
-		textMesh.position.y -= 2;
-		
-		scene.add(textMesh);
-		textGeo.dispose();
 	}
 
 	let animationid = null,
@@ -2097,9 +2161,9 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		render: () => renderer.domElement,
 		unmount: () => {
 			animationid && cancelAnimationFrame(animationid);
+			socket.close();
 			document.removeEventListener("keydown", onDocumentKeyEvent, true);
 			document.removeEventListener("keyup", onDocumentKeyEvent, true);
-			socket.close();
 		}
 	};
 };
@@ -2139,9 +2203,8 @@ class GameView extends Component {
 	}
 
 	endGame() {
-		// this.setState({loading: true});
-		// this.state.reload();
 		navigate("/");
+		this.props.reload();
 		console.log("game view unmounted", this.state.game_render);
 	}
 
@@ -2244,24 +2307,28 @@ class Main extends Component {
 	// 	socket.onclose(() => {
 	// 		console.info("Connection closed");
 	// 	});
-	// 	socket.use((msg) => {
+	// 	socket.onmessage((msg) => {
 	// 		console.log(msg);
 	// 	});
 	// 	this.setState({socket: socket});
 	// }
 
-	loadUser() {
+	loadUser(callBack = null) {
 		xhr.get('/api/user/me/get')
 		.then(res => res.data)
 		.then(data => {
 			console.log("data", data);
-			this.setState({ user: data, loading: false });
+			this.setState({ user: data, loading: false }, callBack);
 			// this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
 			this.setState({ loading: false, error: "An error occured" });
 		})
+	}
+
+	reload() {
+		this.setState({ loading: true });
 	}
 
 	componentDidMount() {
