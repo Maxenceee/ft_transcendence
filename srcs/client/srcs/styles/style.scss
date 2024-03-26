@@ -833,20 +833,6 @@ main {
 			}
 		}
 
-		&.fa-row-border {
-			cursor: pointer;
-			color: var(--color-fg-default);
-			border: 1px solid var(--client-container-border-color);
-			padding: 10px 5px;
-			border-radius: 5px;
-			margin: 0 5px;
-			width: max(calc(50% - 10px), 200px);
-
-			&:hover {
-				border-color: var(--color-fg-secondary);
-			}
-		}
-
 		
 		.item-card-icon {
 			display: flex;
