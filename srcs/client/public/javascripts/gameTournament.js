@@ -9,15 +9,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 
 !function() {
 	let socket = new Socket({path: "/tournament"});
-	let connectionStatus = 0;
 	socket.onconnection(() => {
 		console.info("Connection opened");
 		socket.send({type : "init"});
-		connectionStatus = 1;
 	});
 	socket.onclose(() => {
 		console.info("Connection closed");
-		connectionStatus = 2;
 		window.location.replace("/");
 	});
 	socket.use((msg) =>{
@@ -29,31 +26,46 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				ball[1].position.x = data.ball2.x + 80;
 				ball[2].position.x = data.ball3.x + 160;
 				ball[3].position.x = data.ball4.x + 240;
-				// ball[4].position.x = data.ball.x + 80;
-				// ball[5].position.x = data.ball.x + 160;
-				// ball[6].position.x = data.ball.x + 120;		
+				ball[4].position.x = data.ball5.x + 80;
+				ball[5].position.x = data.ball6.x + 160;
+				ball[6].position.x = data.ball7.x + 120;
 				ball[0].position.z = data.ball.z;
 				ball[1].position.z = data.ball2.z;
 				ball[2].position.z = data.ball3.z;
 				ball[3].position.z = data.ball4.z;
-				// ball[4].position.z = data.ball.z + 100;
-				// ball[5].position.z = data.ball.z + 100;
-				// ball[6].position.z = data.ball.z + 200;
-				// console.log(data.player);
-				pallet[0].position.x = data.player[0].x + data.player[0].gameNumber * 80;
-				pallet[1].position.x = data.player[1].x + data.player[1].gameNumber * 80;
-				pallet[2].position.x = data.player[2].x + data.player[2].gameNumber * 80;
-				pallet[3].position.x = data.player[3].x + data.player[3].gameNumber * 80;
-				pallet[4].position.x = data.player[4].x + data.player[4].gameNumber * 80;
-				pallet[5].position.x = data.player[5].x + data.player[5].gameNumber * 80;
-				pallet[6].position.x = data.player[6].x + data.player[6].gameNumber * 80;
-				pallet[7].position.x = data.player[7].x + data.player[7].gameNumber * 80;
+				ball[4].position.z = data.ball5.z + 100;
+				ball[5].position.z = data.ball6.z + 100;
+				ball[6].position.z = data.ball7.z + 200;
+				for( let i = 0; i < 8; i++){
+					if (data.player[i].gameNumber == -1){
+						scene.remove(ball[data.player[i].gameNumber])
+						scene.remove(pallet[i]);
+					}
+					else if (data.player[i].gameNumber < 4)
+						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
+					else if (data.player[i].gameNumber < 6){
+						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
+						pallet[i].position.z = data.player[i].z + 100;
+						if (i % 4 < 2)
+							pallet[i].position.z += 28.5;
+						else
+							pallet[i].position.z -= 28.5;
+					}
+					else if (data.player[i].gameNumber == 6){
+						pallet[i].position.x = data.player[i].x + 120;
+						pallet[i].position.z = data.player[i].z + 200;
+						if (i  < 4)
+							pallet[i].position.z += 28.5;
+						else
+							pallet[i].position.z -= 28.5;
+					}
+				}
 			}
 			else if (msg.type == "resetCam")
 				// setcam(10, 69, 0);
 				;
 			else if (msg.type == "setCam")
-				setcam(msg.data.x, msg.data.y, msg.data.z);
+				setcam(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 	});
 	let data = {
 		// number : [2],
@@ -75,7 +87,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	document.body.appendChild( renderer.domElement );
 	renderer.setPixelRatio( window.devicePixelRatio );
 
-	var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+	let camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 	camera.position.set( 15, 15, 20 );
 
 	const controls = new OrbitControls( camera, renderer.domElement );
@@ -101,21 +113,13 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	textMesh2 = []
 	
 
-	var score = {
-		scoreP1: 0,
-		scoreP2: 0,
-		scoreP3: 0,
-		scoreP4: 0,
-		scoreP5: 0,
-		scoreP6: 0,
-		scoreP7: 0,
-		scoreP8: 0,
-	};
+	let score = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+	let k = [0, 0, 0, 0, 0, 0, 0, 0]
 
 	function loadFont() {
 
 		const loader = new FontLoader();
-		loader.load( '/static/javascripts/font.json', function ( response ) {
+		loader.load( '/static/fonts/font.json', function ( response ) {
 
 			font = response;
 
@@ -336,13 +340,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		textGeo[game].dispose();
 	}
 
-	var keyCode = {
+	let keyCode = {
 		left : 0,
 		right : 0
 	}
-
 	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/background_sky_box.jpg" );
-	const skyboxGeo		 = new THREE.SphereGeometry( 300 );
+	const skyboxGeo		 = new THREE.SphereGeometry( 450 );
 	const materialSky = new THREE.MeshPhysicalMaterial({
 		wireframe:false, 
 		opacity: 1,
@@ -350,10 +353,11 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		map  : sky
 	});
 	const skybox = new THREE.Mesh(skyboxGeo, materialSky)
+	skybox.position.x += 120;
 	scene.add(skybox)
 
 	loadFont();
-
+	let scoreUpdate =[0, 0, 0, 0, 0, 0, 0];
 	const animate = async () => {
 		if (composer){
 			renderer.render( scene, camera );
@@ -365,54 +369,97 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 		if (data.type == "gameState")
 		{
-			if (score.scoreP1 > 9 || score.scoreP2 > 9)
-			{
-				scene.remove(ball[0]);
-				// return;
-			}
-			if (score.scoreP3 > 9 || score.scoreP4 > 9)
-			{
-				scene.remove(ball[1]);
-				return;
-			}
-			if (score.scoreP5 > 9 || score.scoreP6 > 9)
-			{
-				scene.remove(ball[2]);
-				return;
-			}
-			if (score.scoreP7 > 9 || score.scoreP8 > 9)
-			{
-				scene.remove(ball[3]);
-				return;
-			}
-			if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
-				score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
-				|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score  
-				|| score.scoreP7 != data.player[6].score  || score.scoreP8 != data.player[7].score ))
-			{
-
-				score.scoreP1 = data.player[0].score;
-				score.scoreP2 = data.player[1].score;
-				createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
-				score.scoreP3 = data.player[2].score;
-				score.scoreP4 = data.player[3].score;
-				createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
-				score.scoreP5 = data.player[4].score;
-				score.scoreP6 = data.player[5].score;
-				createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
-				score.scoreP7 = data.player[6].score;
-				score.scoreP8 = data.player[7].score;
-				createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
-				// console.log(textMesh2);
-			}
+			// if ((score.scoreP1 < 0 || score.scoreP2 < 0))
+			// {
+			// 	scene.remove(ball[0]);
+			// 	scene.remove(textMesh2[0])
+			// 	// return;
+			// }
+			// if ((score.scoreP3 < 0 || score.scoreP4 < 0))
+			// {
+			// 	scene.remove(ball[1]);
+			// 	scene.remove(textMesh2[1])			// 	// return;
+			// }
+			// if ((score.scoreP5 < 0 || score.scoreP6 < 0))
+			// {
+			// 	scene.remove(ball[2]);
+			// 	scene.remove(textMesh2[2])
+			// 	// return;
+			// }
+			// if ((score.scoreP7 < 0 || score.scoreP8 < 0))
+			// {
+			// 	scene.remove(ball[3]);
+			// 	scene.remove(textMesh2[3])
+			// 	// return;
+			// }
+			// if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
+			// 	score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
+			// 	|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score ))
+			// 	{
+				
+				for (let i = 0; i < 8; i++)
+				{
+					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
+						score[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].score;
+						scoreUpdate[data.player[i].gameNumber] = 1;
+						console.log("----")
+						console.log("update game : " + data.player[i].gameNumber);
+					}
+					if (data.player[i].gameNumber != -1){
+						k[data.player[i].gameNumber] += 1
+						k[data.player[i].gameNumber] %= 2
+					}
+					if (scoreUpdate[data.player[i].gameNumber] == 1){
+						scoreUpdate[data.player[i].gameNumber] = 0
+						console.log("display" + data.player[i].gameNumber + " : " + score)
+						display_score(data.player[i].gameNumber);
+						console.log("----")
+					}
+				}
+				// score.scoreP1 = data.player[0].score;
+				// score.scoreP2 = data.player[1].score;
+				// score.scoreP3 = data.player[2].score;
+				// score.scoreP4 = data.player[3].score;
+				// score.scoreP5 = data.player[4].score;
+				// score.scoreP6 = data.player[5].score;
+				// score.scoreP7 = data.player[6].score;
+				// score.scoreP8 = data.player[7].score;
+				// createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
+				// createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
+				// createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
+				// createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
+			// }
 		}
-		await sleep(25);
 	}
+
+		function display_score(i){
+			if ( i == 0)
+				createText(score[0][0] + " : " + score[0][1], 0, 0, 0)
+			else if (i == 1)
+				createText(score[1][0] + " : " + score[1][1], 80, 0, 1);
+			else if (i == 2)
+				createText(score[2][0] + " : " + score[2][1], 160, 0, 2);
+			else if (i == 3)
+				createText(score[3][0] + " : " + score[3][1], 240, 0, 3);
+			else if (i == 4)
+				createText(score[4][0] + " : " + score[4][1], 80, 100, 4);
+			else if (i == 5)
+				createText(score[5][0] + " : " + score[5][1], 160, 100, 5);
+			else if (i == 6)
+				createText(score[6][0] + " : " + score[6][1], 120, 200, 6);
+			// console.log(score[0][0] + " : " + score[0][1]);
+			// console.log(score[1][0] + " : " + score[1][1]);
+			// console.log(score[2][0] + " : " + score[2][1]);
+			// console.log(score[3][0] + " : " + score[3][1]);
+		}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
-	function setcam (x, y, z) {
+	function setcam (x, y, z, camx, camy, camz) {
+		controls.target.set(camx, camy, camz)
 		camera.position.set(x, y, z);
+		controls.update();
+
 	}
 	console.log("cookie");
 }();
