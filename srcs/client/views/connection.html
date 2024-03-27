@@ -10,7 +10,7 @@
 	<link rel="shortcut icon" type="image/png" href="/static/images/favicon.ico"/>
 	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
 	<link rel="preload" as="image" href="/static/images/favicon.ico">
-	<link rel="stylesheet" href="/static/stylesheets/style.css">
+	<link rel="stylesheet" href="/static/style.css">
 	<link rel="preload" type="video/mp4" as="video" href="/static/videos/0001-0151.mp4">
 	<link rel="preload" type="image/png" as="image" href="/static/images/pong_visual_1.png">
 	<script src="/static/javascripts/main.58fr6fe.js"></script>
@@ -58,13 +58,13 @@
 										<div class="ttpo form-input">
 											<label class="f0n8F">
 												<span class="_9nyy2">Nom d'utilisateur</span>
-												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login|default:"" }}">
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" minlength="3" maxlength="20" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login|default:"" }}">
 											</label>
 										</div>
 										<div class="ttpo form-input">
 											<label class="f0n8F">
 												<span class="_9nyy2">Mot de passe</span>
-												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
+												<input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" minlength="3" maxlength="20" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
 											</label>
 										</div>
 										{% if is_signup|default:False %}
@@ -114,7 +114,7 @@
 		// test de connexion avec 42 (https://profile.intra.42.fr/oauth/applications/20463)
 		let redir_uri = encodeURIComponent(window.location.origin.concat("/callback/intra"));
 		document.getElementById("intra-button").onclick = () => {
-			window.location.replace("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&response_type=code&redirect_uri=".concat(redir_uri));
+			window.location.assign("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-f5db00ee84d9f1b47815a3376f10198e4a56c2c3be8004261a13fd9c412c814c&response_type=code&redirect_uri=".concat(redir_uri));
 		};
 	</script>
 	<script>

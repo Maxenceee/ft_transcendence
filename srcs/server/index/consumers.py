@@ -1,6 +1,44 @@
 from channels.generic.websocket import WebsocketConsumer
 from index.models import *
 
+global status_manager
+
+class StatusManager():
+	def __init__(self):
+		self.user_list = []
+
+	def add_user(self, socket):
+		self.user_list.append(socket)
+		i = 0
+		for current in self.user_list:
+			if current.user == socket.user:
+				i += 1
+		if i == 1:
+			for current in self.user_list:
+				if socket.user in current.user.following.all():
+					current.send(json.dumps({
+						'user': socket.user.id,
+						'status': 'online'
+					}))
+			user.is_online = True
+			user.save()
+	
+	def remove_user(self, socket):
+		self.user_list.remove(socket)
+		i = 0
+		for current in self.user_list:
+			if current.user == socket.user:
+				i += 1
+		if i == 0:
+			for current in self.user_list:
+				if socket.user in current.user.following.all():
+					current.send(json.dumps({
+						'user': socket.user.id,
+						'status': 'offline'
+					}))
+			user.is_online = False
+			user.save()
+
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
@@ -23,15 +61,12 @@ class websocket_client(WebsocketConsumer):
 		else:
 			return
 		self.user = token.user
-
-		self.user.is_online = True
-		self.user.save()
-
-
+		status_manager.add_user(self)
 
 	def receive(self, text_data=None, bytes_data=None):
 		pass
 
 	def disconnect(self, code):
-		self.user.is_online = False
-		self.user.save()
+		status_manager.remove_user(self)
+
+status_manager = StatusManager()

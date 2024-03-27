@@ -344,8 +344,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		left : 0,
 		right : 0
 	}
-
-	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/sky6.jpg" );
+	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/background_sky_box.jpg" );
 	const skyboxGeo		 = new THREE.SphereGeometry( 450 );
 	const materialSky = new THREE.MeshPhysicalMaterial({
 		wireframe:false, 

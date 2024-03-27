@@ -84,8 +84,14 @@ class Tinder: # Matchmaking
 					id, type = action[1:]
 					for client in self.player_list[type]["list"]:
 						if client[0] == id:
-							self.player_list[type]["list"].remove(client)
-							break
+							if self.player_list[type]["list"].count(client) > 0:
+								user = User.objects.get(id=id)
+								user.is_ingame = False
+								user.save()
+
+								self.player_list[type]["list"].remove(client)
+								break
+
 				elif action[0] == "end_game":
 					for game in self.games:
 						if game.id == action[1]:
@@ -99,9 +105,6 @@ class Tinder: # Matchmaking
 	def	quit_game(self, id, type):
 		logging.info(f"quit game called : {id} {type}")
 		self.queue.put(["quit", id, type])
-		user = User.objects.get(id=id)
-		user.is_ingame = False
-		user.save()
 
 
 class Ball:
@@ -123,20 +126,25 @@ class Player:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
+
 
 	def set_game(self, game, index):
 		self.game = game
 		self.index = index
 
+
 	def push_to_game(self, action):
 		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
+
 
 	def send(self, data):
 		try:
 			self.socket.send(json.dumps(data))
 		except:
 			logging.info(f"error send: {self.id}")
+
 
 	def __str__(self) -> str:
 		return f"player {self.id} index in game {self.index}"
@@ -149,13 +157,17 @@ class LocalPlayer:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
+
 
 	def set_game(self, game, index):
 		self.game = game
 		self.index = index
 
+
 	def push_to_game(self, action):
 		self.game.queue.put([self.index, action])
+
 
 	def send(self, data):
 		pass
@@ -171,6 +183,7 @@ class AIPlayer:
 		self.score = 0
 		self.pad_x = 0
 		self.pad_z = 0
+		self.ready = False
 
 
 	def __del__(self):
@@ -207,7 +220,6 @@ class AIPlayer:
 
 	def run(self):
 		data = None
-		last_update = time.time()
 		while self.running:
 			while not self.queue.empty():
 				action = self.queue.get()
@@ -219,10 +231,6 @@ class AIPlayer:
 
 			if not data:
 				continue
-
-			if time.time() - last_update < 1: # seconde between each update
-				continue
-			last_update = time.time()
 
 			i = 1
 			ball = data["ball"]
@@ -262,6 +270,7 @@ class AIPlayer:
 					for i in range(int(-pad_x)):
 						self.push_to_game("left_arrow_key")
 						time.sleep(0.05)
+			time.sleep(1)
 
 
 class Game:
@@ -276,6 +285,8 @@ class Game:
 		self.type = game_type
 		self.queue = queue.Queue()
 		self.thread = None
+		self.players_ready = 0
+		self.active_players = len(players)
 		if self.type == "ai":
 			self.ai_player = AIPlayer()
 			self.players.append(self.ai_player)
@@ -305,7 +316,6 @@ class Game:
 				logging.info(f"close socket for player {player.id}")
 				player.socket.close()
 			except:
-				# logging.error("error close socket")
 				continue
 
 		logging.info(f"game {self.id} ended")
@@ -332,6 +342,11 @@ class Game:
 			player.send({"type": type, "data": data})
 
 	
+	def send_text(self, text, size=10):
+		for player in self.players:
+			player.send({"type": "text", "data": {"text": text, "size": size}})
+
+	
 	def send(self, player, type, data):
 		self.players[player].send({"type": type, "data": data})
 
@@ -340,16 +355,46 @@ class Game:
 		players = []
 		for player in self.players:
 			players.append({"id": self.players.index(player), "x": round(player.pad_x, 2), "z": round(player.pad_z, 2), "score": player.score})
-		response = {
+		return {
 			"players": players,
 			"ball": {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)},
 			"moveSpeed": round(self.ball.speed, 2)
 		}
-		return response
 
+	
+	def send_start_message(self):
+		self.send_text("Players ready!", 5)
+		time.sleep(2)
+		for i in range(3, 0, -1):
+			self.send_text(str(i))
+			time.sleep(1)
+		self.send_text("GO!", 8)
+		time.sleep(0.5)
+		self.send_text("")
 
+ 
 	def start(self):
 		logging.info("game type : " + self.type)
+
+		logging.info("active players in game : " + str(self.active_players))
+		start = time.time()
+		# wait for all players to be ready or 30 seconds
+		while self.players_ready != self.active_players and time.time() - start < 30:
+			for player in self.players:
+				if not isinstance(player, Player):
+					continue
+				if player.socket.ready:
+					self.players_ready = self.active_players
+
+		# kick all players if not all players are ready in 30 seconds
+		if self.players_ready != self.active_players:
+			logging.info("not all players ready")
+			self.end_game()
+			return
+
+		self.send_start_message()
+
+		logging.info("all players ready")
 		match self.type:
 			case "2p":
 				self.thread = threading.Thread(target=self.game_master_2p, args=())
@@ -367,46 +412,59 @@ class Game:
 
 	def game_master_2p(self):
 		logging.info("game master 2p")
-		self.send_all("initGame", "")
-		self.send_all("gameState", self.to_json())
+		self.send_all("initGame", self.to_json())
+		# TODO:
+		# ajouter la possibilité d'ajouter une transition ou non lors de l'envoie d'un set cam
+		# notemment pour le changement au debut de partie qui est un peu brusque
+		# self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60", "transition": True})
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
+		t = 0
+		l = time.time()
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
-						self.players[player_idx].pad_x += 0.8
-						if self.players[player_idx].pad_x  > 16.0 :
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
 								self.players[player_idx].pad_x = 16
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 1:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 1:
-						self.players[player_idx].pad_x += 0.8
-						if self.players[player_idx].pad_x  > 16.0 :
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
 					self.end_game()
 					return
+				
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"game {self.id} => {l} tps: {t}")
+				t = 0
+				l = time.time()
 
-			time.sleep(0.05)
+			time.sleep(0.04)
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_two_player()
 			self.pad_collision_x(0)
 			self.pad_collision_x(1)
-			self.send_all("gameState", self.to_json())
+			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			for player in self.players:
-				if player.score  > 9 :
+				if player.score  > 4 :
 					self.end_game()
 					return
 
@@ -424,36 +482,36 @@ class Game:
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 0:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 27 :
 								self.players[player_idx].pad_x = 27
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 1:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
 								self.players[player_idx].pad_x = -27
 					if  player_idx == 2:
-						self.players[player_idx].pad_z += 0.8
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z  > 27 :
 								self.players[player_idx].pad_z = 27
 					if  player_idx == 3:
-						self.players[player_idx].pad_z -= 0.8
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 0:
-						self.players[player_idx].pad_x -= 0.8
+						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
 								self.players[player_idx].pad_x = -27
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 1:
-						self.players[player_idx].pad_x += 0.8
+						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 27 :
 							self.players[player_idx].pad_x = 27
 					if  player_idx == 2:
-						self.players[player_idx].pad_z -= 0.8
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
 					if  player_idx == 3:
-						self.players[player_idx].pad_z += 0.8
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z  > 27 :
 							self.players[player_idx].pad_z = 27
 				elif action == "disconnect":
@@ -479,47 +537,58 @@ class Game:
 
 	def game_master_local(self):
 		logging.info("game master local")
-		self.send(0, "initGame", "")
-		self.send(0, "gameState", self.to_json())
+		self.send_all("initGame", self.to_json())
 		self.send(0, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
+		t = 0
+		l = time.time()
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
 				if action == "d_key":
 					if self.players[0].pad_x  < 16.5:
-						self.players[0].pad_x += 0.8
-						if self.players[0].pad_x  > 16.0 :
+						self.players[0].pad_x += 1
+						if self.players[0].pad_x  > 16.0:
 								self.players[0].pad_x = 16
+					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
 				elif action == "a_key":
 					if self.players[0].pad_x  > -16.5:
-						self.players[0].pad_x -= 0.8
+						self.players[0].pad_x -= 1
 						if self.players[0].pad_x  < -16.0:
 								self.players[0].pad_x = -16
+					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
 				if action == "right_arrow_key":
 					if self.players[1].pad_x  > -16.5:
-						self.players[1].pad_x -= 0.8
+						self.players[1].pad_x -= 1
 						if self.players[1].pad_x  < -16.0:
 								self.players[1].pad_x = -16
+					self.send_all("updatePlayer", {"n": 1, "x": round(self.players[1].pad_x, 2)})
 				elif action == "left_arrow_key":
 					if self.players[1].pad_x  < 16.5:
-						self.players[1].pad_x += 0.8
-						if self.players[1].pad_x  > 16.0 :
+						self.players[1].pad_x += 1
+						if self.players[1].pad_x  > 16.0:
 							self.players[1].pad_x = 16
+					self.send_all("updatePlayer", {"n": 1, "x": round(self.players[1].pad_x, 2)})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
 					self.end_game()
 					return
+				
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"game {self.id} => {l} tps: {t}")
+				t = 0
+				l = time.time()
 
-			time.sleep(0.05)
+			time.sleep(0.04)
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_two_player()
 			self.pad_collision_x(0)
 			self.pad_collision_x(1)
-			self.send(0, "gameState", self.to_json())
+			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			for player in self.players:
-				if player.score  > 9 :
+				if player.score  > 4 :
 					self.end_game()
 					return
 
@@ -527,49 +596,55 @@ class Game:
 	def game_master_ai(self):
 		logging.info("game master ai")
 		self.ai_player.start()
-		self.send_all("initGame", "")
-		self.send_all("gameState", self.to_json())
-		# TODO:
-		# set la position de la camera proprement 
-		# eviter les index fixes pour les joueurs
+		self.send_all("initGame", self.to_json())
 		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
-		# self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
+		t = 0
+		l = time.time()
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
-					if self.players[0].pad_x  < 16.5 and player_idx == 0:
-						self.players[0].pad_x += 0.8
-						if self.players[0].pad_x  > 16.0 :
-								self.players[0].pad_x = 16
-					if self.players[1].pad_x  > -16.5 and player_idx == 1:
-						self.players[1].pad_x -= 0.8
-						if self.players[1].pad_x  < -16.0:
-								self.players[1].pad_x = -16
+					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0 :
+							self.players[player_idx].pad_x = 16
+					if self.players[player_idx].pad_x  > -16.5 and player_idx == 1:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+							self.players[player_idx].pad_x = -16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
-					if self.players[0].pad_x  > -16.5 and player_idx == 0:
-						self.players[0].pad_x -= 0.8
-						if self.players[0].pad_x  < -16.0:
-								self.players[0].pad_x = -16
-					if self.players[1].pad_x  < 16.5 and player_idx == 1:
-						self.players[1].pad_x += 0.8
-						if self.players[1].pad_x  > 16.0:
-							self.players[1].pad_x = 16
+					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+							self.players[player_idx].pad_x = -16
+					if self.players[player_idx].pad_x  < 16.5 and player_idx == 1:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+							self.players[player_idx].pad_x = 16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.ai_player.stop()
 					self.end_game()
 					return
 
-			time.sleep(0.05)
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"game {self.id} => {l} tps: {t}")
+				t = 0
+				l = time.time()
+
+			time.sleep(0.04)
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_two_player()
 			self.pad_collision_x(0)
 			self.pad_collision_x(1)
-			self.send_all("gameState", self.to_json())
+			self.send(0, "updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
+			self.send(1, "gameState", self.to_json())
 			for player in self.players:
-				if player.score > 9:
+				if player.score > 4:
 					self.ai_player.stop()
 					self.end_game()
 					return
@@ -582,6 +657,7 @@ class Game:
 			self.ball.direction_x *= -1
 		if self.ball.z < -29:
 			self.players[0].score += 1
+			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
@@ -591,6 +667,7 @@ class Game:
 
 		elif self.ball.z > 29:
 			self.players[1].score +=1
+			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
@@ -664,48 +741,30 @@ class Game:
 			self.ball.speed = 5
 
 
-	def pad_collision_x(self, player_idx):
-		if ((self.ball.z < -27 and player_idx == 1) or (self.ball.z > 27 and player_idx == 0)) and (self.ball.x < (self.players[player_idx].pad_x + 4.5)  and self.ball.x > (self.players[player_idx].pad_x - 4.5)):
-			if (player_idx == 1) :
-				self.ball.direction_x = (self.ball.x - self.players[player_idx].pad_x)/4.5
+	def pad_collision_x(self, player_id):
+		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
+			if (player_id == 1) :
+				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = 1
 			else :
-				self.ball.direction_x = (self.ball.x - self.players[player_idx].pad_x)/4.5
+				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = -1
 			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
 
-	def pad_collision_z(self, player_idx):
-		if ((self.ball.x < -27 and player_idx == 3) or (self.ball.x > 27 and playerID == 2)) and (self.ball.z < (self.players[playerID].pad_z + 4.5)  and self.ball.z > (self.players[playerID].pad_z - 4.5)):
-			if (playerID == 3 and self.players[3].score >= 1) :
-				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+	def pad_collision_z(self, player_id):
+		if ((self.ball.x < -27 and player_id == 3) or (self.ball.x > 27 and player_id == 2)) and (self.ball.z < (self.players[player_id].pad_z + 4.5)  and self.ball.z > (self.players[player_id].pad_z - 4.5)):
+			if (player_id == 3 and self.players[3].score >= 1) :
+				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = 1
-			elif playerID == 2 and self.players[2].score >= 1 :
-				self.ball.direction_z = (self.ball.z - self.players[playerID].pad_z)/4.5
+			elif player_id == 2 and self.players[2].score >= 1 :
+				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
 			self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
-
-
-def create_game(num):
-	logging.info(f"waiting list {len(waiting_list)}")
-	if len(waiting_list) == num:
-		players = []
-		for player in waiting_list:
-			players.append(player)
-			logging.info(f"player added to game")
-		for player in players:
-			waiting_list.remove(player)
-			logging.info(f"player remove from waiting list")
-		game = Game(players)
-		game_list.append(game)
-		threading.Thread(target=game_master, args=(game,)).start()
-		logging.info(f"game created" + game.id)
-	else:
-		logging.info("pas assez de joueurs :" + len(waiting_list))
 
 
 class WebsocketClient(WebsocketConsumer):
@@ -715,6 +774,8 @@ class WebsocketClient(WebsocketConsumer):
 		self.user = None
 		self.type = None
 		self.player = None
+		self.ready = False
+		self.oldmove = time.time()
 
 	def connect(self):
 		logging.info("new player connected in new version <=============================")
@@ -772,7 +833,15 @@ class WebsocketClient(WebsocketConsumer):
 
 		try:
 			if receive_package['type'] == "keyCode":
-				self.player.push_to_game(receive_package['move'])
+				if (time.time() - self.oldmove) > 0.005 and self.type != "local":
+					self.oldmove = time.time()
+					self.player.push_to_game(receive_package['move'])
+				elif (time.time() - self.oldmove) > 0.001 and self.type == "local":
+					self.oldmove = time.time()
+					self.player.push_to_game(receive_package['move'])
+				return
+			elif receive_package['type'] == "ready":
+				self.ready = True
 				return
 		except:
 			pass
