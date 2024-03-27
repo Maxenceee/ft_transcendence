@@ -46,7 +46,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	manager.add(socket, "onconnection");
 	manager.add(loaderManager, "onLoad");
 	manager.onload = () => {
-		// console.info("game ready");
+		console.info("game ready");
 		socket.send({type : "ready"});
 		onload();
 	};
@@ -229,6 +229,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
+		console.log("input key:", event.type, "key:", event.which);
 		let d = (event.type === "keydown");
 		switch (event.which) {
 			case 68:
@@ -331,6 +332,7 @@ class GameView extends Component {
 		}
 		this.setState({loading: true, game_render: null});
 		window.onbeforeunload = (e) => {
+			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
@@ -360,6 +362,7 @@ class GameView extends Component {
 	}
 
 	render() {
+		// console.log("======================== GameView render ========================", this.state);
 		return (
 			this.state.loading ?
 			createElement(Loader)
