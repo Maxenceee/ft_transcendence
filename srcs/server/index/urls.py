@@ -1,6 +1,6 @@
 from django.urls import path
 
-from index.views.index import (index)
+from index.views.index import (index, not_found)
 from index.views.login import (login, signup, logout, callback_intra, callback_swivel)
 from index.views.api import (api_get_user, api_search_user, api_avatar, api_update_user, api_update_picture, api_follow, api_unfollow)
 
@@ -21,4 +21,6 @@ urlpatterns = [
 	path('api/user/update/picture', api_update_picture, name='update_picture'),
 	path('api/follow/<str:id>', api_follow, name='follow'),
 	path('api/unfollow/<str:id>', api_unfollow, name='unfollow'),
+
+	path('<path:url>', not_found, name='redirect'),
 ]
