@@ -71,7 +71,6 @@ WORKDIR /app/client
 RUN npm run pack
 
 # Revenez au répertoire principal de l'application
-
 WORKDIR /app/server
 
 # Exposez le port 3000

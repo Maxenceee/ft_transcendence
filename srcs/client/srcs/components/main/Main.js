@@ -44,7 +44,7 @@ class Main extends Component {
 		 * TODO: remove setTimeout
 		 */
 		this.loadUser();
-		// this.setState({ loading: false, user: {nickename: ""}});
+		// this.setState({ loading: false, user: {}});
 	}
 
 	componentDidUpdate() {
