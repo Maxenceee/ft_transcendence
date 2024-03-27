@@ -1,4 +1,4 @@
-import { pushState } from '../routers/routing.js';
+import { pushState } from '..';
 
 /**
  * 

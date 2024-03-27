@@ -4,11 +4,6 @@ class UserPagePlayerHistory extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user };
-		// console.log(this.state);
-	}
-	
-	componentDidUpdate() {
-		// console.log("this.componentDidUpdate");
 	}
 
 	render() {

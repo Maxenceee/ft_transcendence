@@ -17,7 +17,6 @@ let R = {
 let pushState = function(r) {
 	if (r) {
 		S.location.pathname = r;
-		// console.log("============ pushState", r, S);
 		window.history.pushState({}, '', r);
 		window.dispatchEvent(new Event('popstate'));
 	}
@@ -37,14 +36,14 @@ function useRoute(e, t) {
 	  o = l.replace(/(.)\/+$/, "$1"),
 	  s = a.slice(1);
     return {
-        params: i.reduce((u,h,f)=>{
+        params: i.reduce((u, h, f)=>{
             let {paramName: y, isOptional: v} = h;
             if (y === "*") {
                 let x = s[f] || "";
                 o = l.slice(0, l.length - x.length).replace(/(.)\/+$/, "$1")
             }
             const N = s[f];
-            return v && !N ? u[y] = void 0 : u[y] = nh(N || "", y),
+            return v && !N ? u[y] = undefined : u[y] = nh(N || "", y),
             u
         }, {}),
         pathname: l,
@@ -69,8 +68,8 @@ function Xs(e, t) {
     }
 }
 function eh(e, t, r) {
-    t === void 0 && (t = !1),
-    r === void 0 && (r = !0),
+    t === undefined && (t = !1),
+    r === undefined && (r = !0),
     Xs(e === "*" || !e.endsWith("*") || e.endsWith("/*"), 'Route path "' + e + '" will be treated as if it were ' + ('"' + e.replace(/\*$/, "/*") + '" because the `*` character must ') + "always follow a `/` in the pattern. To get rid of this warning, " + ('please change the route path to "' + e.replace(/\*$/, "/*") + '".'));
     let i = [],
 		a = "^" + e.replace(/\/*\*?$/, "").replace(/^\/*/, "/").replace(/[\\.*+^${}|()[\]]/g, "\\$&").replace(/\/:(\w+)(\?)?/g, (o, s, d)=>(i.push({
@@ -82,7 +81,7 @@ function eh(e, t, r) {
         paramName: "*"
     }),
     a += e === "*" || e === "/*" ? "(.*)$" : "(?:\\/(.+)|\\/*)$") : r ? a += "\\/*$" : e !== "" && e !== "/" && (a += "(?:(?=\\/|$))"),
-    [new RegExp(a, t ? void 0 : "i"), i]
+    [new RegExp(a, t ? undefined : "i"), i]
 }
 
 let useParams = function(e) {

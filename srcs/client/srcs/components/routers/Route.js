@@ -3,8 +3,8 @@ import { Component, createElement, useRoute } from '..';
 class Route extends Component {
 	constructor(props) {
 		super(props);
-		if (props.path === void 0 || !props.path.length) throw new Error('Route must have a `path` property');
-		if (props.element === void 0) throw new Error('Route must have an `element` property');
+		if (props.path === undefined || !props.path.length) throw new Error('Route must have a `path` property');
+		if (props.element === undefined) throw new Error('Route must have an `element` property');
 		if (typeof props.element === "object" && Array.isArray(props.element))
 			throw new Error('Route component cannot be an array');
 
@@ -12,18 +12,8 @@ class Route extends Component {
 		this.active = false;
 	}
 
-	// get element() {
-	// 	return this._data && this._data._element || this._element;
-	// }
-
-	// set element(e) {
-	// 	this._data && (this._element = e);
-	// }
-
 	canRoute(route) {
-		const regex = useRoute(this.path, route);
-		// console.log("regex result on route", this, regex);
-		return regex;
+		return useRoute(this.path, route);
 	}
 
 	propagateUnmount() {
@@ -36,7 +26,6 @@ class Route extends Component {
 		const { element } = this.props;
 
 		this._data = element;
-		// console.log("in render route", this, this._element);
 		return this._data;
 	}
 }

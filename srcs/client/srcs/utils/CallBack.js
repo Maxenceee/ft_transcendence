@@ -12,7 +12,7 @@ CallBack.prototype.emit = function(t) {
 		return ;
 	var i = this.listeners[t];
 	i && i.length && i.forEach(function(t) {
-		return (t.apply(void 0, n));
+		return (t.apply(undefined, n));
 	})
 }
 var mergeProto = function(a, b) {

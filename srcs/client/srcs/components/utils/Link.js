@@ -1,5 +1,4 @@
-import { createElement } from '..';
-import { pushState } from '../routers/routing.js';
+import { createElement, pushState } from '..';
 
 /**
  * 
@@ -11,7 +10,7 @@ import { pushState } from '../routers/routing.js';
 function link(props) {
    const { to } = props;
 
-   if (to === void 0) throw new Error('Link must have a destination (missing `to` property)');
+   if (to === undefined) throw new Error('Link must have a destination (missing `to` property)');
 
    const handleClick = (event) => {
 	   if (event.metaKey || event.ctrlKey) {

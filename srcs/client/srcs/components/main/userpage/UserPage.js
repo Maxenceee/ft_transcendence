@@ -7,15 +7,15 @@ class UserPage extends Component {
 	}
 
 	componentDidMount() {
-		console.log("this.componentDidMount UserPage Page");
+		// console.log("this.componentDidMount UserPage Page");
 	}
 
 	componentDidUpdate() {
-		console.log("this.componentDidUpdate UserPage Page");
+		// console.log("this.componentDidUpdate UserPage Page");
 	}
 
 	componentWillUnmount() {
-		console.log("this.componentWillUnmount UserPage Page");
+		// console.log("this.componentWillUnmount UserPage Page");
 	}
 
 	render() {

@@ -7,28 +7,17 @@ class HomePage extends Component {
 	}
 
 	componentDidMount() {
-		console.log("this.componentDidMount HomePage Page");
+		// console.log("this.componentDidMount HomePage Page");
 	}
 
 	componentWillUnmount() {
-		console.log("this.componentWillUnmount HomePage Page");
+		// console.log("this.componentWillUnmount HomePage Page");
 	}
 
 	render() {
 		return createElement('div', {
 			children: createElement('div', {
 				class: "data", children: [
-					// createElement('div', {
-					// 	class: "featured-bar", children: createElement('div', {
-					// 		class: "featured-bar-margin", children: createElement('div', {
-					// 			class: "featured-bar-content", children: createElement('div', {
-					// 				class: "featured-bar-primary-row", children: createElement('div', {
-					// 					class: "feature-title"
-					// 				})
-					// 			})
-					// 		})
-					// 	})
-					// }),
 					createElement('section', {
 						children: createElement('div', {
 							class: "oa-container", children: createElement('div', {

@@ -2,7 +2,7 @@ import { Component, createElement, HomePage, UserPage, NotFound, FriendsPanel, r
 
 class MainRouter extends Component {
 	componentDidMount() {
-		console.log("componentDidMount MainRouter", this);
+		// console.log("componentDidMount MainRouter", this);
 	}
 
 	render() {

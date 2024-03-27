@@ -39,21 +39,19 @@ class Main extends Component {
 	}
 
 	componentDidMount() {
-		console.log("==================== Main mounted ====================");
+		// console.log("==================== Main mounted ====================");
 		/**
 		 * TODO: remove setTimeout
 		 */
-		setTimeout(() => {
-			this.loadUser();
-		}, 1000);
+		this.loadUser();
 	}
 
 	componentDidUpdate() {
-		console.log("==================== Main updated ====================");
+		// console.log("==================== Main updated ====================");
 	}
 
 	componentWillUnmount() {
-		console.log("==================== Main unmounted ====================");
+		// console.log("==================== Main unmounted ====================");
 		// this.state.socket.close();
 	}
 

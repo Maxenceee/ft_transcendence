@@ -16,27 +16,17 @@ class Component {
 
 	setState(newState, callback) {
 		this._pendingState = Object.assign({}, this.state, newState);
-		// console.log("this._pendingState", this._pendingState);
 		if (callback) {
 			this._pendingStateCallbacks.push(callback);
 		}
 		this._updateComponent();
 	}
 
-	// setParent(parent) {
-	// 	this._parent = parent;
-	// }
-
 	_renderComponent() {
 		let render = this.render();
 		if (render == undefined) throw new Error('Render method must return a value');
-		// if (render instanceof Component) {
-		// 	this._moised = render;
-		// }
-		// console.log("render component", this);
 		this._mounted = true;
 		this._data = render;
-		// this._data._owner = this;
 		this._element = typeof render == "object" ? render._renderComponent() : document.createTextNode(render);
 		this.componentDidMount();
 		return this._element;
@@ -49,8 +39,6 @@ class Component {
 		this.state = this._pendingState;
 		this._pendingState = null;
 
-		// console.log("this.state, this._pendingState", this.state, this._pendingState, this);
-
 		const oldElement = this._data || null;
 		const oldElementData = oldElement && oldElement.element || null;
 		if (oldElement) {
@@ -59,8 +47,7 @@ class Component {
 		let newElement = this.render();
 		this._data = newElement;
 		this._element = newElement._renderComponent()
-		// console.log("new element before", newElement, this);
-		console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
+		// console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
 		if ((node = (this._parent || (oldElementData && oldElementData.parentNode)))) {
 			if (newElement && oldElementData) {
 				node.replaceChild(newElement.element, oldElementData);
@@ -83,7 +70,7 @@ class Component {
 	_unmountComponent() {
 		if (!this._mounted) return;
 		this._mounted = false;
-		console.log("component will unmount", this);
+		// console.log("component will unmount", this);
 		this.componentWillUnmount();
 		this._data && typeof this._data._unmountComponent === "function" && this._data._unmountComponent();
 		this._data = null;

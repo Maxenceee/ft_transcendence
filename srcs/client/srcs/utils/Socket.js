@@ -60,10 +60,6 @@ dj = function(a, b) {
 		(a && b[i]) && a.appendChild(b[i]);
 }
 
-/**
- * TODO:
- * Improve the code
- */
 var Socket = function({port = 3000, host = window.location.hostname, path = "/"}) {
 	if (!(this instanceof Socket)) {
 		throw new Error("Socket must be instanciated with new keyword");

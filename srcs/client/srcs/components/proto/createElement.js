@@ -37,13 +37,8 @@ function createElement(type, props = {}) {
 				throw new Error('Route component must be instanciated with new keyword');
 
 			if (c instanceof HTMLElement) {
-				// console.log("c instanceof HTMLElement", c instanceof HTMLElement, c, element);
 				return element.appendChild(c), c;
 			}
-			// console.log("=== c ===", c);
-			// if (c instanceof Component) {
-			// 	c = c._renderComponent();
-			// }
 			if (typeof c === 'string') {
 				element.appendChild(document.createTextNode(c));
 			} else {

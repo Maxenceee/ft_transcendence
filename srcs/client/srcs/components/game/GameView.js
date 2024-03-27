@@ -46,7 +46,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	manager.add(socket, "onconnection");
 	manager.add(loaderManager, "onLoad");
 	manager.onload = () => {
-		console.info("game ready");
+		// console.info("game ready");
 		socket.send({type : "ready"});
 		onload();
 	};
@@ -323,7 +323,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 class GameView extends Component {
 
 	componentDidMount() {
-		console.log("componentDidMount GameView", this);
+		// console.log("componentDidMount GameView", this);
 		let a = useParams("/game/:type") ?? {params: {type: null}},
 			{type} = a.params;
 		if (!type) {
@@ -331,7 +331,6 @@ class GameView extends Component {
 		}
 		this.setState({loading: true, game_render: null});
 		window.onbeforeunload = (e) => {
-			// display a message to the user
 			e.preventDefault();
 			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
 		}
@@ -341,7 +340,7 @@ class GameView extends Component {
 	}
 
 	componentDidUpdate() {
-		console.log("componentDidUpdate GameView", this.state.game_render);
+		// console.log("componentDidUpdate GameView", this.state.game_render);
 		if (this.state.game_render) {
 			this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
 			this.state.game_render.start(this.state);
@@ -351,17 +350,16 @@ class GameView extends Component {
 	componentWillUnmount() {
 		this.state.game_render.unmount();
 		window.onbeforeunload = null;
-		console.log("game view unmounted", this.state.game_render);
+		// console.log("game view unmounted", this.state.game_render);
 	}
 
 	endGame() {
 		navigate("/");
 		this.props.reload();
-		console.log("game view unmounted", this.state.game_render);
+		// console.log("game view unmounted", this.state.game_render);
 	}
 
 	render() {
-		console.log("======================== GameView render ========================", this.state);
 		return (
 			this.state.loading ?
 			createElement(Loader)

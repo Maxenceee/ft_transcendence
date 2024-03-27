@@ -1,12 +1,12 @@
-const {toString: Yh} = Object.prototype,
-	{getPrototypeOf: n1} = Object,
+const { toString: Yh } = Object.prototype,
+	{ getPrototypeOf: n1}  = Object,
 	sl = e => t => typeof t === e,
-	ku = (()=>typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : global)(),
+	ku = (() => typeof globalThis < "u" ? globalThis : typeof self < "u" ? self : typeof window < "u" ? window : global)(),
 	pt = sl("function"),
 	vi = sl("undefined"),
 	isString = sl("string"),
 	Mu = e => !vi(e) && e !== ku,
-	ol = (e=>t=>{
+	ol = (e => t => {
 		const r = Yh.call(t);
 		return e[r] || (e[r] = r.slice(8, -1).toLowerCase())
 	})(Object.create(null)),
@@ -25,7 +25,7 @@ function Su(e, t) {
 		if (a = r[i],
 		t === a.toLowerCase())
 			return a;
-	return null
+	return (null);
 }
 
 const isUndefined = vi,
@@ -49,7 +49,7 @@ extend = (e,t,r,{allOwnKeys: i}={})=>(forEach(t, (a,l)=>{
 	r && pt(a) ? e[l] = wrap(a, r) : e[l] = a
 }, {
 	allOwnKeys: i
-}), e), s5 = e=>(e.charCodeAt(0) === 65279 && (e = e.slice(1)), e),
+}), e),
 isPlainObject = e => {
     if (ol(e) !== "object")
         return !1;
@@ -90,26 +90,26 @@ function wr(e, t) {
 	function a(u, h, f) {
 		if (isUndefined(h)) {
 			if (!isUndefined(u))
-				return i(void 0, u, f)
+				return i(undefined, u, f)
 		} else
 			return i(u, h, f)
 	}
 	function l(u, h) {
 		if (!isUndefined(h))
-			return i(void 0, h)
+			return i(undefined, h)
 	}
 	function o(u, h) {
 		if (isUndefined(h)) {
 			if (!isUndefined(u))
-				return i(void 0, u)
+				return i(undefined, u)
 		} else
-			return i(void 0, h)
+			return i(undefined, h)
 	}
 	function s(u, h, f) {
 		if (f in t)
 			return i(u, h);
 		if (f in e)
-			return i(void 0, u)
+			return i(undefined, u)
 	}
 	const d = {
 		url: l,
@@ -310,4 +310,4 @@ const xhrsum = Bu({
 xhrsum.default = xhrsum;
 const xhr = xhrsum;
 
-export default xhr ;
+export default xhr;
