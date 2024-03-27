@@ -89,9 +89,7 @@ class Game:
 		
 
 		if playerOrg.gameNumber == 0 or playerOrg.gameNumber == 1:
-			target.score = -999
 			target.gameNumber = -1
-			target.playerNumber = -1
 
 			playerOrg.gameNumber = 4
 			playerOrg.score = 0
@@ -101,9 +99,7 @@ class Game:
 			self.ball[4].speed = 1.05
 		
 		elif playerOrg.gameNumber == 2 or playerOrg.gameNumber == 3:
-			target.score = -999
 			target.gameNumber = -1
-			target.playerNumber = -1
 
 			playerOrg.gameNumber = 5
 			playerOrg.score = 0
@@ -114,9 +110,8 @@ class Game:
 
 		
 		elif playerOrg.gameNumber == 4 or playerOrg.gameNumber == 5 :
-			target.score = -999
 			target.gameNumber = -1
-			target.playerNumber = -1
+
 			playerOrg.gameNumber = 6
 			playerOrg.pad_x = 0
 			playerOrg.score = 0
@@ -249,24 +244,35 @@ def game_master(game):
 	while True:
 		while not game.queue.empty():
 			playerID, action = game.queue.get()
-			if action == "right":
-				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 0:
-					game.players[playerID].pad_x += 0.8
-					if game.players[playerID].pad_x  > 16.0 :
-							game.players[playerID].pad_x = 16
-				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 1:
-					game.players[playerID].pad_x -= 0.8
-					if game.players[playerID].pad_x  < -16.0:
-							game.players[playerID].pad_x = -16
-			elif action == "left":
-				if game.players[playerID].pad_x  > -16.5 and playerID%2 == 0:
-					game.players[playerID].pad_x -= 0.8
-					if game.players[playerID].pad_x  < -16.0:
-							game.players[playerID].pad_x = -16
-				if game.players[playerID].pad_x  < 16.5 and playerID%2 == 1:
-					game.players[playerID].pad_x += 0.8
-					if game.players[playerID].pad_x  > 16.0 :
-						game.players[playerID].pad_x = 16
+			gameplayer = []
+			for current in game.players:
+				if current.gameNumber == game.players[playerID].gameNumber and current.playerNumber != -1:
+					gameplayer.append(current)
+			if len(gameplayer) == 2:
+				if action == "right":
+					if gameplayer[0].playerNumber == playerID:
+						if gameplayer[0].pad_x  < 16.5:
+							gameplayer[0].pad_x += 0.8
+							if gameplayer[0].pad_x  > 16.0 :
+								gameplayer[0].pad_x = 16
+					else:
+						if gameplayer[1].pad_x  > -16.5:
+							gameplayer[1].pad_x -= 0.8
+							if gameplayer[1].pad_x  < -16.0:
+								gameplayer[1].pad_x = -16
+				
+				elif action == "left":
+					if gameplayer[0].playerNumber == playerID:
+						if gameplayer[0].pad_x  > -16.5:
+							gameplayer[0].pad_x -= 0.8
+							if gameplayer[0].pad_x  < -16.0:
+								gameplayer[0].pad_x = -16
+					else:
+						if gameplayer[1].pad_x  < 16.5:
+							gameplayer[1].pad_x += 0.8
+							if gameplayer[1].pad_x  > 16.0:
+								gameplayer[1].pad_x = 16
+
 		time.sleep(0.05)
 		i = 0
 		while i < 7 :
