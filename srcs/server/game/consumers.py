@@ -381,7 +381,7 @@ class Game:
 		# wait for all players to be ready or 30 seconds
 		while self.players_ready != self.active_players and time.time() - start < 30:
 			for player in self.players:
-				if isinstance(player, AIPlayer) or isinstance(player, LocalPlayer):
+				if not isinstance(player, Player):
 					continue
 				if player.socket.ready:
 					self.players_ready = self.active_players

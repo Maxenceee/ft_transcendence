@@ -44,8 +44,7 @@ class Main extends Component {
 		 * TODO: remove setTimeout
 		 */
 		setTimeout(() => {
-			this.setState({ loading: false, user: {"id": "2kH0JR3NP4","nickname": "bbb","is_online": false,"profile_picture": "https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/2023-09-12-00-31-30.png","following": [],"game_history": [{"id": 2,"date": 1711459155,"type": "2p","data": [{"id": "SGEVodFRCr","score": 5},{"id": "2kH0JR3NP4","score": 0}]}]} });
-			// this.loadUser();
+			this.loadUser();
 		}, 1000);
 	}
 
