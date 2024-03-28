@@ -86,7 +86,7 @@ class FriendsPanel extends Component {
 							class: "friend-name", children: link({to: "/user/"+player.id, children: player.nickname})
 						}),
 						createElement('div', {
-							class: "friend-status"+(player.is_online ?  "on" : " off"), children: player.is_online ? "Online" : "Offline"
+							class: "friend-status"+(player.is_online ?  "on" : " off"), children: player.status
 						})
 					]
 				}),
@@ -122,7 +122,7 @@ class FriendsPanel extends Component {
 					createElement('div', {
 						class: "friend-container", children: [
 							createElement('div', {
-								class: "friend-search", style: (this.state.open ? "width: 280px" : ""), children: [
+								class: "friend-search", style: (this.state.open ? "width: 450px" : ""), children: [
 									this.state.open && createElement('div', {
 										class: "friend-search-header", children: [
 											createElement('div', {
@@ -140,12 +140,17 @@ class FriendsPanel extends Component {
 											})
 											:
 											createElement('div', {
-												class: "friend-search-label", children: "Friends"
+												class: "friend-search-label", children: "Amis"
 											})
 										]
 									}),
+									this.state.open ?
 									!this.state.onsearch && createElement('div', {
 										class: "friend-count", children: ((this.state.following.filter(e => e.is_online).length)+"/"+this.state.following.length)
+									})
+									:
+									createElement('div', {
+										class: "friend-count", children: "Amis"
 									})
 								]
 							}),
