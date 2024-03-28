@@ -15,6 +15,7 @@ urlpatterns = [
 	path('callback/swivel', callback_swivel, name='callback_swivel'),
 
 	path('api/user/<str:id>/get', api_get_user, name='get_user'),
+	path('api/user/<str:id>/following', api_get_user, name='get_user'),
 	path('api/user/<str:id>/search', api_search_user, name='search_user'),
 	path('api/avatar/<str:id>', api_avatar, name='avatar'),
 	path('api/user/update/nickname', api_update_user, name='update_user'),

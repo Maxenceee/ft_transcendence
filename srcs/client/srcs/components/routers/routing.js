@@ -1,7 +1,10 @@
 let S = {
 	location: {
 		pathname: window.location.pathname,
-	}
+	},
+    history: {
+        current: [],
+    }
 }
 
 let R = {
@@ -15,8 +18,9 @@ let R = {
 }
 
 let pushState = function(r) {
-	if (r) {
+	if (r && r !== S.location.pathname) {
 		S.location.pathname = r;
+        S.history.current.push(r);
 		window.history.pushState({}, '', r);
 		window.dispatchEvent(new Event('popstate'));
 	}

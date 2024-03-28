@@ -184,6 +184,9 @@ button span {
 	--progress-filled-color-l: 49.2;
 
 	--href-color: #0969da;
+
+	--friend-bg: #F189C8;
+	--friend-bg-h: #d154a0;
 }
 
 body {
@@ -539,8 +542,14 @@ header {
 	position: sticky;
 	top: 0;
 	z-index: 50;
+}
+
+.header-content {
 	justify-content: flex-end;
 	padding: 20px 30px;
+	display: flex;
+	width: 100%;
+	position: absolute;
 }
 
 .nav-bar {
@@ -616,6 +625,7 @@ main {
 	.data {
 		height: 100vh;
 		overflow-y: scroll;
+		padding-top: 50px;
 	}
 
 	.featured-bar {
@@ -738,6 +748,10 @@ main {
 		// float: left !important;
 		// width: max(25%, 200px);
 		overflow: hidden;
+
+		&:nth-last-child(-n+2):nth-child(3n+2) {
+			grid-column-end: span 2;
+		}
 
 		.fa-list-l {
 			display: flex;
@@ -2014,6 +2028,11 @@ body:has(.connection-page) {
 
 		.card-header {
 			margin-bottom: 30px;
+
+			h2 {
+				line-break: anywhere;
+				font-size: 16;
+			}
 		}
 
 		.card-picture {
@@ -2031,6 +2050,30 @@ body:has(.connection-page) {
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
+			}
+		}
+
+		.card-action {
+			display: flex;
+			align-items: center;
+			margin-top: 30px;
+			// --friend-action-color: var(--friend-bg);
+
+			button {
+				appearance: none;
+				-webkit-appearance: none;
+				outline: none;
+				border: none;
+				background-color: var(--friend-action-color);
+				color: #ffffff;
+				font-size: 16px;
+				border-radius: 20px;
+				padding: 5px 10px;
+				height: max-content;
+				
+				&:hover {
+					background-color: var(--friend-action-color-h);
+				}
 			}
 		}
 	}
@@ -2229,38 +2272,71 @@ body:has(.connection-page) {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 15px;
+		// padding: 10px 13px;
+		padding: 13px 10px;
 		color: #FFF;
 		z-index: 4;
+
+		box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.1);
 
 		& > .icon {
 			width: 100%;
 			height: 100%;
 		}
+
+		.menu {
+			display: block;
+			width: 100%;
+			height: 100%;
+			position: relative;
+			cursor: pointer;
+
+			div {
+				position: absolute;
+				height: 2.5px;
+				border-radius: 2px;
+				background: #fff;
+				transition: transform .45s cubic-bezier(.9, -.6, .3, 1.6), width .2s ease .2s;
+			}
+			input {
+				display: none;
+				pointer-events: none;
+
+				& + div {
+					top: 50%;
+					left: 0;
+					margin: -2px 0 0 0;
+					width: 100%;
+					transform-origin: 50% 50%;
+
+					& + div {
+						top: 2px;
+						left: 0;
+						width: 50%;
+						transform-origin: 0 50%;
+
+						& + div {
+							bottom: 2px;
+							right: 0;
+							width: 50%;
+							transform-origin: 100% 50%;
+							transform: translate(-12px, 0);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	.friend-container {
-		height: 30px;
+		height: 40px;
 		padding-right: 40px;
 		width: max-content;
 		transition: width 0.5s;
-		
-		.friend-search-header {
-			width: 0;
-			transition: width 0.5s;
-		}
-
-		&.open {
-			.friend-search-header {
-				width: 100px;
-			}
-		}
-
+			
 		.friend-search {
-			background-color: #F189C8;
+			background-color: var(--friend-bg);
 			color: #fff;
-			padding-right: 10px;
-			padding-left: 5px;
 			display: flex;
 			align-items: center;
 			width: 100%;
@@ -2268,14 +2344,253 @@ body:has(.connection-page) {
 			height: 100%;
 			border-top-left-radius: 20px;
 			border-bottom-left-radius: 20px;
+
+			box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.1);
 		}
 
 		.friend-count {
 			font-size: 15px;
-			padding: 0 10px;
+			padding: 0 15px;
 			// display: inline-block;
 			// vertical-align: middle;
 			// height: 100%;
+		}
+
+		.friend-search-header {
+			transition: width 0.5s;
+			overflow: hidden;
+			position: relative;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			padding-left: 10px;
+		}
+
+		.friend-search-icon {
+			position: absolute;
+			left: 15px;
+			top: 0px;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			.icon {
+				width: 17px;
+			}
+		}
+
+		.friend-search-label {
+			// text-align: center;
+			flex: 1 auto;
+			padding-left: 10px;
+			margin-left: 15px;
+		}
+	}
+
+	// &.open {
+		// .friend-search-header {
+		// 	width: 100% !important;
+		// 	display: flex !important;
+		// 	align-items: center !important;
+		// 	padding-left: 10px !important;
+		// }
+		// .menu input + div {
+		// 	transform: rotate(-45deg);
+		// 	transition: transform .45s cubic-bezier(.9, -.6, .3, 1.6) .1s;
+
+		// 	& + div {
+		// 		width: 19px;
+		// 		transform: translate(6px, 0) rotate(45deg);
+		// 		transition: transform .45s cubic-bezier(.9, -.6, .3, 1.6) .1s, width .2s ease;
+
+		// 		& + div {
+		// 			width: 19px;
+		// 			transform: translate(-6px, 0) rotate(45deg);
+		// 			transition: transform .45s cubic-bezier(.9, -.6, .3, 1.6) .1s, width .2s ease;
+		// 		}
+		// 	}
+		// }
+		// .menu input + div {
+		// 	animation: rotateTopLine 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s forwards;
+		// }
+		
+		// .menu input + div + div {
+		// 	animation: rotateMiddleLine 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s forwards;
+		// }
+		
+		// .menu input + div + div + div {
+		// 	animation: rotateBottomLine 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s forwards;
+		// }
+	// }
+	@keyframes rotateTopLine {
+		0% {
+			transform: rotate(-45deg);
+		}
+		100% {
+			transform: rotate(0deg);
+		}
+	}
+	
+	@keyframes rotateMiddleLine {
+		0% {
+			width: 19px;
+			transform: translate(6px, 0) rotate(45deg);
+		}
+		100% {
+			width: 100%;
+			transform: translate(0, 0) rotate(45deg);
+		}
+	}
+	
+	@keyframes rotateBottomLine {
+		0% {
+			width: 19px;
+			transform: translate(-6px, 0) rotate(45deg);
+		}
+		100% {
+			width: 100%;
+			transform: translate(0, 0) rotate(45deg);
+		}
+	}
+
+	// .friend-list {
+	// 	height: 0;
+	// 	width: 0;
+	// 	overflow: hidden;
+	// }
+
+	.friend-search-input {
+		background-color: #fff;
+		padding-left: 30px;
+		border-radius: 15px;
+		display: flex;
+		height: 25px;
+		width: 100%;
+
+		input {
+			height: 100%;
+			appearance: none;
+			-webkit-appearance: none;
+			border: none;
+			flex: 1 0 auto;
+			margin: 0;
+			outline: 0;
+			overflow: hidden;
+			// padding: 9px 0 7px 8px;
+			text-overflow: ellipsis;
+		}
+	}
+
+	.friend-list {
+		position: absolute;
+		height: max-content;
+		width: auto;
+		background-color: #f6f7fb;
+		left: 20px;
+		right: 20px;
+		border-bottom-left-radius: 20px;
+		border-bottom-right-radius: 20px;
+		box-shadow:
+			0 2px 7px 0 rgba(0, 0, 0, 0.09),
+			0 15px 10px -12px rgba(0, 0, 0, 0.2) inset;
+		display: flex;
+		flex-direction: column;
+		padding: 5px;
+		max-height: 50vh;
+		overflow-y: scroll;
+
+		.friend-row {
+			width: 100%;
+			height: 80px;
+			display: flex;
+			padding: 10px;
+
+			&.empty {
+				justify-content: center;
+				align-items: center;
+			}
+
+			.friend-avatar {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				overflow: hidden;
+
+				img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+				}
+			}
+
+			.friend-middle-row {
+				flex: 1 auto;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				padding-left: 10px;
+
+				.friend-name {
+					font-size: 22px;
+					text-decoration: none;
+					color: currentColor;
+
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+
+				.friend-status {
+					position: relative;
+					font-size: 15px;
+					margin-left: 14px;
+
+					&::before {
+						content: "";
+						position: absolute;
+						left: -14px;
+						top: 7px;
+						width: 10px;
+						height: 10px;
+						border-radius: 50%;
+					}
+
+					&.on {
+						&::before {
+							background-color: green;
+						}
+					}
+					&.off {
+						&::before {
+							background-color: red;
+						}
+					}
+				}
+			}
+
+			.friend-action {
+				display: flex;
+				align-items: center;
+				// --friend-action-color: var(--friend-bg);
+
+				button {
+					appearance: none;
+					-webkit-appearance: none;
+					outline: none;
+					border: none;
+					background-color: var(--friend-action-color);
+					color: #ffffff;
+					font-size: 16px;
+					border-radius: 20px;
+					padding: 5px 10px;
+					height: max-content;
+					
+					&:hover {
+						background-color: var(--friend-action-color-h);
+					}
+				}
+			}
 		}
 	}
 }

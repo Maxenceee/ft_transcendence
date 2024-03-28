@@ -21,6 +21,24 @@ def api_get_user(request, id):
 	return JsonResponse(response)
 
 @login_required
+def api_get_user_following(request, id):
+	if request.method != 'GET':
+		return JsonResponse({'error': 'Method not allowed'}, status=405)
+	if id == "me":
+		id = request.COOKIES.get('token')
+		user = Token.objects.get(token=id).user
+	else:
+		user = get_object_or_404(User, id=id)
+	following = []
+	for user in self.following.all():
+		following.append(user.resume_to_json())
+	response = {
+		"following": following,
+	}
+
+	return JsonResponse(response)
+
+@login_required
 def api_update_user(request):
 	if request.method != 'POST':
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -88,7 +106,13 @@ def api_follow(request, id):
 	user = Token.objects.get(token=request.COOKIES.get('token')).user
 	user_to_follow = get_object_or_404(User, id=id)
 	user.following.add(user_to_follow)
-	return HttpResponse({'message': 'Succes'}, status=200)
+	following = []
+	for user in user.following.all():
+		following.append(user.resume_to_json())
+	response = {
+		"following": following,
+	}
+	return JsonResponse(response, safe=False)
 
 @login_required
 def api_unfollow(request, id):
@@ -97,4 +121,10 @@ def api_unfollow(request, id):
 	user = Token.objects.get(token=request.COOKIES.get('token')).user
 	user_to_unfollow = get_object_or_404(User, id=id)
 	user.following.remove(user_to_unfollow)
-	return HttpResponse({'message': 'Succes'}, status=200)
+	following = []
+	for user in user.following.all():
+		following.append(user.resume_to_json())
+	response = {
+		"following": following,
+	}
+	return JsonResponse(response, safe=False)
