@@ -1,4 +1,5 @@
 import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, xhr, Loader, BadConnection } from '..';
+import { Socket } from '../../utils';
 
 class Main extends Component {
 	constructor(props) {
@@ -6,19 +7,19 @@ class Main extends Component {
 		this.state = { user: null, loading: true, error: null, socket: null};
 	}
 
-	// connectSocket() {
-	// 	let socket = new Socket({path: "/user"});
-	// 	socket.onconnection(() => {
-	// 		console.info("Connection opened");
-	// 	});
-	// 	socket.onclose(() => {
-	// 		console.info("Connection closed");
-	// 	});
-	// 	socket.onmessage((msg) => {
-	// 		console.log(msg);
-	// 	});
-	// 	this.setState({socket: socket});
-	// }
+	connectSocket() {
+		let socket = new Socket({path: "/user"});
+		socket.onconnection(() => {
+			console.info("Connection opened");
+		});
+		socket.onclose(() => {
+			console.info("Connection closed");
+		});
+		socket.onmessage((msg) => {
+			console.log(msg);
+		});
+		this.setState({socket: socket});
+	}
 
 	loadUser(callBack = null) {
 		xhr.get('/api/user/me/get')
@@ -26,7 +27,7 @@ class Main extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ user: data, loading: false }, callBack);
-			// this.connectSocket();
+			this.connectSocket();
 		})
 		.catch(error => {
 			console.error("error", error);
