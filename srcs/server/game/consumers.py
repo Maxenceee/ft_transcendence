@@ -366,8 +366,8 @@ class Game:
 		self.send_text("Players ready!", 5)
 		time.sleep(2)
 		if self.type != "local" :
-			self.send(0, "moveCam", {"x" : "30", "y" : "30", "z" : "60", "frame" : "175"})
-			self.send(1, "moveCam", {"x" : "30", "y" : "30", "z" : "-60", "frame" : "175"})
+			self.send(0, "moveCam", {"x" : "0", "y" : "30", "z" : "60", "frame" : "175"})
+			self.send(1, "moveCam", {"x" : "0", "y" : "30", "z" : "-60", "frame" : "175"})
 		for i in range(3, 0, -1):
 			self.send_text(str(i))
 			time.sleep(1)
@@ -474,10 +474,6 @@ class Game:
 		logging.info("game master 4p")
 		self.send_all("initGame", "")
 		self.send_all("gameState", self.to_json())
-		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
-		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60"})
-		self.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "30"})
-		self.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "30"})
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
@@ -539,7 +535,6 @@ class Game:
 	def game_master_local(self):
 		logging.info("game master local")
 		self.send_all("initGame", self.to_json())
-		self.send(0, "setCam", {"x" : "10", "y" : "69", "z" : "0"})
 		t = 0
 		l = time.time()
 		while True:
@@ -598,7 +593,6 @@ class Game:
 		logging.info("game master ai")
 		self.ai_player.start()
 		self.send_all("initGame", self.to_json())
-		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60"})
 		t = 0
 		l = time.time()
 		while True:
