@@ -33,6 +33,9 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 			case "setCam":
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
+			case "moveCam":
+				movecam(msg.data.x, msg.data.y, msg.data.z, msg.data.frame);
+				break;
 			case "text":
 				createText(msg.data.text, msg.data.size);
 			default:
@@ -53,6 +56,16 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 
 	let setcam = (x, y, z) => {
 		camera.position.set(x, y, z);
+	}
+	let targetx = 0, targetz = 0, targety = 0, ittr = 0;
+	let movecam = (x, y, z, frame) => {
+		targetx = x - camera.position.x;
+		targetx /= frame;
+		targetz = z - camera.position.z;
+		targetz /= frame;
+		targety = y - camera.position.y;
+		targety /= frame;
+		ittr=Math.round(frame);
 	}
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -260,6 +273,10 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		composer.render();
 
 		controls.update();
+		if (ittr > 0){
+			setcam(camera.position.x + targetx, camera.position.y + targety, camera.position.z + targetz)
+			ittr -=1;
+		}
 		animationid = requestAnimationFrame(animate);
 		while (render_data.queue.length > 0)
 		{
