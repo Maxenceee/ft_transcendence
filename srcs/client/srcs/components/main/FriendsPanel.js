@@ -144,8 +144,13 @@ class FriendsPanel extends Component {
 											})
 										]
 									}),
+									this.state.open ?
 									!this.state.onsearch && createElement('div', {
 										class: "friend-count", children: ((this.state.following.filter(e => e.is_online).length)+"/"+this.state.following.length)
+									})
+									:
+									createElement('div', {
+										class: "friend-count", children: "Amis"
 									})
 								]
 							}),
