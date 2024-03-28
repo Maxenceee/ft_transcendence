@@ -69,13 +69,13 @@ class UserPage extends Component {
 													src: this.state.user.profile_picture, alt: "profile-picture"
 												})
 											}),
-											this.state.user.id != this.props.user.id && createElement('div', {
-												class: "card-action", children: [
-													createElement('button', {
-														class: "action-button", children: "Follow (not working here yet bc of server)", style: "--friend-action-color: var(--friend-bg); --friend-action-color-h: var(--friend-bg-h);"
-													})
-												]
-											})
+											// this.state.user.id != this.props.user.id && createElement('div', {
+											// 	class: "card-action", children: [
+											// 		createElement('button', {
+											// 			class: "action-button", children: "Follow (not working here yet bc of server)", style: "--friend-action-color: var(--friend-bg); --friend-action-color-h: var(--friend-bg-h);"
+											// 		})
+											// 	]
+											// })
 										]
 									}),
 									createElement('div', {

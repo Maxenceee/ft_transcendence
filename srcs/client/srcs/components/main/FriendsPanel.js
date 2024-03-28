@@ -135,7 +135,7 @@ class FriendsPanel extends Component {
 											this.state.onsearch ?
 											createElement('div', {
 												class: "friend-search-input", children: createElement('input', {
-													ref: this.ref, value: this.state.search, onkeypress: this.searchPlayer, placeholder: "Search", oninput: e => this.setState({search: e.target.value})
+													ref: this.ref, value: this.state.search, onkeydown: this.searchPlayer, placeholder: "Rechercher", oninput: e => this.setState({search: e.target.value})
 												})
 											})
 											:
@@ -158,14 +158,14 @@ class FriendsPanel extends Component {
 							:
 							this.state.onsearch && this.state.seachresult && !this.state.seachresult.length && this.state.search.length ?
 							createElement('div', {
-								class: "friend-row empty", children: "No result."
+								class: "friend-row empty", children: "Aucun résultat"
 							})
 							:
 							this.state.following.length ?
 							this.state.following.map(player => this.playerRow(player))
 							:
 							createElement('div', {
-								class: "friend-row empty", children: "You are not following anyone."
+								class: "friend-row empty", children: "Vous ne suivez personne"
 							})
 						)
 					})
