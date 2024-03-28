@@ -384,7 +384,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		return textObj;
 	}
 
-	function displayScore(){
+	function displayScore() {
 
 		if (P1score != 0)
 			scene.remove(P1score, P2score, P3score, P4score)

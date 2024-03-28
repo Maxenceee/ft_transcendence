@@ -21,6 +21,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		keyCodes: {},
 		updateScore: 0,
 		queue: [],
+		scores: [],
 	}
 
 	let socket = new Socket({path: "/game/"+type});
@@ -52,11 +53,15 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		console.info("game ready");
 		socket.send({type : "ready"});
 		onload();
+		if (type == "4p") {
+			displayScore(render_data.pallet);
+		}
 	};
 
 	let setcam = (x, y, z) => {
 		camera.position.set(x, y, z);
 	}
+
 	let targetx = 0, targetz = 0, targety = 0, ittr = 0;
 	let movecam = (x, y, z, frame) => {
 		targetx = x - camera.position.x;
@@ -135,6 +140,51 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		textGeo.dispose();
 	}
 
+	function createTextObject(msg) {
+		return new THREE.Mesh(new TextGeometry( msg , {
+			font: font,
+			size: 10,
+			height: 0.5,
+			curveSegments: 2,
+			bevelThickness: 0.1,
+			bevelSize: 0.01,
+			bevelEnabled: true
+		}), materials);
+	}
+
+	function displayScore(data) {
+
+		if (render_data.scores.length)
+			scene.remove(...render_data.scores)
+		render_data.scores = [];
+		for (let i = 0; i < data.length; i++) {
+			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
+			render_data.scores[i].position.z += 30 * (i % 2 ? -1 : 1);
+			render_data.scores[i].position.y += 6;
+			render_data.scores[i].position.x += 2.5 * (i % 2 ? -1 : 1) * (i < 2 ? 1 : -1);
+			render_data.scores[i].rotateY(Math.PI * i);
+		}
+
+		// P2score.position.x -= 5
+		// P2score.position.y += 6
+		// P2score.position.z -= 30
+		
+		// P3score.position.x -= 30
+		// P3score.position.y += 6
+		// P3score.position.z += 2.5
+		// P3score.rotateY(Math.PI*0.5);
+
+		// P4score.position.x += 30
+		// P4score.position.y += 6
+		// P4score.position.z -= 2.5
+		// P4score.rotateY(-Math.PI*0.5);
+		console.log('====================================');
+		console.log(render_data.scores);
+		console.log('====================================');
+
+		scene.add(...render_data.scores);
+	}
+
 	const genTwoPlayerMap = function(render_data, scene) {
 		let mapWidth = 40;
 		let mapLenth = 60;
@@ -142,12 +192,12 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-					color:0xffffff, 
-					opacity: 1, 
-					emissive:0xffffff,
-					side : THREE.DoubleSide,
-				})
-			));
+				color:0xffffff, 
+				opacity: 1, 
+				emissive:0xffffff,
+				side : THREE.DoubleSide,
+			})
+		));
 		render_data.pallet.push(new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
@@ -227,61 +277,61 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		))
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		));
 		let wallLeft = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0x00ffff, 
+				wireframe: false, 
+				color: 0x00ffff, 
 				opacity: 1, 
-				emissive:0x00ffff,
-				side : THREE.DoubleSide,
+				emissive: 0x00ffff,
+				side: THREE.DoubleSide,
 			})
 		);
 		let wallRight = new THREE.Mesh(
 			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0x0000ff, 
+				wireframe: false, 
+				color: 0x0000ff, 
 				opacity: 1, 
-				emissive:0x0000ff,
-				side : THREE.DoubleSide,
+				emissive: 0x0000ff,
+				side: THREE.DoubleSide,
 			})
 		);
 		wallRight.position.x += mapWidth / 2;
@@ -289,12 +339,12 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		let wallP2 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
 			new THREE.MeshStandardMaterial( {
-				wireframe:false, 
-				color:0xff00ff, 
+				wireframe: false, 
+				color: 0xff00ff, 
 				opacity: 1, 
-				emissive:0xff00ff,
-				side : THREE.DoubleSide,
-				})
+				emissive: 0xff00ff,
+				side: THREE.DoubleSide,
+			})
 		);	
 		let wallP1 = new THREE.Mesh(
 			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
@@ -302,16 +352,23 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				wireframe:false,
 				color: new THREE.Color("rgb(255, 0, 0)"), 
 				opacity: 1, 
-				emissive: new THREE.Color("rgb(255, 0, 0)"),
-				
-				side : THREE.DoubleSide,
-				})
+				emissive: new THREE.Color("rgb(255, 0, 0)"),		
+				side: THREE.DoubleSide,
+			})
 		);
 		wallP1.position.z += mapLenth / 2;
 		wallP2.position.z -= mapLenth / 2;
+
+		render_data.pallet[0].position.z += (mapLenth / 2) - 1.5;
+		render_data.pallet[1].position.z -= (mapLenth / 2) - 1.5;
+		render_data.pallet[2].position.x += (mapLenth / 2) - 1.5;
+		render_data.pallet[3].position.x -= (mapLenth / 2) - 1.5;
+
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 		scene.add(...render_data.pallet);
-	}
+	};
+
+	(type == "4p") ? genFourPlayerMap(render_data, scene) : genTwoPlayerMap(render_data, scene);
 
 	const params = {
 		threshold: 0,
@@ -399,9 +456,12 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				} break;
 				case "updateScore": {
 					render_data.pallet[data.n].score = data.score;
-					createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
-					if (render_data.pallet.some(e => e.score > 9))
-					{
+					if (type == "4p") {
+						displayScore(data.pallet);
+					} else {
+						createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
+					}
+					if (render_data.pallet.some(e => e.score > 4)) {
 						scene.remove(render_data.ball);
 						return;
 					}
