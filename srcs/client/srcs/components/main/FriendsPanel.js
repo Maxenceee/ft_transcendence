@@ -86,7 +86,7 @@ class FriendsPanel extends Component {
 							class: "friend-name", children: link({to: "/user/"+player.id, children: player.nickname})
 						}),
 						createElement('div', {
-							class: "friend-status"+(player.is_online ?  "on" : " off"), children: player.is_online ? "Online" : "Offline"
+							class: "friend-status"+(player.is_online ?  "on" : " off"), children: player.status
 						})
 					]
 				}),

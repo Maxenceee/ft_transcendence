@@ -57,6 +57,7 @@ class User(models.Model):
 			"id": self.id,
 			"nickname": self.nickname,
 			"status": status,
+			"is_online": self.is_online,
 			"profile_picture": profile_picture,
 			"following": following,
 			"game_history": game_history,
@@ -78,6 +79,7 @@ class User(models.Model):
 			"id": self.id,
 			"nickname": self.nickname,
 			"status": status,
+			"is_online": self.is_online,
 			"profile_picture": profile_picture,
 		}
 		return response
