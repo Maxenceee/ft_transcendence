@@ -48,11 +48,11 @@ class User(models.Model):
 		for user in self.following.all():
 			following.append(user.resume_to_json())
 		if self.is_online:
-			status = "online"
+			status = "En ligne"
 		else:
-			status = "offline"
+			status = "Hors ligne"
 		if self.is_ingame:
-			status = "in-game"
+			status = "En jeu"
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
@@ -70,11 +70,11 @@ class User(models.Model):
 		else:
 			profile_picture = settings.BASE_URL + "/api" + self.profile_picture_image.url,
 		if self.is_online:
-			status = "online"
+			status = "En ligne"
 		else:
-			status = "offline"
+			status = "Hors ligne"
 		if self.is_ingame:
-			status = "in-game"
+			status = "En jeu"
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
