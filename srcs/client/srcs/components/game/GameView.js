@@ -135,7 +135,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		textGeo.dispose();
 	}
 
-	(function() {
+	const genTwoPlayerMap = function(render_data, scene) {
 		let mapWidth = 40;
 		let mapLenth = 60;
 		render_data.pallet.push(new THREE.Mesh(
@@ -218,7 +218,100 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 		scene.add(...render_data.pallet);
-	}());
+	};
+
+	const genFourPlayerMap = function(render_data, scene) {
+		let mapLenth = 60;
+		let mapWidth = 60;
+
+		render_data.pallet.push(new THREE.Mesh( 
+			new THREE.BoxGeometry( 6, 1, 1 ), 
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0xffffff, 
+				opacity: 1, 
+				emissive:0xffffff,
+				side : THREE.DoubleSide,
+			})
+		));
+		render_data.pallet.push(new THREE.Mesh( 
+			new THREE.BoxGeometry( 6, 1, 1 ), 
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0xffffff, 
+				opacity: 1, 
+				emissive:0xffffff,
+				side : THREE.DoubleSide,
+			})
+		))
+		render_data.pallet.push(new THREE.Mesh( 
+			new THREE.BoxGeometry( 1, 1, 6 ), 
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0xffffff, 
+				opacity: 1, 
+				emissive:0xffffff,
+				side : THREE.DoubleSide,
+			})
+		));
+		render_data.pallet.push(new THREE.Mesh( 
+			new THREE.BoxGeometry( 1, 1, 6 ), 
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0xffffff, 
+				opacity: 1, 
+				emissive:0xffffff,
+				side : THREE.DoubleSide,
+			})
+		));
+		let wallLeft = new THREE.Mesh(
+			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0x00ffff, 
+				opacity: 1, 
+				emissive:0x00ffff,
+				side : THREE.DoubleSide,
+			})
+		);
+		let wallRight = new THREE.Mesh(
+			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0x0000ff, 
+				opacity: 1, 
+				emissive:0x0000ff,
+				side : THREE.DoubleSide,
+			})
+		);
+		wallRight.position.x += mapWidth / 2;
+		wallLeft.position.x -= mapWidth / 2;
+		let wallP2 = new THREE.Mesh(
+			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
+			new THREE.MeshStandardMaterial( {
+				wireframe:false, 
+				color:0xff00ff, 
+				opacity: 1, 
+				emissive:0xff00ff,
+				side : THREE.DoubleSide,
+				})
+		);	
+		let wallP1 = new THREE.Mesh(
+			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
+			new THREE.MeshStandardMaterial( {
+				wireframe:false,
+				color: new THREE.Color("rgb(255, 0, 0)"), 
+				opacity: 1, 
+				emissive: new THREE.Color("rgb(255, 0, 0)"),
+				
+				side : THREE.DoubleSide,
+				})
+		);
+		wallP1.position.z += mapLenth / 2;
+		wallP2.position.z -= mapLenth / 2;
+		scene.add(wallLeft, wallRight, wallP1, wallP2);
+		scene.add(...render_data.pallet);
+	}
 
 	const params = {
 		threshold: 0,
