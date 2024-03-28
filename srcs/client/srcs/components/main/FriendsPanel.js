@@ -47,7 +47,7 @@ class FriendsPanel extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ following: data.following });
-			this.props.reload();
+			// this.props.reload();
 		})
 		.catch(error => {
 			console.error("error", error);
