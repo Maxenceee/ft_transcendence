@@ -3,7 +3,10 @@ import { Component, createElement, link } from '..';
 class HomePage extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: props.user, reload: props.reload };
+		this.state = { user: props.user, reload: props.reload, scrollTop: 0 };
+		this.ref = {current: null};
+
+		// this.handleScroll = this.handleScroll.bind(this);
 	}
 
 	componentDidMount() {
@@ -17,7 +20,7 @@ class HomePage extends Component {
 	render() {
 		return createElement('div', {
 			children: createElement('div', {
-				class: "data", children: [
+				ref: this.ref, class: "data", children: [
 					createElement('section', {
 						children: createElement('div', {
 							class: "oa-container", children: createElement('div', {

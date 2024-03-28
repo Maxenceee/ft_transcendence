@@ -47,6 +47,7 @@ class FriendsPanel extends Component {
 		.then(data => {
 			console.log("data", data);
 			this.setState({ following: data.following });
+			this.props.reload();
 		})
 		.catch(error => {
 			console.error("error", error);
@@ -144,7 +145,7 @@ class FriendsPanel extends Component {
 										]
 									}),
 									!this.state.onsearch && createElement('div', {
-										class: "friend-count", children: (0+"/"+this.state.following.length)
+										class: "friend-count", children: ((this.state.following.filter(e => e.is_online).length)+"/"+this.state.following.length)
 									})
 								]
 							}),
