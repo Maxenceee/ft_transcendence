@@ -184,6 +184,9 @@ button span {
 	--progress-filled-color-l: 49.2;
 
 	--href-color: #0969da;
+
+	--friend-bg: #F189C8;
+	--friend-bg-h: #d154a0;
 }
 
 body {
@@ -622,6 +625,7 @@ main {
 	.data {
 		height: 100vh;
 		overflow-y: scroll;
+		padding-top: 30px;
 	}
 
 	.featured-bar {
@@ -2024,6 +2028,11 @@ body:has(.connection-page) {
 
 		.card-header {
 			margin-bottom: 30px;
+
+			h2 {
+				line-break: anywhere;
+				font-size: 16;
+			}
 		}
 
 		.card-picture {
@@ -2041,6 +2050,30 @@ body:has(.connection-page) {
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
+			}
+		}
+
+		.card-action {
+			display: flex;
+			align-items: center;
+			margin-top: 30px;
+			// --friend-action-color: var(--friend-bg);
+
+			button {
+				appearance: none;
+				-webkit-appearance: none;
+				outline: none;
+				border: none;
+				background-color: var(--friend-action-color);
+				color: #ffffff;
+				font-size: 16px;
+				border-radius: 20px;
+				padding: 5px 10px;
+				height: max-content;
+				
+				&:hover {
+					background-color: var(--friend-action-color-h);
+				}
 			}
 		}
 	}
@@ -2296,7 +2329,6 @@ body:has(.connection-page) {
 	}
 
 	.friend-container {
-		--friend-bg: #F189C8;
 		height: 40px;
 		padding-right: 40px;
 		width: max-content;
@@ -2533,6 +2565,29 @@ body:has(.connection-page) {
 						&::before {
 							background-color: red;
 						}
+					}
+				}
+			}
+
+			.friend-action {
+				display: flex;
+				align-items: center;
+				// --friend-action-color: var(--friend-bg);
+
+				button {
+					appearance: none;
+					-webkit-appearance: none;
+					outline: none;
+					border: none;
+					background-color: var(--friend-action-color);
+					color: #ffffff;
+					font-size: 16px;
+					border-radius: 20px;
+					padding: 5px 10px;
+					height: max-content;
+					
+					&:hover {
+						background-color: var(--friend-action-color-h);
 					}
 				}
 			}

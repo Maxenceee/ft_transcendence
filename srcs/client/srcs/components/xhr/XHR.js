@@ -140,7 +140,7 @@ function wr(e, t) {
 		socketPath: o,
 		responseEncoding: o,
 		validateStatus: s,
-		headers: (u,h)=>a(jc(u), jc(h), !0)
+		headers: (u, h) => a(u, h, !0)
 	};
 	return forEach(Object.keys(Object.assign({}, e, t)), function(h) {
 		const f = d[h] || a,
