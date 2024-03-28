@@ -162,7 +162,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
-			render_data.scores.push(createTextObject((data[i].score || 1).toString()));
+			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
 			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
 			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
