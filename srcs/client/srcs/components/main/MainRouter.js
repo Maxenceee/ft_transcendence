@@ -5,6 +5,10 @@ class MainRouter extends Component {
 		// console.log("componentDidMount MainRouter", this);
 	}
 
+	componentDidUpdate() {
+		console.log("componentDidUpdate MainRouter", this);
+	}
+
 	render() {
 		return createElement('div', {
 			class: "home", children: [
@@ -52,11 +56,11 @@ class MainRouter extends Component {
 						]
 					})
 				}),
-				createElement('header', {children: createElement(FriendsPanel)}),
+				createElement('header', {children: createElement(FriendsPanel, {following: this.props.user.following, reload: () => this.setState({oui: "oui"})})}),
 				createElement('main', {children:
 					router(
 						route({path: "/", element: createElement(HomePage, {user: this.props.user, reload: this.props.reload})}),
-						route({path: "/user/me", element: createElement(UserPage, {user: this.props.user, reload: this.props.reload})}),
+						route({path: "/user/:id", element: createElement(UserPage, {user: this.props.user, reload: this.props.reload})}),
 						route({path: "*", element: createElement(NotFound)})
 					)
 				})

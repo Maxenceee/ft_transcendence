@@ -16,7 +16,12 @@ class Loader extends Component {
 							class: "ball"
 						})
 					]
-				})					
+				}),
+				createElement('div', {
+					class: "ad-up-box-loader-text", children: createElement('span', {
+						class: "ad-up-box-loader-text", children: "Please be patient, we are working on it..."
+					})
+				})				
 			]
 		})		
 	}

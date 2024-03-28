@@ -85,6 +85,7 @@ var Socket = function({port = 3000, host = window.location.hostname, path = "/"}
 			WSHost = (host === 'localhost') ? bindPort(hr[0], sp) : hr[0],
 			spath = WSProtocol.concat(WSHost, path);
 		this.socket = new WebSocket(spath);
+		this.openingtime = Date.now();
 	} catch (error) {
 		console.error("Could not open socket with server");
 	}
@@ -168,7 +169,8 @@ s.initPing = function() {
 };
 s.pingServer = function() {
 	this.ps = Date.now();
-	if (this.lastPing && this.ps - this.lastPing < 1 * 60 * 1000) return;
+	if (this.openingtime && this.ps - this.openingtime < 30 * 1000) return;
+	if (this.lastPing && this.ps - this.lastPing < 60 * 1000) return;
 	this.lastPing = this.ps;
 	this.send(this.j({PING: this.ps}));
 };

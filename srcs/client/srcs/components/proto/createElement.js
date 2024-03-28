@@ -54,6 +54,12 @@ function createElement(type, props = {}) {
 				} else {
 					jv(children);
 				}
+			} else if (key == "ref") {
+				if (typeof props[key] !== "object") throw new Error('`ref` must be an object, not '+typeof props[key]);
+				if (props[key].current != null) {
+					element.scrollTop = props[key].current.scrollTop;
+				}
+				props[key].current = element;
 			} else if (key.startsWith('on') && typeof props[key] === 'function') {
 				element.addEventListener(key.substring(2).toLowerCase(), props[key]);
 			} else {
