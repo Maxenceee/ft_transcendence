@@ -69,7 +69,7 @@ class FriendsPanel extends Component {
 	playerRow(player) {
 		let action = [
 			{title: "Follow", color: "var(--friend-bg)", hover: "var(--friend-bg-h)", action: this.followPlayer},
-			{title: "Unfollow", color: "#8e8e8e", hover: "#555555", action: this.unfollowPlayer}
+			{title: "Unfollow", color: "#555555", hover: "#8e8e8e", action: this.unfollowPlayer}
 		]
 		let isfr = (e) => this.state.following.find(f => f.id == e);
 		let opt = action[isfr(player.id) ? 1 : 0];
