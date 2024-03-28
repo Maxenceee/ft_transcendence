@@ -141,7 +141,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	}
 
 	function createTextObject(msg) {
-		return new THREE.Mesh(new TextGeometry( msg , {
+		let geo = new TextGeometry(msg, {
 			font: font,
 			size: 10,
 			height: 0.5,
@@ -149,38 +149,25 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 			bevelThickness: 0.1,
 			bevelSize: 0.01,
 			bevelEnabled: true
-		}), materials);
+		});
+		geo.computeBoundingBox();
+		geo.center();
+		return new THREE.Mesh(geo, materials);
 	}
 
 	function displayScore(data) {
 
 		if (render_data.scores.length)
-			scene.remove(...render_data.scores)
+			scene.remove(...render_data.scores);
+
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
-			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += 30 * (i % 2 ? -1 : 1);
+			render_data.scores.push(createTextObject((data[i].score || 1).toString()));
+			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += 2.5 * (i % 2 ? -1 : 1) * (i < 2 ? 1 : -1);
-			render_data.scores[i].rotateY(Math.PI * i);
+			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
+			render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
-
-		// P2score.position.x -= 5
-		// P2score.position.y += 6
-		// P2score.position.z -= 30
-		
-		// P3score.position.x -= 30
-		// P3score.position.y += 6
-		// P3score.position.z += 2.5
-		// P3score.rotateY(Math.PI*0.5);
-
-		// P4score.position.x += 30
-		// P4score.position.y += 6
-		// P4score.position.z -= 2.5
-		// P4score.rotateY(-Math.PI*0.5);
-		console.log('====================================');
-		console.log(render_data.scores);
-		console.log('====================================');
 
 		scene.add(...render_data.scores);
 	}

@@ -398,7 +398,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		P2score = createTextObject(score.scoreP2.toString()) //Purple player
 		P2score.position.z -= 30
 		P2score.position.y += 6
-		P2score.position.x -= 5
+		P2score.position.x -= 2.5
 		
 		
 		P3score = createTextObject(score.scoreP3.toString()) //Cyan player
