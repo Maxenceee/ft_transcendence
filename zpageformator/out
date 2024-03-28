@@ -1,5 +1,18 @@
-createElement('svg', {
-    width: "16", height: "16", viewBox: "0 0 16 16", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
-        d: "M0.375211 15.5322C0.874894 16.0415 1.74348 16.0234 2.2284 15.5406L7.93732 9.81999L13.6537 15.5364C14.1471 16.0298 14.9955 16.0394 15.4952 15.5301C16.0141 15.0208 16.0045 14.1724 15.5015 13.679L9.79683 7.96047L15.5015 2.25577C16.0045 1.76031 16.0141 0.902272 15.4952 0.404698C14.9955 -0.104595 14.1471 -0.0949854 13.6537 0.396261L7.93732 6.11057L2.2284 0.394151C1.74348 -0.0907668 0.874894 -0.106704 0.375211 0.400479C-0.131973 0.900163 -0.116035 1.76875 0.368883 2.25366L6.08952 7.96047L0.368883 13.6811C-0.116035 14.166 -0.131973 15.0229 0.375211 15.5322Z"
-    })
+createElement('ul', {
+    class: "bc-btn-transition reserv-btn", children: [
+        createElement('li', {
+            class: "bc-btn-transition", children: createElement('span', {
+                children: link({
+                    class: "bc-btn-transition", children: "Réserver"
+                })
+            })
+        }),
+        createElement('li', {
+            class: "bc-btn-transition", children: createElement('span', {
+                children: createElement('i', {
+                    class: "fa fa-chevron-down bc-btn-transition", aria-hidden: "true"
+                })
+            })
+        })
+    ]
 })
