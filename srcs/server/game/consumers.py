@@ -365,8 +365,9 @@ class Game:
 	def send_start_message(self):
 		self.send_text("Players ready!", 5)
 		time.sleep(2)
-		self.send(0, "moveCam", {"x" : "30", "y" : "30", "z" : "60", "frame" : "175"})
-		self.send(1, "moveCam", {"x" : "30", "y" : "30", "z" : "-60", "frame" : "175"})
+		if self.type != "local" :
+			self.send(0, "moveCam", {"x" : "30", "y" : "30", "z" : "60", "frame" : "175"})
+			self.send(1, "moveCam", {"x" : "30", "y" : "30", "z" : "-60", "frame" : "175"})
 		for i in range(3, 0, -1):
 			self.send_text(str(i))
 			time.sleep(1)
