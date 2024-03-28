@@ -229,19 +229,20 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
-		console.log("input key:", event.type, "key:", event.which);
 		let d = (event.type === "keydown");
 		switch (event.which) {
 			case 68:
 				render_data.keyCodes["d_key"] = d;
 				break;
 			case 39:
+			case 38:
 				render_data.keyCodes["right_arrow_key"] = d;
 				break;
 			case 65:
 				render_data.keyCodes["a_key"] = d;
 				break;
 			case 37:
+			case 40:
 				render_data.keyCodes["left_arrow_key"] = d;
 				break;
 			case 82:
@@ -326,7 +327,7 @@ class GameView extends Component {
 	componentDidMount() {
 		// console.log("componentDidMount GameView", this);
 		let a = useParams("/game/:type") ?? {params: {type: null}},
-			{type} = a.params;
+			{ type } = a.params;
 		if (!type) {
 			navigate("/");
 		}

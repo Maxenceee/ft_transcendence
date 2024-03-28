@@ -184,28 +184,32 @@ const Go = {
 
 			xhr.onload = function() {
 				const responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
-				const transformResponse = function(t) {
-					const r = this.transitional,
-						i = r && r.forcedJSONParsing,
-						a = this.responseType === "json";
-					if (t && isString(t) && (i && !this.responseType || a)) {
-						const o = a;
-						try {
-							return JSON.parse(t)
-						} catch (s) {
-							throw o ? new Error("Unable to parse JSON data") : s
+				try {
+					const transformResponse = function(t) {
+						const r = this.transitional,
+							i = r && r.forcedJSONParsing,
+							a = this.responseType === "json";
+						if (t && isString(t) && (i && !this.responseType || a)) {
+							const o = a;
+							try {
+								return JSON.parse(t)
+							} catch (s) {
+								throw o ? new Error("Unable to parse JSON data") : s
+							}
 						}
+						return (t);
 					}
-					return t
+					resolve({
+						data: transformResponse.call(config, xhr.response),
+						status: xhr.status,
+						statusText: xhr.statusText,
+						headers: responseHeaders,
+						config: config,
+						request: xhr
+					});
+				} catch (error) {
+					reject(error);
 				}
-				resolve({
-					data: transformResponse.call(config, xhr.response),
-					status: xhr.status,
-					statusText: xhr.statusText,
-					headers: responseHeaders,
-					config: config,
-					request: xhr
-				});
 			};
 
 			xhr.onerror = function() {

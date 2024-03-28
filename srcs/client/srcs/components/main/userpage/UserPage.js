@@ -1,12 +1,29 @@
-import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats } from '../..';
+import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams, xhr } from '../..';
 
 class UserPage extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: props.user };
+		this.state = { loading: false, user: props.user };
 	}
 
 	componentDidMount() {
+		let a = useParams("/user/:id") ?? {params: {id: null}},
+			{ id } = a.params;
+		if (!id) {
+			navigate("/");
+		}
+		if (id != "me" && id != this.state.user.id) {
+			this.setState({ loading: true });
+			xhr.get('/api/user/'+id+'/get')
+			.then(res => res.data)
+			.then(data => {
+				this.setState({ user: data, loading: false });
+			})
+			.catch(error => {
+				console.error("error", error);
+				this.setState({ loading: false });
+			})
+		}
 		// console.log("this.componentDidMount UserPage Page");
 	}
 
@@ -19,7 +36,10 @@ class UserPage extends Component {
 	}
 
 	render() {
-		return createElement('div', {
+		return this.state.loading ?
+		createElement(Loader)
+		:
+		createElement('div', {
 			children: createElement('div', {
 				class: "data", children: [
 					createElement('div', {
