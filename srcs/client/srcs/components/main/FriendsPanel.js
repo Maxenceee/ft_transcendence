@@ -68,8 +68,8 @@ class FriendsPanel extends Component {
 
 	playerRow(player) {
 		let action = [
-			{title: "Follow", color: "var(--friend-bg)", hover: "var(--friend-bg-h)", action: this.followPlayer},
-			{title: "Unfollow", color: "#8e8e8e", hover: "#555555", action: this.unfollowPlayer}
+			{title: "Suivre", color: "var(--friend-bg)", hover: "var(--friend-bg-h)", action: this.followPlayer},
+			{title: "Ne plus suivre", color: "#8e8e8e", hover: "#555555", action: this.unfollowPlayer}
 		]
 		let isfr = (e) => this.state.following.find(f => f.id == e);
 		let opt = action[isfr(player.id) ? 1 : 0];
@@ -122,7 +122,7 @@ class FriendsPanel extends Component {
 					createElement('div', {
 						class: "friend-container", children: [
 							createElement('div', {
-								class: "friend-search", style: (this.state.open ? "width: 280px" : ""), children: [
+								class: "friend-search", style: (this.state.open ? "width: 450px" : ""), children: [
 									this.state.open && createElement('div', {
 										class: "friend-search-header", children: [
 											createElement('div', {
@@ -135,12 +135,12 @@ class FriendsPanel extends Component {
 											this.state.onsearch ?
 											createElement('div', {
 												class: "friend-search-input", children: createElement('input', {
-													ref: this.ref, value: this.state.search, onkeypress: this.searchPlayer, placeholder: "Search", oninput: e => this.setState({search: e.target.value})
+													ref: this.ref, value: this.state.search, onkeypress: this.searchPlayer, placeholder: "Rechercher", oninput: e => this.setState({search: e.target.value})
 												})
 											})
 											:
 											createElement('div', {
-												class: "friend-search-label", children: "Friends"
+												class: "friend-search-label", children: "Amis"
 											})
 										]
 									}),
