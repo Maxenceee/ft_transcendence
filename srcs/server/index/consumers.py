@@ -14,14 +14,14 @@ class StatusManager():
 			if current.user == socket.user:
 				i += 1
 		if i == 1:
+			socket.user.is_online = True
+			socket.user.save()
 			for current in self.user_list:
 				if socket.user in current.user.following.all():
 					current.send(json.dumps({
 						'user': socket.user.id,
 						'status': 'online'
 					}))
-			user.is_online = True
-			user.save()
 	
 	def remove_user(self, socket):
 		self.user_list.remove(socket)
@@ -30,14 +30,14 @@ class StatusManager():
 			if current.user == socket.user:
 				i += 1
 		if i == 0:
+			socket.user.is_online = False
+			socket.user.save()
 			for current in self.user_list:
 				if socket.user in current.user.following.all():
 					current.send(json.dumps({
 						'user': socket.user.id,
 						'status': 'offline'
 					}))
-			user.is_online = False
-			user.save()
 
 class websocket_client(WebsocketConsumer):
 

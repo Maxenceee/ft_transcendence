@@ -93,10 +93,12 @@ def api_avatar(request, id):
 def api_search_user(request, id):
 	if request.method != 'GET':
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
+	consumer = Token.objects.get(token=request.COOKIES.get('token')).user
 	users = User.objects.filter(nickname__contains=id)
 	response = []
 	for user in users:
-		response.append(user.resume_to_json())
+		if user.id != consumer.id:
+			response.append(user.resume_to_json())
 	return JsonResponse(response, safe=False)
 
 @login_required
@@ -105,6 +107,8 @@ def api_follow(request, id):
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
 	user = Token.objects.get(token=request.COOKIES.get('token')).user
 	user_to_follow = get_object_or_404(User, id=id)
+	if user == user_to_follow:
+		return JsonResponse({'error': 'You cannot follow yourself'}, status=400)
 	user.following.add(user_to_follow)
 	following = []
 	for user in user.following.all():
@@ -120,6 +124,8 @@ def api_unfollow(request, id):
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
 	user = Token.objects.get(token=request.COOKIES.get('token')).user
 	user_to_unfollow = get_object_or_404(User, id=id)
+	if user == user_to_unfollow:
+		return JsonResponse({'error': 'You cannot unfollow yourself'}, status=400)
 	user.following.remove(user_to_unfollow)
 	following = []
 	for user in user.following.all():
