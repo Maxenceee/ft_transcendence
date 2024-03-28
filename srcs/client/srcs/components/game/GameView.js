@@ -34,7 +34,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
 			case "moveCam":
-				console.log("moving cam");
 				movecam(msg.data.x, msg.data.y, msg.data.z, msg.data.frame);
 				break;
 			case "text":
@@ -67,7 +66,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		targety = y - camera.position.y;
 		targety /= frame;
 		ittr=Math.round(frame);
-		// console.log("move to");
 	}
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
