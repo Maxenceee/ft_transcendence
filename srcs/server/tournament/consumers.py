@@ -79,6 +79,8 @@ class Game:
 				logging.info(f"player{player.playerNumber}, score : {player.score}, gameN :{player.gameNumber}")
 
 
+
+
 		target = None
 		for player in self.players :
 				if player.gameNumber == playerOrg.gameNumber and player.playerNumber != playerOrg.playerNumber :
@@ -97,6 +99,7 @@ class Game:
 			self.ball[4].x = 0
 			self.ball[4].z = 0
 			self.ball[4].speed = 1.05
+			
 		
 		elif playerOrg.gameNumber == 2 or playerOrg.gameNumber == 3:
 			target.gameNumber = -1
@@ -123,6 +126,23 @@ class Game:
 		for player in self.players :
 			logging.info(f"{str(player)}")
 		logging.info(f"player win :{player.playerNumber}, going to {player.gameNumber}, ball at {self.ball[player.gameNumber].x}")
+
+		gameplayer = []
+		for current in self.players:
+			if current.gameNumber == playerOrg.gameNumber:
+				gameplayer.append(current)
+		if len(gameplayer) != 2 :
+			return True
+		if playerOrg.gameNumber == 4 :
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "40" , "camx" :"160", "camy" :"0", "camz" :"100"})
+		elif playerOrg.gameNumber == 5 :
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "40" , "camx" :"80", "camy" :"0", "camz" :"100"})
+		elif playerOrg.gameNumber == 6 :
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "260" , "camx" :"120", "camy" :"0", "camz" :"200"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "140" , "camx" :"120", "camy" :"0", "camz" :"200"})
+
 		return True
 
 	def send_all(self, type, data):
