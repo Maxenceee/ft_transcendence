@@ -4,13 +4,14 @@
   "description": "",
   "scripts": {
     "pack": "webpack --config webpack.config.js",
-    "watch": "webpack --config webpack.config.js --watch"
+    "watch": "dotenv -f ../../.env -- webpack --config webpack.config.js --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "chart.js": "^4.4.2",
     "dotenv": "^16.4.5",
+    "dotenv-cli": "^7.4.1",
     "mini-css-extract-plugin": "^2.8.1",
     "three": "^0.162.0"
   },
