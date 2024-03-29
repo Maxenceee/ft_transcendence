@@ -24,6 +24,15 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		scores: [],
 	}
 
+	let animation = {
+		start_time: null,
+		start_point: null,
+		end_point: null,
+		time: 0,
+		completion: 1,
+		started: false
+	}
+
 	let socket = new Socket({path: "/game/"+type});
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
@@ -35,7 +44,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
 			case "moveCam":
-				movecam(msg.data.x, msg.data.y, msg.data.z, msg.data.frame);
+				startanimation(camera.position, {x: msg.data.x, y: msg.data.y, z: msg.data.z}, msg.data.duration.toString());
 				break;
 			case "text":
 				createText(msg.data.text, msg.data.size);
@@ -62,15 +71,36 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		camera.position.set(x, y, z);
 	}
 
-	let targetx = 0, targetz = 0, targety = 0, ittr = 0;
-	let movecam = (x, y, z, frame) => {
-		targetx = x - camera.position.x;
-		targetx /= frame;
-		targetz = z - camera.position.z;
-		targetz /= frame;
-		targety = y - camera.position.y;
-		targety /= frame;
-		ittr=Math.round(frame);
+	let startanimation = (s, e, dur) => {
+		if (animation.started) return console.error('an animation is already running');
+		animation.start_time = Date.now();
+		animation.start_point = s;
+		animation.end_point = e;
+		animation.time = dur;
+		animation.completion = 0;
+		animation.started = true;
+		// console.log('====================================');
+		// console.log('start animation', animation);
+		// console.log('====================================');
+	}
+
+	let getanimationframe = () => {
+		let now = Date.now();
+		let elapsed = now - animation.start_time;
+		
+		animation.completion = elapsed / animation.time;
+		if (animation.completion > 1) {
+			animation.completion = 1;
+			animation.started = false;
+			// console.log('====================================, ended at', now, animation.start_time, elapsed);
+		}
+		// console.log(elapsed, animation.completion);
+
+		// on utilise une fonction de easing pour rendre l'animation fluide (lerp, interpolation linéaire en bon français)
+		let x = animation.start_point.x + (animation.end_point.x - animation.start_point.x) * animation.completion;
+		let y = animation.start_point.y + (animation.end_point.y - animation.start_point.y) * animation.completion;
+		let z = animation.start_point.z + (animation.end_point.z - animation.start_point.z) * animation.completion;
+		return {x, y, z};
 	}
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -409,13 +439,13 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	const animate = async () => {
 		renderer.render(scene, camera);
 		composer.render();
-
 		controls.update();
-		if (ittr > 0){
-			setcam(camera.position.x + targetx, camera.position.y + targety, camera.position.z + targetz)
-			ittr -=1;
+
+		if (animation.started) {
+			let {x, y, z} = getanimationframe();
+			setcam(x, y, z);
 		}
-		animationid = requestAnimationFrame(animate);
+
 		while (render_data.queue.length > 0)
 		{
 			let event = render_data.queue.shift(),
@@ -462,6 +492,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				} break;
 			}
 		}
+		animationid = requestAnimationFrame(animate);
 	}
 
 	return {
