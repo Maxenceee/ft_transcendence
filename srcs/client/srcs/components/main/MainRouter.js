@@ -56,7 +56,7 @@ class MainRouter extends Component {
 						]
 					})
 				}),
-				createElement('header', {children: createElement(FriendsPanel, {following: this.props.user.following, reload: () => this.setState({oui: "oui"})})}),
+				createElement('header', {children: createElement(FriendsPanel, {id: this.props.user.id, following: this.props.user.following})}),
 				createElement('main', {children:
 					router(
 						route({path: "/", element: createElement(HomePage, {user: this.props.user, reload: this.props.reload})}),
