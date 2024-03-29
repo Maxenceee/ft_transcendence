@@ -502,11 +502,14 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 						return;
 					}
 				} break;
+				case "deletePallet": {
+					scene.remove(render_data.pallet[data.n]);
+				} break;
 				case "updatePlayer": {
 					if (data.x)
 						render_data.pallet[data.n].position.x = data.x;
-					if (data.y)
-						render_data.pallet[data.n].position.y = data.y;
+					if (data.z)
+						render_data.pallet[data.n].position.z = data.z;
 				} break;
 				case "updateBall": {
 					render_data.ball.position.x = data.x;

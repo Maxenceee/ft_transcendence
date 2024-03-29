@@ -34,13 +34,15 @@ def login(request):
 		
 		if User.objects.filter(username=username).exists():
 			user = User.objects.get(username=username)
-			if pbkdf2.verify(password, user.password):
-				token = makeid(100)
-				response = redirect("/")
-				Token.objects.create(token=token, user=user)
-				response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
-				return response
-
+			try :
+				if pbkdf2.verify(password, user.password):
+					token = makeid(100)
+					response = redirect("/")
+					Token.objects.create(token=token, user=user)
+					response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+					return response
+			except:
+				return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 		return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 	else :
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
@@ -116,7 +118,7 @@ def callback_intra(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		user = User.objects.create(id=id, nickname=intra_id, username=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
+		user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(intra_id=intra_id)
 
@@ -156,7 +158,7 @@ def callback_swivel(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		user = User.objects.create(id=id, nickname=swivel_id, username=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
+		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
 
