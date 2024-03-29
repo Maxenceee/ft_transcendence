@@ -15,7 +15,7 @@ debug: all
 
 up:
 	@printf "$(GREEN)Building and running the container...$(DEFAULT)\n"
-	@cp .env srcs/.env f
+	@cp -f .env srcs/.env 
 	@docker compose down --rmi local --remove-orphans
 	@docker compose up -d --build
 	@printf "$(GREEN)The server is running on http://localhost:$(FORWARDPORT)\n"
