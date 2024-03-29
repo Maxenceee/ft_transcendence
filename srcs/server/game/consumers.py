@@ -485,45 +485,48 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
+				logging.info(f"action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
 				if action == "d_key" or action == "right_arrow_key":
-					if self.players[player_idx].pad_x  < 27.5 and player_idx == 0:
+					if self.players[player_idx].pad_x < 27 and player_idx == 0:
 						self.players[player_idx].pad_x += 1
-						if self.players[player_idx].pad_x  > 27:
+						if self.players[player_idx].pad_x > 27:
 								self.players[player_idx].pad_x = 27
-					if self.players[player_idx].pad_x  > -27.5 and player_idx == 1:
+					if self.players[player_idx].pad_x > -27 and player_idx == 1:
 						self.players[player_idx].pad_x -= 1
-						if self.players[player_idx].pad_x  < -27:
+						if self.players[player_idx].pad_x < -27:
 								self.players[player_idx].pad_x = -27
-					if  player_idx == 2:
-						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  > 27:
-								self.players[player_idx].pad_z = 27
-					if  player_idx == 3:
+					if player_idx == 2:
 						self.players[player_idx].pad_z -= 1
-						if self.players[player_idx].pad_z  < -27:
+						if self.players[player_idx].pad_z > 27:
+								self.players[player_idx].pad_z = 27
+					if player_idx == 3:
+						self.players[player_idx].pad_z += 1
+						if self.players[player_idx].pad_z < -27:
 								self.players[player_idx].pad_z = -27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
-					if self.players[player_idx].pad_x  > -27.5 and player_idx == 0:
+					if self.players[player_idx].pad_x  > -27 and player_idx == 0:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
 								self.players[player_idx].pad_x = -27
-					if self.players[player_idx].pad_x  < 27.5 and player_idx == 1:
+					if self.players[player_idx].pad_x < 27 and player_idx == 1:
 						self.players[player_idx].pad_x += 1
-						if self.players[player_idx].pad_x  > 27:
+						if self.players[player_idx].pad_x > 27:
 							self.players[player_idx].pad_x = 27
-					if  player_idx == 2:
-						self.players[player_idx].pad_z -= 1
+					if player_idx == 2:
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
-					if  player_idx == 3:
-						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  > 27:
+					if player_idx == 3:
+						self.players[player_idx].pad_z -= 1
+						if self.players[player_idx].pad_z > 27:
 							self.players[player_idx].pad_z = 27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
+					logging.info(f"After : action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
+					self.send_all("updateScore", {"n": player_idx, "score": 0})
 
 			t += 1
 			if time.time() - l > 1:
