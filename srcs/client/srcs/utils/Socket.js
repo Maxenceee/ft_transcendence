@@ -60,7 +60,7 @@ dj = function(a, b) {
 		(a && b[i]) && a.appendChild(b[i]);
 }
 
-var Socket = function({port = 3000, host = window.location.hostname, path = "/"}) {
+var Socket = function({port = 3000, host = process.env.BASE_URI || window.location.hostname, path = "/"}) {
 	if (!(this instanceof Socket)) {
 		throw new Error("Socket must be instanciated with new keyword");
 	}

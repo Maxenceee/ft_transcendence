@@ -26,7 +26,9 @@ class Main extends Component {
 		.then(res => res.data)
 		.then(data => {
 			this.setState({ user: data, loading: false }, callBack);
-			this.connectSocket();
+			if (!this.state.socket) {
+				this.connectSocket();
+			}
 		})
 		.catch(error => {
 			console.error("error", error);
@@ -49,7 +51,7 @@ class Main extends Component {
 
 	componentWillUnmount() {
 		// console.log("==================== Main unmounted ====================");
-		// this.state.socket.close();
+		this.state.socket.close();
 	}
 
 	render() {
