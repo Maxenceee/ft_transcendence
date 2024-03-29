@@ -34,13 +34,15 @@ def login(request):
 		
 		if User.objects.filter(username=username).exists():
 			user = User.objects.get(username=username)
-			if pbkdf2.verify(password, user.password):
-				token = makeid(100)
-				response = redirect("/")
-				Token.objects.create(token=token, user=user)
-				response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
-				return response
-
+			try :
+				if pbkdf2.verify(password, user.password):
+					token = makeid(100)
+					response = redirect("/")
+					Token.objects.create(token=token, user=user)
+					response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
+					return response
+			except:
+				return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 		return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
 	else :
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
