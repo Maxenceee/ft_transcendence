@@ -376,6 +376,16 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		wallP1.position.z += mapLenth / 2;
 		wallP2.position.z -= mapLenth / 2;
 
+		const geometryBall = new THREE.BoxGeometry(1, 1, 1);
+		const materialBall = new THREE.MeshPhysicalMaterial({
+			wireframe:false, 
+			color:0xff0000, 
+			opacity: 1, 
+			iridescence :1,
+			side : THREE.DoubleSide,
+		});
+		render_data.ball = new THREE.Mesh(geometryBall, materialBall);
+
 		render_data.pallet[0].position.z += (mapLenth / 2) - 1.5;
 		render_data.pallet[1].position.z -= (mapLenth / 2) - 1.5;
 		render_data.pallet[2].position.x += (mapLenth / 2) - 1.5;
@@ -434,6 +444,10 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		}
 	}
 
+	// let updatePos = (l, n) => {
+	// 	return Object.assign({}, l, n);
+	// }
+
 	let animationid = null,
 		ts = Date.now();
 	const animate = async () => {
@@ -484,7 +498,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					}
 				} break;
 				case "updatePlayer": {
-					render_data.pallet[data.n].position.x = data.x;
+					render_data.pallet[data.n].position = Object.assign({}, render_data.pallet[data.n].position, data);
 				} break;
 				case "updateBall": {
 					render_data.ball.position.x = data.x;

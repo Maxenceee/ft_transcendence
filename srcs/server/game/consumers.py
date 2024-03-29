@@ -472,15 +472,20 @@ class Game:
 
 	def game_master_4p(self):
 		logging.info("game master 4p")
-		self.send_all("initGame", "")
-		self.send_all("gameState", self.to_json())
+		for player in self.players:
+			player.score = 5
+		self.send_all("initGame", self.to_json())
+		for i in range(len(self.players)):
+			self.send_all("updateScore", {"n": i, "score": self.players[i].score})
+		t = 0
+		l = time.time()
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
 				if action == "d_key" or action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 1
-						if self.players[player_idx].pad_x  > 27 :
+						if self.players[player_idx].pad_x  > 27:
 								self.players[player_idx].pad_x = 27
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 1:
 						self.players[player_idx].pad_x -= 1
@@ -488,12 +493,13 @@ class Game:
 								self.players[player_idx].pad_x = -27
 					if  player_idx == 2:
 						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  > 27 :
+						if self.players[player_idx].pad_z  > 27:
 								self.players[player_idx].pad_z = 27
 					if  player_idx == 3:
 						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z  < -27:
 								self.players[player_idx].pad_z = -27
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
 				elif action == "a_key" or action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -27.5 and player_idx == 0:
 						self.players[player_idx].pad_x -= 1
@@ -501,7 +507,7 @@ class Game:
 								self.players[player_idx].pad_x = -27
 					if self.players[player_idx].pad_x  < 27.5 and player_idx == 1:
 						self.players[player_idx].pad_x += 1
-						if self.players[player_idx].pad_x  > 27 :
+						if self.players[player_idx].pad_x  > 27:
 							self.players[player_idx].pad_x = 27
 					if  player_idx == 2:
 						self.players[player_idx].pad_z -= 1
@@ -509,12 +515,22 @@ class Game:
 								self.players[player_idx].pad_z = -27
 					if  player_idx == 3:
 						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  > 27 :
+						if self.players[player_idx].pad_z  > 27:
 							self.players[player_idx].pad_z = 27
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
 				elif action == "disconnect":
+					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
+					self.end_game()
+					return
 
-			time.sleep(0.05)
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"game {self.id} => {l} tps: {t}")
+				t = 0
+				l = time.time()
+
+			time.sleep(0.04)
 			self.ball.x += self.ball.direction_x * 0.4 * self.ball.speed
 			self.ball.z += self.ball.direction_z * 0.4 * self.ball.speed
 			self.wall_collide_four_player()
@@ -522,10 +538,10 @@ class Game:
 			self.pad_collision_x(1)
 			self.pad_collision_z(2)
 			self.pad_collision_z(3)
-			self.send_all("gameState", self.to_json())
+			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			i = 0
 			for player in self.players:
-				if player.score  < 1 :
+				if player.score < 1:
 					i += 1
 				if i >= 3 :
 					self.end_game()
@@ -681,10 +697,11 @@ class Game:
 
 	def wall_collide_four_player(self):
 		if self.ball.x < -29 :
-			if self.players[2].score <= 0 :
+			if self.players[2].score <= 0:
 				self.ball.direction_x *=-1
-				return	
-			self.players[2].score -=1
+				return
+			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
+			self.players[2].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
@@ -694,9 +711,10 @@ class Game:
 			if self.players[2].score <= 0:
 				self.send_all("deletePallet", {"n" : 2})
 		elif self.ball.x > 29 :
-			if self.players[3].score <= 0 :
-				self.ball.direction_x *=-1
-				return	
+			if self.players[3].score <= 0:
+				self.ball.direction_x *= -1
+				return
+			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -707,9 +725,10 @@ class Game:
 			if self.players[3].score <= 0:
 				self.send_all("deletePallet", {"n" : 3})
 		elif self.ball.z < -29:
-			if self.players[1].score <= 0 :
-				self.ball.direction_z *=-1
-				return	
+			if self.players[1].score <= 0:
+				self.ball.direction_z *= -1
+				return
+			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -720,9 +739,10 @@ class Game:
 			if self.players[1].score <= 0:
 				self.send_all("deletePallet", {"n" : 1})
 		elif self.ball.z > 29:
-			if self.players[0].score <= 0 :
-				self.ball.direction_z *=-1
-				return	
+			if self.players[0].score <= 0:
+				self.ball.direction_z *= -1
+				return
+			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
