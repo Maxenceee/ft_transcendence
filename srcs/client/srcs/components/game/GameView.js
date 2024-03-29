@@ -192,11 +192,11 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
-			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
+			render_data.scores.push(createTextObject((data[i].score || i).toString()));
+			render_data.scores[i].position.z += (i % 2 ? 30 : 0) * (i % 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
-			render_data.scores[i].rotateY((Math.PI / 2) * i);
+			render_data.scores[i].position.x += (i % 2 ? 0 : 30) * (i % 2 ? -1 : 1);
+			// render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
 
 		scene.add(...render_data.scores);
@@ -386,10 +386,15 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		});
 		render_data.ball = new THREE.Mesh(geometryBall, materialBall);
 
+		let tmp = new Array(4).fill(0).map(_ => new THREE.Object3D());
 		render_data.pallet[0].position.z += (mapLenth / 2) - 1.5;
 		render_data.pallet[1].position.z -= (mapLenth / 2) - 1.5;
 		render_data.pallet[2].position.x += (mapLenth / 2) - 1.5;
 		render_data.pallet[3].position.x -= (mapLenth / 2) - 1.5;
+		for (let i = 0; i < 4; i++) {
+			tmp[i].add(render_data.pallet[i]);
+		}
+		render_data.pallet = tmp;
 
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 		scene.add(...render_data.pallet);
@@ -492,13 +497,16 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					} else {
 						createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
 					}
-					if (render_data.pallet.some(e => e.score > 4)) {
+					if (type != "4p" && render_data.pallet.some(e => e.score > 4)) {
 						scene.remove(render_data.ball);
 						return;
 					}
 				} break;
 				case "updatePlayer": {
-					render_data.pallet[data.n].position = Object.assign({}, render_data.pallet[data.n].position, data);
+					if (data.x)
+						render_data.pallet[data.n].position.x = data.x;
+					if (data.y)
+						render_data.pallet[data.n].position.y = data.y;
 				} break;
 				case "updateBall": {
 					render_data.ball.position.x = data.x;

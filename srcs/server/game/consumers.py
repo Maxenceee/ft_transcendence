@@ -368,6 +368,9 @@ class Game:
 		if self.type != "local" :
 			self.send(0, "moveCam", {"x" : "0", "y" : "30", "z" : "60", "duration" : "3000"})
 			self.send(1, "moveCam", {"x" : "0", "y" : "30", "z" : "-60", "duration" : "3000"})
+			if self.type == "4p":
+				self.send(2, "moveCam", {"x" : "60", "y" : "30", "z" : "0", "duration" : "3000"})
+				self.send(3, "moveCam", {"x" : "-60", "y" : "30", "z" : "0", "duration" : "3000"})
 		for i in range(3, 0, -1):
 			self.send_text(str(i))
 			time.sleep(1)
@@ -476,7 +479,7 @@ class Game:
 			player.score = 5
 		self.send_all("initGame", self.to_json())
 		for i in range(len(self.players)):
-			self.send_all("updateScore", {"n": i, "score": self.players[i].score})
+			self.send_all("updateScore", {"n": i, "score": i})
 		t = 0
 		l = time.time()
 		while True:
@@ -521,8 +524,6 @@ class Game:
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
-					self.end_game()
-					return
 
 			t += 1
 			if time.time() - l > 1:
@@ -543,7 +544,7 @@ class Game:
 			for player in self.players:
 				if player.score < 1:
 					i += 1
-				if i >= 3 :
+				if i >= 3:
 					self.end_game()
 					return
 
