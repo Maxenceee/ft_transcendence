@@ -5,8 +5,6 @@ const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 
-console.log("================================", process.env);
-
 module.exports = {
     entry: {
         app: path.resolve(__dirname, './srcs/App.js'),
