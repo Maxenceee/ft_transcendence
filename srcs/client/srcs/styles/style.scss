@@ -3,6 +3,7 @@
 	inherits: true;
 	initial-value: 0;
 }
+
 @property --gradient-angle {
 	syntax: '<angle>';
 	inherits: false;
@@ -187,6 +188,8 @@ button span {
 
 	--friend-bg: #F189C8;
 	--friend-bg-h: #d154a0;
+
+	--gradient-angle: 0deg;
 }
 
 body {
@@ -1747,7 +1750,6 @@ body:has(.connection-page) {
 			}
 	
 			&.btn-primary {
-				--gradient-angle: 0deg;
 				transition: --gradient-angle 2s ease-in-out;
 				margin-top: 16px;
 				background: linear-gradient(var(--gradient-angle), #f62ca4, #fb0842);
