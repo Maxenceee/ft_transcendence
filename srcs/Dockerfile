@@ -62,6 +62,7 @@ RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv pass
 
 # Copiez les fichiers de l'application
 COPY ./server /app/server
+COPY ../.env /app/.env
 COPY ./client /app/client
 
 # Déplacez-vous vers le répertoire client
