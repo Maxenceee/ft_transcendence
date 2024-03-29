@@ -90,7 +90,7 @@ class FriendsPanel extends Component {
 				createElement('span', {
 					class: "friend-middle-row", children: [
 						createElement('div', {
-							class: "friend-name", title: player.nickname, children: link({to: "/user/"+player.id, children: player.nickname})
+							class: "friend-name", children: link({to: "/user/"+player.id, title: player.nickname, children: player.nickname})
 						}),
 						createElement('div', {
 							class: "friend-status"+(player.is_online ?  " on" : " off"), children: player.status
