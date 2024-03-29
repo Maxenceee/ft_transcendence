@@ -55,6 +55,8 @@ const App = {
 	},
 }
 
+console.log(process.env);
+
 xhr.defaults.baseURL = (process.env.BASE_URI || "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));

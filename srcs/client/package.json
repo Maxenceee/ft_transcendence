@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "pack": "dotenv -f /app/.env -- webpack --config webpack.config.js",
+    "pack": "webpack --config webpack.config.js",
     "watch": "dotenv -f ../../.env -- webpack --config webpack.config.js --watch"
   },
   "author": "",

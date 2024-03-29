@@ -831,8 +831,7 @@ class WebsocketClient(WebsocketConsumer):
 				if (time.time() - self.oldmove) > 0.005 and self.type != "local":
 					self.oldmove = time.time()
 					self.player.push_to_game(receive_package['move'])
-				elif (time.time() - self.oldmove) > 0.001 and self.type == "local":
-					self.oldmove = time.time()
+				elif self.type == "local":
 					self.player.push_to_game(receive_package['move'])
 				return
 			elif receive_package['type'] == "ready":
