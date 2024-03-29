@@ -1,6 +1,8 @@
 import { CallBack, mergeProto } from ".";
 
 var bindPort = function(a, b) {
+	if (!b.length)
+		return ("//"+a);
 	if (!isNaN(parseInt(b))) {
 		return ("//"+a+':'+b);
 	}
@@ -60,14 +62,14 @@ dj = function(a, b) {
 		(a && b[i]) && a.appendChild(b[i]);
 }
 
-var Socket = function({port = 3000, host = window.location.hostname, path = "/"}) {
+var Socket = function({port = -1, host = process.env.BASE_URI || window.location.hostname, path = "/"}) {
 	if (!(this instanceof Socket)) {
 		throw new Error("Socket must be instanciated with new keyword");
 	}
 	if (typeof port !== "number" || typeof host !== "string" || typeof path !== "string") {
 		throw new Error("Socket must be instanciated with an object containing port, host and path");
 	}
-	if (port < 0 || port > 65535) {
+	if (port > 65535) {
 		throw new Error("Port must be a valid port number, not "+port);
 	}
 	if (host.length < 3) {
@@ -76,13 +78,18 @@ var Socket = function({port = 3000, host = window.location.hostname, path = "/"}
 	if (path.length < 1) {
 		throw new Error("Path must be a valid path, not "+path);
 	}
+	try {
+		host = new URL(host);
+	} catch (error) {
+		throw new Error("Host must be a valid domain name, not "+host);
+	}
 	this.callBack = null;
 
 	try {
-		let sp = port.toString(),
-			hr = [host];
-		let WSProtocol = (location.protocol === 'https:') ? 'wss:' : 'ws:',
-			WSHost = (host === 'localhost') ? bindPort(hr[0], sp) : hr[0],
+		let sp = (port > 0 && port || host.port).toString(),
+			hr = [host.hostname];
+		let WSProtocol = (host.protocol === 'https:') ? 'wss:' : 'ws:',
+			WSHost = bindPort(hr[0], sp),
 			spath = WSProtocol.concat(WSHost, path);
 		this.socket = new WebSocket(spath);
 		this.openingtime = Date.now();

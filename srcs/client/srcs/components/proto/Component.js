@@ -60,7 +60,7 @@ class Component {
 			}
 		}
 
-		this._pendingStateCallbacks.forEach(callback => callback());
+		this._pendingStateCallbacks.forEach(callback => callback(this.state));
 		this._pendingStateCallbacks = [];
 
 		if (this._mounted)

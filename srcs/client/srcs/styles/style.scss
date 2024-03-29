@@ -846,9 +846,9 @@ main {
 		a {
 			color: inherit;
 
-			&:hover {
-				text-decoration: underline;
-			}
+			// &:hover {
+			// 	text-decoration: underline;
+			// }
 		}
 
 		
@@ -1124,16 +1124,137 @@ main {
 	}
 }
 
+.bc-price-btn {
+	--bc-pr-btn-l: rgba(43, 7, 110, 0.2);
+  	--bc-pr-btn-d: rgba(255, 255, 255, 0.3);
+	--bc-pr-btn: var(--bc-pr-btn-d);
+    position: relative;
+    // width: 80%;
+    // height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    // margin-bottom: 5%;
+
+	ul {
+		position: relative;
+		height: 50px;
+		min-width: 50px;
+		list-style: none;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		margin: 5px;
+		border: 2px solid var(--bc-pr-btn);
+		border-radius: 50px;
+		overflow: hidden;
+		transition: .5s ease-in-out;
+		background-color: #62d2f5;
+
+		li:nth-child(1) a {
+			color: white;
+		}
+
+		li:nth-child(1) {
+			width: 0px;
+			overflow: hidden;
+			font-size: 18px;
+
+			span {
+				display: inline;
+				vertical-align: md;
+			}
+		}
+		
+		li:nth-child(2) {
+			div {
+				border-radius: 20px;
+				height: 40px;
+				width: 40px;
+			}
+			svg {
+				color: #fff;
+				padding: 10px;
+				transform: rotate(90deg);
+			}
+		}
+	}
+	&:hover ul {
+		border: 2px solid rgba(43, 7, 110, 0);
+		// background-color: #3671E9;
+		background-color: #fff;
+		padding: 10px;
+
+		li:nth-child(1) {
+			width: 60px;
+			color: #62d2f5;
+			padding-left: 5px;
+		}
+
+		li:nth-child(2) {
+			div {
+				background-color: #62d2f5;
+				transform: scale(0.7);
+			}
+			svg {
+				color: #fff;
+			}
+		}
+	}
+
+	a {
+		text-decoration: none;
+	}	
+}
+
+.transiton {
+    transition: .5s ease-in-out;
+}
+
+.bc-btn-transition {
+    -webkit-transition: .5s cubic-bezier(0.9, 0, 0.5, 1);
+    transition: .5s cubic-bezier(0.9, 0, 0.5, 1); /*bouce transition (0.4, 1.5, 0.4, 1)*/
+}
+
+// .bc-rpice-sub.resizesable .bc-price-btn ul li:nth-child(1) {
+//     width: 75px;
+//     color: white;
+// }
+// .bc-rpice-sub.resizesable .bc-price-btn ul li:nth-child(2) i {
+//     transform: scale(0.8);
+//     background-color: white;
+// }
+// .bc-rpice-sub.resizesable .bc-price-btn ul {
+//     border: 2px solid rgba(43, 7, 110, 0);
+//     background-color: #3671E9;
+//     padding: 10px;
+// }
+
 section {
 	margin-bottom: 35px;
 
 	.section-header {
-		margin: 40px 0;
+		margin-top: 40px;
 		padding: 0 34px;
 
 		h1 {
 			text-align: left;
 			font-size: 1.6em;
+		}
+	}
+
+	.tmp-title {
+		display: none;
+		padding: 0 34px;
+
+		h1 {
+			text-align: left;
+			color: #6a6a6a;
+		}
+
+		@media screen and (min-width: 1500px) {
+			display: block;
 		}
 	}
 }
@@ -2530,6 +2651,7 @@ body:has(.connection-page) {
 				height: 60px;
 				border-radius: 50%;
 				overflow: hidden;
+				flex: 0 0 auto;
 
 				img {
 					width: 100%;
@@ -2539,16 +2661,21 @@ body:has(.connection-page) {
 			}
 
 			.friend-middle-row {
-				flex: 1 auto;
+				flex: 1 1 auto;
+				overflow: hidden;
 				display: flex;
 				flex-direction: column;
 				align-items: flex-start;
-				padding-left: 10px;
+				padding: 0 10px;
 
 				.friend-name {
 					font-size: 22px;
 					text-decoration: none;
 					color: currentColor;
+					width: 100%;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
 
 					&:hover {
 						text-decoration: underline;
@@ -2586,6 +2713,7 @@ body:has(.connection-page) {
 			.friend-action {
 				display: flex;
 				align-items: center;
+				flex: 0 0 auto;
 				// --friend-action-color: var(--friend-bg);
 
 				button {

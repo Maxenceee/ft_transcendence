@@ -55,6 +55,6 @@ const App = {
 	},
 }
 
-xhr.defaults.baseURL = (window.location.hostname == "localhost" ? "http://localhost:3000" : "");
+xhr.defaults.baseURL = (process.env.BASE_URI || "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));

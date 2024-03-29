@@ -2,6 +2,7 @@ const path = require('path');
 const TerserPlugin = require("terser-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     entry: {
@@ -55,6 +56,7 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style.css',
         }),
+        new Dotenv(),
     ],
     optimization: {
         minimize: true,

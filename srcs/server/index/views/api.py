@@ -30,7 +30,7 @@ def api_get_user_following(request, id):
 	else:
 		user = get_object_or_404(User, id=id)
 	following = []
-	for user in self.following.all():
+	for user in user.following.all():
 		following.append(user.resume_to_json())
 	response = {
 		"following": following,

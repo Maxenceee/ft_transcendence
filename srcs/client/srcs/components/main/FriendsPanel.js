@@ -19,7 +19,14 @@ class FriendsPanel extends Component {
 	}
 
 	openPanel() {
-		this.setState({open: !this.state.open, onsearch: false});
+		this.setState({open: !this.state.open, onsearch: false}, (state) => {
+			if (!state.open) return;
+			xhr.get('/api/user/'+this.props.id+'/following')
+			.then(res => res.data)
+			.then(data => {
+				this.setState({ following: data.following || [] });
+			});
+		});
 	}
 
 	componentDidUpdate() {
@@ -68,8 +75,8 @@ class FriendsPanel extends Component {
 
 	playerRow(player) {
 		let action = [
-			{title: "Follow", color: "var(--friend-bg)", hover: "var(--friend-bg-h)", action: this.followPlayer},
-			{title: "Unfollow", color: "#555555", hover: "#8e8e8e", action: this.unfollowPlayer}
+			{title: "Suivre", color: "var(--friend-bg)", hover: "var(--friend-bg-h)", action: this.followPlayer},
+			{title: "Ne plus suivre", color: "#555555", hover: "#8e8e8e", action: this.unfollowPlayer}
 		]
 		let isfr = (e) => this.state.following.find(f => f.id == e);
 		let opt = action[isfr(player.id) ? 1 : 0];
@@ -83,10 +90,10 @@ class FriendsPanel extends Component {
 				createElement('span', {
 					class: "friend-middle-row", children: [
 						createElement('div', {
-							class: "friend-name", children: link({to: "/user/"+player.id, children: player.nickname})
+							class: "friend-name", title: player.nickname, children: link({to: "/user/"+player.id, children: player.nickname})
 						}),
 						createElement('div', {
-							class: "friend-status"+(player.is_online ?  "on" : " off"), children: player.status
+							class: "friend-status"+(player.is_online ?  " on" : " off"), children: player.status
 						})
 					]
 				}),

@@ -27,25 +27,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fapwxb2=b$h%90303zws)x0bpx+#!i-addbbawk#q&+yn9%i!-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-BASE_URL = 'http://localhost:3000'
+BASE_URL = os.environ.get('BASE_URI')
 DEBUG = False
 
 ALLOWED_HOSTS = [
 	"localhost",
 	"website",
 	"trace.maxencegama.dev",
-	"tracendance.tech"
+	"tracendance.tech",
+	BASE_URL,
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-	"http://localhost:3000",
+	BASE_URL,
 	"http://website:3000",
 	"https://trace.maxencegama.dev",
 	"https://tracendance.tech"
 ]
 
 CORS_ALLOWED_ORIGINS = [
-	"http://localhost:3000",
+	BASE_URL,
 	"http://localhost:3001",
 ]
 

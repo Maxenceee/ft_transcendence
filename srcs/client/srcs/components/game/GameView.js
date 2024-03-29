@@ -24,6 +24,15 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		scores: [],
 	}
 
+	let animation = {
+		start_time: null,
+		start_point: null,
+		end_point: null,
+		time: 0,
+		completion: 1,
+		started: false
+	}
+
 	let socket = new Socket({path: "/game/"+type});
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
@@ -35,7 +44,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				setcam(msg.data.x, msg.data.y, msg.data.z);
 				break;
 			case "moveCam":
-				movecam(msg.data.x, msg.data.y, msg.data.z, msg.data.frame);
+				startanimation(camera.position, {x: msg.data.x, y: msg.data.y, z: msg.data.z}, msg.data.duration.toString());
 				break;
 			case "text":
 				createText(msg.data.text, msg.data.size);
@@ -62,15 +71,36 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		camera.position.set(x, y, z);
 	}
 
-	let targetx = 0, targetz = 0, targety = 0, ittr = 0;
-	let movecam = (x, y, z, frame) => {
-		targetx = x - camera.position.x;
-		targetx /= frame;
-		targetz = z - camera.position.z;
-		targetz /= frame;
-		targety = y - camera.position.y;
-		targety /= frame;
-		ittr=Math.round(frame);
+	let startanimation = (s, e, dur) => {
+		if (animation.started) return console.error('an animation is already running');
+		animation.start_time = Date.now();
+		animation.start_point = s;
+		animation.end_point = e;
+		animation.time = dur;
+		animation.completion = 0;
+		animation.started = true;
+		// console.log('====================================');
+		// console.log('start animation', animation);
+		// console.log('====================================');
+	}
+
+	let getanimationframe = () => {
+		let now = Date.now();
+		let elapsed = now - animation.start_time;
+		
+		animation.completion = elapsed / animation.time;
+		if (animation.completion > 1) {
+			animation.completion = 1;
+			animation.started = false;
+			// console.log('====================================, ended at', now, animation.start_time, elapsed);
+		}
+		// console.log(elapsed, animation.completion);
+
+		// on utilise une fonction de easing pour rendre l'animation fluide (lerp, interpolation linéaire en bon français)
+		let x = animation.start_point.x + (animation.end_point.x - animation.start_point.x) * animation.completion;
+		let y = animation.start_point.y + (animation.end_point.y - animation.start_point.y) * animation.completion;
+		let z = animation.start_point.z + (animation.end_point.z - animation.start_point.z) * animation.completion;
+		return {x, y, z};
 	}
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -162,11 +192,11 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
-			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
+			render_data.scores.push(createTextObject((data[i].score || i).toString()));
+			render_data.scores[i].position.z += (i % 2 ? 30 : 0) * (i % 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
-			render_data.scores[i].rotateY((Math.PI / 2) * i);
+			render_data.scores[i].position.x += (i % 2 ? 0 : 30) * (i % 2 ? -1 : 1);
+			// render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
 
 		scene.add(...render_data.scores);
@@ -346,10 +376,25 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		wallP1.position.z += mapLenth / 2;
 		wallP2.position.z -= mapLenth / 2;
 
+		const geometryBall = new THREE.BoxGeometry(1, 1, 1);
+		const materialBall = new THREE.MeshPhysicalMaterial({
+			wireframe:false, 
+			color:0xff0000, 
+			opacity: 1, 
+			iridescence :1,
+			side : THREE.DoubleSide,
+		});
+		render_data.ball = new THREE.Mesh(geometryBall, materialBall);
+
+		let tmp = new Array(4).fill(0).map(_ => new THREE.Object3D());
 		render_data.pallet[0].position.z += (mapLenth / 2) - 1.5;
 		render_data.pallet[1].position.z -= (mapLenth / 2) - 1.5;
 		render_data.pallet[2].position.x += (mapLenth / 2) - 1.5;
 		render_data.pallet[3].position.x -= (mapLenth / 2) - 1.5;
+		for (let i = 0; i < 4; i++) {
+			tmp[i].add(render_data.pallet[i]);
+		}
+		render_data.pallet = tmp;
 
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 		scene.add(...render_data.pallet);
@@ -404,18 +449,22 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 		}
 	}
 
+	// let updatePos = (l, n) => {
+	// 	return Object.assign({}, l, n);
+	// }
+
 	let animationid = null,
 		ts = Date.now();
 	const animate = async () => {
 		renderer.render(scene, camera);
 		composer.render();
-
 		controls.update();
-		if (ittr > 0){
-			setcam(camera.position.x + targetx, camera.position.y + targety, camera.position.z + targetz)
-			ittr -=1;
+
+		if (animation.started) {
+			let {x, y, z} = getanimationframe();
+			setcam(x, y, z);
 		}
-		animationid = requestAnimationFrame(animate);
+
 		while (render_data.queue.length > 0)
 		{
 			let event = render_data.queue.shift(),
@@ -444,17 +493,20 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				case "updateScore": {
 					render_data.pallet[data.n].score = data.score;
 					if (type == "4p") {
-						displayScore(data.pallet);
+						displayScore(render_data.pallet);
 					} else {
 						createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
 					}
-					if (render_data.pallet.some(e => e.score > 4)) {
+					if (type != "4p" && render_data.pallet.some(e => e.score > 4)) {
 						scene.remove(render_data.ball);
 						return;
 					}
 				} break;
 				case "updatePlayer": {
-					render_data.pallet[data.n].position.x = data.x;
+					if (data.x)
+						render_data.pallet[data.n].position.x = data.x;
+					if (data.y)
+						render_data.pallet[data.n].position.y = data.y;
 				} break;
 				case "updateBall": {
 					render_data.ball.position.x = data.x;
@@ -462,6 +514,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				} break;
 			}
 		}
+		animationid = requestAnimationFrame(animate);
 	}
 
 	return {
