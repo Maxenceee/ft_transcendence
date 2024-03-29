@@ -479,7 +479,7 @@ class Game:
 			player.score = 5
 		self.send_all("initGame", self.to_json())
 		for i in range(len(self.players)):
-			self.send_all("updateScore", {"n": i, "score": i})
+			self.send_all("updateScore", {"n": i, "score": 5})
 		t = 0
 		l = time.time()
 		while True:
