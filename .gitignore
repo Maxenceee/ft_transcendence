@@ -4,3 +4,5 @@ old_*
 .DS_Store
 */**.DS_Store
 .venv/
+.env
+**/.env
