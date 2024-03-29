@@ -1,4 +1,4 @@
-import { Component, createElement, HomePage, UserPage, NotFound, FriendsPanel, router, route, link } from '..';
+import { Component, createElement, HomePage, UserPage, NotFound, FriendsPanel, router, route, link, ServerError } from '..';
 
 class MainRouter extends Component {
 	componentDidMount() {

@@ -1,5 +1,27 @@
-createElement('svg', {
-    width: "28", height: "28", viewBox: "0 0 28 28", fill: "none", xmlns: "http://www.w3.org/2000/svg", children: createElement('path', {
-        d: "M19.9208 14.3723C19.9165 13.9738 19.7677 13.6305 19.4523 13.3267L10.325 4.38484C10.0592 4.12867 9.74233 4 9.3596 4C8.60585 4 8 4.59203 8 5.35327C8 5.72428 8.15094 6.06764 8.41226 6.33435L16.6524 14.3701L8.41226 22.4102C8.15304 22.6748 8 23.0106 8 23.3934C8 24.1525 8.60585 24.7466 9.3596 24.7466C9.73811 24.7466 10.0592 24.618 10.325 24.3522L19.4523 15.4178C19.7698 15.1044 19.9208 14.7686 19.9208 14.3723Z"
-    })
+createElement('main', {
+    children: [
+        createElement('div', {
+            class: "logo", children: createElement('img', {
+                src: "./Internal server error ! (500)_files/42_logo.svg", alt: "logo"
+            })
+        }),
+        createElement('div', {
+            class: "title", children: createElement('img', {
+                src: "./Internal server error ! (500)_files/500.png", alt: ""
+            })
+        }),
+        createElement('div', {
+            class: "screen", children: [
+                createElement('div', {
+                    class: "main-image", style: "background-image: url("/images/1-sorry.gif");"
+                }),
+                createElement('img', {
+                    src: "./Internal server error ! (500)_files/macbook.png", alt: ""
+                })
+            ]
+        }),
+        createElement('h1', {
+            children: "Ooops ! Something went wrong !"
+        })
+    ]
 })

@@ -9,4 +9,5 @@ export { default as UserPagePlayerStats } from './userpage/UserPagePlayerStats';
 
 export { default as Loader } from './Loader';
 export { default as BadConnection } from './BadConnection';
-export { default as NotFound } from './NotFound';
+export { default as NotFound } from '../error_page/NotFound';
+export { default as ServerError } from '../error_page/ServerError';

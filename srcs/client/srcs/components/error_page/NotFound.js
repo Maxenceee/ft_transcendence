@@ -7,7 +7,6 @@ class NotFound extends Component {
 				createElement('img', {
 					src: process.env.BASE_URI+"/static/images/404_img.png", alt: "404"
 				}),
-				// link({to: "/", class: "link", children: "Go back to home"})
 			]
 		});
 	}

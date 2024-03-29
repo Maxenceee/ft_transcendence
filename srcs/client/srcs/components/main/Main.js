@@ -1,4 +1,4 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, xhr, Loader, BadConnection } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, xhr, Loader, BadConnection, ServerError } from '..';
 import { Socket } from '../../utils';
 
 class Main extends Component {
@@ -65,6 +65,7 @@ class Main extends Component {
 			createElement(BrowserRouter, {children:
 				router(
 					route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
+					route({path: "/500", element: createElement(ServerError)}),
 					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 				)
 			})
