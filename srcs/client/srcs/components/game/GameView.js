@@ -488,7 +488,7 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 				case "updateScore": {
 					render_data.pallet[data.n].score = data.score;
 					if (type == "4p") {
-						displayScore(data.pallet);
+						displayScore(render_data.pallet);
 					} else {
 						createText(render_data.pallet[0].score + " : " + render_data.pallet[1].score);
 					}
