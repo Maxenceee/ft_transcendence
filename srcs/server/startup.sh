@@ -1,4 +1,8 @@
 #!/bin/sh
+cd /app/client && npm run pack
+
+cd /app/server
+
 python3 manage.py makemigrations
 
 python3 manage.py makemigrations index

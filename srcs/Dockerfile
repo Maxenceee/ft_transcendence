@@ -22,14 +22,13 @@ RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv pass
 
 # Copiez les fichiers de l'application
 COPY ./server /app/server
-COPY .env /app/client/.env
 COPY ./client /app/client
 
 # Déplacez-vous vers le répertoire client
-WORKDIR /app/client
+# WORKDIR /app/client
 
 # Installez les dépendances Node.js et compilez l'application client avec Webpack
-RUN npm run pack
+# RUN npm run pack
 
 # Revenez au répertoire principal de l'application
 WORKDIR /app/server
