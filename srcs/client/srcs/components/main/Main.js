@@ -1,5 +1,6 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, xhr, Loader, BadConnection, ServerError } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError } from '..';
 import { Socket } from '../../utils';
+import axios from "axios";
 
 class Main extends Component {
 	constructor(props) {
@@ -21,8 +22,11 @@ class Main extends Component {
 		this.setState({socket: socket});
 	}
 
-	loadUser(callBack = null) {
-		xhr.get('/api/user/me/get')
+	loadUser(callBack = null, loading = true) {
+		if (loading) {
+			this.setState({ loading: true });
+		}
+		axios.get('/api/user/me/get')
 		.then(res => res.data)
 		.then(data => {
 			this.setState({ user: data, loading: false }, callBack);
@@ -34,10 +38,6 @@ class Main extends Component {
 			console.error("error", error);
 			this.setState({ loading: false, error: "An error occured" });
 		})
-	}
-
-	reload() {
-		this.setState({ loading: true });
 	}
 
 	componentDidMount() {

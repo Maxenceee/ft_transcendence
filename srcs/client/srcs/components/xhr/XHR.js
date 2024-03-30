@@ -30,6 +30,28 @@ function Su(e, t) {
 
 const isUndefined = vi,
 isArray = Array.isArray,
+isObject = e => e !== null && typeof e == "object",
+isHTMLForm = e => e instanceof HTMLFormElement,
+isFormData = e => {
+    return e && (typeof FormData == "function" && e instanceof FormData)
+},
+isArrayBuffer = e => e instanceof ArrayBuffer,
+isBuffer = e => typeof Buffer == "function" && Buffer.isBuffer(e),
+isStream = e => {
+		return isObject(e) && pt(e.pipe)
+	},
+isFile = e => {
+		return isObject(e) && pt(e.stream) && e.path != null
+	},
+isBlob = e => {
+		return isObject(e) && pt(e.stream) && pt(e.arrayBuffer)
+},
+isURLSearchParams = e => {
+	return typeof URLSearchParams == "function" && e instanceof URLSearchParams
+},
+isFileList = e => {
+	return isObject(e) && pt(e.item) && pt(e.length)
+},
 forEach = function(e, t, { allOwnKeys: r = false } = {}) {
 	if (e === null || typeof e > "u")
 		return;
@@ -77,6 +99,16 @@ function X5(e, t) {
 }
 function Pu(e, t) {
     return e && !J5(t) ? X5(e, t) : t
+}
+function B5(e, t, r) {
+    if (isString(e))
+        try {
+            return (t || JSON.parse)(e), j.trim(e);
+        } catch (i) {
+            if (i.name !== "SyntaxError")
+                throw i;
+        }
+    return (r || JSON.stringify)(e)
 }
 
 function wr(e, t) {
@@ -159,9 +191,16 @@ class XHR {
 		typeof u == "string" ? (d = d || {}, d.url = u) : d = u || {},
 			d = wr(this.defaults, d);
 		d.method = (d.method || this.defaults.method || "get").toLowerCase();
+		
+		let { headers } = d;
+		let o = headers && headers.common || {};
+		headers && forEach(["delete", "get", "head", "post", "put", "patch", "common"], N => {
+            delete headers[N]
+        });
+		d.headers = Object.assign({}, o, headers);
+		
 		const transport = d.transport || "xhr";
 		const handler = Go[transport];
-
 		if (!handler) {
 			throw new Error(`Transport "${transport}" is not supported`);
 		}
@@ -170,13 +209,34 @@ class XHR {
 	}
 }
 
+const setContentType = (e, t) => {
+	!e["Content-Type"] && (e["Content-Type"] = t);
+}
+
 const Go = {
 	xhr: function(config) {
 		return new Promise(function(resolve, reject) {
-			let data = config.data;
+			let data = (function(t, r) {
+				const i = r["Content-Type"] || "",
+					a = i.indexOf("application/json") > -1,
+					l = isObject(t);
+				if (l && isHTMLForm(t) && (t = new FormData(t)), isFormData(t))
+					return a && a ? JSON.stringify(t) : t;
+				if (isArrayBuffer(t) || isBuffer(t) || isStream(t) || isFile(t) || isBlob(t))
+					return t;
+				if (isURLSearchParams(t))
+					return setContentType(r, "application/x-www-form-urlencoded;charset=utf-8"), t.toString();
+				return l || a ? (setContentType(r, "application/json"), B5(t)) : t
+			}).call(this, config.data, config.headers || {});
+			["post", "put", "patch"].indexOf(config.method) !== -1 && setContentType(config.headers, "application/x-www-form-urlencoded");
 			const headers = config.headers || {};
-			let {responseType: o} = config;
+			let { responseType: o } = config;
 			const xhr = new XMLHttpRequest();
+
+			if (isFormData(data)) {
+				const [x,...S] = h ? h.split(";").map(C => C.trim()).filter(Boolean) : [];
+					l.setContentType([x || "multipart/form-data", ...S].join("; "))
+			}
 
 			const y = Pu(config.baseURL, config.url);
 			xhr.open(config.method.toUpperCase(), y, true);
@@ -225,7 +285,7 @@ const Go = {
 				xhr.setRequestHeader(key, headers[key]);
 			});
 			isUndefined(config.withCredentials) || (xhr.withCredentials = !!config.withCredentials);
-			o && o !== "json" && (f.responseType = e.responseType)
+			o && o !== "json" && (f.responseType = e.responseType);
 			xhr.send(data || null);
 		}.bind(this));
 	},
@@ -301,6 +361,9 @@ const xhrsum = Bu({
 		silentJSONParsing: !0,
 		forcedJSONParsing: !0,
 		clarifyTimeoutError: !1
+	},
+	headers: {
+		common: {Accept: "application/json, text/plain, */*"},
 	},
 	timeout: 0,
 	maxContentLength: -1,

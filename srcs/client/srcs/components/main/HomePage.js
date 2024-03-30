@@ -54,11 +54,6 @@ class HomePage extends Component {
 										})
 									}),
 									createElement('div', {
-										class: "tmp-title", children: createElement('h1', {
-											children: "Oui c'est moche sur grand ecran je suis sur le coup !"
-										})
-									}),
-									createElement('div', {
 										class: "lobby-container page-card", children: [
 											createElement('h2', {
 												class: "container-title", children: "En ligne"

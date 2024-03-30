@@ -44,6 +44,7 @@ def api_update_user(request):
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
 	id = request.COOKIES.get('token')
 	user = Token.objects.get(token=id).user
+	logging.info(request.POST)
 	if 'nickname' not in request.POST:
 		return JsonResponse({'error': 'Missing nickname'}, status=400)
 	if len(request.POST['nickname']) < 3:
@@ -61,8 +62,9 @@ def api_update_picture(request):
 	id = request.COOKIES.get('token')
 	user = Token.objects.get(token=id).user
 
-	if 'file' in request.FILES:
-		profile_picture = request.FILES['file']
+	logging.info(request.FILES)
+	if 'profile_picture' in request.FILES:
+		profile_picture = request.FILES['profile_picture']
 		content_type = profile_picture.content_type
 
 		if content_type not in ['image/jpeg', 'image/png']:

@@ -1,4 +1,6 @@
-import { Component, createElement, link, xhr } from '..';
+import { Component, createElement, link } from '..';
+import axios from "axios";
+import { ismax } from '../proto/Component';
 
 class FriendsPanel extends Component {
 	constructor(props) {
@@ -21,7 +23,7 @@ class FriendsPanel extends Component {
 	openPanel() {
 		this.setState({open: !this.state.open, onsearch: false}, (state) => {
 			if (!state.open) return;
-			xhr.get('/api/user/'+this.props.id+'/following')
+			axios.get('/api/user/'+this.props.id+'/following')
 			.then(res => res.data)
 			.then(data => {
 				this.setState({ following: data.following || [] });
@@ -38,7 +40,7 @@ class FriendsPanel extends Component {
 
 	searchPlayer() {
 		if (!this.state.search.length) return;
-		xhr.get('/api/user/'+this.state.search+"/search")
+		axios.get('/api/user/'+this.state.search+"/search")
 		.then(res => res.data)
 		.then(data => {
 			this.setState({ seachresult: data });
@@ -49,7 +51,7 @@ class FriendsPanel extends Component {
 	}
 
 	followPlayer(id) {
-		xhr.post('/api/follow/'+id)
+		axios.post('/api/follow/'+id)
 		.then(res => res.data)
 		.then(data => {
 			console.log("data", data);
@@ -62,7 +64,7 @@ class FriendsPanel extends Component {
 	}
 
 	unfollowPlayer(id) {
-		xhr.post('/api/unfollow/'+id)
+		axios.post('/api/unfollow/'+id)
 		.then(res => res.data)
 		.then(data => {
 			console.log("data", data);
@@ -90,10 +92,10 @@ class FriendsPanel extends Component {
 				createElement('span', {
 					class: "friend-middle-row", children: [
 						createElement('div', {
-							class: "friend-name", children: link({to: "/user/"+player.id, title: player.nickname, children: player.nickname})
+							class: "friend-name", children: link({to: "/user/"+player.id, title: player.nickname, children: player.nickname, class: ismax(player.id)})
 						}),
 						createElement('div', {
-							class: "friend-status"+(player.is_online ?  " on" : " off"), children: player.status
+							class: "friend-status"+(player.is_online ?  " on" : " off"), children: player.status || "Hors ligne"
 						})
 					]
 				}),

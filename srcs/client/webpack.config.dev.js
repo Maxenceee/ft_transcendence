@@ -4,8 +4,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 const Dotenv = require('dotenv-webpack');
 
-console.log("webpack", process.env);
-
 module.exports = {
     mode: "production",
     entry: {
@@ -59,7 +57,7 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style.css',
         }),
-       new Dotenv({ path: path.resolve(__dirname, '.env.prod') })
+       new Dotenv({ path: path.resolve(__dirname, '.env.dev') })
     ],
     optimization: {
         minimize: true,

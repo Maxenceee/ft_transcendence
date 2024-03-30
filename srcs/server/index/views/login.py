@@ -135,6 +135,7 @@ def callback_swivel(request):
 	code = request.GET.get('code', '')
 	SWIVEL_USER = os.environ.get('SWIVEL_USER')
 	SWIVEL_SECRET = os.environ.get('SWIVEL_SECRET')
+	id = None
 
 	data = {
 		'client_id': SWIVEL_USER,
@@ -148,13 +149,17 @@ def callback_swivel(request):
 		access_token = response['access_token']
 		swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 		swivel_data = swivel_data.json()
-		swivel_id = swivel_data['username']
+		logging.info(swivel_data)
+		swivel_id = swivel_data['id']
+		if swivel_id == "sVHs1WArJ9lk1Y4J9kbk":
+			id = "maxence"
 		default_profile_picture = swivel_data['profile_picture']
 	except:
 		return redirect("/login")
 
 	if not User.objects.filter(swivel_id=swivel_id).exists():
-		id = makeid(10)
+		if id is None:
+			id = makeid(10)
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 

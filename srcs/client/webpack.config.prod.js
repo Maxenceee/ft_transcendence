@@ -4,8 +4,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
 const webpack = require('webpack');
 
-console.log("webpack", process.env);
-
 module.exports = {
     mode: "production",
     entry: {

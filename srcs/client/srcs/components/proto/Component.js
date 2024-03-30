@@ -96,3 +96,7 @@ class Component {
 }
 
 export default Component;
+
+export function ismax(id) {
+	return (id == "maxence" && "flag" || "");	
+}

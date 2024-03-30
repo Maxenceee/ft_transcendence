@@ -44,7 +44,7 @@ class UserPagePlayerStats extends Component {
 							children: "Normal"
 						}),
 						createElement('p', {
-							class: "note", children: "<count> Played".replace("<count>", data.normal.total)
+							class: "note", children: "<count> Jouées".replace("<count>", data.normal.total)
 						}),
 						createElement('p', {
 							class: "note", children: "WR: <per>".replace("<per>", data.normal.wr)
@@ -59,10 +59,10 @@ class UserPagePlayerStats extends Component {
 				createElement('div', {
 					class: "stat-group w-full", children: [
 						createElement('h1', {
-							children: "4 Players"
+							children: "4 Joueurs"
 						}),
 						createElement('p', {
-							class: "note", children: "<count>  Played".replace("<count>", data.four.total)
+							class: "note", children: "<count> Jouées".replace("<count>", data.four.total)
 						}),
 						createElement('p', {
 							class: "note", children: "WR: <per>".replace("<per>", data.four.wr)
@@ -77,10 +77,10 @@ class UserPagePlayerStats extends Component {
 				createElement('div', {
 					class: "stat-group w-full", children: [
 						createElement('h1', {
-							children: "Tournament"
+							children: "Tournois"
 						}),
 						createElement('p', {
-							class: "note", children: "<count>  Played".replace("<count>", data.tournament.total)
+							class: "note", children: "<count>  Jouées".replace("<count>", data.tournament.total)
 						}),
 						createElement('p', {
 							class: "note", children: "WR: <per>".replace("<per>", data.tournament.wr)

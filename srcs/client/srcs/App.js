@@ -1,4 +1,5 @@
-import { createElement, Component, xhr, Main } from './components';
+import { createElement, Component, Main } from './components';
+import axios from "axios";
 
 let renderer = function() {
 	this._internalRoot = root;
@@ -55,6 +56,6 @@ const App = {
 	},
 }
 
-xhr.defaults.baseURL = (process.env.BASE_URI || "");
+axios.defaults.baseURL = (process.env.BASE_URI || "");
 
 App.createRoot(document.getElementById('root')).render(createElement(Main));

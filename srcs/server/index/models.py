@@ -56,9 +56,11 @@ class User(models.Model):
 		response = {
 			"id": self.id,
 			"nickname": self.nickname,
+			"username": self.username,
 			"status": status,
 			"is_online": self.is_online,
 			"profile_picture": profile_picture,
+			"default_profile_picture": profile_picture == self.default_profile_picture,
 			"following": following,
 			"game_history": game_history,
 		}

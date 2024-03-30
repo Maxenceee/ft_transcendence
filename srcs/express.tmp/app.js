@@ -6,6 +6,7 @@ var fs = require('fs');
 var morgan = require('morgan');
 var uuid = require('uuid');
 const expressWs = require('express-ws');
+var fileUpload = require('express-fileupload');
 require('dotenv').config();
 
 /**
@@ -141,261 +142,276 @@ app.use('/oui', (req, res) => {
 	res.status(200).send(req.body);
 });
 
+let tmp_user = {
+	"id": "maxence",
+	"nickname": "Max",
+	"username": "max",
+	"is_online": false,
+	"profile_picture": "https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/2023-03-01-23-34-51.png",
+	"following": [
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "01234567890123456789",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+		{
+			"id": "S2u0kgbPSC",
+			"nickname": "mgama",
+			"is_online": false,
+			"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
+		},
+	],
+	"game_history": [
+		{
+			"id": 1,
+			"date": 1711405447,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 0
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 3
+				}
+			]
+		},
+		{
+			"id": 2,
+			"date": 1711405993,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 3
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 5
+				}
+			]
+		},
+		{
+			"id": 3,
+			"date": 1711406177,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 0
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 3
+				}
+			]
+		},
+		{
+			"id": 4,
+			"date": 1711406237,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 1
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 0
+				}
+			]
+		},
+		{
+			"id": 5,
+			"date": 1711406469,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 5
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 1
+				}
+			]
+		},
+		{
+			"id": 6,
+			"date": 1711410695,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 0
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 3
+				}
+			]
+		},
+		{
+			"id": 7,
+			"date": 1711410747,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 1
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 0
+				}
+			]
+		},
+		{
+			"id": 8,
+			"date": 1711410801,
+			"type": "2p",
+			"data": [
+				{
+					"id": "hj10QnsdUi",
+					"score": 0
+				},
+				{
+					"id": "QivsUeI4kS",
+					"score": 3
+				}
+			]
+		},
+		{
+			"id": 9,
+			"date": 1711410905,
+			"type": "2p",
+			"data": [
+				{
+					"id": "QivsUeI4kS",
+					"score": 5
+				},
+				{
+					"id": "hj10QnsdUi",
+					"score": 3
+				}
+			]
+		}
+	]
+};
+
 app.get('/api/user/:id/get', (req, res) => {
-	res.status(200).json({
-		"id": "hj10QnsdUi",
-		"nickname": "Max",
-		"is_online": false,
-		"profile_picture": "https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/2023-03-01-23-34-51.png",
-		"following": [
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "01234567890123456789",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-			{
-				"id": "S2u0kgbPSC",
-				"nickname": "mgama",
-				"is_online": false,
-				"profile_picture": "https://cdn.intra.42.fr/users/9b1753f3d477f8847544d53b89003586/medium_mgama.jpg"
-			},
-		],
-		"game_history": [
-			{
-				"id": 1,
-				"date": 1711405447,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 0
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 3
-					}
-				]
-			},
-			{
-				"id": 2,
-				"date": 1711405993,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 3
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 5
-					}
-				]
-			},
-			{
-				"id": 3,
-				"date": 1711406177,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 0
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 3
-					}
-				]
-			},
-			{
-				"id": 4,
-				"date": 1711406237,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 1
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 0
-					}
-				]
-			},
-			{
-				"id": 5,
-				"date": 1711406469,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 5
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 1
-					}
-				]
-			},
-			{
-				"id": 6,
-				"date": 1711410695,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 0
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 3
-					}
-				]
-			},
-			{
-				"id": 7,
-				"date": 1711410747,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 1
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 0
-					}
-				]
-			},
-			{
-				"id": 8,
-				"date": 1711410801,
-				"type": "2p",
-				"data": [
-					{
-						"id": "hj10QnsdUi",
-						"score": 0
-					},
-					{
-						"id": "QivsUeI4kS",
-						"score": 3
-					}
-				]
-			},
-			{
-				"id": 9,
-				"date": 1711410905,
-				"type": "2p",
-				"data": [
-					{
-						"id": "QivsUeI4kS",
-						"score": 5
-					},
-					{
-						"id": "hj10QnsdUi",
-						"score": 3
-					}
-				]
-			}
-		]
-	});
+	console.log(req.headers);
+	res.status(200).json(tmp_user);
 });
+
+app.post('/api/user/update/nickname', (req, res) => {
+	console.log("body:", req.method, req.headers, req.body);
+	if(req.body.nickname)
+		tmp_user.nickname = req.body.nickname;
+	res.status(200).json({ success: true });
+});
+
+let router = require('./router');
+
+app.use(router)
 
 /**
  * 
