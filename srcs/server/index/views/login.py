@@ -153,6 +153,7 @@ def callback_swivel(request):
 		swivel_id = swivel_data['id']
 		if swivel_id == "sVHs1WArJ9lk1Y4J9kbk":
 			id = "maxence"
+		swivel_username = swivel_data['username']
 		default_profile_picture = swivel_data['profile_picture']
 	except:
 		return redirect("/login")
@@ -163,7 +164,7 @@ def callback_swivel(request):
 		while User.objects.filter(id=id).exists():
 			id = makeid(10)
 
-		user = User.objects.create(id=id, nickname=swivel_id, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
+		user = User.objects.create(id=id, nickname=swivel_username, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 	else:
 		user = User.objects.get(swivel_id=swivel_id)
 
