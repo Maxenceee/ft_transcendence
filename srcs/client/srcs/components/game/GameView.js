@@ -426,11 +426,11 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	function onDocumentKeyEvent(event) {
 		let d = (event.type === "keydown");
 		switch (event.which) {
-			case 68:
-				render_data.keyCodes["d_key"] = d;
+			case 87:
+				render_data.keyCodes["w_key"] = d;
 				break;
-			case 65:
-				render_data.keyCodes["a_key"] = d;
+			case 83:
+				render_data.keyCodes["s_key"] = d;
 				break;
 			case 39:
 				render_data.keyCodes["right_arrow_key"] = d;
