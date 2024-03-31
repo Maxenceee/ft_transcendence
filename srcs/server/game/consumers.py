@@ -447,6 +447,18 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})	
+				elif action == "down_arrow_key":
+					if self.players[player_idx].pad_x  < 16.5:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "up_arrow_key":
+					if self.players[player_idx].pad_x  > -16.5:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "e_key":
 					if player_idx == 0:
@@ -476,7 +488,6 @@ class Game:
 				if player.score  > 4 :
 					self.end_game()
 					return
-
 
 	def game_master_4p(self):
 		logging.info("game master 4p")
@@ -651,6 +662,18 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
+				elif action == "down_arrow_key":
+					if self.players[player_idx].pad_x  < 16.5:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "up_arrow_key":
+					if self.players[player_idx].pad_x  > -16.5:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "e_key":
 					self.send(player_idx, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
