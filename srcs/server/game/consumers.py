@@ -359,7 +359,7 @@ class Game:
 			if isinstance(player, AIPlayer):
 				id = player.id
 				nickname = "Marvin (AI)"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=1564823102"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
 				players.append({
 					"id": id,
 					"nickname": nickname,
