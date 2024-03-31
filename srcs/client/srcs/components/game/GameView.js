@@ -446,6 +446,9 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					controls.target.set(0, 0, 0)
 				)
 				break;
+			case 69:
+				socket.send({type : 'keyCode', move : 'e_key'});
+				break;
 		}
 	}
 
@@ -625,9 +628,17 @@ class GameView extends Component {
 								class: "game-keyboard-shortcut", children: [
 									createElement('div', {
 										class: "key", children: [
+											"E",
+											createElement('p', {
+												children: "Player View"
+											})
+										]
+									}),
+									createElement('div', {
+										class: "key", children: [
 											"R",
 											createElement('p', {
-												children: "Reset Camera"
+												children: "Pong View"
 											})
 										]
 									}),

@@ -448,6 +448,11 @@ class Game:
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "e_key":
+					if player_idx == 0:
+						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+					elif player_idx == 1:
+						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
@@ -523,6 +528,15 @@ class Game:
 							self.players[player_idx].pad_z = 27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
 					logging.info(f"After : action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
+				elif action == "e_key":
+					if player_idx == 0:
+						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+					elif player_idx == 1:
+						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
+					elif player_idx == 2:
+						self.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "0"})
+					elif player_idx == 3:
+						self.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
@@ -638,6 +652,8 @@ class Game:
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "e_key":
+					self.send(player_idx, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.ai_player.stop()
