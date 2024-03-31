@@ -693,11 +693,13 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "down_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 								self.players[player_idx].pad_x = 16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
 				elif action == "up_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5:
 						self.players[player_idx].pad_x -= 1
