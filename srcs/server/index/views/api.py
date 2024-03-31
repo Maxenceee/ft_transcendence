@@ -44,14 +44,19 @@ def api_update_user(request):
 		return JsonResponse({'error': 'Method not allowed'}, status=405)
 	id = request.COOKIES.get('token')
 	user = Token.objects.get(token=id).user
-	logging.info(request.POST)
-	if 'nickname' not in request.POST:
+
+	try :
+		data = json.loads(request.body)
+	except:
+		return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+	if 'nickname' not in data:
 		return JsonResponse({'error': 'Missing nickname'}, status=400)
-	if len(request.POST['nickname']) < 3:
+	if len(data['nickname']) < 3:
 		return JsonResponse({'error': 'Nickname too short'}, status=400)
-	if len(request.POST['nickname']) > 20:
+	if len(data['nickname']) > 20:
 		return JsonResponse({'error': 'Nickname too long'}, status=400)
-	user.nickname = request.POST['nickname']
+	user.nickname = data['nickname']
 	user.save()
 	return JsonResponse({'message': 'Succes'}, status=200)
 
@@ -75,6 +80,16 @@ def api_update_picture(request):
 		return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
 	else:
 		return JsonResponse({'error': 'Aucun fichier téléchargé.'}, status=400)
+
+@login_required
+def api_delete_picture(request):
+	if request.method != 'POST':
+		return JsonResponse({'error': 'Method not allowed'}, status=405)
+	id = request.COOKIES.get('token')
+	user = Token.objects.get(token=id).user
+	user.profile_picture_image = None
+	user.save()
+	return JsonResponse({'message': 'Photo de profil supprimée avec succès.'})
 		
 
 @login_required
