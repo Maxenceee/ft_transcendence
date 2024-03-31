@@ -192,12 +192,15 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
+
 			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
+		render_data.scores[0].position.z += 31.5;
+		render_data.scores[1].position.z -= 31.5;
+		render_data.scores[3].position.x += 31.5;
+		render_data.scores[2].position.x -= 31.5;
 
 		scene.add(...render_data.scores);
 	}
@@ -536,10 +539,6 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 };
 
 class GameView extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {loading: true, game_render: null, type: ""};
-	}
 
 	componentDidMount() {
 		// console.log("componentDidMount GameView", this);
@@ -548,7 +547,7 @@ class GameView extends Component {
 		if (!type) {
 			navigate("/");
 		}
-		this.setState({loading: true, game_render: null, type: type});
+		this.setState({loading: true, game_render: null});
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
@@ -568,7 +567,7 @@ class GameView extends Component {
 	}
 
 	componentWillUnmount() {
-		this.state.game_render && this.state.game_render.unmount();
+		this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		// console.log("game view unmounted", this.state.game_render);
 	}
@@ -589,95 +588,6 @@ class GameView extends Component {
 				class: "render-context", children: [
 					createElement('div', {
 						class: "back-button", onclick: () => this.endGame(), children: "Go home"
-					}),
-					this.state.type != "4p" && createElement('div', {
-						class: "game-player-overlay", children: createElement('div', {
-							class: "game-player-overlay-cnt", children: [
-								createElement('div', {
-									class: "game-player-profile", children: [
-										createElement('h1', {
-											children: "Joueur 1",
-										}),
-										createElement('img', {
-											src: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=1564823102"
-										}),
-									]
-								}),
-								createElement('div', {
-									class: "game-player-separator", children: "VS"
-								}),
-								createElement('div', {
-									class: "game-player-profile", children: [
-										createElement('img', {
-											src: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
-										}),
-										createElement('h1', {
-											children: "Joueur 2",
-										}),
-									]
-								})
-							]
-						})
-					}),
-					createElement('div', {
-						class: "game-keyboard", children: [
-							createElement('div', {
-								class: "game-keyboard-shortcut", children: [
-									createElement('div', {
-										class: "key", children: [
-											"R",
-											createElement('p', {
-												children: "Reset Camera"
-											})
-										]
-									}),
-									createElement('div', {
-										class: "key", children: [
-											"T",
-											createElement('p', {
-												children: "Top View"
-											})
-										]
-									}),
-								]
-							}),
-							createElement('div', {
-								class: "game-keyboard-moves", children: [
-									createElement('div', {
-										class: "key", children: [
-											"↑",
-											createElement('p', {
-												children: "Move Up"
-											})
-										]
-									}),
-									createElement('div', {
-										class: "key", children: [
-											"←",
-											createElement('p', {
-												children: "Move Left"
-											})
-										]
-									}),
-									createElement('div', {
-										class: "key", children: [
-											"↓",
-											createElement('p', {
-												children: "Move Down"
-											})
-										]
-									}),
-									createElement('div', {
-										class: "key", children: [
-											"→",
-											createElement('p', {
-												children: "Move Right"
-											})
-										]
-									})
-								]
-							}),
-						]
 					}),
 					this.state.game_render && this.state.game_render.render()
 				]
