@@ -1,6 +1,7 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
 from django.http import HttpResponse
+from django.conf import settings
 from index.models import *
 import json
 import logging
@@ -350,6 +351,34 @@ class Game:
 	def send(self, player, type, data):
 		self.players[player].send({"type": type, "data": data})
 
+	def init_players(self):
+		players = []
+		for player in self.players:
+			if isinstance(player, Player):
+				players.append(User.objects.get(id=player.id).resume_to_json())
+			if isinstance(player, AIPlayer):
+				id = player.id
+				nickname = "Marvin (AI)"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=1564823102"
+				players.append({
+					"id": id,
+					"nickname": nickname,
+					"status": "En Jeu",
+					"is_online": True,
+					"profile_picture": profile_picture,
+				})
+			if isinstance(player, LocalPlayer):
+				id = player.id
+				nickname = "Invité"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+				players.append({
+					"id": id,
+					"nickname": nickname,
+					"status": "En Jeu",
+					"is_online": True,
+					"profile_picture": profile_picture,
+				})
+		return players
 
 	def to_json(self):
 		players = []
@@ -398,7 +427,9 @@ class Game:
 			self.end_game()
 			return
 
+		self.send_all("initPlayers", self.init_players())
 		self.send_start_message()
+		self.send_all("initPlayers", self.init_players())
 
 		logging.info("all players ready")
 		match self.type:
