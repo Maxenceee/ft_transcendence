@@ -561,10 +561,10 @@ class GameView extends Component {
 
 	componentDidUpdate() {
 		// console.log("componentDidUpdate GameView", this.state.game_render);
-		if (this.state.game_render) {
-			this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
-			this.state.game_render.start(this.state);
-		}
+		// if (this.state.game_render) {
+		// 	this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
+		// 	this.state.game_render.start(this.state);
+		// }
 	}
 
 	componentWillUnmount() {
