@@ -428,19 +428,23 @@ let game_render = function(type, onload, onclose, setplayers, {width, height} = 
 	function onDocumentKeyEvent(event) {
 		let d = (event.type === "keydown");
 		switch (event.which) {
-			case 68:
-				render_data.keyCodes["d_key"] = d;
+			case 87:
+				render_data.keyCodes["w_key"] = d;
+				break;
+			case 83:
+				render_data.keyCodes["s_key"] = d;
 				break;
 			case 39:
-			case 38:
 				render_data.keyCodes["right_arrow_key"] = d;
 				break;
-			case 65:
-				render_data.keyCodes["a_key"] = d;
+			case 38:
+				render_data.keyCodes["up_arrow_key"] = d;
 				break;
 			case 37:
-			case 40:
 				render_data.keyCodes["left_arrow_key"] = d;
+				break;
+			case 40:
+				render_data.keyCodes["down_arrow_key"] = d;
 				break;
 			case 82:
 				d && (
@@ -448,6 +452,11 @@ let game_render = function(type, onload, onclose, setplayers, {width, height} = 
 					controls.target.set(0, 0, 0)
 				)
 				break;
+			case 69:
+				socket.send({type : 'keyCode', move : 'e_key'});
+				break;
+			case 84:
+				// Si mode tournoi alors on change de vue en vision bracket
 		}
 	}
 
@@ -635,20 +644,28 @@ class GameView extends Component {
 								class: "game-keyboard-shortcut", children: [
 									createElement('div', {
 										class: "key", children: [
-											"R",
+											"E",
 											createElement('p', {
-												children: "Reset Camera"
+												children: "Player View"
 											})
 										]
 									}),
 									createElement('div', {
 										class: "key", children: [
-											"T",
+											"R",
 											createElement('p', {
-												children: "Top View"
+												children: "Pong View"
 											})
 										]
 									}),
+									// createElement('div', {
+									// 	class: "key", children: [
+									// 		"T",
+									// 		createElement('p', {
+									// 			children: "Top View"
+									// 		})
+									// 	]
+									// }),
 								]
 							}),
 							createElement('div', {
