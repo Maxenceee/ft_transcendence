@@ -10,7 +10,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { Component, createElement, Loader, useParams, navigate } from '..';
 import { Socket, LoadManager } from '../../utils';
 
-let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let game_render = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -37,6 +37,8 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "initPlayers":
+				setplayers(msg.data);
 			case "resetCam":
 				setcam(10, 69, 0);
 				break;
@@ -538,7 +540,10 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {loading: true, game_render: null, type: ""};
+		this.state = {loading: true, game_render: null, type: "", players: null};
+
+		this.setplayers = this.setplayers.bind(this);
+		this.endGame = this.endGame.bind(this);
 	}
 
 	componentDidMount() {
@@ -556,7 +561,7 @@ class GameView extends Component {
 		}
 		let onload = () => this.setState({loading: false});
 
-		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -571,6 +576,11 @@ class GameView extends Component {
 		this.state.game_render && this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		// console.log("game view unmounted", this.state.game_render);
+	}
+
+	setplayers(data) {
+		console.log("set player", data);
+		this.setState({players: data});
 	}
 
 	endGame() {
@@ -590,16 +600,16 @@ class GameView extends Component {
 					createElement('div', {
 						class: "back-button", onclick: () => this.endGame(), children: "Go home"
 					}),
-					this.state.type != "4p" && createElement('div', {
+					this.state.players && this.state.type != "4p" && createElement('div', {
 						class: "game-player-overlay", children: createElement('div', {
 							class: "game-player-overlay-cnt", children: [
 								createElement('div', {
 									class: "game-player-profile", children: [
 										createElement('h1', {
-											children: "Joueur 1",
+											children: this.state.players[0].nickname,
 										}),
 										createElement('img', {
-											src: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=1564823102"
+											src: this.state.players[0].profile_picture
 										}),
 									]
 								}),
@@ -609,10 +619,10 @@ class GameView extends Component {
 								createElement('div', {
 									class: "game-player-profile", children: [
 										createElement('img', {
-											src: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+											src: this.state.players[1].profile_picture
 										}),
 										createElement('h1', {
-											children: "Joueur 2",
+											children: this.state.players[1].nickname,
 										}),
 									]
 								})
