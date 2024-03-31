@@ -7,7 +7,8 @@ class BrowserRouter extends Component {
 		this.event = this.event.bind(this);
 	}
 
-	event() {
+	event(ev) {
+		S.location.pathname = window.location.pathname;
 		for (let router of R.routers) {
 			if (router.evalRoute(S.location.pathname)) {
 				router.setState({ route: S.location.pathname });
