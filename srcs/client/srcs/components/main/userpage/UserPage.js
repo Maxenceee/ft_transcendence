@@ -196,7 +196,7 @@ class UserProfilePicture extends Component {
 					})
 				}),
 				!this.props.user.default_profile_picture && createElement('div', {
-					class: "dropdown-item", children: "Supprimer la photo"
+					class: "dropdown-item", onclick: this.removeProfilePicture, children: "Supprimer la photo"
 				}),
 			]
 		})
