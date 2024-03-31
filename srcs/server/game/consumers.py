@@ -490,7 +490,6 @@ class Game:
 					return
 
 	def game_master_4p(self):
-		# Implementer les fleches haut et bas
 		logging.info("game master 4p")
 		for player in self.players:
 			player.score = 5
