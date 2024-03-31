@@ -429,7 +429,6 @@ class Game:
 
 		self.send_all("initPlayers", self.init_players())
 		self.send_start_message()
-		self.send_all("initPlayers", self.init_players())
 
 		logging.info("all players ready")
 		match self.type:
