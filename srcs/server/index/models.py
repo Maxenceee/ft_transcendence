@@ -14,18 +14,18 @@ class User(models.Model):
 	nickname = models.CharField(max_length=100)
 	is_online = models.BooleanField(default=False)
 	is_ingame = models.BooleanField(default=False)
-	game_history = models.ManyToManyField('Game_history', related_name='game_history')
+	game_history = models.ManyToManyField('Game_history', related_name='game_history', blank=True)
 
 	default_profile_picture = models.CharField(max_length=100)
-	profile_picture_image = models.ImageField(null=True, upload_to='avatar/')
+	profile_picture_image = models.ImageField(upload_to='avatar/', blank=True)
 
-	following = models.ManyToManyField('User', related_name='followers')
+	following = models.ManyToManyField('User', related_name='followers', blank=True)
 
-	username = models.CharField(max_length=100)
-	password = models.CharField(max_length=100)
+	username = models.CharField(max_length=100, blank=True)
+	password = models.CharField(max_length=100, blank=True)
 
-	intra_id = models.CharField(max_length=100)
-	swivel_id = models.CharField(max_length=100)
+	intra_id = models.CharField(max_length=100, blank=True)
+	swivel_id = models.CharField(max_length=100, blank=True)
 
 	def __str__(self):
 		return str(self.username)
