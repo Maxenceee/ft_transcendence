@@ -436,7 +436,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		animationid = requestAnimationFrame(animate);
 	}
 
-	return {
+	{
 		start: animate,
 		socket: socket,
 		renderer: renderer,
