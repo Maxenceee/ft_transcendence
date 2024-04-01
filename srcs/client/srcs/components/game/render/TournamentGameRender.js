@@ -256,8 +256,8 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
     document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
-		// let d = (event.type === "keydown");
-		// switch (event.which) {
+		let d = (event.type === "keydown");
+		switch (event.which) {
 			// case 87:
 			// 	render_data.keyCodes["w_key"] = d;
 			// 	break;
@@ -288,37 +288,38 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			// case 84:
 			// 	// Si mode tournoi alors on change de vue en vision bracket
 			// 	break;
-		let keyVar = event.which;
-		keyCode.right = 0;
-		keyCode.left = 0;
-		if (keyVar == 68)
-		{
-			keyCode.left = 0;
-			keyCode.right = 1;
-		}
-		if (keyVar == 65)
-		{
-			keyCode.left = 1;
+			let keyVar = event.which;
 			keyCode.right = 0;
-		}
-		if (keyVar == 39)
-		{
 			keyCode.left = 0;
-			keyCode.right = 1;
-		}
-		if (keyVar == 37)
-		{
-			keyCode.left = 1;
-			keyCode.right = 0;
-		}
-		if (keyVar == 82)
-		{
-			socket.send({type : 'keyCode', move : "reset"});
-		}
-		if (keyCode.right == 1 && keyCode.left == 0)
-			socket.send({type : 'keyCode', move : "right"});
-		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"});
+			if (keyVar == 68)
+			{
+				keyCode.left = 0;
+				keyCode.right = 1;
+			}
+			if (keyVar == 65)
+			{
+				keyCode.left = 1;
+				keyCode.right = 0;
+			}
+			if (keyVar == 39)
+			{
+				keyCode.left = 0;
+				keyCode.right = 1;
+			}
+			if (keyVar == 37)
+			{
+				keyCode.left = 1;
+				keyCode.right = 0;
+			}
+			if (keyVar == 82)
+			{
+				socket.send({type : 'keyCode', move : "reset"});
+			}
+			if (keyCode.right == 1 && keyCode.left == 0)
+				socket.send({type : 'keyCode', move : "right"});
+			else if (keyCode.right == 0 && keyCode.left == 1) 
+				socket.send({type : 'keyCode', move : "left"});
+			
 		}
 	}
 
@@ -408,7 +409,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 				render_data.balls[6].position.z = data.ball7.z + 200;
 				for( let i = 0; i < 8; i++){
 					if (data.player[i].gameNumber == -1){
-						scene.remove(render_data.balls[data.player[i].gameNumber])
+						scene.remove(ball[data.player[i].gameNumber])
 						scene.remove(pallet[i]);
 					}
 					else if (data.player[i].gameNumber < 4)
@@ -448,6 +449,6 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			document.removeEventListener("keyup", onDocumentKeyEvent, true);
 		}
 	};
-// }
+}
 
 export default TournamentGameRender;
