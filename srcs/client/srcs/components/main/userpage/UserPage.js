@@ -177,8 +177,8 @@ class UserProfilePicture extends Component {
 	}
 
 	uploadProfilePicture(e) {
-		this.setState({ loading: true });
 		const formData = new FormData(this.ref.current);
+		this.setState({ loading: true });
 		axios.post('/api/user/update/picture', formData, {headers: { "Content-Type": "multipart/form-data" }})
 		.then(res => res.data)
 		.then(data => {
