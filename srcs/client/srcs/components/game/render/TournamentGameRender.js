@@ -260,7 +260,8 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		right : 0
 	}
 	let onDocumentKeyEvent(event) {
-		let keyVar = event.witch;
+		let keyVar = event.witch;	console.log(keyvar);
+		console.log(keyvar);
 		// switch (event.which) {
 		// 	case 87:
 		// 		render_data.keyCodes["w_key"] = d;
