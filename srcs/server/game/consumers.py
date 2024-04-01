@@ -827,13 +827,18 @@ class Game:
 
 	def pad_collision_x(self, player_id):
 		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
+			if  self.type == "4p" and self.players[player_id].score <= 0 :
+				return
 			if (player_id == 1) :
 				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = 1
 			else :
 				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = -1
-			self.ball.speed *= 1.1
+			if self.type == "4p":
+				self.ball.speed *= 1.2
+			else :
+				self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -846,7 +851,7 @@ class Game:
 			elif player_id == 2 and self.players[2].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
-			self.ball.speed *= 1.1
+			self.ball.speed *= 1.2
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
