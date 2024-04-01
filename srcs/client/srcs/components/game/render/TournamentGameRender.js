@@ -53,49 +53,6 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			// 	break;
 			// case "text":
 			// 	createText(msg.data.text, msg.data.size);
-			case "gameState"
-			{	
-				data = msg.data;
-				data.type = msg.type
-				ball[0].position.x = data.ball.x;
-				ball[1].position.x = data.ball2.x + 80;
-				ball[2].position.x = data.ball3.x + 160;
-				ball[3].position.x = data.ball4.x + 240;
-				ball[4].position.x = data.ball5.x + 80;
-				ball[5].position.x = data.ball6.x + 160;
-				ball[6].position.x = data.ball7.x + 120;
-				ball[0].position.z = data.ball.z;
-				ball[1].position.z = data.ball2.z;
-				ball[2].position.z = data.ball3.z;
-				ball[3].position.z = data.ball4.z;
-				ball[4].position.z = data.ball5.z + 100;
-				ball[5].position.z = data.ball6.z + 100;
-				ball[6].position.z = data.ball7.z + 200;
-				for( let i = 0; i < 8; i++){
-					if (data.player[i].gameNumber == -1){
-						scene.remove(ball[data.player[i].gameNumber])
-						scene.remove(pallet[i]);
-					}
-					else if (data.player[i].gameNumber < 4)
-						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
-					else if (data.player[i].gameNumber < 6){
-						pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
-						pallet[i].position.z = data.player[i].z + 100;
-						if (i % 4 < 2)
-							pallet[i].position.z += 28.5;
-						else
-							pallet[i].position.z -= 28.5;
-					}
-					else if (data.player[i].gameNumber == 6){
-						pallet[i].position.x = data.player[i].x + 120;
-						pallet[i].position.z = data.player[i].z + 200;
-						if (i  < 4)
-							pallet[i].position.z += 28.5;
-						else
-							pallet[i].position.z -= 28.5;
-					}
-				}
-			}
             case "setCam":
 				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 			default:
@@ -404,6 +361,44 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
                         console.log("----")
                     }
                 }
+				render_data.balls[0].position.x = data.ball.x;
+				render_data.balls[1].position.x = data.ball2.x + 80;
+				render_data.balls[2].position.x = data.ball3.x + 160;
+				render_data.balls[3].position.x = data.ball4.x + 240;
+				render_data.balls[4].position.x = data.ball5.x + 80;
+				render_data.balls[5].position.x = data.ball6.x + 160;
+				render_data.balls[6].position.x = data.ball7.x + 120;
+				render_data.balls[0].position.z = data.ball.z;
+				render_data.balls[1].position.z = data.ball2.z;
+				render_data.balls[2].position.z = data.ball3.z;
+				render_data.balls[3].position.z = data.ball4.z;
+				render_data.balls[4].position.z = data.ball5.z + 100;
+				render_data.balls[5].position.z = data.ball6.z + 100;
+				render_data.balls[6].position.z = data.ball7.z + 200;
+				for( let i = 0; i < 8; i++){
+					if (data.player[i].gameNumber == -1){
+						scene.remove(ball[data.player[i].gameNumber])
+						scene.remove(pallet[i]);
+					}
+					else if (data.player[i].gameNumber < 4)
+						render_data.pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
+					else if (data.player[i].gameNumber < 6){
+						render_data.pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
+						render_data.pallet[i].position.z = data.player[i].z + 100;
+						if (i % 4 < 2)
+							render_data.pallet[i].position.z += 28.5;
+						else
+							render_data.pallet[i].position.z -= 28.5;
+					}
+					else if (data.player[i].gameNumber == 6){
+						render_data.pallet[i].position.x = data.player[i].x + 120;
+						render_data.pallet[i].position.z = data.player[i].z + 200;
+						if (i  < 4)
+							render_data.pallet[i].position.z += 28.5;
+						else
+							render_data.pallet[i].position.z -= 28.5;
+					}
+				}
             }
 		}
 		animationid = requestAnimationFrame(animate);
