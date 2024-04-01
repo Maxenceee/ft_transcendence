@@ -254,13 +254,13 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 	composer.addPass(outputPass);
 
     document.addEventListener("keydown", onDocumentKeyEvent, true);
-	document.addEventListener("keyup", onDocumentKeyEvent, true);
+	// document.addEventListener("keyup", onDocumentKeyEvent, true);
 	let keyCode = {				//fuck you maxence don't touch my variable
 		left : 0,
 		right : 0
 	}
 	function onDocumentKeyEvent(event) {
-		let keyVar = (event.type === "keydown");
+		let keyVar = event.witch;
 		// switch (event.which) {
 		// 	case 87:
 		// 		render_data.keyCodes["w_key"] = d;
