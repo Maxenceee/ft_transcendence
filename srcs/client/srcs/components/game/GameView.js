@@ -642,7 +642,7 @@ class GameView extends Component {
 						class: "game-keyboard", children: [
 							createElement('div', {
 								class: "game-keyboard-shortcut", children: [
-									createElement('div', {
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"E",
 											createElement('p', {
@@ -650,7 +650,7 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"R",
 											createElement('p', {
@@ -658,19 +658,19 @@ class GameView extends Component {
 											})
 										]
 									}),
-									// createElement('div', {
-									// 	class: "key", children: [
-									// 		"T",
-									// 		createElement('p', {
-									// 			children: "Top View"
-									// 		})
-									// 	]
-									// }),
+									this.state.type == "tournament" && createElement('div', {
+										class: "key", children: [
+											"T",
+											createElement('p', {
+												children: "Bracket View"
+											})
+										]
+									}),
 								]
 							}),
 							createElement('div', {
 								class: "game-keyboard-moves", children: [
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"↑",
 											createElement('p', {
@@ -678,7 +678,15 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type == "local" && createElement('div', {
+										class: "key", children: [
+											"W",
+											createElement('p', {
+												children: "Move Up"
+											})
+										]
+									}),
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"←",
 											createElement('p', {
@@ -686,7 +694,7 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"↓",
 											createElement('p', {
@@ -694,7 +702,15 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type == "local" && createElement('div', {
+										class: "key", children: [
+											"S",
+											createElement('p', {
+												children: "Move Up"
+											})
+										]
+									}),
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"→",
 											createElement('p', {
