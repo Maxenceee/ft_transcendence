@@ -2306,21 +2306,6 @@ body:has(.connection-page) {
 				border: 2px solid var(--border-active);
 				border-radius: 50%;
 				width: 100%;
-				position: relative;
-
-				&.loading {
-					&::before {
-						content: "";
-						position: absolute;
-						left: 0;
-						top: 0;
-						right: 0;
-						bottom: 0;
-						backdrop-filter: blur(10px);
-						-webkit-backdrop-filter: blur(10px);
-						z-index: 10;
-					}
-				}
 	
 				img {
 					position: relative;

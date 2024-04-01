@@ -79,7 +79,7 @@ def api_update_picture(request):
 		user.save()
 		return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
 	else:
-		return JsonResponse({'error': 'Aucun fichier téléversé.'}, status=400)
+		return JsonResponse({'error': 'Aucun fichier téléchargé.'}, status=400)
 
 @login_required
 def api_delete_picture(request):
