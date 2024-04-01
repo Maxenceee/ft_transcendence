@@ -255,8 +255,12 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 
     document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
+	let keyCode = {				//fuck you maxence don't touch my variable
+		left : 0,
+		right : 0
+	}
 	function onDocumentKeyEvent(event) {
-		let keyCode = (event.type === "keydown");
+		let keyVar = (event.type === "keydown");
 		// switch (event.which) {
 		// 	case 87:
 		// 		render_data.keyCodes["w_key"] = d;
