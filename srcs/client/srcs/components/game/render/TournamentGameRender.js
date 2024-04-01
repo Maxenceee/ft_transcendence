@@ -257,7 +257,6 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
 		let d = (event.type === "keydown");
-		switch (event.which) {
 			// case 87:
 			// 	render_data.keyCodes["w_key"] = d;
 			// 	break;
@@ -320,7 +319,6 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			else if (keyCode.right == 0 && keyCode.left == 1) 
 				socket.send({type : 'keyCode', move : "left"});
 			
-		}
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);
