@@ -29,6 +29,13 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		camera.position.set(x, y, z);
 	}
 
+	function setcamTournament (x, y, z, camx, camy, camz) {
+		controls.target.set(camx, camy, camz)
+		camera.position.set(x, y, z);
+		controls.update();
+
+	}
+
     let socket = new Socket({path: "/game/tournament"});
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
@@ -47,7 +54,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			// case "text":
 			// 	createText(msg.data.text, msg.data.size);
             case "setCam":
-				setcam(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
+				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 			default:
 				render_data.queue.push(msg);
 		}
@@ -333,19 +340,19 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 				ts = Date.now();
 			}
 
-			if (data.type == "gameState")
+			if (event.type == "gameState")
             {
                 for (let i = 0; i < 8; i++)
                 {
-                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].render_data.scores && data.player[i].render_data.scores >= 0){
-                        render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].render_data.scores;
+                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].scores && data.player[i].scores >= 0){
+                        render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] = data.player[i].scores;
                         scoreUpdate[data.player[i].gameNumber] = 1;
                         console.log("----")
                         console.log("update game : " + data.player[i].gameNumber);
                     }
                     if (data.player[i].gameNumber != -1){
-                        k[data.player[i].gameNumber] += 1
-                        k[data.player[i].gameNumber] %= 2
+                        render_data.k[data.player[i].gameNumber] += 1
+                        render_data.k[data.player[i].gameNumber] %= 2
                     }
                     if (scoreUpdate[data.player[i].gameNumber] == 1){
                         scoreUpdate[data.player[i].gameNumber] = 0
