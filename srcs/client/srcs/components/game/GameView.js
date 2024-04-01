@@ -200,7 +200,7 @@ let game_render = function(type, onload, onclose, setplayers, {width, height} = 
 		}
 		render_data.scores[0].rotateY((Math.PI / 2) * 2);
 		render_data.scores[1].rotateY((Math.PI / 2) * 2);
-		render_data.scores[2].rotateY((Math.PI / 2) * 1);
+		render_data.scores[2].rotateY((Math.PI / 2));
 		render_data.scores[3].rotateY((Math.PI / 2) * 3);
 		render_data.scores[0].position.z += 31.5;
 		render_data.scores[1].position.z -= 31.5;
