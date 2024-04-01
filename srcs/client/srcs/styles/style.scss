@@ -3100,4 +3100,36 @@ body:has(.connection-page) {
 	}
 }
 
+.dg-overlay {
+	--overlay-major: var(--border-active);
+	color: #fff;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	
+	.dg-overlay-cnt {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		z-index: 4;
+		width: max-content;
+		padding: 20px 25px;
+		gap: 50px;
+		margin: 0 auto;
+		background-color: rgba(42, 46, 64, 0.05);
+		backdrop-filter: blur(2px);
+		-webkit-backdrop-filter: blur(2px);
+		border-radius: 20px;
+	}
+
+	.dg-overlay-player {
+		
+	}
+}
+
 @import './loaders.scss';
