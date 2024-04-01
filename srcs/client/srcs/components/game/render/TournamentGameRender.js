@@ -318,7 +318,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		}
 		if (keyVar == 82)
 		{
-			// socket.send({type : 'keyCode', move : "reset"});
+			socket.send({type : 'keyCode', move : "reset"});
 		}
 		if (keyCode.right == 1 && keyCode.left == 0)
 			socket.send({type : 'keyCode', move : "right"});
@@ -413,7 +413,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 				for( let i = 0; i < 8; i++){
 					if (data.player[i].gameNumber == -1){
 						scene.remove(render_data.balls[data.player[i].gameNumber])
-						scene.remove(pallet[i]);
+						scene.remove(render_data.pallet[i]);
 					}
 					else if (data.player[i].gameNumber < 4)
 						render_data.pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
