@@ -360,6 +360,7 @@ class websocket_tournament(WebsocketConsumer):
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
+		logging.info("pouet")
 
 		if receive_package['type'] == "keyCode":
 			try:
