@@ -256,7 +256,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
     document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
-		// let d = (event.type === "keydown");
+		let keyVar = (event.type === "keydown");
 		// switch (event.which) {
 		// 	case 87:
 		// 		render_data.keyCodes["w_key"] = d;
@@ -289,7 +289,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		// 		// Si mode tournoi alors on change de vue en vision bracket
 		// 		break;
 		// }
-		let keyVar = event.which;
+		// let keyVar = event.which;
 		keyCode.right = 0;
 		keyCode.left = 0;
 		if (keyVar == 68)
