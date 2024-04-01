@@ -567,13 +567,13 @@ class Game:
 					logging.info(f"After : action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
 				elif action == "e_key":
 					if player_idx == 0:
-						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+						self.send(0, "setCam", {"x" : "0", "y" : "40", "z" : "70"})
 					elif player_idx == 1:
-						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
+						self.send(1, "setCam", {"x" : "0", "y" : "40", "z" : "-70"})
 					elif player_idx == 2:
-						self.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "0"})
+						self.send(2, "setCam", {"x" : "70", "y" : "40", "z" : "0"})
 					elif player_idx == 3:
-						self.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "0"})
+						self.send(3, "setCam", {"x" : "-70", "y" : "40", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
