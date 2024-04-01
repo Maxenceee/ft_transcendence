@@ -320,10 +320,15 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		{
 			socket.send({type : 'keyCode', move : "reset"});
 		}
-		if (keyCode.right == 1 && keyCode.left == 0)
+		if (keyCode.right == 1 && keyCode.left == 0){
+			console.log("right")
 			socket.send({type : 'keyCode', move : "right"});
-		else if (keyCode.right == 0 && keyCode.left == 1) 
+		}
+		else if (keyCode.right == 0 && keyCode.left == 1) {
+			console.log("left")
 			socket.send({type : 'keyCode', move : "left"});
+		}
+		console.log(keyvar);
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);

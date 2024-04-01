@@ -134,14 +134,14 @@ class Game:
 		if len(gameplayer) != 2 :
 			return True
 		if playerOrg.gameNumber == 4 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160", "camy" :"0", "camz" :"100"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "40" , "camx" :"160", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "160.0", "y" : "30.0", "z" : "160.0" , "camx" :"160.0", "camy" :"0.0", "camz" :"100.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "160.0", "y" : "30.0", "z" : "40.0" , "camx" :"160.0", "camy" :"0.0", "camz" :"100.0"})
 		elif playerOrg.gameNumber == 5 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80", "camy" :"0", "camz" :"100"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "40" , "camx" :"80", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "80.0", "y" : "30.0", "z" : "160.0" , "camx" :"80.0", "camy" :"0.0", "camz" :"100.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "80.0", "y" : "30.0", "z" : "40.0" , "camx" :"80.0", "camy" :"0.0", "camz" :"100.0"})
 		elif playerOrg.gameNumber == 6 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "260" , "camx" :"120", "camy" :"0", "camz" :"200"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "140" , "camx" :"120", "camy" :"0", "camz" :"200"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "120.0", "y" : "30.0", "z" : "260.0" , "camx" :"120.0", "camy" :"0.0", "camz" :"200.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "120.0", "y" : "30.0", "z" : "140.0" , "camx" :"120.0", "camy" :"0.0", "camz" :"200.0"})
 
 		return True
 
