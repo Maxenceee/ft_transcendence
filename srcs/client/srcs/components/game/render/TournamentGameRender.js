@@ -256,70 +256,70 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
     document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
-		let d = (event.type === "keydown");
-		switch (event.which) {
-			case 87:
-				render_data.keyCodes["w_key"] = d;
-				break;
-			case 83:
-				render_data.keyCodes["s_key"] = d;
-				break;
-			case 39:
-				render_data.keyCodes["right_arrow_key"] = d;
-				break;
-			case 38:
-				render_data.keyCodes["up_arrow_key"] = d;
-				break;
-			case 37:
-				render_data.keyCodes["left_arrow_key"] = d;
-				break;
-			case 40:
-				render_data.keyCodes["down_arrow_key"] = d;
-				break;
-			case 82:
-				d && (
-					setcam(10, 80, 0),
-					controls.target.set(0, 0, 0)
-				)
-				break;
-			case 69:
-				socket.send({type : 'keyCode', move : 'e_key'});
-				break;
-			case 84:
-				// Si mode tournoi alors on change de vue en vision bracket
-				break;
+		// let d = (event.type === "keydown");
+		// switch (event.which) {
+		// 	case 87:
+		// 		render_data.keyCodes["w_key"] = d;
+		// 		break;
+		// 	case 83:
+		// 		render_data.keyCodes["s_key"] = d;
+		// 		break;
+		// 	case 39:
+		// 		render_data.keyCodes["right_arrow_key"] = d;
+		// 		break;
+		// 	case 38:
+		// 		render_data.keyCodes["up_arrow_key"] = d;
+		// 		break;
+		// 	case 37:
+		// 		render_data.keyCodes["left_arrow_key"] = d;
+		// 		break;
+		// 	case 40:
+		// 		render_data.keyCodes["down_arrow_key"] = d;
+		// 		break;
+		// 	case 82:
+		// 		d && (
+		// 			setcam(10, 80, 0),
+		// 			controls.target.set(0, 0, 0)
+		// 		)
+		// 		break;
+		// 	case 69:
+		// 		socket.send({type : 'keyCode', move : 'e_key'});
+		// 		break;
+		// 	case 84:
+		// 		// Si mode tournoi alors on change de vue en vision bracket
+		// 		break;
+		// }
+		let keyVar = event.which;
+		keyCode.right = 0;
+		keyCode.left = 0;
+		if (keyVar == 68)
+		{
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
-		// let keyVar = event.which;
-		// keyCode.right = 0;
-		// keyCode.left = 0;
-		// if (keyVar == 68)
-		// {
-		// 	keyCode.left = 0;
-		// 	keyCode.right = 1;
-		// }
-		// if (keyVar == 65)
-		// {
-		// 	keyCode.left = 1;
-		// 	keyCode.right = 0;
-		// }
-		// if (keyVar == 39)
-		// {
-		// 	keyCode.left = 0;
-		// 	keyCode.right = 1;
-		// }
-		// if (keyVar == 37)
-		// {
-		// 	keyCode.left = 1;
-		// 	keyCode.right = 0;
-		// }
-		// if (keyVar == 82)
-		// {
-		// 	socket.send({type : 'keyCode', move : "reset"});
-		// }
-		// if (keyCode.right == 1 && keyCode.left == 0)
-		// 	socket.send({type : 'keyCode', move : "right"});
-		// else if (keyCode.right == 0 && keyCode.left == 1) 
-		// 	socket.send({type : 'keyCode', move : "left"});
+		if (keyVar == 65)
+		{
+			keyCode.left = 1;
+			keyCode.right = 0;
+		}
+		if (keyVar == 39)
+		{
+			keyCode.left = 0;
+			keyCode.right = 1;
+		}
+		if (keyVar == 37)
+		{
+			keyCode.left = 1;
+			keyCode.right = 0;
+		}
+		if (keyVar == 82)
+		{
+			socket.send({type : 'keyCode', move : "reset"});
+		}
+		if (keyCode.right == 1 && keyCode.left == 0)
+			socket.send({type : 'keyCode', move : "right"});
+		else if (keyCode.right == 0 && keyCode.left == 1) 
+			socket.send({type : 'keyCode', move : "left"});
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);
