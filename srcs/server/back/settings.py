@@ -31,11 +31,11 @@ BASE_URL = os.environ.get('BASE_URI')
 DEBUG = False
 
 ALLOWED_HOSTS = [
+	BASE_URL,
 	"localhost",
 	"website",
 	"trace.maxencegama.dev",
 	"tracendance.tech",
-	BASE_URL,
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -55,11 +55,6 @@ CORS_ALLOWED_ORIGINS = [
 INSTALLED_APPS = [
 	'index',
 	'game',
-
-	# 'game_2player',
-	# 'game_4player',
-	# 'game_local',
-	# 'game_AI',
 	'tournament',
 	
 	'channels',

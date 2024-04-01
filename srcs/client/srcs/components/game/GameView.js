@@ -10,7 +10,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { Component, createElement, Loader, useParams, navigate } from '..';
 import { Socket, LoadManager } from '../../utils';
 
-let game_render = function(type, onload, onclose, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let game_render = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -37,6 +37,8 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "initPlayers":
+				setplayers(msg.data);
 			case "resetCam":
 				setcam(10, 69, 0);
 				break;
@@ -429,19 +431,23 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 	function onDocumentKeyEvent(event) {
 		let d = (event.type === "keydown");
 		switch (event.which) {
-			case 68:
-				render_data.keyCodes["d_key"] = d;
+			case 87:
+				render_data.keyCodes["w_key"] = d;
+				break;
+			case 83:
+				render_data.keyCodes["s_key"] = d;
 				break;
 			case 39:
-			case 38:
 				render_data.keyCodes["right_arrow_key"] = d;
 				break;
-			case 65:
-				render_data.keyCodes["a_key"] = d;
+			case 38:
+				render_data.keyCodes["up_arrow_key"] = d;
 				break;
 			case 37:
-			case 40:
 				render_data.keyCodes["left_arrow_key"] = d;
+				break;
+			case 40:
+				render_data.keyCodes["down_arrow_key"] = d;
 				break;
 			case 82:
 				d && (
@@ -449,6 +455,11 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 					controls.target.set(0, 0, 0)
 				)
 				break;
+			case 69:
+				socket.send({type : 'keyCode', move : 'e_key'});
+				break;
+			case 84:
+				// Si mode tournoi alors on change de vue en vision bracket
 		}
 	}
 
@@ -539,6 +550,13 @@ let game_render = function(type, onload, onclose, {width, height} = {width: wind
 };
 
 class GameView extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {loading: true, game_render: null, type: "", players: null};
+
+		this.setplayers = this.setplayers.bind(this);
+		this.endGame = this.endGame.bind(this);
+	}
 
 	componentDidMount() {
 		// console.log("componentDidMount GameView", this);
@@ -555,7 +573,7 @@ class GameView extends Component {
 		}
 		let onload = () => this.setState({loading: false});
 
-		this.setState({game_render: game_render(type, onload, this.endGame.bind(this), {width: window.innerWidth, height: window.innerHeight})});
+		this.setState({game_render: game_render(type, onload, this.endGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 	}
 
 	componentDidUpdate() {
@@ -570,6 +588,11 @@ class GameView extends Component {
 		this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		// console.log("game view unmounted", this.state.game_render);
+	}
+
+	setplayers(data) {
+		console.log("set player", data);
+		this.setState({players: data});
 	}
 
 	endGame() {
@@ -588,6 +611,103 @@ class GameView extends Component {
 				class: "render-context", children: [
 					createElement('div', {
 						class: "back-button", onclick: () => this.endGame(), children: "Go home"
+					}),
+					this.state.players && this.state.type != "4p" && createElement('div', {
+						class: "game-player-overlay", children: createElement('div', {
+							class: "game-player-overlay-cnt", children: [
+								createElement('div', {
+									class: "game-player-profile", children: [
+										createElement('h1', {
+											children: this.state.players[0].nickname,
+										}),
+										createElement('img', {
+											src: this.state.players[0].profile_picture
+										}),
+									]
+								}),
+								createElement('div', {
+									class: "game-player-separator", children: "VS"
+								}),
+								createElement('div', {
+									class: "game-player-profile", children: [
+										createElement('img', {
+											src: this.state.players[1].profile_picture
+										}),
+										createElement('h1', {
+											children: this.state.players[1].nickname,
+										}),
+									]
+								})
+							]
+						})
+					}),
+					createElement('div', {
+						class: "game-keyboard", children: [
+							createElement('div', {
+								class: "game-keyboard-shortcut", children: [
+									createElement('div', {
+										class: "key", children: [
+											"E",
+											createElement('p', {
+												children: "Player View"
+											})
+										]
+									}),
+									createElement('div', {
+										class: "key", children: [
+											"R",
+											createElement('p', {
+												children: "Pong View"
+											})
+										]
+									}),
+									// createElement('div', {
+									// 	class: "key", children: [
+									// 		"T",
+									// 		createElement('p', {
+									// 			children: "Top View"
+									// 		})
+									// 	]
+									// }),
+								]
+							}),
+							createElement('div', {
+								class: "game-keyboard-moves", children: [
+									createElement('div', {
+										class: "key", children: [
+											"↑",
+											createElement('p', {
+												children: "Move Up"
+											})
+										]
+									}),
+									createElement('div', {
+										class: "key", children: [
+											"←",
+											createElement('p', {
+												children: "Move Left"
+											})
+										]
+									}),
+									createElement('div', {
+										class: "key", children: [
+											"↓",
+											createElement('p', {
+												children: "Move Down"
+											})
+										]
+									}),
+									createElement('div', {
+										class: "key", children: [
+											"→",
+											createElement('p', {
+												children: "Move Right"
+											})
+										]
+									})
+								]
+							}),
+						]
 					}),
 					this.state.game_render && this.state.game_render.render()
 				]

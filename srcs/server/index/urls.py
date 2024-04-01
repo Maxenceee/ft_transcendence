@@ -2,7 +2,7 @@ from django.urls import path
 
 from index.views.index import (index, not_found)
 from index.views.login import (login, signup, logout, callback_intra, callback_swivel)
-from index.views.api import (api_get_user, api_get_user_following, api_search_user, api_avatar, api_update_user, api_update_picture, api_follow, api_unfollow)
+from index.views.api import (api_get_user, api_get_user_following, api_search_user, api_avatar, api_update_user, api_update_picture, api_delete_picture, api_follow, api_unfollow)
 
 urlpatterns = [
 	path('', index, name='index'),
@@ -20,6 +20,7 @@ urlpatterns = [
 	path('api/avatar/<str:id>', api_avatar, name='avatar'),
 	path('api/user/update/nickname', api_update_user, name='update_user'),
 	path('api/user/update/picture', api_update_picture, name='update_picture'),
+	path('api/user/delete/picture', api_delete_picture, name='delete_picture'),
 	path('api/follow/<str:id>', api_follow, name='follow'),
 	path('api/unfollow/<str:id>', api_unfollow, name='unfollow'),
 

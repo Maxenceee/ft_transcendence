@@ -1,6 +1,7 @@
 import random
 from channels.generic.websocket import WebsocketConsumer
 from django.http import HttpResponse
+from django.conf import settings
 from index.models import *
 import json
 import logging
@@ -350,6 +351,34 @@ class Game:
 	def send(self, player, type, data):
 		self.players[player].send({"type": type, "data": data})
 
+	def init_players(self):
+		players = []
+		for player in self.players:
+			if isinstance(player, Player):
+				players.append(User.objects.get(id=player.id).resume_to_json())
+			if isinstance(player, AIPlayer):
+				id = player.id
+				nickname = "Marvin (AI)"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
+				players.append({
+					"id": id,
+					"nickname": nickname,
+					"status": "En Jeu",
+					"is_online": True,
+					"profile_picture": profile_picture,
+				})
+			if isinstance(player, LocalPlayer):
+				id = player.id
+				nickname = "Invité"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+				players.append({
+					"id": id,
+					"nickname": nickname,
+					"status": "En Jeu",
+					"is_online": True,
+					"profile_picture": profile_picture,
+				})
+		return players
 
 	def to_json(self):
 		players = []
@@ -398,6 +427,7 @@ class Game:
 			self.end_game()
 			return
 
+		self.send_all("initPlayers", self.init_players())
 		self.send_start_message()
 
 		logging.info("all players ready")
@@ -424,7 +454,7 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "d_key" or action == "right_arrow_key":
+				if action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
@@ -434,7 +464,7 @@ class Game:
 						if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
-				elif action == "a_key" or action == "left_arrow_key":
+				elif action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
@@ -443,7 +473,24 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})	
+				elif action == "down_arrow_key":
+					if self.players[player_idx].pad_x  < 16.5:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "up_arrow_key":
+					if self.players[player_idx].pad_x  > -16.5:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "e_key":
+					if player_idx == 0:
+						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+					elif player_idx == 1:
+						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
@@ -468,7 +515,6 @@ class Game:
 					self.end_game()
 					return
 
-
 	def game_master_4p(self):
 		logging.info("game master 4p")
 		for player in self.players:
@@ -481,8 +527,8 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				logging.info(f"{player_idx}: {action}")
-				if action == "d_key" or action == "right_arrow_key":
+				logging.info(f"action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
+				if action == "right_arrow_key":
 					if self.players[player_idx].pad_x < 27 and player_idx == 0:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x > 27:
@@ -500,7 +546,7 @@ class Game:
 						if self.players[player_idx].pad_z < -27:
 								self.players[player_idx].pad_z = -27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
-				elif action == "a_key" or action == "left_arrow_key":
+				elif action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -27 and player_idx == 0:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -27:
@@ -518,6 +564,16 @@ class Game:
 						if self.players[player_idx].pad_z > 27:
 							self.players[player_idx].pad_z = 27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
+					logging.info(f"After : action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
+				elif action == "e_key":
+					if player_idx == 0:
+						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+					elif player_idx == 1:
+						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
+					elif player_idx == 2:
+						self.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "0"})
+					elif player_idx == 3:
+						self.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
@@ -555,25 +611,25 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "d_key":
+				if action == "s_key":
 					if self.players[0].pad_x  < 16.5:
 						self.players[0].pad_x += 1
 						if self.players[0].pad_x  > 16.0:
 								self.players[0].pad_x = 16
 					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
-				elif action == "a_key":
+				elif action == "w_key":
 					if self.players[0].pad_x  > -16.5:
 						self.players[0].pad_x -= 1
 						if self.players[0].pad_x  < -16.0:
 								self.players[0].pad_x = -16
 					self.send_all("updatePlayer", {"n": 0, "x": round(self.players[0].pad_x, 2)})
-				if action == "right_arrow_key":
+				if action == "up_arrow_key":
 					if self.players[1].pad_x  > -16.5:
 						self.players[1].pad_x -= 1
 						if self.players[1].pad_x  < -16.0:
 								self.players[1].pad_x = -16
 					self.send_all("updatePlayer", {"n": 1, "x": round(self.players[1].pad_x, 2)})
-				elif action == "left_arrow_key":
+				elif action == "down_arrow_key":
 					if self.players[1].pad_x  < 16.5:
 						self.players[1].pad_x += 1
 						if self.players[1].pad_x  > 16.0:
@@ -613,7 +669,7 @@ class Game:
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
-				if action == "d_key" or action == "right_arrow_key":
+				if action == "right_arrow_key":
 					if self.players[player_idx].pad_x  < 16.5 and player_idx == 0:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x  > 16.0 :
@@ -623,7 +679,7 @@ class Game:
 						if self.players[player_idx].pad_x  < -16.0:
 							self.players[player_idx].pad_x = -16
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
-				elif action == "a_key" or action == "left_arrow_key":
+				elif action == "left_arrow_key":
 					if self.players[player_idx].pad_x  > -16.5 and player_idx == 0:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x  < -16.0:
@@ -633,6 +689,20 @@ class Game:
 						if self.players[player_idx].pad_x  > 16.0:
 							self.players[player_idx].pad_x = 16
 					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "down_arrow_key":
+					if self.players[player_idx].pad_x  < 16.5:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "up_arrow_key":
+					if self.players[player_idx].pad_x  > -16.5:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+					self.send(0, "updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x, 2)})
+				elif action == "e_key":
+					self.send(player_idx, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.ai_player.stop()

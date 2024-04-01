@@ -165,19 +165,18 @@ class UserProfilePicture extends Component {
 	}
 
 	removeProfilePicture() {
-		// xhr.post('/api/user/remove/profile_picture')
-		// .then(res => res.data)
-		// .then(data => {
-		// 	this.props.reload(null, false);
-		// })
-		// .catch(error => {
-		// 	console.error("error", error);
-		// })
+		axios.post('/api/user/delete/picture')
+		.then(res => res.data)
+		.then(data => {
+			this.props.reload(null, false);
+		})
+		.catch(error => {
+			console.error("error", error);
+		});
 	}
 
 	uploadProfilePicture(e) {
 		const formData = new FormData(this.ref.current);
-		// console.log(formData.values(), this.ref.current, e.target.files);
 		axios.post('/api/user/update/picture', formData, {headers: { "Content-Type": "multipart/form-data" }})
 		.then(res => res.data)
 		.then(data => {
@@ -196,10 +195,9 @@ class UserProfilePicture extends Component {
 						for: "avatar_upload", children: "Téléverser une photo"
 					})
 				}),
-				// waiting for route on server
-				// !this.props.user.default_profile_picture && createElement('div', {
-				// 	class: "dropdown-item", children: "Supprimer la photo"
-				// }),
+				!this.props.user.default_profile_picture && createElement('div', {
+					class: "dropdown-item", onclick: this.removeProfilePicture, children: "Supprimer la photo"
+				}),
 			]
 		})
 	}
