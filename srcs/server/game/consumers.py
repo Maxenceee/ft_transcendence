@@ -449,10 +449,6 @@ class Game:
 	def game_master_2p(self):
 		logging.info("game master 2p")
 		self.send_all("initGame", self.to_json())
-		# TODO:
-		# ajouter la possibilité d'ajouter une transition ou non lors de l'envoie d'un set cam
-		# notemment pour le changement au debut de partie qui est un peu brusque
-		# self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60", "transition": True})
 		t = 0
 		l = time.time()
 		while True:
@@ -541,12 +537,12 @@ class Game:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x < -27:
 								self.players[player_idx].pad_x = -27
-					if player_idx == 2:
-						self.players[player_idx].pad_z -= 1
-						if self.players[player_idx].pad_z > 27:
-								self.players[player_idx].pad_z = 27
 					if player_idx == 3:
 						self.players[player_idx].pad_z += 1
+						if self.players[player_idx].pad_z > 27:
+								self.players[player_idx].pad_z = 27
+					if player_idx == 2:
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z < -27:
 								self.players[player_idx].pad_z = -27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
@@ -559,12 +555,12 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x > 27:
 							self.players[player_idx].pad_x = 27
-					if player_idx == 2:
-						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  < -27:
-								self.players[player_idx].pad_z = -27
 					if player_idx == 3:
 						self.players[player_idx].pad_z -= 1
+						if self.players[player_idx].pad_z < -27:
+								self.players[player_idx].pad_z = -27
+					if player_idx == 2:
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z > 27:
 							self.players[player_idx].pad_z = 27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
@@ -773,7 +769,6 @@ class Game:
 			if self.players[2].score <= 0:
 				self.ball.direction_x *=-1
 				return
-			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			self.players[2].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -781,13 +776,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			if self.players[2].score <= 0:
-				self.send_all("deletePallet", {"n" : 2})
+				self.send_all("deletePallet", {"n" : 3})
 		elif self.ball.x > 29 :
 			if self.players[3].score <= 0:
 				self.ball.direction_x *= -1
 				return
-			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -795,13 +790,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			if self.players[3].score <= 0:
-				self.send_all("deletePallet", {"n" : 3})
+				self.send_all("deletePallet", {"n" : 2})
 		elif self.ball.z < -29:
 			if self.players[1].score <= 0:
 				self.ball.direction_z *= -1
 				return
-			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -809,13 +804,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			if self.players[1].score <= 0:
 				self.send_all("deletePallet", {"n" : 1})
 		elif self.ball.z > 29:
 			if self.players[0].score <= 0:
 				self.ball.direction_z *= -1
 				return
-			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -823,6 +818,7 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			if self.players[0].score <= 0:
 				self.send_all("deletePallet", {"n" : 0})
 		if (self.ball.speed > 5) :

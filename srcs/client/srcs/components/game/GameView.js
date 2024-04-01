@@ -194,12 +194,15 @@ let game_render = function(type, onload, onclose, setplayers, {width, height} = 
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
+
 			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
+		render_data.scores[0].position.z += 31.5;
+		render_data.scores[1].position.z -= 31.5;
+		render_data.scores[3].position.x += 31.5;
+		render_data.scores[2].position.x -= 31.5;
 
 		scene.add(...render_data.scores);
 	}
@@ -562,7 +565,7 @@ class GameView extends Component {
 		if (!type) {
 			navigate("/");
 		}
-		this.setState({loading: true, game_render: null, type: type});
+		this.setState({loading: true, game_render: null});
 		window.onbeforeunload = (e) => {
 			// display a message to the user
 			e.preventDefault();
@@ -582,7 +585,7 @@ class GameView extends Component {
 	}
 
 	componentWillUnmount() {
-		this.state.game_render && this.state.game_render.unmount();
+		this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		// console.log("game view unmounted", this.state.game_render);
 	}
