@@ -260,8 +260,8 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		right : 0
 	}
 	function onDocumentKeyEvent(event) {
-		let keyVar = event.witch;	console.log(keyvar);
-		console.log(keyvar);
+		let keyVar = event.witch;	console.log(keyVar);
+		console.log(keyVar);
 		// switch (event.which) {
 		// 	case 87:
 		// 		render_data.keyCodes["w_key"] = d;
@@ -329,7 +329,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 			console.log("left")
 			socket.send({type : 'keyCode', move : "left"});
 		}
-		console.log(keyvar);
+		console.log(keyVar);
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);
