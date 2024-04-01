@@ -1,6 +1,7 @@
 import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams } from '../..';
 import axios from "axios";
 import { ismax } from '../../proto/Component';
+import AlertBanner from '../../../utils/AlertBanner';
 
 class UserPage extends Component {
 	constructor(props) {
@@ -106,6 +107,7 @@ class UserNicknameField extends Component {
 		})
 		.catch(error => {
 			console.error("error", error);
+			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
 		})
 	}
 
@@ -171,7 +173,7 @@ class UserProfilePicture extends Component {
 			this.props.reload(null, false);
 		})
 		.catch(error => {
-			console.error("error", error);
+			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
 		});
 	}
 
@@ -184,7 +186,7 @@ class UserProfilePicture extends Component {
 			this.props.reload(null, false);
 		})
 		.catch(error => {
-			console.error("error", error);
+			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
 		});
 	}
 

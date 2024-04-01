@@ -308,6 +308,10 @@ class Game:
 
 	def end_game(self):
 		logging.info(f"game ended called: {self.id}")
+		players = []
+		for player in self.players:
+			players.append({"id": self.players.index(player), "score": player.score})
+		self.send_all("endGame", {"players": players})
 		for player in self.players:
 			if User.objects.filter(id=player.id).exists():
 				user = User.objects.get(id=player.id)

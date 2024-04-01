@@ -9,7 +9,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager } from '../../../utils';
 
-let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -36,8 +36,14 @@ let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, heig
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "endGame": {
+				socket.rmclose(onclose);
+				socket.close();
+				onfinish(msg.data);
+			} break;
 			case "initPlayers":
 				setplayers(msg.data);
+				break;
 			case "resetCam":
 				setcam(10, 69, 0);
 				break;
@@ -49,6 +55,7 @@ let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, heig
 				break;
 			case "text":
 				createText(msg.data.text, msg.data.size);
+				break;
 			default:
 				render_data.queue.push(msg);
 		}

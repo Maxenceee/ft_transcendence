@@ -2361,6 +2361,10 @@ body:has(.connection-page) {
 					background-color: #fb0842;
 					color: #fff;
 				}
+
+				& > label {
+					height: 100%;
+				}
 			}
 		}
 
@@ -2509,6 +2513,14 @@ body:has(.connection-page) {
 	flex-direction: row;
 	align-content: center;
 	overflow: hidden;
+
+	&.error {
+		background-color: #ce0000;
+	}
+	
+	&.warn {
+		background-color: #ad8e00;
+	}
 
 	& > div {
 		position: relative;

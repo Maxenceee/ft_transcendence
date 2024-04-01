@@ -23,6 +23,7 @@ class Main extends Component {
 	}
 
 	loadUser(callBack = null, loading = true) {
+		console.log("load user");
 		if (loading) {
 			this.setState({ loading: true });
 		}
@@ -30,19 +31,17 @@ class Main extends Component {
 		.then(res => res.data)
 		.then(data => {
 			this.setState({ user: data, loading: false }, callBack);
-			if (!this.state.socket) {
-				this.connectSocket();
-			}
 		})
 		.catch(error => {
-			console.error("error", error);
-			this.setState({ loading: false, error: "An error occured" });
+			// console.error("error", error);
+			this.setState({ loading: false, error: "An error occured, please try again later." });
 		})
 	}
 
 	componentDidMount() {
 		// console.log("==================== Main mounted ====================");
 		this.loadUser();
+		this.connectSocket();
 	}
 
 	componentDidUpdate() {
