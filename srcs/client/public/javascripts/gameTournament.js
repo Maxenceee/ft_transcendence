@@ -396,7 +396,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		controls.target.set(camx, camy, camz)
 		camera.position.set(x, y, z);
 		controls.update();
-
 	}
 	console.log("cookie");
 }();
