@@ -353,7 +353,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		{
 			for (let i = 0; i < 8; i++)
 			{
-				if (data.player[i].gameNumber != -1 && scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].scores && data.player[i].scores >= 0){
+				if (data.player[i].gameNumber != -1 && scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].score){
 					scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].scores;
 					scoreUpdate[data.player[i].gameNumber] = 1;
 					console.log("----")
