@@ -259,7 +259,7 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		left : 0,
 		right : 0
 	}
-	let onDocumentKeyEvent(event) {
+	function onDocumentKeyEvent(event) {
 		let keyVar = event.witch;	console.log(keyvar);
 		console.log(keyvar);
 		// switch (event.which) {
