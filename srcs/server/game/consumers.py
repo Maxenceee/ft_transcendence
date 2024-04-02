@@ -867,6 +867,7 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			data = self.scope['headers']
 		except:
+			self.close()
 			return
 		for i in data:
 			if b'cookie' in i:
@@ -881,13 +882,16 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		if not Token.objects.filter(token=token).exists():
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		token = Token.objects.get(token=token)
 		if token.is_valid == False:
+			self.close()
 			return logging.info("user connection rejected token not valid")
 
 		self.accept()
@@ -933,9 +937,10 @@ class WebsocketClient(WebsocketConsumer):
 	def disconnect(self, code):
 		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
-		matchmaker.quit_game(self, self.type)
-		if self.player is not None:
-			self.player.push_to_game("disconnect")
+		if self.user is not None:
+			matchmaker.quit_game(self, self.type)
+			if self.player is not None:
+				self.player.push_to_game("disconnect")
 
 
 #####################################################

@@ -319,7 +319,11 @@ class websocket_tournament(WebsocketConsumer):
 	def connect(self):
 		
 		cookies = {}
-		data = self.scope['headers']
+		try:
+			data = self.scope['headers']
+		except:
+			self.close()
+			return
 		for i in data:
 			if b'cookie' in i:
 				cookie = i[1].decode('utf-8')
@@ -328,13 +332,19 @@ class websocket_tournament(WebsocketConsumer):
 					j = j.strip()
 					j = j.split('=')
 					cookies[j[0]] = j[1]
-		token = cookies['token']
+		try:
+			token = cookies['token']
+		except:
+			self.close()
+			return
 		if not Token.objects.filter(token=token).exists():
+			self.close()
 			return
 		token = Token.objects.get(token=token)
 		if token.is_valid:
 			self.accept()
 		else:
+			self.close()
 			return
 		user = token.user
 

@@ -179,67 +179,26 @@ def game_master(game):
 				return
 
 
-# _____________________
-# tournamentList= {} 		
-# game_list_tournament = []										# make a map please
-# def start_gameTournament(name, size):
-# 	if tournamentList.find(name) == False :
-# 			tournamentList.append(Tournament(size, name))
-# 	else :
-# 			target =  tournamentList.find(name)
-# 	if target.full:
-# 		# pass
-# 		it = 0
-# 		tmp = []
-# 		while it < target.size + 1 :
-# 			tmp[0] = target.players[it]
-# 			tmp[1] = target.players[it + 1]
-# 			it += 2
-# 			game_list_tournament.append(Game(tmp))
-# 		target.size /= 2
-# 		return
-# 	else :
-# 		return
-
-
-# class Tournament :
-# 	players = []
-# 	size = 0
-# 	name = "default"
-
-# 	def __init__(self, size, name):
-# 		self.size = size
-# 		self.name = name
-# 		pass
-	
-# 	def add(self, player):
-# 		self.players.append(player)
-	
-# 	def full(self):
-# 		if (len(self.players) == self.size):
-# 			return True
-# 		return False
-# _______________________
-
 class websocket_client(WebsocketConsumer):
 
 	def connect(self):
-		# ft_getGameType(self) 								?????????????????????????
-		
-		cookies = {}
-		data = self.scope['headers']
-		for i in data:
-			if b'cookie' in i:
-				cookie = i[1].decode('utf-8')
-				cookie = cookie.split(';')
-				for j in cookie:
-					j = j.strip()
-					j = j.split('=')
-					cookies[j[0]] = j[1]
-		token = cookies['token']
-		if not Token.objects.filter(token=token).exists():
+		try :
+			cookies = {}
+			data = self.scope['headers']
+			for i in data:
+				if b'cookie' in i:
+					cookie = i[1].decode('utf-8')
+					cookie = cookie.split(';')
+					for j in cookie:
+						j = j.strip()
+						j = j.split('=')
+						cookies[j[0]] = j[1]
+			token = cookies['token']
+			if not Token.objects.filter(token=token).exists():
+				return
+			token = Token.objects.get(token=token)
+		except:
 			return
-		token = Token.objects.get(token=token)
 		if token.is_valid:
 			self.accept()
 		else:
