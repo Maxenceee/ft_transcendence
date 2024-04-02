@@ -133,7 +133,6 @@ class Player:
 
 
 	def push_to_game(self, action):
-		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 
