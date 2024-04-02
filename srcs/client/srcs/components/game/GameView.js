@@ -177,8 +177,8 @@ class GameView extends Component {
 						]
 					}),
 					this.state.game_render && this.state.game_render.render(),
-					// this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
-					createElement(EndGameRecap, {data: this.state.endGameData})
+					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
+					// createElement(EndGameRecap, {data: this.state.endGameData})
 				]
 			})
 		)
