@@ -172,11 +172,13 @@ class UserProfilePicture extends Component {
 		})
 		.catch(error => {
 			console.error("error", error);
+			this.setState({ loading: false });
 		});
 	}
 
 	uploadProfilePicture(e) {
 		const formData = new FormData(this.ref.current);
+		this.setState({ loading: true });
 		axios.post('/api/user/update/picture', formData, {headers: { "Content-Type": "multipart/form-data" }})
 		.then(res => res.data)
 		.then(data => {
@@ -184,6 +186,7 @@ class UserProfilePicture extends Component {
 		})
 		.catch(error => {
 			console.error("error", error);
+			this.setState({ loading: false });
 		});
 	}
 
@@ -206,7 +209,7 @@ class UserProfilePicture extends Component {
 		return createElement('div', {
 			class: "card-profile", children: [
 				createElement('div', {
-					class: "card-picture", children: createElement('img', {
+					class: "card-picture"+(this.state.loading ? " loading" : ""), children: createElement('img', {
 						src: this.props.user.profile_picture, alt: "profile-picture"
 					})
 				}),

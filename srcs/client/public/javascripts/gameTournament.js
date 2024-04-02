@@ -61,9 +61,6 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 					}
 				}
 			}
-			else if (msg.type == "resetCam")
-				// setcam(10, 69, 0);
-				;
 			else if (msg.type == "setCam")
 				setcam(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 	});
@@ -73,14 +70,14 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		// ballDirection : ballDirection,
 		// P1position : pallet[0].position,
 		// P2position : pallet[1].position,
-		// score : score,
+		// scores : scores,
 		// updateScore : 0,
 		// moveSpeed : moveSpeed,
 		// playerNumber : playerNumber,
 		// gameID : 0,
 		// keyCode : keyCode
 	};
-	let ball = [0 ,1 ,2 ,3 ,4 ,5 ,6];
+	let balls = [0 ,1 ,2 ,3 ,4 ,5 ,6];
 
 	const renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize( window.innerWidth, window.innerHeight );
@@ -101,20 +98,12 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	const Alight = new THREE.AmbientLight({color:0xffffff});
 	scene.add( Alight );
 
+	let font;
+	let textGeo = [];
+	let textMesh2 = [];
 
-	// const player1Map = new THREE.TextureLoader().load( "/static/javascripts/img/kitten.jpg" );
-	// const player2Map = new THREE.TextureLoader().load( "/static/javascripts/img/smug_frieren.jpg" );
-	// const ballMap = new THREE.TextureLoader().load( "/static/javascripts/img/fire.jpg" );
-
-	// const nooo = new THREE.TextureLoader().load( "/static/javascripts/img/no.jpg" );
-
-	let font, textGeo, textMesh2
-	textGeo = []
-	textMesh2 = []
-	
-
-	let score = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
-	let k = [0, 0, 0, 0, 0, 0, 0, 0]
+	let scores = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]];
+	let k = [0, 0, 0, 0, 0, 0, 0, 0];
 
 	function loadFont() {
 
@@ -129,13 +118,10 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	}
 
 	let pallet = [0, 1 ,2, 3, 4, 5, 6, 7];
-	let mapLenth
-	let mapWidth
 	function initiateMapTwoPlayer(data, offset_x, offset_z, num )
 	{
-		
-		mapLenth = 60;
-		mapWidth = 40;
+		let mapLenth = 60;
+		let mapWidth = 40;
 		if (num <= 3){
 			pallet[0 + (num * 2)] = new THREE.Mesh( 
 				new THREE.BoxGeometry( 6, 1, 1 ), 
@@ -206,6 +192,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 				side : THREE.DoubleSide,
 			})
 		);
+	
 		wallP2.position.x += offset_x
 		wallP2.position.z -= mapLenth/2 - offset_z
 		wallP1.position.x += offset_x
@@ -219,15 +206,15 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			iridescence :1,
 			side : THREE.DoubleSide,
 		});
-		ball[num] = new THREE.Mesh( geometryBall, materialBall );
-		ball[num].position.x = offset_x;
-		ball[num].position.z = offset_z;
 
-		
+		balls[num] = new THREE.Mesh( geometryBall, materialBall );
+		balls[num].position.x = offset_x;
+		balls[num].position.z = offset_z;
+
 		scene.add(wallLeft, wallRight, wallP1, wallP2, ball[num]);
 	}
 
-		const params = {
+	const params = {
 		threshold: 0,
 		strength: 0.35,
 		radius: 0,
@@ -241,76 +228,71 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	bloomPass.strength = params.strength;
 	bloomPass.radius = params.radius;
 	const outputPass = new OutputPass();
-	let composer
-	composer = new EffectComposer( renderer );
+	let composer = new EffectComposer( renderer );
 	composer.addPass( renderScene );
 	composer.addPass( bloomPass );
 	composer.addPass( outputPass );
 
-	initiateMapTwoPlayer({}, 0, 0, 0)
-	initiateMapTwoPlayer({}, 80, 0, 1)
-	initiateMapTwoPlayer({}, 160, 0, 2)
-	initiateMapTwoPlayer({}, 240, 0, 3)
-	initiateMapTwoPlayer({}, 160, 100, 4)
-	initiateMapTwoPlayer({}, 80, 100, 5)
-	initiateMapTwoPlayer({}, 120, 200, 6)
+	initiateMapTwoPlayer({}, 0, 0, 0);
+	initiateMapTwoPlayer({}, 80, 0, 1);
+	initiateMapTwoPlayer({}, 160, 0, 2);
+	initiateMapTwoPlayer({}, 240, 0, 3);
+	initiateMapTwoPlayer({}, 160, 100, 4);
+	initiateMapTwoPlayer({}, 80, 100, 5);
+	initiateMapTwoPlayer({}, 120, 200, 6);
 
 	document.addEventListener("keydown", onDocumentKeyDown, true);
-	document.addEventListener("keyup", onDocumentKeyUp, true)
+	document.addEventListener("keyup", onDocumentKeyUp, true);
 	function onDocumentKeyDown(event) {
 		let keyVar = event.which;
-		keyCode.right = 0
-		keyCode.left = 0
+		keyCode.right = 0;
+		keyCode.left = 0;
 		if (keyVar == 68)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
 		if (keyVar == 65)
 		{
-			keyCode.left = 1
-			keyCode.right = 0
+			keyCode.left = 1;
+			keyCode.right = 0;
 		}
 		if (keyVar == 39)
 		{
-			keyCode.left = 0
-			keyCode.right = 1
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
 		if (keyVar == 37)
 		{
-			keyCode.left = 1
-			keyCode.right = 0
+			keyCode.left = 1;
+			keyCode.right = 0;
 		}
 		if (keyVar == 82)
 		{
 			socket.send({type : 'keyCode', move : "reset"});
-			// setcam(10, 69, 0)
-			// controls.target.set( 0, 0, 0 );
 		}
 		if (keyCode.right == 1 && keyCode.left == 0)
 			socket.send({type : 'keyCode', move : "right"});
 		else if (keyCode.right == 0 && keyCode.left == 1) 
-			socket.send({type : 'keyCode', move : "left"})
-		else
-			;
+			socket.send({type : 'keyCode', move : "left"});
 	}
 	function onDocumentKeyUp(event) {
 	    let keyVar = event.which; 
 		if (keyVar == 68)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 65)
-			keyCode.left = 0
+			keyCode.left = 0;
 		if (keyVar == 39)
-			keyCode.right = 0
+			keyCode.right = 0;
 		if (keyVar == 37)
-			keyCode.left = 0
+			keyCode.left = 0;
 	}
 
 
 	const 	materials = [
 		new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } ), // front
 		new THREE.MeshPhongMaterial( { color: 0xffffff } ) // side
-		];
+	];
 	if (pallet[0] != 0)
 		scene.add(pallet[0], pallet[1], pallet[2], pallet[3], pallet[4], pallet[5], pallet[6], pallet[7]);
 
@@ -345,7 +327,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		right : 0
 	}
 	const sky = new THREE.TextureLoader().load( "/static/javascripts/img/background_sky_box.jpg" );
-	const skyboxGeo		 = new THREE.SphereGeometry( 450 );
+	const skyboxGeo = new THREE.SphereGeometry( 450 );
 	const materialSky = new THREE.MeshPhysicalMaterial({
 		wireframe:false, 
 		opacity: 1,
@@ -357,7 +339,7 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 	scene.add(skybox)
 
 	loadFont();
-	let scoreUpdate =[0, 0, 0, 0, 0, 0, 0];
+	let scoreUpdate = [0, 0, 0, 0, 0, 0, 0];
 	const animate = async () => {
 		if (composer){
 			renderer.render( scene, camera );
@@ -369,89 +351,44 @@ import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 		requestAnimationFrame(animate);
 		if (data.type == "gameState")
 		{
-			// if ((score.scoreP1 < 0 || score.scoreP2 < 0))
-			// {
-			// 	scene.remove(ball[0]);
-			// 	scene.remove(textMesh2[0])
-			// 	// return;
-			// }
-			// if ((score.scoreP3 < 0 || score.scoreP4 < 0))
-			// {
-			// 	scene.remove(ball[1]);
-			// 	scene.remove(textMesh2[1])			// 	// return;
-			// }
-			// if ((score.scoreP5 < 0 || score.scoreP6 < 0))
-			// {
-			// 	scene.remove(ball[2]);
-			// 	scene.remove(textMesh2[2])
-			// 	// return;
-			// }
-			// if ((score.scoreP7 < 0 || score.scoreP8 < 0))
-			// {
-			// 	scene.remove(ball[3]);
-			// 	scene.remove(textMesh2[3])
-			// 	// return;
-			// }
-			// if ((score.scoreP2 != data.player[1].score || score.scoreP1 != data.player[0].score || 
-			// 	score.scoreP3 != data.player[2].score  || score.scoreP4 != data.player[3].score 
-			// 	|| score.scoreP5 != data.player[4].score  || score.scoreP6 != data.player[5].score ))
-			// 	{
-				
-				for (let i = 0; i < 8; i++)
-				{
-					if (data.player[i].gameNumber != -1 && score[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
-						score[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].score;
-						scoreUpdate[data.player[i].gameNumber] = 1;
-						console.log("----")
-						console.log("update game : " + data.player[i].gameNumber);
-					}
-					if (data.player[i].gameNumber != -1){
-						k[data.player[i].gameNumber] += 1
-						k[data.player[i].gameNumber] %= 2
-					}
-					if (scoreUpdate[data.player[i].gameNumber] == 1){
-						scoreUpdate[data.player[i].gameNumber] = 0
-						console.log("display" + data.player[i].gameNumber + " : " + score)
-						display_score(data.player[i].gameNumber);
-						console.log("----")
-					}
+			for (let i = 0; i < 8; i++)
+			{
+				if (data.player[i].gameNumber != -1 && scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].scores && data.player[i].scores >= 0){
+					scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].scores;
+					scoreUpdate[data.player[i].gameNumber] = 1;
+					console.log("----")
+					console.log("update game : " + data.player[i].gameNumber);
 				}
-				// score.scoreP1 = data.player[0].score;
-				// score.scoreP2 = data.player[1].score;
-				// score.scoreP3 = data.player[2].score;
-				// score.scoreP4 = data.player[3].score;
-				// score.scoreP5 = data.player[4].score;
-				// score.scoreP6 = data.player[5].score;
-				// score.scoreP7 = data.player[6].score;
-				// score.scoreP8 = data.player[7].score;
-				// createText(data.player[0].score + " : " + data.player[1].score, 0, 0, 0);
-				// createText(data.player[2].score + " : " + data.player[3].score, 80, 0, 1);
-				// createText(data.player[4].score + " : " + data.player[5].score, 160, 0, 2);
-				// createText(data.player[6].score + " : " + data.player[7].score, 240, 0, 3);
-			// }
+				if (data.player[i].gameNumber != -1){
+					k[data.player[i].gameNumber] += 1
+					k[data.player[i].gameNumber] %= 2
+				}
+				if (scoreUpdate[data.player[i].gameNumber] == 1){
+					scoreUpdate[data.player[i].gameNumber] = 0
+					console.log("display" + data.player[i].gameNumber + " : " + scores)
+					display_score(data.player[i].gameNumber);
+					console.log("----")
+				}
+			}
 		}
 	}
 
-		function display_score(i){
-			if ( i == 0)
-				createText(score[0][0] + " : " + score[0][1], 0, 0, 0)
-			else if (i == 1)
-				createText(score[1][0] + " : " + score[1][1], 80, 0, 1);
-			else if (i == 2)
-				createText(score[2][0] + " : " + score[2][1], 160, 0, 2);
-			else if (i == 3)
-				createText(score[3][0] + " : " + score[3][1], 240, 0, 3);
-			else if (i == 4)
-				createText(score[4][0] + " : " + score[4][1], 80, 100, 4);
-			else if (i == 5)
-				createText(score[5][0] + " : " + score[5][1], 160, 100, 5);
-			else if (i == 6)
-				createText(score[6][0] + " : " + score[6][1], 120, 200, 6);
-			// console.log(score[0][0] + " : " + score[0][1]);
-			// console.log(score[1][0] + " : " + score[1][1]);
-			// console.log(score[2][0] + " : " + score[2][1]);
-			// console.log(score[3][0] + " : " + score[3][1]);
-		}
+	function display_score(i){
+		if ( i == 0)
+			createText(scores[0][0] + " : " + scores[0][1], 0, 0, 0)
+		else if (i == 1)
+			createText(scores[1][0] + " : " + scores[1][1], 80, 0, 1);
+		else if (i == 2)
+			createText(scores[2][0] + " : " + scores[2][1], 160, 0, 2);
+		else if (i == 3)
+			createText(scores[3][0] + " : " + scores[3][1], 240, 0, 3);
+		else if (i == 4)
+			createText(scores[4][0] + " : " + scores[4][1], 80, 100, 4);
+		else if (i == 5)
+			createText(scores[5][0] + " : " + scores[5][1], 160, 100, 5);
+		else if (i == 6)
+			createText(scores[6][0] + " : " + scores[6][1], 120, 200, 6);
+	}
 
 	const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 	sleep(250).then(() => { animate(); });
