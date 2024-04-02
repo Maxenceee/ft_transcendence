@@ -13,5 +13,5 @@ asgi_application = get_asgi_application()
 
 application = ProtocolTypeRouter({
 	"http": asgi_application,
-	"websocket": URLRouter(index.routing.websocket_urlpatterns + tournament.routing.websocket_urlpatterns + game.routing.websocket_urlpatterns)
+	"websocket": URLRouter(tournament.routing.websocket_urlpatterns + game.routing.websocket_urlpatterns + index.routing.websocket_urlpatterns)
 })

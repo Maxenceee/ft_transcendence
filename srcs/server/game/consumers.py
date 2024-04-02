@@ -82,17 +82,14 @@ class Tinder: # Matchmaking
 					id, socket, type = action[1:]
 					self.player_list[type]["list"].append([id, socket])
 				elif action[0] == "quit":
-					id, type = action[1:]
+					socket, type = action[1:]
 					for client in self.player_list[type]["list"]:
-						if client[0] == id:
-							if self.player_list[type]["list"].count(client) > 0:
-								user = User.objects.get(id=id)
-								user.is_ingame = False
-								user.save()
-
-								self.player_list[type]["list"].remove(client)
-								break
-
+						if client[1] == socket:
+							user = User.objects.get(id=client[0])
+							user.is_ingame = False
+							user.save()
+							self.player_list[type]["list"].remove(client)
+							break
 				elif action[0] == "end_game":
 					for game in self.games:
 						if game.id == action[1]:
@@ -103,9 +100,9 @@ class Tinder: # Matchmaking
 			time.sleep(1)
 
 
-	def	quit_game(self, id, type):
+	def	quit_game(self, socket, type):
 		logging.info(f"quit game called : {id} {type}")
-		self.queue.put(["quit", id, type])
+		self.queue.put(["quit", socket, type])
 
 
 class Ball:
@@ -136,7 +133,6 @@ class Player:
 
 
 	def push_to_game(self, action):
-		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 
@@ -876,6 +872,7 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			data = self.scope['headers']
 		except:
+			self.close()
 			return
 		for i in data:
 			if b'cookie' in i:
@@ -890,13 +887,16 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		if not Token.objects.filter(token=token).exists():
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		token = Token.objects.get(token=token)
 		if token.is_valid == False:
+			self.close()
 			return logging.info("user connection rejected token not valid")
 
 		self.accept()
@@ -942,9 +942,10 @@ class WebsocketClient(WebsocketConsumer):
 	def disconnect(self, code):
 		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
-		matchmaker.quit_game(self.id, self.type)
-		if self.player is not None:
-			self.player.push_to_game("disconnect")
+		if self.user is not None:
+			matchmaker.quit_game(self, self.type)
+			if self.player is not None:
+				self.player.push_to_game("disconnect")
 
 
 #####################################################
