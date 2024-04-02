@@ -82,17 +82,14 @@ class Tinder: # Matchmaking
 					id, socket, type = action[1:]
 					self.player_list[type]["list"].append([id, socket])
 				elif action[0] == "quit":
-					id, type = action[1:]
+					socket, type = action[1:]
 					for client in self.player_list[type]["list"]:
-						if client[0] == id:
-							if self.player_list[type]["list"].count(client) > 0:
-								user = User.objects.get(id=id)
-								user.is_ingame = False
-								user.save()
-
-								self.player_list[type]["list"].remove(client)
-								break
-
+						if client[1] == socket:
+							user = User.objects.get(id=client[0])
+							user.is_ingame = False
+							user.save()
+							self.player_list[type]["list"].remove(client)
+							break
 				elif action[0] == "end_game":
 					for game in self.games:
 						if game.id == action[1]:
@@ -103,9 +100,9 @@ class Tinder: # Matchmaking
 			time.sleep(1)
 
 
-	def	quit_game(self, id, type):
+	def	quit_game(self, socket, type):
 		logging.info(f"quit game called : {id} {type}")
-		self.queue.put(["quit", id, type])
+		self.queue.put(["quit", socket, type])
 
 
 class Ball:
@@ -136,7 +133,6 @@ class Player:
 
 
 	def push_to_game(self, action):
-		# logging.info(f"push to game: {self.index} {action}")
 		self.game.queue.put([self.index, action])
 
 
@@ -579,13 +575,13 @@ class Game:
 					logging.info(f"After : action: {action} {player_idx} {self.players[player_idx].pad_x} {self.players[player_idx].pad_z}")
 				elif action == "e_key":
 					if player_idx == 0:
-						self.send(0, "setCam", {"x" : "0", "y" : "30", "z" : "60"})
+						self.send(0, "setCam", {"x" : "0", "y" : "40", "z" : "70"})
 					elif player_idx == 1:
-						self.send(1, "setCam", {"x" : "0", "y" : "30", "z" : "-60"})
+						self.send(1, "setCam", {"x" : "0", "y" : "40", "z" : "-70"})
 					elif player_idx == 2:
-						self.send(2, "setCam", {"x" : "60", "y" : "30", "z" : "0"})
+						self.send(2, "setCam", {"x" : "70", "y" : "40", "z" : "0"})
 					elif player_idx == 3:
-						self.send(3, "setCam", {"x" : "-60", "y" : "30", "z" : "0"})
+						self.send(3, "setCam", {"x" : "-70", "y" : "40", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
@@ -839,13 +835,18 @@ class Game:
 
 	def pad_collision_x(self, player_id):
 		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
+			if  self.type == "4p" and self.players[player_id].score <= 0 :
+				return
 			if (player_id == 1) :
 				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = 1
 			else :
 				self.ball.direction_x = (self.ball.x - self.players[player_id].pad_x)/4.5
 				self.ball.direction_z = -1
-			self.ball.speed *= 1.1
+			if self.type == "4p":
+				self.ball.speed *= 1.2
+			else :
+				self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -858,7 +859,7 @@ class Game:
 			elif player_id == 2 and self.players[2].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
-			self.ball.speed *= 1.1
+			self.ball.speed *= 1.2
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
@@ -879,6 +880,7 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			data = self.scope['headers']
 		except:
+			self.close()
 			return
 		for i in data:
 			if b'cookie' in i:
@@ -893,13 +895,16 @@ class WebsocketClient(WebsocketConsumer):
 		try:
 			token = cookies['token']
 		except:
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		if not Token.objects.filter(token=token).exists():
+			self.close()
 			return logging.info("user connection rejected token not found")
 
 		token = Token.objects.get(token=token)
 		if token.is_valid == False:
+			self.close()
 			return logging.info("user connection rejected token not valid")
 
 		self.accept()
@@ -945,9 +950,10 @@ class WebsocketClient(WebsocketConsumer):
 	def disconnect(self, code):
 		logging.info(f"user disconnected : {code}")
 		super().disconnect(code)
-		matchmaker.quit_game(self.id, self.type)
-		if self.player is not None:
-			self.player.push_to_game("disconnect")
+		if self.user is not None:
+			matchmaker.quit_game(self, self.type)
+			if self.player is not None:
+				self.player.push_to_game("disconnect")
 
 
 #####################################################

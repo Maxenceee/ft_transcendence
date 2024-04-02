@@ -1,7 +1,9 @@
 import { Component, createElement, Loader, useParams, navigate } from '..';
+				
 import TwoFourGameRender from './render/TwoFourGameRender';
 import TournamentGameRender from './render/TournamentGameRender';
 import EndGameRecap from './EndGameRecap';
+
 
 class GameView extends Component {
 	constructor(props) {

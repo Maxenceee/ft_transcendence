@@ -187,6 +187,7 @@ class UserProfilePicture extends Component {
 		})
 		.catch(error => {
 			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			this.setState({ loading: false });
 		});
 	}
 
@@ -209,7 +210,7 @@ class UserProfilePicture extends Component {
 		return createElement('div', {
 			class: "card-profile", children: [
 				createElement('div', {
-					class: "card-picture", children: createElement('img', {
+					class: "card-picture"+(this.state.loading ? " loading" : ""), children: createElement('img', {
 						src: this.props.user.profile_picture, alt: "profile-picture"
 					})
 				}),
