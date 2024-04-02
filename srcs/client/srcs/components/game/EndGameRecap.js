@@ -1,48 +1,109 @@
-import { Component, createElement } from "..";
+import { Component, createElement, link } from "..";
 
 class EndGameRecap extends Component {
 	constructor(props) {
 		super(props);
 	}
 
-	twoPlayers() {
+	button(text, to) {
+		return createElement('div', {
+			class: "dg-overlay-button", children: [
+				link({to: to, children: createElement('p', {
+					children: text
+				})})
+			]
+		});
+	}
+
+	twoPlayers(type, players) {
+		let getTypeTitle = (type) => {
+			switch(type) {
+				case "2p":
+					return "Normale";
+				case "ai":
+					return "Partie contre IA";
+				case "local":
+					return "Partie locale";
+			}
+		}
+
 		return [
 			createElement('div', {
 				class: "dg-overlay-player", children: [
-					createElement('h1', {
-						children: this.state.players[0].nickname,
+					createElement('h2', {
+						class: "dg-overlay-player-score",
 					}),
-					createElement('img', {
-						src: this.state.players[0].profile_picture
+					createElement('div', {
+						class: "profile-picture", children: createElement('img', {
+							src: players[0].profile_picture
+						}),
+					}),
+					createElement('h1', {
+						children: players[0].nickname || "N/A",
+					}),
+					this.button("Voir le profil", "/user/" + players[0].id)
+				]
+			}),
+			createElement('div', {
+				class: "dg-overlay-vs", children: [
+					createElement('div', {
+						class: "", children: [
+							createElement('h1', {
+								class: "dg-overlay-vs-title", children: getTypeTitle(type)
+							})
+						]
+					}),
+					createElement('div', {
+						class: "dg-overlay-vs-scores", children: [
+							createElement('h1', {
+								class: "", children: players[0].score || 0
+							}),
+							createElement('div', {class: "separator"}),
+							createElement('h1', {
+								class: "", children: players[1].score || 0
+							})
+						]
+					}),
+					createElement('div', {
+						class: "", children: [
+							this.button("Rejouer", "/game/" + type)
+						]
 					}),
 				]
 			}),
 			createElement('div', {
-				
-			}),
-			createElement('div', {
-				class: "dg-overlay-player", 
+				class: "dg-overlay-player", children: [
+					createElement('h2', {
+						class: "dg-overlay-player-score",
+					}),
+					createElement('div', {
+						class: "profile-picture", children: createElement('img', {
+							src: players[1].profile_picture
+						}),
+					}),
+					createElement('h1', {
+						children: players[1].nickname || "N/A",
+					}),
+					this.button("Voir le profil", "/user/" + players[1].id)
+				]
 			}),
 		]
 	}
 
-	fourPlayers() {
+	fourPlayers(players) {
 
 	}
 
 	render() {
 		return createElement('div', {
 			class: "dg-overlay", children: createElement('div', {
-				class: "dg-overlay-cnt", children: this.props.data.length == 2 ?
-				this.twoPlayers()
+				class: "dg-overlay-cnt", children: (this.props.data).length == 2 ?
+				this.twoPlayers(this.props.type, this.props.data)
 				:
-				this.fourPlayers()
+				this.fourPlayers(this.props.type, this.props.data)
 			})
 		});
 	}
-	// children: this.props && this.props.data.sort((a, b) => a.score < b.score ? -1 : 1).map((player, i) => {
-	// 	return player.id;
-	// }),
 }
 
 export default EndGameRecap;

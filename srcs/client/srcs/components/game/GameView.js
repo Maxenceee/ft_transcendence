@@ -28,7 +28,6 @@ class GameView extends Component {
 		}
 		let onload = () => this.setState({loading: false});
 
-		console.log("type", type);
 		if (type == "tournament") {
 			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 		} else {
@@ -178,7 +177,7 @@ class GameView extends Component {
 					}),
 					this.state.game_render && this.state.game_render.render(),
 					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
-					// createElement(EndGameRecap, {data: this.state.endGameData})
+					// createElement(EndGameRecap, {type: this.state.type, data: [{id: "maxence", score: 3, nickname: "Max", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=7516293836"}, {id: "2", score: 5, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"}]})
 				]
 			})
 		)
