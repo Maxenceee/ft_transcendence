@@ -101,8 +101,10 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 	});
 
     let font,
-		textGeo = [],
-		textMesh = [];
+		textGeo = [], 
+		textGeo2 = [0, 0, 0, 0., 0, 0, 0, 0],
+		textMesh = [], 
+		textMesh2 = [0, 0, 0, 0., 0, 0, 0, 0];
 
 	const fontLoader = new FontLoader(loaderManager);
 	fontLoader.load('/static/fonts/font.json', function (response) {
@@ -138,6 +140,32 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		textGeo.dispose();
 	}
 
+    function createText2(msg, x, z, number) {
+		scene.remove(textMesh2[number]);
+        textGeo2[number] = new TextGeometry(msg, {
+            font: font,
+            size: 10,
+            height: 0.5,
+            curveSegments: 2,
+            bevelThickness: 0.1,
+            bevelSize: 0.01,
+            bevelEnabled: true
+        });
+
+        textGeo2[number].computeBoundingBox();
+        textGeo2[number].center();
+        textMesh2[number] = new THREE.Mesh(textGeo2[number], materials);
+        textMesh2[number].rotateX(-Math.PI * 0.5);
+        textMesh2[number].rotateZ(Math.PI * 0.5);
+        textMesh2[number].position.x += x;
+        textMesh2[number].position.z += z;
+        textMesh2[number].position.y -= 2;
+        
+        
+        scene.add(textMesh2[number]);
+        textGeo2[number].dispose();
+    }
+	
     function initiateMapTwoPlayer(data, offset_x, offset_z, num )
 	{
 		let mapLenth = 60;
@@ -343,21 +371,21 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
     scene.add(...render_data.pallet, ...render_data.balls);
 
     function display_score(i){
-		if ( i == 0)
-			createText(render_data.scores[0][0] + " : " + render_data.scores[0][1], 0, 0, 0)
-		else if (i == 1)
-			createText(render_data.scores[1][0] + " : " + render_data.scores[1][1], 80, 0, 1);
-		else if (i == 2)
-			createText(render_data.scores[2][0] + " : " + render_data.scores[2][1], 160, 0, 2);
-		else if (i == 3)
-			createText(render_data.scores[3][0] + " : " + render_data.scores[3][1], 240, 0, 3);
-		else if (i == 4)
-			createText(render_data.scores[4][0] + " : " + render_data.scores[4][1], 80, 100, 4);
-		else if (i == 5)
-			createText(render_data.scores[5][0] + " : " + render_data.scores[5][1], 160, 100, 5);
-		else if (i == 6)
-			createText(render_data.scores[6][0] + " : " + render_data.scores[6][1], 120, 200, 6);
-	}
+        if ( i == 0)
+            createText2(render_data.scores[0][0] + " : " + render_data.scores[0][1],  0, 0, 0)
+        else if (i == 1)
+            createText2(render_data.scores[1][0] + " : " + render_data.scores[1][1],  80, 0, 1);
+        else if (i == 2)
+            createText2(render_data.scores[2][0] + " : " + render_data.scores[2][1],  160, 0, 2);
+        else if (i == 3)
+            createText2(render_data.scores[3][0] + " : " + render_data.scores[3][1],  240, 0, 3);
+        else if (i == 4)
+            createText2(render_data.scores[4][0] + " : " + render_data.scores[4][1],  80, 100, 4);
+        else if (i == 5)
+            createText2(render_data.scores[5][0] + " : " + render_data.scores[5][1],  160, 100, 5);
+        else if (i == 6)
+            createText2(render_data.scores[6][1] + " : " + render_data.scores[6][0], 120, 200, 6);
+    }
 
     let scoreUpdate = [0, 0, 0, 0, 0, 0, 0];
     let animationid = null,
@@ -383,24 +411,33 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 
 			if (event.type == "gameState")
             {
-                for (let i = 0; i < 8; i++)
+				createText("");
+                for (let i = 0; i < 7; i++)
                 {
-                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].scores && data.player[i].scores >= 0){
-                        render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] = data.player[i].scores;
-                        scoreUpdate[data.player[i].gameNumber] = 1;
-                        console.log("----")
-                        console.log("update game : " + data.player[i].gameNumber);
-                    }
-                    if (data.player[i].gameNumber != -1){
-                        render_data.k[data.player[i].gameNumber] += 1
-                        render_data.k[data.player[i].gameNumber] %= 2
-                    }
-                    if (scoreUpdate[data.player[i].gameNumber] == 1){
-                        scoreUpdate[data.player[i].gameNumber] = 0
-                        console.log("display" + data.player[i].gameNumber + " : " + render_data.scores)
-                        display_score(data.player[i].gameNumber);
-                        console.log("----")
-                    }
+					let j  = 0
+                    // if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
+                    //     render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] = data.player[i].score;
+                    //     scoreUpdate[data.player[i].gameNumber] = 1;
+                    // }
+                    // if (data.player[i].gameNumber != -1){
+                    //     render_data.k[data.player[i].gameNumber] += 1
+                    //     render_data.k[data.player[i].gameNumber] %= 2
+                    // }
+                    // if (scoreUpdate[data.player[i].gameNumber] == 1){
+                    //     scoreUpdate[data.player[i].gameNumber] = 0
+                    //     display_score(data.player[i].gameNumber);
+                    // }
+					let k = 0;
+					while(j < 8){
+						if (data.player[j].gameNumber == i && data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
+							render_data.scores[data.player[i].gameNumber][k] = data.player[j].score;
+							k += 1;
+							if (k == 1)
+								display_score(i);
+						}
+						j++;
+					}
+
                 }
 				render_data.balls[0].position.x = data.ball.x;
 				render_data.balls[1].position.x = data.ball2.x + 80;
