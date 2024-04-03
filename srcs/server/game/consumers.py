@@ -308,8 +308,23 @@ class Game:
 		logging.info(f"game ended called: {self.id}")
 		players = []
 		for player in self.players:
-			players.append({"id": self.players.index(player), "score": player.score})
+			if isinstance(player, AIPlayer):
+				nickname = "Marvin (AI)"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder"
+			if isinstance(player, LocalPlayer):
+				nickname = "Invité"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+			if isinstance(player, Player):
+				user = User.objects.get(id=player.id)
+				nickname = user.nickname
+				profile_picture = user.default_profile_picture
+				if user.profile_picture_image:
+					profile_picture = settings.BASE_URL + "/api" + user.profile_picture_image.url
+			if player.score == 0:
+				player.score = "0"
+			players.append({"id": self.players.index(player), "score": player.score, "nickname": nickname, "profile_picture": profile_picture})
 		self.send_all("endGame", {"players": players})
+
 		for player in self.players:
 			if User.objects.filter(id=player.id).exists():
 				user = User.objects.get(id=player.id)
