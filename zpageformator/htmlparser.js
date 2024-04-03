@@ -40,6 +40,9 @@ function parseHTMLElement(node, level = 1) {
 	if (node.rawAttrs) {
 		Object.keys(node.attributes).forEach(attr => {
 			const value = node.attributes[attr];
+			if (attr.includes('-')) {
+				attr = `"${attr}"`;
+			}
 			res.push(`${attr}: "${value}"`);
 		});
 	}

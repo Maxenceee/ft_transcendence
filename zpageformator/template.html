@@ -1,3 +1,33 @@
-<svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true" class="octicon octicon-pencil">
-    <path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"></path>
-</svg>
+<div>
+    <h1>Créer un compte</h1>
+    <form data-turbo="false" action="{{ action_url|default:"/login" }}" accept-charset="UTF-8" method="post">
+        <div class="auth-form-input">
+            <div class="ttpo form-input">
+                <label class="f0n8F">
+                    <span class="_9nyy2">Nom d'utilisateur</span>
+                    <input class="_2hvTZ pexuQ zyHYP" id="identifierU" autocomplete="current-username" minlength="3" maxlength="20" autocorrect="off" autocapitalize="off" required type="text" aria-required="true" name="login" value="{{ login|default:"" }}">
+                </label>
+            </div>
+            <div class="ttpo form-input">
+                <label class="f0n8F">
+                    <span class="_9nyy2">Mot de passe</span>
+                    <input class="_2hvTZ pexuQ zyHYP" id="identifierP" autocomplete="current-password" minlength="3" maxlength="20" autocorrect="off" autocapitalize="off" required type="password" aria-required="true" aria-label="password" name="password" value="">
+                </label>
+            </div>
+            <input type="submit" value="Créer mon compte" class="auth-form-submit btn-primary" data-disable-with="Création…" data-signin-label="Créer mon compte" data-sso-label="Créer un compte pour accéder à la ressource">
+        </div>
+        <div class="auth-form-other-l">
+            <p>Déjà un compte ? <a href="/login">Se connecter</a></p>
+        </div>
+        <div class="card-separator upper-text"></div>
+        <div class="external-connect">
+            <div>
+                <div id="intra-button" class="external-connect-btn intra-button">
+                    <img class="icon" src="/static/images/42_logo_black-684989d43d629b3c0ff6fd7e1157ee04db9bb7a73fba8ec4e01543d650a1c607.png" alt="icon-42">
+                    <div class="inner">Sign in with 42 Intra</div>
+                </div>
+                <div id="swivel-ref-h" class="external-connect-btn"></div>
+            </div>
+        </div>
+    </form>
+</div>

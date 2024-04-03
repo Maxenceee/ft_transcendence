@@ -1,4 +1,4 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, ConnectionPage } from '..';
 import { Socket } from '../../utils';
 import axios from "axios";
 
@@ -55,19 +55,20 @@ class Main extends Component {
 
 	render() {
 		return (
-			this.state.loading ?
-			createElement(Loader)
-			:
-			this.state.error != null ?
-			createElement(BadConnection)
-			:
-			createElement(BrowserRouter, {children:
-				router(
-					route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
-					route({path: "/500", element: createElement(ServerError)}),
-					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
-				)
-			})
+			// this.state.loading ?
+			// createElement(Loader)
+			// :
+			// this.state.error != null ?
+			// createElement(BadConnection)
+			// :
+			// createElement(BrowserRouter, {children:
+			// 	router(
+			// 		route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
+			// 		route({path: "/500", element: createElement(ServerError)}),
+			// 		route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+			// 	)
+			// })
+			createElement(ConnectionPage)
 		)
 	}
 }
