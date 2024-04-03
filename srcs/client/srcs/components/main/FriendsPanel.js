@@ -59,7 +59,8 @@ class FriendsPanel extends Component {
 			// this.props.reload();
 		})
 		.catch(error => {
-			console.error("error", error);
+			// console.error("error", error);
+			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
 		})
 	}
 
@@ -71,7 +72,8 @@ class FriendsPanel extends Component {
 			this.setState({ following: data.following });
 		})
 		.catch(error => {
-			console.error("error", error);
+			// console.error("error", error);
+			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
 		})
 	}
 

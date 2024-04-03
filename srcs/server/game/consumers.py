@@ -145,7 +145,8 @@ class Player:
 
 	def __str__(self) -> str:
 		return f"player {self.id} index in game {self.index}"
-	
+
+
 class LocalPlayer:
 	def __init__(self) -> None:
 		self.id = "local_" + makeid(15)
@@ -168,6 +169,7 @@ class LocalPlayer:
 
 	def send(self, data):
 		pass
+
 
 class AIPlayer:
 	def __init__(self):
@@ -304,6 +306,10 @@ class Game:
 
 	def end_game(self):
 		logging.info(f"game ended called: {self.id}")
+		players = []
+		for player in self.players:
+			players.append({"id": self.players.index(player), "score": player.score})
+		self.send_all("endGame", {"players": players})
 		for player in self.players:
 			if User.objects.filter(id=player.id).exists():
 				user = User.objects.get(id=player.id)
@@ -347,6 +353,7 @@ class Game:
 	def send(self, player, type, data):
 		self.players[player].send({"type": type, "data": data})
 
+
 	def init_players(self):
 		players = []
 		for player in self.players:
@@ -375,6 +382,7 @@ class Game:
 					"profile_picture": profile_picture,
 				})
 		return players
+
 
 	def to_json(self):
 		players = []

@@ -9,8 +9,8 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager } from '../../../utils';
 
-let TournamentGameRender = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
-    let render_data = {
+let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+	let render_data = {
 		pallet: [],
 		ball: null,
 		ballDirection: {
@@ -21,18 +21,23 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		updateScore: 0,
 		queue: [],
 		scores: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
-        balls: [],
-        k: [0, 0, 0, 0, 0, 0, 0, 0]
+		balls: [],
+		k: [0, 0, 0, 0, 0, 0, 0, 0]
 	}
 
-    let setcam = (x, y, z) => {
+	let setcam = (x, y, z) => {
 		camera.position.set(x, y, z);
 	}
 
-    let socket = new Socket({path: "/game/tournament"});
+	let socket = new Socket({path: "/game/tournament"});
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "endGame": {
+				socket.rmclose(onclose);
+				socket.close();
+				onfinish(msg.data);
+			} break;
 			// case "initPlayers":
 			// 	setplayers(msg.data);
 			// case "resetCam":
@@ -333,21 +338,21 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 				ts = Date.now();
 			}
 
-			if (data.type == "gameState")
+			if (event.type == "gameState")
             {
                 for (let i = 0; i < 8; i++)
                 {
-                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].render_data.scores && data.player[i].render_data.scores >= 0){
+                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].render_data.scores && data.player[i].render_data.scores >= 0) {
                         render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].render_data.scores;
                         scoreUpdate[data.player[i].gameNumber] = 1;
                         console.log("----")
                         console.log("update game : " + data.player[i].gameNumber);
                     }
-                    if (data.player[i].gameNumber != -1){
+                    if (data.player[i].gameNumber != -1) {
                         k[data.player[i].gameNumber] += 1
                         k[data.player[i].gameNumber] %= 2
                     }
-                    if (scoreUpdate[data.player[i].gameNumber] == 1){
+                    if (scoreUpdate[data.player[i].gameNumber] == 1) {
                         scoreUpdate[data.player[i].gameNumber] = 0
                         console.log("display" + data.player[i].gameNumber + " : " + render_data.scores)
                         display_score(data.player[i].gameNumber);
