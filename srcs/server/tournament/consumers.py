@@ -147,10 +147,16 @@ class Game:
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(json.dumps({"type" : type, "data" : data}))
+			try:
+				player.socket.send(json.dumps({"type" : type, "data" : data}))
+			except:
+				return
 	
 	def send(self, player, type, data):
-		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		try:
+			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		except:
+			return
 
 	def to_json(self):
 		players = []
@@ -266,7 +272,7 @@ def game_master(game):
 			playerID, action = game.queue.get()
 			gameplayer = []
 			for current in game.players:
-				if current.gameNumber == game.players[playerID].gameNumber and current.playerNumber != -1:
+				if current.gameNumber == game.players[playerID].gameNumber and current.gameNumber != -1:
 					gameplayer.append(current)
 			if len(gameplayer) == 2:
 				if action == "right":
@@ -292,7 +298,16 @@ def game_master(game):
 							gameplayer[1].pad_x += 0.8
 							if gameplayer[1].pad_x  > 16.0:
 								gameplayer[1].pad_x = 16
+				elif action == "disconnect":
+					logging.info("disconnect")
 
+					if gameplayer[0].playerNumber == playerID:
+						gameplayer[0].score = 0
+						gameplayer[1].score = 5
+					else:
+						gameplayer[1].score = 0
+						gameplayer[0].score = 5
+					logging.info(f"player {playerID} disconnected")
 		time.sleep(0.05)
 		i = 0
 		while i < 7 :
@@ -338,6 +353,13 @@ class websocket_tournament(WebsocketConsumer):
 			return
 		user = token.user
 
+		if user.is_ingame == True:
+			self.close()
+			return
+		else :
+			user.is_ingame = False #TODO change flase in true
+			user.save()
+
 		logging.info(user.id)
 		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
@@ -362,6 +384,9 @@ class websocket_tournament(WebsocketConsumer):
 		receive_package = json.loads(text_data)
 		logging.info(receive_package)
 
+		if not "type" in receive_package:
+			return
+
 		if receive_package['type'] == "keyCode":
 			try:
 				if receive_package['move'] == "left":
@@ -377,7 +402,7 @@ class websocket_tournament(WebsocketConsumer):
 	def disconnect(self, code):
 		print("server says disconnected")
 		if hasattr(self, "data"):
-			self.data.end_game()
+			self.data.queue.put([self.playerID, "disconnect"])
 		else:
 			for player in waiting_list:
 				if player.socket == self:
