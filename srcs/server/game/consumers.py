@@ -560,12 +560,12 @@ class Game:
 						self.players[player_idx].pad_x -= 1
 						if self.players[player_idx].pad_x < -27:
 								self.players[player_idx].pad_x = -27
-					if player_idx == 2:
-						self.players[player_idx].pad_z -= 1
-						if self.players[player_idx].pad_z > 27:
-								self.players[player_idx].pad_z = 27
 					if player_idx == 3:
 						self.players[player_idx].pad_z += 1
+						if self.players[player_idx].pad_z > 27:
+								self.players[player_idx].pad_z = 27
+					if player_idx == 2:
+						self.players[player_idx].pad_z -= 1
 						if self.players[player_idx].pad_z < -27:
 								self.players[player_idx].pad_z = -27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
@@ -578,12 +578,12 @@ class Game:
 						self.players[player_idx].pad_x += 1
 						if self.players[player_idx].pad_x > 27:
 							self.players[player_idx].pad_x = 27
-					if player_idx == 2:
-						self.players[player_idx].pad_z += 1
-						if self.players[player_idx].pad_z  < -27:
-								self.players[player_idx].pad_z = -27
 					if player_idx == 3:
 						self.players[player_idx].pad_z -= 1
+						if self.players[player_idx].pad_z < -27:
+								self.players[player_idx].pad_z = -27
+					if player_idx == 2:
+						self.players[player_idx].pad_z += 1
 						if self.players[player_idx].pad_z > 27:
 							self.players[player_idx].pad_z = 27
 					self.send_all("updatePlayer", {"n": player_idx, "x": round(self.players[player_idx].pad_x), "z": round(self.players[player_idx].pad_z, 2)})
@@ -599,8 +599,19 @@ class Game:
 						self.send(3, "setCam", {"x" : "-70", "y" : "40", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
-					self.players[player_idx].score = 0
-					self.send_all("updateScore", {"n": player_idx, "score": 0})
+					if player_idx == 3 :
+						self.players[2].score = 0
+					elif player_idx == 2 :
+						self.players[3].score = 0
+					else:
+						self.players[player_idx].score = 0
+					self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
+					self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
+					self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
+					self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
+					self.send_all("deletePallet", {"n" : player_idx})
+
+
 
 			t += 1
 			if time.time() - l > 1:
@@ -624,7 +635,6 @@ class Game:
 				if i >= 3:
 					self.end_game()
 					return
-
 
 	def game_master_local(self):
 		logging.info("game master local")
@@ -792,7 +802,6 @@ class Game:
 			if self.players[2].score <= 0:
 				self.ball.direction_x *=-1
 				return
-			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			self.players[2].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -800,13 +809,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			if self.players[2].score <= 0:
-				self.send_all("deletePallet", {"n" : 2})
+				self.send_all("deletePallet", {"n" : 3})
 		elif self.ball.x > 29 :
 			if self.players[3].score <= 0:
 				self.ball.direction_x *= -1
 				return
-			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -814,13 +823,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			if self.players[3].score <= 0:
-				self.send_all("deletePallet", {"n" : 3})
+				self.send_all("deletePallet", {"n" : 2})
 		elif self.ball.z < -29:
 			if self.players[1].score <= 0:
 				self.ball.direction_z *= -1
 				return
-			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -828,13 +837,13 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			if self.players[1].score <= 0:
 				self.send_all("deletePallet", {"n" : 1})
 		elif self.ball.z > 29:
 			if self.players[0].score <= 0:
 				self.ball.direction_z *= -1
 				return
-			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
@@ -842,6 +851,7 @@ class Game:
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.05
+			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			if self.players[0].score <= 0:
 				self.send_all("deletePallet", {"n" : 0})
 		if (self.ball.speed > 5) :
@@ -868,10 +878,10 @@ class Game:
 
 	def pad_collision_z(self, player_id):
 		if ((self.ball.x < -27 and player_id == 3) or (self.ball.x > 27 and player_id == 2)) and (self.ball.z < (self.players[player_id].pad_z + 4.5)  and self.ball.z > (self.players[player_id].pad_z - 4.5)):
-			if (player_id == 3 and self.players[3].score >= 1) :
+			if (player_id == 3 and self.players[2].score >= 1) :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = 1
-			elif player_id == 2 and self.players[2].score >= 1 :
+			elif player_id == 2 and self.players[3].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
 			self.ball.speed *= 1.2

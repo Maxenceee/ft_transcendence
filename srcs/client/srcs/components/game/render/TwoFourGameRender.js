@@ -193,19 +193,25 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 		return new THREE.Mesh(geo, materials);
 	}
 
-	function displayScore(data) {
+function displayScore(data) {
 
 		if (render_data.scores.length)
 			scene.remove(...render_data.scores);
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
+
 			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
-			render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
+		render_data.scores[0].rotateY((Math.PI / 2) * 2);
+		render_data.scores[1].rotateY((Math.PI / 2) * 4);
+		render_data.scores[2].rotateY((Math.PI / 2));
+		render_data.scores[3].rotateY((Math.PI / 2) * 3);
+		render_data.scores[0].position.z += 31.5;
+		render_data.scores[1].position.z -= 31.5;
+		render_data.scores[3].position.x += 31.5;
+		render_data.scores[2].position.x -= 31.5;
 
 		scene.add(...render_data.scores);
 	}
