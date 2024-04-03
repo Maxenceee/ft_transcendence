@@ -62,6 +62,9 @@ class Game:
 		except:
 			return
 		for player in self.players:
+			user = User.objects.get(id=player.id)
+			user.is_ingame = False
+			user.save()
 			player.socket.close()
 		resume_data = []
 		for player in self.players:
@@ -348,6 +351,13 @@ class websocket_tournament(WebsocketConsumer):
 			return
 		user = token.user
 
+		if user.is_ingame == True:
+			self.close()
+			return
+		else :
+			user.is_ingame = True
+			user.save()
+
 		logging.info(user.id)
 		logging.info("new player connected")
 		waiting_list.append(Player(user.id, self))
@@ -390,4 +400,7 @@ class websocket_tournament(WebsocketConsumer):
 		else:
 			for player in waiting_list:
 				if player.socket == self:
+					user = User.objects.get(id=player.id)
+					user.is_ingame = False
+					user.save()
 					waiting_list.remove(player)
