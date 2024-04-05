@@ -793,7 +793,7 @@ class Game:
 		l = time.time()
 		l = [l,l,l,l,l,l,l]
 		while True:
-			for currentGameId in range(6):
+			for currentGameId in range(7):
 				players = []
 				for player in self.players:
 					if player.gameNumber == currentGameId:
@@ -808,15 +808,40 @@ class Game:
 
 				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
 				self.ball[currentGameId].z += self.ball[currentGameId].direction_z * 0.4 * self.ball[currentGameId].speed
-				# self.wall_collide_two_player()
-				# self.pad_collision_x(0)
-				# self.pad_collision_x(1)
-				# self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
-				# for player in self.players:
-				# 	if player.score  > 4 :
-				# 		self.end_game()
-				# 		return
+				self.wall_collide_tournament(currentGameId)
+				self.pad_collision_tournament(currentGameId, 0)
+				self.pad_collision_tournament(currentGameId, 1)
+				for player in players:
+					if player.score  > 4 :
+						logging.info(f"player {player.id} won the match {currentGameId}")
+						if player.gameNumber == 0 or player.gameNumber == 1:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 4
+									current.score = 0
+									break
+						elif player.gameNumber == 2 or player.gameNumber == 3:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 5
+									current.score = 0
+									break
+						elif player.gameNumber == 4 or player.gameNumber == 5:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 6
+									current.score = 0
+									break
+						elif player.gameNumber == 6:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 7
+									logging.info(f"player {current.id} won the tournament")
+									self.end_game()
+									return
+
 			self.send_all("gameState", self.tournament_state())
+			logging.info(f"{self.players[0].gameNumber} {self.players[1].gameNumber} {self.players[2].gameNumber} {self.players[3].gameNumber} {self.players[4].gameNumber} {self.players[5].gameNumber} {self.players[6].gameNumber} {self.players[7].gameNumber}")
 			time.sleep(0.04)
 
 
@@ -929,6 +954,40 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+	def wall_collide_tournament(self, gameNum):
+		gameplayer = []
+		for current in self.players:
+			if current.gameNumber == gameNum:
+				gameplayer.append(current)
+		if len(gameplayer) != 2:
+			return
+		if self.ball[gameNum].x < -18.5 :
+			self.ball[gameNum].direction_x *= -1
+		elif self.ball[gameNum].x > 18.5 :
+			self.ball[gameNum].direction_x *= -1
+		if self.ball[gameNum].z < -29:
+			gameplayer[0].score += 1
+			self.ball[gameNum].x = 0
+			self.ball[gameNum].z = 0 
+			self.ball[gameNum].y = 0
+			self.ball[gameNum].direction_z *= -1
+			self.ball[gameNum].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball[gameNum].speed = 1.05
+		elif self.ball[gameNum].z > 29:
+			gameplayer[1].score += 1
+			self.ball[gameNum].x = 0
+			self.ball[gameNum].z = 0 
+			self.ball[gameNum].y = 0
+			self.ball[gameNum].direction_z *= -1
+			self.ball[gameNum].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball[gameNum].speed = 1.05
+		if (self.ball[gameNum].speed > 5) :
+			self.ball[gameNum].speed = 5
+		if (self.ball[gameNum].x < -18.5):
+			self.ball[gameNum].x = -18.49
+		if (self.ball[gameNum].x > 18.5):
+			self.ball[gameNum].x = 18.49
+
 	def pad_collision_x(self, player_id):
 		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
 			if  self.type == "4p" and self.players[player_id].score <= 0 :
@@ -958,6 +1017,27 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+	def pad_collision_tournament(self, gameNum, playerPos):
+		gameplayer = []
+		for current in self.players:
+			if current.gameNumber == gameNum:
+				gameplayer.append(current)
+		if len(gameplayer) != 2:
+			return
+
+		if ((self.ball[gameNum].z < -27 and playerPos == 1) or (self.ball[gameNum].z > 27 and playerPos == 0)) and (self.ball[gameNum].x < (gameplayer[playerPos].pad_x + 4.5)  
+				and self.ball[gameNum].x > (gameplayer[playerPos].pad_x - 4.5)):
+			
+			if (playerPos== 1) :
+				self.ball[gameNum].direction_x = (self.ball[gameNum].x - gameplayer[playerPos].pad_x)/4.5
+				self.ball[gameNum].direction_z = 1
+			else :
+				self.ball[gameNum].direction_x = (self.ball[gameNum].x - gameplayer[playerPos].pad_x)/4.5
+				self.ball[gameNum].direction_z = -1
+
+			self.ball[gameNum].speed *= 1.1
+		if (self.ball[gameNum].speed > 5) :
+			self.ball[gameNum].speed = 5
 
 class WebsocketClient(WebsocketConsumer):
 	def __init__(self, *args, **kwargs):

@@ -226,7 +226,6 @@ class Game:
 			self.ball[gameNum].speed *= 1.1
 		if (self.ball[gameNum].speed > 5) :
 			self.ball[gameNum].speed = 5
-			# i += 1
 
 def start_game(num):
 	logging.info(f"waiting list {len(waiting_list)}")
