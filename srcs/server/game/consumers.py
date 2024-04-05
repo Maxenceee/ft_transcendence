@@ -21,7 +21,7 @@ def makeid(len):
 
 
 def	check_type(type):
-	return type == "2p" or type == "4p" or type == "ai" or type == "local" 
+	return type == "2p" or type == "4p" or type == "ai" or type == "local" or type == "tournament"
 
 
 class Tinder: # Matchmaking
@@ -32,7 +32,8 @@ class Tinder: # Matchmaking
 				"2p": {"list": [], "num": 2},
 				"4p": {"list": [], "num": 4},
 				"ai": {"list": [], "num": 1},
-				"local": {"list": [], "num": 1}
+				"local": {"list": [], "num": 1},
+				"tournament": {"list": [], "num": 8},
 			}
 		self.games = []
 		self.thread = threading.Thread(target=self.run, args=()).start()
@@ -45,7 +46,7 @@ class Tinder: # Matchmaking
 			return
 		
 		user = User.objects.get(id=id)
-		if user.is_ingame == False:
+		if user.is_ingame == False or user.is_dev == True:
 			user.is_ingame = True
 			user.save()
 		else:
@@ -62,7 +63,7 @@ class Tinder: # Matchmaking
 				players = []
 				for _ in range(self.player_list[key]["num"]):
 					id, socket = self.player_list[key]["list"].pop(0)
-					players.append(Player(id, socket))
+					players.append(Player(id, socket, key))
 				game = Game(key, players)
 				logging.info(f"game created : {game}")
 				self.games.append(game)
@@ -81,6 +82,7 @@ class Tinder: # Matchmaking
 				if action[0] == "join":
 					id, socket, type = action[1:]
 					self.player_list[type]["list"].append([id, socket])
+					logging.info(f"player {id} added to game, they are {len(self.player_list[type]['list'])} players int the {type} queue")
 				elif action[0] == "quit":
 					socket, type = action[1:]
 					for client in self.player_list[type]["list"]:
@@ -89,6 +91,7 @@ class Tinder: # Matchmaking
 							user.is_ingame = False
 							user.save()
 							self.player_list[type]["list"].remove(client)
+							logging.info(f"player {client[0]} removed from queue, they are {len(self.player_list[type]['list'])} players int the {type} queue")
 							break
 				elif action[0] == "end_game":
 					for game in self.games:
@@ -115,7 +118,7 @@ class Ball:
 
 
 class Player:
-	def __init__(self, id, socket) -> None:
+	def __init__(self, id, socket, type) -> None:
 		self.id = id
 		self.index = -1
 		self.socket = socket
@@ -125,6 +128,8 @@ class Player:
 		self.pad_x = 0
 		self.pad_z = 0
 		self.ready = False
+		if type == "Tournament":
+			self.gameId = None
 
 
 	def set_game(self, game, index):
@@ -280,7 +285,10 @@ class Game:
 		logging.info("new game init")
 		self.id = makeid(15)
 		self.players = players
-		self.ball = Ball()
+		if game_type == "tournament":
+			self.ball = [Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball()]
+		else:
+			self.ball = Ball()
 		self.type = game_type
 		self.queue = queue.Queue()
 		self.thread = None
@@ -409,11 +417,10 @@ class Game:
 			"moveSpeed": round(self.ball.speed, 2)
 		}
 
-	
 	def send_start_message(self):
 		self.send_text("Players ready!", 5)
 		time.sleep(2)
-		if self.type != "local" :
+		if self.type != "local":
 			self.send(0, "moveCam", {"x" : "0", "y" : "30", "z" : "60", "duration" : "3000"})
 			self.send(1, "moveCam", {"x" : "0", "y" : "30", "z" : "-60", "duration" : "3000"})
 			if self.type == "4p":
@@ -447,7 +454,8 @@ class Game:
 			return
 
 		self.send_all("initPlayers", self.init_players())
-		self.send_start_message()
+		if self.type != "tournament":
+			self.send_start_message()
 
 		logging.info("all players ready")
 		match self.type:
@@ -459,6 +467,8 @@ class Game:
 				self.thread = threading.Thread(target=self.game_master_ai, args=())
 			case "local":
 				self.thread = threading.Thread(target=self.game_master_local, args=())
+			case "tournament":
+				self.thread = threading.Thread(target=self.game_master_tournament, args=())
 			case _:
 				logging.error("game type not found")
 				return
@@ -692,7 +702,6 @@ class Game:
 					self.end_game()
 					return
 
-	
 	def game_master_ai(self):
 		logging.info("game master ai")
 		self.ai_player.start()
@@ -762,6 +771,17 @@ class Game:
 					self.end_game()
 					return
 
+	def game_master_tournament(self):
+		i = 0
+		game = 0
+		for player in self.players:
+			player.gameId = self.game
+			i += 1
+			if i == 2:
+				i = 0
+				game += 1
+		logging.info("game master tournament")
+		return
 
 	def wall_collide_two_player(self):
 		if self.ball.x < -18.5 :
@@ -795,7 +815,6 @@ class Game:
 			self.ball.x = -18.49
 		if (self.ball.x > 18.5):
 			self.ball.x = 18.49
-
 
 	def wall_collide_four_player(self):
 		if self.ball.x < -29 :
@@ -857,7 +876,6 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
-
 	def pad_collision_x(self, player_id):
 		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
 			if  self.type == "4p" and self.players[player_id].score <= 0 :
@@ -874,7 +892,6 @@ class Game:
 				self.ball.speed *= 1.1
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
-
 
 	def pad_collision_z(self, player_id):
 		if ((self.ball.x < -27 and player_id == 3) or (self.ball.x > 27 and player_id == 2)) and (self.ball.z < (self.players[player_id].pad_z + 4.5)  and self.ball.z > (self.players[player_id].pad_z - 4.5)):
