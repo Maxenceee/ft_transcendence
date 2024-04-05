@@ -14,6 +14,7 @@ class User(models.Model):
 	nickname = models.CharField(max_length=100)
 	is_online = models.BooleanField(default=False)
 	is_ingame = models.BooleanField(default=False)
+	is_dev = models.BooleanField(default=False)
 	game_history = models.ManyToManyField('Game_history', related_name='game_history', blank=True)
 
 	default_profile_picture = models.CharField(max_length=100)

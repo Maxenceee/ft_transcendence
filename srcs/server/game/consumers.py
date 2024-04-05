@@ -21,7 +21,7 @@ def makeid(len):
 
 
 def	check_type(type):
-	return type == "2p" or type == "4p" or type == "ai" or type == "local" 
+	return type == "2p" or type == "4p" or type == "ai" or type == "local" or type == "tournament"
 
 
 class Tinder: # Matchmaking
@@ -32,7 +32,8 @@ class Tinder: # Matchmaking
 				"2p": {"list": [], "num": 2},
 				"4p": {"list": [], "num": 4},
 				"ai": {"list": [], "num": 1},
-				"local": {"list": [], "num": 1}
+				"local": {"list": [], "num": 1},
+				"tournament": {"list": [], "num": 8},
 			}
 		self.games = []
 		self.thread = threading.Thread(target=self.run, args=()).start()
@@ -45,7 +46,7 @@ class Tinder: # Matchmaking
 			return
 		
 		user = User.objects.get(id=id)
-		if user.is_ingame == False:
+		if user.is_ingame == False or user.is_dev == True:
 			user.is_ingame = True
 			user.save()
 		else:
@@ -62,7 +63,7 @@ class Tinder: # Matchmaking
 				players = []
 				for _ in range(self.player_list[key]["num"]):
 					id, socket = self.player_list[key]["list"].pop(0)
-					players.append(Player(id, socket))
+					players.append(Player(id, socket, key))
 				game = Game(key, players)
 				logging.info(f"game created : {game}")
 				self.games.append(game)
@@ -81,6 +82,7 @@ class Tinder: # Matchmaking
 				if action[0] == "join":
 					id, socket, type = action[1:]
 					self.player_list[type]["list"].append([id, socket])
+					logging.info(f"player {id} added to game, they are {len(self.player_list[type]['list'])} players int the {type} queue")
 				elif action[0] == "quit":
 					socket, type = action[1:]
 					for client in self.player_list[type]["list"]:
@@ -89,6 +91,7 @@ class Tinder: # Matchmaking
 							user.is_ingame = False
 							user.save()
 							self.player_list[type]["list"].remove(client)
+							logging.info(f"player {client[0]} removed from queue, they are {len(self.player_list[type]['list'])} players int the {type} queue")
 							break
 				elif action[0] == "end_game":
 					for game in self.games:
@@ -115,7 +118,7 @@ class Ball:
 
 
 class Player:
-	def __init__(self, id, socket) -> None:
+	def __init__(self, id, socket, type) -> None:
 		self.id = id
 		self.index = -1
 		self.socket = socket
@@ -125,6 +128,8 @@ class Player:
 		self.pad_x = 0
 		self.pad_z = 0
 		self.ready = False
+		if type == "Tournament":
+			self.gameNumber = None
 
 
 	def set_game(self, game, index):
@@ -280,7 +285,10 @@ class Game:
 		logging.info("new game init")
 		self.id = makeid(15)
 		self.players = players
-		self.ball = Ball()
+		if game_type == "tournament":
+			self.ball = [Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball()]
+		else:
+			self.ball = Ball()
 		self.type = game_type
 		self.queue = queue.Queue()
 		self.thread = None
@@ -409,11 +417,10 @@ class Game:
 			"moveSpeed": round(self.ball.speed, 2)
 		}
 
-	
 	def send_start_message(self):
 		self.send_text("Players ready!", 5)
 		time.sleep(2)
-		if self.type != "local" :
+		if self.type != "local":
 			self.send(0, "moveCam", {"x" : "0", "y" : "30", "z" : "60", "duration" : "3000"})
 			self.send(1, "moveCam", {"x" : "0", "y" : "30", "z" : "-60", "duration" : "3000"})
 			if self.type == "4p":
@@ -447,7 +454,8 @@ class Game:
 			return
 
 		self.send_all("initPlayers", self.init_players())
-		self.send_start_message()
+		if self.type != "tournament":
+			self.send_start_message()
 
 		logging.info("all players ready")
 		match self.type:
@@ -459,6 +467,8 @@ class Game:
 				self.thread = threading.Thread(target=self.game_master_ai, args=())
 			case "local":
 				self.thread = threading.Thread(target=self.game_master_local, args=())
+			case "tournament":
+				self.thread = threading.Thread(target=self.game_master_tournament, args=())
 			case _:
 				logging.error("game type not found")
 				return
@@ -692,7 +702,6 @@ class Game:
 					self.end_game()
 					return
 
-	
 	def game_master_ai(self):
 		logging.info("game master ai")
 		self.ai_player.start()
@@ -762,7 +771,138 @@ class Game:
 					self.end_game()
 					return
 
+	def game_master_tournament(self):
+		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
+		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
+		self.send(2, "setCam", {"x" : "110", "y" : "30", "z" : "60" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+		self.send(3, "setCam", {"x" : "110", "y" : "30", "z" : "-60", "camx" :"80.0", "camy" :"0", "camz" :"0"})
+		self.send(4, "setCam", {"x" : "190", "y" : "30", "z" : "60" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+		self.send(5, "setCam", {"x" : "190", "y" : "30", "z" : "-60", "camx" :"160.0", "camy" :"0", "camz" :"0"})
+		self.send(6, "setCam", {"x" : "270", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
+		self.send(7, "setCam", {"x" : "270", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
+		i = 0
+		tmp = 0
+		for player in self.players:
+			player.gameNumber = tmp
+			i += 1
+			if i == 2:
+				i = 0
+				tmp += 1
+		logging.info("game master tournament")
+		t = 0
+		l = time.time()
+		while True:
+			while not self.queue.empty():
+				player_idx, action = self.queue.get()
+				players = []
+				for current in self.players:
+					if current.gameNumber == self.players[player_idx].gameNumber and current.gameNumber != -1:
+						players.append(current)
+				if len(players) != 2:
+					continue
 
+				if action == "right":
+					if players[0].socket == self.players[player_idx].socket:
+						if self.players[player_idx].pad_x  < 16.5:
+							self.players[player_idx].pad_x += 1
+							if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+					else:
+						if self.players[player_idx].pad_x  > -16.5:
+							self.players[player_idx].pad_x -= 1
+							if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+				elif action == "left":
+					if players[0].socket == self.players[player_idx].socket:
+						if self.players[player_idx].pad_x  > -16.5:
+							self.players[player_idx].pad_x -= 1
+							if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+					else:
+						if self.players[player_idx].pad_x  < 16.5:
+							self.players[player_idx].pad_x += 1
+							if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+				elif action == "disconnect":
+					if players[0].socket == self.players[player_idx].socket:
+						self.players[player_idx].score = 0
+						for current in self.players:
+							if players[1].socket == current.socket:
+								current.score = 5
+								break
+					else:
+						self.players[player_idx].score = 0
+						for current in self.players:
+							if players[0].socket == current.socket:
+								current.score = 5
+								break
+
+			for currentGameId in range(7):
+				players = []
+				for player in self.players:
+					if player.gameNumber == currentGameId:
+						players.append(player)
+				if len(players) != 2:
+					continue
+				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
+				self.ball[currentGameId].z += self.ball[currentGameId].direction_z * 0.4 * self.ball[currentGameId].speed
+				self.wall_collide_tournament(currentGameId)
+				self.pad_collision_tournament(currentGameId, 0)
+				self.pad_collision_tournament(currentGameId, 1)
+				for player in players:
+					if player.score  > 4 :
+						logging.info(f"player {player.id} won the match {currentGameId}")
+						if player.gameNumber == 0 or player.gameNumber == 1:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 4
+									current.score = 0
+									break
+						elif player.gameNumber == 2 or player.gameNumber == 3:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 5
+									current.score = 0
+									break
+						elif player.gameNumber == 4 or player.gameNumber == 5:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 6
+									current.score = 0
+									break
+						elif player.gameNumber == 6:
+							for current in self.players:
+								if player.socket == current.socket:
+									current.gameNumber = 7
+									logging.info(f"player {current.id} won the tournament")
+									self.end_game()
+									return
+
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"tounament {self.id}, {currentGameId}=> {l} tps: {t}")
+				t = 0
+				l = time.time()
+			self.send_all("gameState", self.tournament_state())
+			time.sleep(0.04)
+
+
+	def tournament_state(self):
+		players = []
+		for player in self.players:
+			players.append({"x": player.pad_x, "z": player.pad_z, "score": player.score, "gameNumber" : player.gameNumber})
+		response = {
+			"player": players,
+			"ball" : {"x": self.ball[0].x, "z": self.ball[0].z},
+			"ball2": {"x": self.ball[1].x, "z": self.ball[1].z},
+			"ball3": {"x": self.ball[2].x, "z": self.ball[2].z},
+			"ball4": {"x": self.ball[3].x, "z": self.ball[3].z},
+			"ball5": {"x": self.ball[4].x, "z": self.ball[4].z},
+			"ball6": {"x": self.ball[5].x, "z": self.ball[5].z},
+			"ball7": {"x": self.ball[6].x, "z": self.ball[6].z},
+		}
+		return response
+	
 	def wall_collide_two_player(self):
 		if self.ball.x < -18.5 :
 			self.ball.direction_x *= -1
@@ -795,7 +935,6 @@ class Game:
 			self.ball.x = -18.49
 		if (self.ball.x > 18.5):
 			self.ball.x = 18.49
-
 
 	def wall_collide_four_player(self):
 		if self.ball.x < -29 :
@@ -857,6 +996,39 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+	def wall_collide_tournament(self, gameNum):
+		gameplayer = []
+		for current in self.players:
+			if current.gameNumber == gameNum:
+				gameplayer.append(current)
+		if len(gameplayer) != 2:
+			return
+		if self.ball[gameNum].x < -18.5 :
+			self.ball[gameNum].direction_x *= -1
+		elif self.ball[gameNum].x > 18.5 :
+			self.ball[gameNum].direction_x *= -1
+		if self.ball[gameNum].z < -29:
+			gameplayer[0].score += 1
+			self.ball[gameNum].x = 0
+			self.ball[gameNum].z = 0 
+			self.ball[gameNum].y = 0
+			self.ball[gameNum].direction_z *= -1
+			self.ball[gameNum].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball[gameNum].speed = 1.05
+		elif self.ball[gameNum].z > 29:
+			gameplayer[1].score += 1
+			self.ball[gameNum].x = 0
+			self.ball[gameNum].z = 0 
+			self.ball[gameNum].y = 0
+			self.ball[gameNum].direction_z *= -1
+			self.ball[gameNum].direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
+			self.ball[gameNum].speed = 1.05
+		if (self.ball[gameNum].speed > 5) :
+			self.ball[gameNum].speed = 5
+		if (self.ball[gameNum].x < -18.5):
+			self.ball[gameNum].x = -18.49
+		if (self.ball[gameNum].x > 18.5):
+			self.ball[gameNum].x = 18.49
 
 	def pad_collision_x(self, player_id):
 		if ((self.ball.z < -27 and player_id == 1) or (self.ball.z > 27 and player_id == 0)) and (self.ball.x < (self.players[player_id].pad_x + 4.5)  and self.ball.x > (self.players[player_id].pad_x - 4.5)):
@@ -875,7 +1047,6 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
-
 	def pad_collision_z(self, player_id):
 		if ((self.ball.x < -27 and player_id == 3) or (self.ball.x > 27 and player_id == 2)) and (self.ball.z < (self.players[player_id].pad_z + 4.5)  and self.ball.z > (self.players[player_id].pad_z - 4.5)):
 			if (player_id == 3 and self.players[2].score >= 1) :
@@ -888,6 +1059,27 @@ class Game:
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
+	def pad_collision_tournament(self, gameNum, playerPos):
+		gameplayer = []
+		for current in self.players:
+			if current.gameNumber == gameNum:
+				gameplayer.append(current)
+		if len(gameplayer) != 2:
+			return
+
+		if ((self.ball[gameNum].z < -27 and playerPos == 1) or (self.ball[gameNum].z > 27 and playerPos == 0)) and (self.ball[gameNum].x < (gameplayer[playerPos].pad_x + 4.5)  
+				and self.ball[gameNum].x > (gameplayer[playerPos].pad_x - 4.5)):
+			
+			if (playerPos== 1) :
+				self.ball[gameNum].direction_x = (self.ball[gameNum].x - gameplayer[playerPos].pad_x)/4.5
+				self.ball[gameNum].direction_z = 1
+			else :
+				self.ball[gameNum].direction_x = (self.ball[gameNum].x - gameplayer[playerPos].pad_x)/4.5
+				self.ball[gameNum].direction_z = -1
+
+			self.ball[gameNum].speed *= 1.1
+		if (self.ball[gameNum].speed > 5) :
+			self.ball[gameNum].speed = 5
 
 class WebsocketClient(WebsocketConsumer):
 	def __init__(self, *args, **kwargs):
@@ -900,7 +1092,7 @@ class WebsocketClient(WebsocketConsumer):
 		self.oldmove = time.time()
 
 	def connect(self):
-		logging.info("new player connected in new version <=============================")
+		logging.info("new player connected")
 		cookies = {}
 		try:
 			data = self.scope['headers']
