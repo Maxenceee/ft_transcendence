@@ -917,7 +917,7 @@ class WebsocketClient(WebsocketConsumer):
 		self.oldmove = time.time()
 
 	def connect(self):
-		logging.info("new player connected in new version <=============================")
+		logging.info("new player connected")
 		cookies = {}
 		try:
 			data = self.scope['headers']
