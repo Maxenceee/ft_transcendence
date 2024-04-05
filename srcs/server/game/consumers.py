@@ -129,7 +129,7 @@ class Player:
 		self.pad_z = 0
 		self.ready = False
 		if type == "Tournament":
-			self.gameId = None
+			self.gameNumber = None
 
 
 	def set_game(self, game, index):
@@ -772,17 +772,70 @@ class Game:
 					return
 
 	def game_master_tournament(self):
+		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
+		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
+		self.send(2, "setCam", {"x" : "110", "y" : "30", "z" : "60" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+		self.send(3, "setCam", {"x" : "110", "y" : "30", "z" : "-60", "camx" :"80.0", "camy" :"0", "camz" :"0"})
+		self.send(4, "setCam", {"x" : "190", "y" : "30", "z" : "60" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+		self.send(5, "setCam", {"x" : "190", "y" : "30", "z" : "-60", "camx" :"160.0", "camy" :"0", "camz" :"0"})
+		self.send(6, "setCam", {"x" : "270", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
+		self.send(7, "setCam", {"x" : "270", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
 		i = 0
-		game = 0
+		tmp = 0
 		for player in self.players:
-			player.gameId = self.game
+			player.gameNumber = tmp
 			i += 1
 			if i == 2:
 				i = 0
-				game += 1
+				tmp += 1
 		logging.info("game master tournament")
-		return
+		t = [0, 0, 0, 0, 0, 0, 0]
+		l = time.time()
+		l = [l,l,l,l,l,l,l]
+		while True:
+			for currentGameId in range(6):
+				players = []
+				for player in self.players:
+					if player.gameNumber == currentGameId:
+						players.append(player)
+				if len(players) != 2:
+					continue
+				t[currentGameId] += 1
+				if time.time() - l[currentGameId] > 1:
+					logging.info(f"tounament {self.id}, {currentGameId}=> {l[currentGameId]} tps: {t[currentGameId]}")
+					t[currentGameId] = 0
+					l[currentGameId] = time.time()
 
+				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
+				self.ball[currentGameId].z += self.ball[currentGameId].direction_z * 0.4 * self.ball[currentGameId].speed
+				# self.wall_collide_two_player()
+				# self.pad_collision_x(0)
+				# self.pad_collision_x(1)
+				# self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
+				# for player in self.players:
+				# 	if player.score  > 4 :
+				# 		self.end_game()
+				# 		return
+			self.send_all("gameState", self.tournament_state())
+			time.sleep(0.04)
+
+
+	def tournament_state(self):
+		players = []
+		for player in self.players:
+			players.append({"x": player.pad_x, "z": player.pad_z, "score": player.score, "gameNumber" : player.gameNumber})
+		response = {
+			"player": players,
+			"ball" : {"x": self.ball[0].x, "z": self.ball[0].z},
+			"ball2": {"x": self.ball[1].x, "z": self.ball[1].z},
+			"ball3": {"x": self.ball[2].x, "z": self.ball[2].z},
+			"ball4": {"x": self.ball[3].x, "z": self.ball[3].z},
+			"ball5": {"x": self.ball[4].x, "z": self.ball[4].z},
+			"ball6": {"x": self.ball[5].x, "z": self.ball[5].z},
+			"ball7": {"x": self.ball[6].x, "z": self.ball[6].z},
+		}
+		return response
+	
 	def wall_collide_two_player(self):
 		if self.ball.x < -18.5 :
 			self.ball.direction_x *= -1
