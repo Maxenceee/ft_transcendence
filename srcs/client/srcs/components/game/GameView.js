@@ -1,18 +1,22 @@
 import { Component, createElement, Loader, useParams, navigate } from '..';
+				
 import TwoFourGameRender from './render/TwoFourGameRender';
 import TournamentGameRender from './render/TournamentGameRender';
+import EndGameRecap from './EndGameRecap';
+
 
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {loading: true, game_render: null, type: "", players: null};
+		this.state = { loading: true, game_render: null, type: "", players: null, endGameData: null };
 
 		this.setplayers = this.setplayers.bind(this);
 		this.endGame = this.endGame.bind(this);
+		this.finishGame = this.finishGame.bind(this);
 	}
 
 	componentDidMount() {
-		// console.log("componentDidMount GameView", this);
+		console.log("componentDidMount GameView", this);
 		let a = useParams("/game/:type") ?? {params: {type: null}},
 			{ type } = a.params;
 		if (!type) {
@@ -27,9 +31,9 @@ class GameView extends Component {
 		let onload = () => this.setState({loading: false});
 
 		if (type == "tournament") {
-			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
+			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 		} else {
-			this.setState({game_render: TwoFourGameRender(type, onload, this.endGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
+			this.setState({game_render: TwoFourGameRender(type, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 		}
 	}
 
@@ -53,9 +57,16 @@ class GameView extends Component {
 	}
 
 	endGame() {
+		console.log("end game called", this.state.game_render);
 		navigate("/");
 		this.props.reload();
-		// console.log("game view unmounted", this.state.game_render);
+	}
+
+	finishGame(data) {
+		console.log("finish game", data);
+		this.state.game_render && this.state.game_render.unmount();
+		window.onbeforeunload = null;
+		this.setState({endGameData: data.players});
 	}
 
 	render() {
@@ -102,7 +113,7 @@ class GameView extends Component {
 						class: "game-keyboard", children: [
 							createElement('div', {
 								class: "game-keyboard-shortcut", children: [
-									createElement('div', {
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"E",
 											createElement('p', {
@@ -110,7 +121,7 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"R",
 											createElement('p', {
@@ -118,19 +129,19 @@ class GameView extends Component {
 											})
 										]
 									}),
-									// createElement('div', {
-									// 	class: "key", children: [
-									// 		"T",
-									// 		createElement('p', {
-									// 			children: "Top View"
-									// 		})
-									// 	]
-									// }),
+									this.state.type == "tournament" && createElement('div', {
+										class: "key", children: [
+											"T",
+											createElement('p', {
+												children: "Bracket View"
+											})
+										]
+									}),
 								]
 							}),
 							createElement('div', {
 								class: "game-keyboard-moves", children: [
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"↑",
 											createElement('p', {
@@ -138,7 +149,15 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type == "local" && createElement('div', {
+										class: "key", children: [
+											"W",
+											createElement('p', {
+												children: "Move Up"
+											})
+										]
+									}),
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"←",
 											createElement('p', {
@@ -146,7 +165,7 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type != "4p" && createElement('div', {
 										class: "key", children: [
 											"↓",
 											createElement('p', {
@@ -154,7 +173,15 @@ class GameView extends Component {
 											})
 										]
 									}),
-									createElement('div', {
+									this.state.type == "local" && createElement('div', {
+										class: "key", children: [
+											"S",
+											createElement('p', {
+												children: "Move Up"
+											})
+										]
+									}),
+									this.state.type != "local" && createElement('div', {
 										class: "key", children: [
 											"→",
 											createElement('p', {
@@ -166,7 +193,9 @@ class GameView extends Component {
 							}),
 						]
 					}),
-					this.state.game_render && this.state.game_render.render()
+					this.state.game_render && this.state.game_render.render(),
+					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
+					// createElement(EndGameRecap, {type: this.state.type, data: [{id: "maxence", score: 3, nickname: "Max", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=7516293836"}, {id: "2", score: 5, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"}]})
 				]
 			})
 		)

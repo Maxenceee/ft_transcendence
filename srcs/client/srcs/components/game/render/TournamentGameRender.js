@@ -9,8 +9,8 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager } from '../../../utils';
 
-let TournamentGameRender = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
-    let render_data = {
+let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+	let render_data = {
 		pallet: [],
 		ball: null,
 		ballDirection: {
@@ -21,11 +21,11 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 		updateScore: 0,
 		queue: [],
 		scores: [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]],
-        balls: [],
-        k: [0, 0, 0, 0, 0, 0, 0, 0]
+		balls: [],
+		k: [0, 0, 0, 0, 0, 0, 0, 0]
 	}
 
-    let setcam = (x, y, z) => {
+	let setcam = (x, y, z) => {
 		camera.position.set(x, y, z);
 	}
 
@@ -40,6 +40,11 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "endGame": {
+				socket.rmclose(onclose);
+				socket.close();
+				onfinish(msg.data);
+			} break;
 			// case "initPlayers":
 			// 	setplayers(msg.data);
 			// case "resetCam":
@@ -437,7 +442,6 @@ let TournamentGameRender = function(type, onload, onclose, setplayers, {width, h
 						}
 						j++;
 					}
-
                 }
 				render_data.balls[0].position.x = data.ball.x;
 				render_data.balls[1].position.x = data.ball2.x + 80;

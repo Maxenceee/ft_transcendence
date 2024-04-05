@@ -5,6 +5,15 @@ CallBack.prototype.on = function(t, e) {
 	this.listeners[t] || (this.listeners[t] = []),
 	this.listeners[t].push(e);
 }
+CallBack.prototype.remove = function(t, e) {
+	if (!this.listeners)
+		return ;
+	var n = this.listeners[t];
+	if (n) {
+		var o = n.indexOf(e);
+		o > -1 && n.splice(o, 1)
+	}
+}
 CallBack.prototype.emit = function(t) {
 	for (var e = arguments.length, n = Array(e > 1 ? e - 1 : 0), o = 1; o < e; o++)
 		n[o - 1] = arguments[o];
@@ -15,6 +24,7 @@ CallBack.prototype.emit = function(t) {
 		return (t.apply(undefined, n));
 	})
 }
+
 var mergeProto = function(a, b) {
 	return function(t, e) {
 		if ("function" != typeof e && null !== e)

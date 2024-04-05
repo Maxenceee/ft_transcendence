@@ -10,7 +10,7 @@ class HomePage extends Component {
 	}
 
 	componentDidMount() {
-		// console.log("this.componentDidMount HomePage Page");
+		console.log("this.componentDidMount HomePage Page");
 	}
 
 	componentWillUnmount() {

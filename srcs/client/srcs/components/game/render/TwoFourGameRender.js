@@ -9,7 +9,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager } from '../../../utils';
 
-let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
@@ -36,8 +36,14 @@ let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, heig
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
+			case "endGame": {
+				socket.rmclose(onclose);
+				socket.close();
+				onfinish(msg.data);
+			} break;
 			case "initPlayers":
 				setplayers(msg.data);
+				break;
 			case "resetCam":
 				setcam(10, 69, 0);
 				break;
@@ -49,6 +55,7 @@ let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, heig
 				break;
 			case "text":
 				createText(msg.data.text, msg.data.size);
+				break;
 			default:
 				render_data.queue.push(msg);
 		}
@@ -186,19 +193,25 @@ let TwoFourGameRender = function(type, onload, onclose, setplayers, {width, heig
 		return new THREE.Mesh(geo, materials);
 	}
 
-	function displayScore(data) {
+function displayScore(data) {
 
 		if (render_data.scores.length)
 			scene.remove(...render_data.scores);
 
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
+
 			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
-			render_data.scores[i].position.z += (i % 2 ? 0 : 30) * (i % 4 < 2 ? -1 : 1);
 			render_data.scores[i].position.y += 6;
-			render_data.scores[i].position.x += (i % 2 ? 30 : 0) * (i % 4 < 2 ? -1 : 1);
-			render_data.scores[i].rotateY((Math.PI / 2) * i);
 		}
+		render_data.scores[0].rotateY((Math.PI / 2) * 2);
+		render_data.scores[1].rotateY((Math.PI / 2) * 4);
+		render_data.scores[2].rotateY((Math.PI / 2));
+		render_data.scores[3].rotateY((Math.PI / 2) * 3);
+		render_data.scores[0].position.z += 31.5;
+		render_data.scores[1].position.z -= 31.5;
+		render_data.scores[3].position.x += 31.5;
+		render_data.scores[2].position.x -= 31.5;
 
 		scene.add(...render_data.scores);
 	}

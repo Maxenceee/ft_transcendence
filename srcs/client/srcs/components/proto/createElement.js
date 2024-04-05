@@ -39,8 +39,8 @@ function createElement(type, props = {}) {
 			if (c instanceof HTMLElement) {
 				return element.appendChild(c), c;
 			}
-			if (typeof c === 'string') {
-				element.appendChild(document.createTextNode(c));
+			if (typeof c === 'string' || typeof c === 'number') {
+				element.appendChild(document.createTextNode(c + ''));
 			} else {
 				c && element.appendChild(c._renderComponent());
 			}
