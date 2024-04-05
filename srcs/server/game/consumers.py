@@ -789,10 +789,54 @@ class Game:
 				i = 0
 				tmp += 1
 		logging.info("game master tournament")
-		t = [0, 0, 0, 0, 0, 0, 0]
+		t = 0
 		l = time.time()
-		l = [l,l,l,l,l,l,l]
 		while True:
+			while not self.queue.empty():
+				player_idx, action = self.queue.get()
+				players = []
+				for current in self.players:
+					if current.gameNumber == self.players[player_idx].gameNumber and current.gameNumber != -1:
+						players.append(current)
+				if len(players) != 2:
+					continue
+
+				if action == "right":
+					if players[0].socket == self.players[player_idx].socket:
+						if self.players[player_idx].pad_x  < 16.5:
+							self.players[player_idx].pad_x += 1
+							if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+					else:
+						if self.players[player_idx].pad_x  > -16.5:
+							self.players[player_idx].pad_x -= 1
+							if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+				elif action == "left":
+					if players[0].socket == self.players[player_idx].socket:
+						if self.players[player_idx].pad_x  > -16.5:
+							self.players[player_idx].pad_x -= 1
+							if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
+					else:
+						if self.players[player_idx].pad_x  < 16.5:
+							self.players[player_idx].pad_x += 1
+							if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+				elif action == "disconnect":
+					if players[0].socket == self.players[player_idx].socket:
+						self.players[player_idx].score = 0
+						for current in self.players:
+							if players[1].socket == current.socket:
+								current.score = 5
+								break
+					else:
+						self.players[player_idx].score = 0
+						for current in self.players:
+							if players[0].socket == current.socket:
+								current.score = 5
+								break
+
 			for currentGameId in range(7):
 				players = []
 				for player in self.players:
@@ -800,12 +844,6 @@ class Game:
 						players.append(player)
 				if len(players) != 2:
 					continue
-				t[currentGameId] += 1
-				if time.time() - l[currentGameId] > 1:
-					logging.info(f"tounament {self.id}, {currentGameId}=> {l[currentGameId]} tps: {t[currentGameId]}")
-					t[currentGameId] = 0
-					l[currentGameId] = time.time()
-
 				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
 				self.ball[currentGameId].z += self.ball[currentGameId].direction_z * 0.4 * self.ball[currentGameId].speed
 				self.wall_collide_tournament(currentGameId)
@@ -840,8 +878,12 @@ class Game:
 									self.end_game()
 									return
 
+			t += 1
+			if time.time() - l > 1:
+				logging.info(f"tounament {self.id}, {currentGameId}=> {l} tps: {t}")
+				t = 0
+				l = time.time()
 			self.send_all("gameState", self.tournament_state())
-			logging.info(f"{self.players[0].gameNumber} {self.players[1].gameNumber} {self.players[2].gameNumber} {self.players[3].gameNumber} {self.players[4].gameNumber} {self.players[5].gameNumber} {self.players[6].gameNumber} {self.players[7].gameNumber}")
 			time.sleep(0.04)
 
 
