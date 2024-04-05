@@ -137,23 +137,29 @@ class Game:
 		if len(gameplayer) != 2 :
 			return True
 		if playerOrg.gameNumber == 4 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160", "camy" :"0", "camz" :"100"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "160", "y" : "30", "z" : "40" , "camx" :"160", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "80.0", "y" : "30.0", "z" : "160.0" , "camx" :"80.0", "camy" :"0.0", "camz" :"100.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "80.0", "y" : "30.0", "z" : "40.0" , "camx" :"80.0", "camy" :"0.0", "camz" :"100.0"})
 		elif playerOrg.gameNumber == 5 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80", "camy" :"0", "camz" :"100"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "80", "y" : "30", "z" : "40" , "camx" :"80", "camy" :"0", "camz" :"100"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "160.0", "y" : "30.0", "z" : "160.0" , "camx" :"160.0", "camy" :"0.0", "camz" :"100.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "160.0", "y" : "30.0", "z" : "40.0" , "camx" :"160.0", "camy" :"0.0", "camz" :"100.0"})
 		elif playerOrg.gameNumber == 6 :
-			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "260" , "camx" :"120", "camy" :"0", "camz" :"200"})
-			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "120", "y" : "30", "z" : "140" , "camx" :"120", "camy" :"0", "camz" :"200"})
+			self.send(gameplayer[0].playerNumber, "setCam", {"x" : "120.0", "y" : "30.0", "z" : "260.0" , "camx" :"120.0", "camy" :"0.0", "camz" :"200.0"})
+			self.send(gameplayer[1].playerNumber, "setCam", {"x" : "120.0", "y" : "30.0", "z" : "140.0" , "camx" :"120.0", "camy" :"0.0", "camz" :"200.0"})
 
 		return True
 
 	def send_all(self, type, data):
 		for player in self.players:
-			player.socket.send(json.dumps({"type" : type, "data" : data}))
+			try:
+				player.socket.send(json.dumps({"type" : type, "data" : data}))
+			except:
+				return
 	
 	def send(self, player, type, data):
-		self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		try:
+			self.players[player].socket.send(json.dumps({"type" : type, "data" : data}))
+		except:
+			return
 
 	def to_json(self):
 		players = []
@@ -268,7 +274,7 @@ def game_master(game):
 			playerID, action = game.queue.get()
 			gameplayer = []
 			for current in game.players:
-				if current.gameNumber == game.players[playerID].gameNumber and current.playerNumber != -1:
+				if current.gameNumber == game.players[playerID].gameNumber and current.gameNumber != -1:
 					gameplayer.append(current)
 			if len(gameplayer) == 2:
 				if action == "right":
@@ -294,7 +300,16 @@ def game_master(game):
 							gameplayer[1].pad_x += 0.8
 							if gameplayer[1].pad_x  > 16.0:
 								gameplayer[1].pad_x = 16
+				elif action == "disconnect":
+					logging.info("disconnect")
 
+					if gameplayer[0].playerNumber == playerID:
+						gameplayer[0].score = 0
+						gameplayer[1].score = 5
+					else:
+						gameplayer[1].score = 0
+						gameplayer[0].score = 5
+					logging.info(f"player {playerID} disconnected")
 		time.sleep(0.05)
 		i = 0
 		while i < 7 :
@@ -379,6 +394,10 @@ class websocket_tournament(WebsocketConsumer):
 			if not hasattr(self, "data"):
 				return
 		receive_package = json.loads(text_data)
+		logging.info(receive_package)
+
+		if not "type" in receive_package:
+			return
 
 		if receive_package['type'] == "keyCode":
 			try:
@@ -395,7 +414,7 @@ class websocket_tournament(WebsocketConsumer):
 	def disconnect(self, code):
 		print("server says disconnected")
 		if hasattr(self, "data"):
-			self.data.end_game()
+			self.data.queue.put([self.playerID, "disconnect"])
 		else:
 			for player in waiting_list:
 				if player.socket == self:

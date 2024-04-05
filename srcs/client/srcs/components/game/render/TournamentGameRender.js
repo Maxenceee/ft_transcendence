@@ -29,7 +29,14 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		camera.position.set(x, y, z);
 	}
 
-	let socket = new Socket({path: "/game/tournament"});
+	function setcamTournament (x, y, z, camx, camy, camz) {
+		controls.target.set(camx, camy, camz)
+		camera.position.set(x, y, z);
+		controls.update();
+
+	}
+
+    let socket = new Socket({path: "/game/tournament"});
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
@@ -52,7 +59,7 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			// case "text":
 			// 	createText(msg.data.text, msg.data.size);
             case "setCam":
-				setcam(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
+				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 			default:
 				render_data.queue.push(msg);
 		}
@@ -99,8 +106,10 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	});
 
     let font,
-		textGeo = [],
-		textMesh = [];
+		textGeo = [], 
+		textGeo2 = [0, 0, 0, 0., 0, 0, 0, 0],
+		textMesh = [], 
+		textMesh2 = [0, 0, 0, 0., 0, 0, 0, 0];
 
 	const fontLoader = new FontLoader(loaderManager);
 	fontLoader.load('/static/fonts/font.json', function (response) {
@@ -136,6 +145,32 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		textGeo.dispose();
 	}
 
+    function createText2(msg, x, z, number) {
+		scene.remove(textMesh2[number]);
+        textGeo2[number] = new TextGeometry(msg, {
+            font: font,
+            size: 10,
+            height: 0.5,
+            curveSegments: 2,
+            bevelThickness: 0.1,
+            bevelSize: 0.01,
+            bevelEnabled: true
+        });
+
+        textGeo2[number].computeBoundingBox();
+        textGeo2[number].center();
+        textMesh2[number] = new THREE.Mesh(textGeo2[number], materials);
+        textMesh2[number].rotateX(-Math.PI * 0.5);
+        textMesh2[number].rotateZ(Math.PI * 0.5);
+        textMesh2[number].position.x += x;
+        textMesh2[number].position.z += z;
+        textMesh2[number].position.y -= 2;
+        
+        
+        scene.add(textMesh2[number]);
+        textGeo2[number].dispose();
+    }
+	
     function initiateMapTwoPlayer(data, offset_x, offset_z, num )
 	{
 		let mapLenth = 60;
@@ -252,41 +287,82 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	composer.addPass(outputPass);
 
     document.addEventListener("keydown", onDocumentKeyEvent, true);
-	document.addEventListener("keyup", onDocumentKeyEvent, true);
+	// document.addEventListener("keyup", onDocumentKeyEvent, true);
+	let keyCode = {				//fuck you maxence don't touch my variable
+		left : 0,
+		right : 0
+	}
 	function onDocumentKeyEvent(event) {
-		let d = (event.type === "keydown");
-		switch (event.which) {
-			case 87:
-				render_data.keyCodes["w_key"] = d;
-				break;
-			case 83:
-				render_data.keyCodes["s_key"] = d;
-				break;
-			case 39:
-				render_data.keyCodes["right_arrow_key"] = d;
-				break;
-			case 38:
-				render_data.keyCodes["up_arrow_key"] = d;
-				break;
-			case 37:
-				render_data.keyCodes["left_arrow_key"] = d;
-				break;
-			case 40:
-				render_data.keyCodes["down_arrow_key"] = d;
-				break;
-			case 82:
-				d && (
-					setcam(10, 80, 0),
-					controls.target.set(0, 0, 0)
-				)
-				break;
-			case 69:
-				socket.send({type : 'keyCode', move : 'e_key'});
-				break;
-			case 84:
-				// Si mode tournoi alors on change de vue en vision bracket
-				break;
+		let keyVar = event.which;
+		console.log(keyVar);
+		// switch (event.which) {
+		// 	case 87:
+		// 		render_data.keyCodes["w_key"] = d;
+		// 		break;
+		// 	case 83:
+		// 		render_data.keyCodes["s_key"] = d;
+		// 		break;
+		// 	case 39:
+		// 		render_data.keyCodes["right_arrow_key"] = d;
+		// 		break;
+		// 	case 38:
+		// 		render_data.keyCodes["up_arrow_key"] = d;
+		// 		break;
+		// 	case 37:
+		// 		render_data.keyCodes["left_arrow_key"] = d;
+		// 		break;
+		// 	case 40:
+		// 		render_data.keyCodes["down_arrow_key"] = d;
+		// 		break;
+		// 	case 82:
+		// 		d && (
+		// 			setcam(10, 80, 0),
+		// 			controls.target.set(0, 0, 0)
+		// 		)
+		// 		break;
+		// 	case 69:
+		// 		socket.send({type : 'keyCode', move : 'e_key'});
+		// 		break;
+		// 	case 84:
+		// 		// Si mode tournoi alors on change de vue en vision bracket
+		// 		break;
+		// }
+		// let keyVar = event.which;
+		keyCode.right = 0;
+		keyCode.left = 0;
+		if (keyVar == 68)
+		{
+			keyCode.left = 0;
+			keyCode.right = 1;
 		}
+		if (keyVar == 65)
+		{
+			keyCode.left = 1;
+			keyCode.right = 0;
+		}
+		if (keyVar == 39)
+		{
+			keyCode.left = 0;
+			keyCode.right = 1;
+		}
+		if (keyVar == 37)
+		{
+			keyCode.left = 1;
+			keyCode.right = 0;
+		}
+		if (keyVar == 82)
+		{
+			socket.send({type : 'keyCode', move : "reset"});
+		}
+		if (keyCode.right == 1 && keyCode.left == 0){
+			console.log("right")
+			socket.send({type : 'keyCode', move : "right"});
+		}
+		else if (keyCode.right == 0 && keyCode.left == 1) {
+			console.log("left")
+			socket.send({type : 'keyCode', move : "left"});
+		}
+		console.log(keyVar);
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);
@@ -300,21 +376,21 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
     scene.add(...render_data.pallet, ...render_data.balls);
 
     function display_score(i){
-		if ( i == 0)
-			createText(render_data.scores[0][0] + " : " + render_data.scores[0][1], 0, 0, 0)
-		else if (i == 1)
-			createText(render_data.scores[1][0] + " : " + render_data.scores[1][1], 80, 0, 1);
-		else if (i == 2)
-			createText(render_data.scores[2][0] + " : " + render_data.scores[2][1], 160, 0, 2);
-		else if (i == 3)
-			createText(render_data.scores[3][0] + " : " + render_data.scores[3][1], 240, 0, 3);
-		else if (i == 4)
-			createText(render_data.scores[4][0] + " : " + render_data.scores[4][1], 80, 100, 4);
-		else if (i == 5)
-			createText(render_data.scores[5][0] + " : " + render_data.scores[5][1], 160, 100, 5);
-		else if (i == 6)
-			createText(render_data.scores[6][0] + " : " + render_data.scores[6][1], 120, 200, 6);
-	}
+        if ( i == 0)
+            createText2(render_data.scores[0][0] + " : " + render_data.scores[0][1],  0, 0, 0)
+        else if (i == 1)
+            createText2(render_data.scores[1][0] + " : " + render_data.scores[1][1],  80, 0, 1);
+        else if (i == 2)
+            createText2(render_data.scores[2][0] + " : " + render_data.scores[2][1],  160, 0, 2);
+        else if (i == 3)
+            createText2(render_data.scores[3][0] + " : " + render_data.scores[3][1],  240, 0, 3);
+        else if (i == 4)
+            createText2(render_data.scores[4][0] + " : " + render_data.scores[4][1],  80, 100, 4);
+        else if (i == 5)
+            createText2(render_data.scores[5][0] + " : " + render_data.scores[5][1],  160, 100, 5);
+        else if (i == 6)
+            createText2(render_data.scores[6][1] + " : " + render_data.scores[6][0], 120, 200, 6);
+    }
 
     let scoreUpdate = [0, 0, 0, 0, 0, 0, 0];
     let animationid = null,
@@ -340,25 +416,71 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 
 			if (event.type == "gameState")
             {
-                for (let i = 0; i < 8; i++)
+				createText("");
+                for (let i = 0; i < 7; i++)
                 {
-                    if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] != data.player[i].render_data.scores && data.player[i].render_data.scores >= 0) {
-                        render_data.scores[data.player[i].gameNumber][k[data.player[i].gameNumber]] = data.player[i].render_data.scores;
-                        scoreUpdate[data.player[i].gameNumber] = 1;
-                        console.log("----")
-                        console.log("update game : " + data.player[i].gameNumber);
-                    }
-                    if (data.player[i].gameNumber != -1) {
-                        k[data.player[i].gameNumber] += 1
-                        k[data.player[i].gameNumber] %= 2
-                    }
-                    if (scoreUpdate[data.player[i].gameNumber] == 1) {
-                        scoreUpdate[data.player[i].gameNumber] = 0
-                        console.log("display" + data.player[i].gameNumber + " : " + render_data.scores)
-                        display_score(data.player[i].gameNumber);
-                        console.log("----")
-                    }
+					let j  = 0
+                    // if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
+                    //     render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] = data.player[i].score;
+                    //     scoreUpdate[data.player[i].gameNumber] = 1;
+                    // }
+                    // if (data.player[i].gameNumber != -1){
+                    //     render_data.k[data.player[i].gameNumber] += 1
+                    //     render_data.k[data.player[i].gameNumber] %= 2
+                    // }
+                    // if (scoreUpdate[data.player[i].gameNumber] == 1){
+                    //     scoreUpdate[data.player[i].gameNumber] = 0
+                    //     display_score(data.player[i].gameNumber);
+                    // }
+					let k = 0;
+					while(j < 8){
+						if (data.player[j].gameNumber == i && data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
+							render_data.scores[data.player[i].gameNumber][k] = data.player[j].score;
+							k += 1;
+							if (k == 1)
+								display_score(i);
+						}
+						j++;
+					}
                 }
+				render_data.balls[0].position.x = data.ball.x;
+				render_data.balls[1].position.x = data.ball2.x + 80;
+				render_data.balls[2].position.x = data.ball3.x + 160;
+				render_data.balls[3].position.x = data.ball4.x + 240;
+				render_data.balls[4].position.x = data.ball5.x + 80;
+				render_data.balls[5].position.x = data.ball6.x + 160;
+				render_data.balls[6].position.x = data.ball7.x + 120;
+				render_data.balls[0].position.z = data.ball.z;
+				render_data.balls[1].position.z = data.ball2.z;
+				render_data.balls[2].position.z = data.ball3.z;
+				render_data.balls[3].position.z = data.ball4.z;
+				render_data.balls[4].position.z = data.ball5.z + 100;
+				render_data.balls[5].position.z = data.ball6.z + 100;
+				render_data.balls[6].position.z = data.ball7.z + 200;
+				for( let i = 0; i < 8; i++){
+					if (data.player[i].gameNumber == -1){
+						scene.remove(render_data.balls[data.player[i].gameNumber])
+						scene.remove(render_data.pallet[i]);
+					}
+					else if (data.player[i].gameNumber < 4)
+						render_data.pallet[i].position.x = data.player[i].x + data.player[i].gameNumber * 80;
+					else if (data.player[i].gameNumber < 6){
+						render_data.pallet[i].position.x = data.player[i].x + data.player[i].gameNumber%2 * 80 + 80;
+						render_data.pallet[i].position.z = data.player[i].z + 100;
+						if (i % 4 < 2)
+							render_data.pallet[i].position.z += 28.5;
+						else
+							render_data.pallet[i].position.z -= 28.5;
+					}
+					else if (data.player[i].gameNumber == 6){
+						render_data.pallet[i].position.x = data.player[i].x + 120;
+						render_data.pallet[i].position.z = data.player[i].z + 200;
+						if (i  < 4)
+							render_data.pallet[i].position.z += 28.5;
+						else
+							render_data.pallet[i].position.z -= 28.5;
+					}
+				}
             }
 		}
 		animationid = requestAnimationFrame(animate);
