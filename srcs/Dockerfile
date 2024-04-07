@@ -6,12 +6,8 @@ WORKDIR /app
 
 # Installez Node.js et npm
 RUN apt-get update && apt-get install -y curl
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y nodejs
-
-COPY ./client/package.json /app/client/package.json
-WORKDIR /app/client
-RUN npm install
 
 WORKDIR /app
 
@@ -21,8 +17,6 @@ RUN pip install --upgrade pip
 RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv passlib requests django-cors-headers Twisted[tls,http2] Pillow
 
 # Copiez les fichiers de l'application
-COPY ./server /app/server
-COPY ./client /app/client
 
 # Déplacez-vous vers le répertoire client
 # WORKDIR /app/client

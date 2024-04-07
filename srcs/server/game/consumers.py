@@ -67,7 +67,7 @@ class Tinder: # Matchmaking
 				game = Game(key, players)
 				logging.info(f"game created : {game}")
 				self.games.append(game)
-				game.start()
+				game.run()
 
 
 	def delete_game(self, id):
@@ -327,15 +327,7 @@ class Game:
 				nickname = user.nickname
 				profile_picture = user.default_profile_picture
 				if user.profile_picture_image:
-					profile_picture = settings.BASE_URL + "/api" + user.profile_picture_image.url
-			if player.score == 0:
-				player.score = "0"
-			players.append({"id": self.players.index(player), "score": player.score, "nickname": nickname, "profile_picture": profile_picture})
-		self.send_all("endGame", {"players": players})
-
-		for player in self.players:
-			if User.objects.filter(id=player.id).exists():
-				user = User.objects.get(id=player.id)
+					profile_picture = settings.BASE_URL + "/api" + user.profile_pictulauch_games
 				user.is_ingame = False
 				user.save()
 			try:
@@ -433,7 +425,10 @@ class Game:
 		time.sleep(0.5)
 		self.send_text("")
 
- 
+	def run(self):
+		self.thread = threading.Thread(target=self.start, args=())
+		self.thread.start()
+
 	def start(self):
 		logging.info("game type : " + self.type)
 
@@ -460,28 +455,22 @@ class Game:
 		logging.info("all players ready")
 		match self.type:
 			case "2p":
-				self.thread = threading.Thread(target=self.game_master_2p, args=())
+				self.game_master_2p()
 			case "4p":
-				self.thread = threading.Thread(target=self.game_master_4p, args=())
+				self.game_master_4p()
 			case "ai":
-				self.thread = threading.Thread(target=self.game_master_ai, args=())
+				self.game_master_ai()
 			case "local":
-				self.thread = threading.Thread(target=self.game_master_local, args=())
+				self.game_master_local()
 			case "tournament":
-				self.thread = threading.Thread(target=self.game_master_tournament, args=())
+				self.game_master_tournament()
 			case _:
 				logging.error("game type not found")
 				return
-		self.thread.start()
-
 
 	def game_master_2p(self):
 		logging.info("game master 2p")
 		self.send_all("initGame", self.to_json())
-		# TODO:
-		# ajouter la possibilité d'ajouter une transition ou non lors de l'envoie d'un set cam
-		# notemment pour le changement au debut de partie qui est un peu brusque
-		# self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60", "transition": True})
 		t = 0
 		l = time.time()
 		while True:
@@ -529,7 +518,7 @@ class Game:
 					self.players[player_idx].score = 0
 					self.end_game()
 					return
-				
+
 			t += 1
 			if time.time() - l > 1:
 				logging.info(f"game {self.id} => {l} tps: {t}")
@@ -772,14 +761,6 @@ class Game:
 					return
 
 	def game_master_tournament(self):
-		self.send(0, "setCam", {"x" : "30", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
-		self.send(1, "setCam", {"x" : "30", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
-		self.send(2, "setCam", {"x" : "110", "y" : "30", "z" : "60" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
-		self.send(3, "setCam", {"x" : "110", "y" : "30", "z" : "-60", "camx" :"80.0", "camy" :"0", "camz" :"0"})
-		self.send(4, "setCam", {"x" : "190", "y" : "30", "z" : "60" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
-		self.send(5, "setCam", {"x" : "190", "y" : "30", "z" : "-60", "camx" :"160.0", "camy" :"0", "camz" :"0"})
-		self.send(6, "setCam", {"x" : "270", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
-		self.send(7, "setCam", {"x" : "270", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
 		i = 0
 		tmp = 0
 		for player in self.players:
@@ -791,6 +772,7 @@ class Game:
 		logging.info("game master tournament")
 		t = 0
 		l = time.time()
+		is_init = [False, False, False, False, False, False, False]
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
@@ -844,6 +826,33 @@ class Game:
 						players.append(player)
 				if len(players) != 2:
 					continue
+
+				if not is_init[currentGameId]:
+					# set camera
+					if currentGameId == 0:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "0", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "0", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 1:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "60" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "-60", "camx" :"80.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 2:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "60" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "-60", "camx" :"160.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 3:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "240", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "240", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 4:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"320.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60", "camx" :"320.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 5:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 6:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+
+					is_init[currentGameId] = True
+
 				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
 				self.ball[currentGameId].z += self.ball[currentGameId].direction_z * 0.4 * self.ball[currentGameId].speed
 				self.wall_collide_tournament(currentGameId)
@@ -880,7 +889,7 @@ class Game:
 
 			t += 1
 			if time.time() - l > 1:
-				logging.info(f"tounament {self.id}, {currentGameId}=> {l} tps: {t}")
+				logging.info(f"tounament {self.id} => {l} tps: {t}")
 				t = 0
 				l = time.time()
 			self.send_all("gameState", self.tournament_state())

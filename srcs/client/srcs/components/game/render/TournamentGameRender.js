@@ -33,7 +33,6 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		controls.target.set(camx, camy, camz)
 		camera.position.set(x, y, z);
 		controls.update();
-
 	}
 
     let socket = new Socket({path: "/game/tournament"});
@@ -94,7 +93,7 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 
 	const skyLoader = new THREE.TextureLoader(loaderManager);
 	const sky = skyLoader.load("/static/images/background_sky_box.jpg", () => {
-		const skyboxGeo = new THREE.SphereGeometry(700);
+		const skyboxGeo = new THREE.SphereGeometry(400);
 		const materialSky = new THREE.MeshPhysicalMaterial({
 			wireframe: false,
 			opacity: 1,
@@ -106,10 +105,10 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	});
 
     let font,
-		textGeo = [], 
 		textGeo2 = [0, 0, 0, 0., 0, 0, 0, 0],
-		textMesh = [], 
-		textMesh2 = [0, 0, 0, 0., 0, 0, 0, 0];
+		textMesh = null,
+		textStrings2 = ['', '', '', '', '', '', '', ''],
+		textMesh2 = [null, null, null, null, null, null, null, null];
 
 	const fontLoader = new FontLoader(loaderManager);
 	fontLoader.load('/static/fonts/font.json', function (response) {
@@ -123,8 +122,15 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	];
 
     function createText(msg, size = 10) {
-		scene.remove(textMesh);
-		textGeo = new TextGeometry(msg, {
+		if (textMesh) {
+			textMesh.geometry.dispose();
+			scene.remove(textMesh);
+			textMesh = null;
+		}
+		if (!msg) {
+			return ;
+		}
+		const textGeo = new TextGeometry(msg, {
 			font: font,
 			size: size,
 			height: 0.5,
@@ -142,11 +148,20 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		textMesh.position.y -= 2;
 		
 		scene.add(textMesh);
-		textGeo.dispose();
 	}
 
     function createText2(msg, x, z, number) {
-		scene.remove(textMesh2[number]);
+		console.log(number, msg);
+		if (textStrings2[number] == msg)
+			return ;
+		console.log('Setting to ', number, msg);
+
+		if (textMesh2[number]) {
+			textMesh2[number].geometry.dispose();
+			scene.remove(textMesh2[number]);
+			textMesh2[number] = '';
+		}
+		textStrings2[number] = msg;
         textGeo2[number] = new TextGeometry(msg, {
             font: font,
             size: 10,
@@ -165,10 +180,8 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
         textMesh2[number].position.x += x;
         textMesh2[number].position.z += z;
         textMesh2[number].position.y -= 2;
-        
-        
+
         scene.add(textMesh2[number]);
-        textGeo2[number].dispose();
     }
 	
     function initiateMapTwoPlayer(data, offset_x, offset_z, num )
@@ -267,30 +280,30 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 	}
 
-    const params = {
-		threshold: 0,
-		strength: 0.35,
-		radius: 0,
-		exposure: 1
-	};
+    // const params = {
+	// 	threshold: 0,
+	// 	strength: 0.35,
+	// 	radius: 0,
+	// 	exposure: 1
+	// };
 
     const renderScene = new RenderPass(scene, camera);
 
-	const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 1.5, 0.4, 0.85);
-	bloomPass.threshold = params.threshold;
-	bloomPass.strength = params.strength;
-	bloomPass.radius = params.radius;
+	// const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 1.5, 0.4, 0.85);
+	// bloomPass.threshold = params.threshold;
+	// bloomPass.strength = params.strength;
+	// bloomPass.radius = params.radius;
 	const outputPass = new OutputPass();
 	let composer = new EffectComposer(renderer);
 	composer.addPass(renderScene);
-	composer.addPass(bloomPass);
+	// composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
     document.addEventListener("keydown", onDocumentKeyEvent, true);
 	// document.addEventListener("keyup", onDocumentKeyEvent, true);
-	let keyCode = {				//fuck you maxence don't touch my variable
-		left : 0,
-		right : 0
+	let keyCode = {
+		left: 0,
+		right: 0,
 	}
 	function onDocumentKeyEvent(event) {
 		let keyVar = event.which;
@@ -389,7 +402,7 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
         else if (i == 5)
             createText2(render_data.scores[5][0] + " : " + render_data.scores[5][1],  160, 100, 5);
         else if (i == 6)
-            createText2(render_data.scores[6][1] + " : " + render_data.scores[6][0], 120, 200, 6);
+            createText2(render_data.scores[6][0] + " : " + render_data.scores[6][1], 120, 200, 6);
     }
 
     let scoreUpdate = [0, 0, 0, 0, 0, 0, 0];
@@ -417,32 +430,23 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			if (event.type == "gameState")
             {
 				createText("");
-                for (let i = 0; i < 7; i++)
-                {
-					let j  = 0
-                    // if (data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
-                    //     render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] = data.player[i].score;
-                    //     scoreUpdate[data.player[i].gameNumber] = 1;
-                    // }
-                    // if (data.player[i].gameNumber != -1){
-                    //     render_data.k[data.player[i].gameNumber] += 1
-                    //     render_data.k[data.player[i].gameNumber] %= 2
-                    // }
-                    // if (scoreUpdate[data.player[i].gameNumber] == 1){
-                    //     scoreUpdate[data.player[i].gameNumber] = 0
-                    //     display_score(data.player[i].gameNumber);
-                    // }
-					let k = 0;
-					while(j < 8){
-						if (data.player[j].gameNumber == i && data.player[i].gameNumber != -1 && render_data.scores[data.player[i].gameNumber][render_data.k[data.player[i].gameNumber]] != data.player[i].score && data.player[i].score >= 0){
-							render_data.scores[data.player[i].gameNumber][k] = data.player[j].score;
-							k += 1;
-							if (k == 1)
-								display_score(i);
-						}
-						j++;
+
+				const magic = [
+					[], [], [], [],
+					[], [], [], [],
+				];
+
+				data.player.forEach(player => {
+					magic[player.gameNumber].push(player.score);
+				});
+
+				magic.forEach((m, idx) => {
+					if (m.length === 2) {
+						render_data.scores[idx] = m;
+						display_score(idx);
 					}
-                }
+				})
+
 				render_data.balls[0].position.x = data.ball.x;
 				render_data.balls[1].position.x = data.ball2.x + 80;
 				render_data.balls[2].position.x = data.ball3.x + 160;
