@@ -643,11 +643,11 @@ class Game:
 					elif player_idx == 2:
 						self.send_all("updateScore", {"n": 3, "score": 0})
 						self.send_all("deletePallet", {"n" : 2})
-						self.players[2].score = 0
+						self.players[3].score = 0
 					elif player_idx == 3:
 						self.send_all("updateScore", {"n": 2, "score": 0})
 						self.send_all("deletePallet", {"n" : 3})
-						self.players[3].score = 0
+						self.players[2].score = 0
 
 			t += 1
 			if time.time() - l > 1:
@@ -674,6 +674,7 @@ class Game:
 					classement[0].score = -3
 					classement[1].score = -2
 					classement[2].score = -1
+					classement[3].score = 1
 					self.end_game()
 					return
 
