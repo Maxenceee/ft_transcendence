@@ -286,7 +286,7 @@ class Game:
 		self.id = makeid(15)
 		self.players = players
 		if game_type == "tournament":
-			self.ball = [Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball()]
+			self.ball = [Ball() for _ in range(7)]
 		else:
 			self.ball = Ball()
 		self.type = game_type
