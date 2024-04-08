@@ -837,6 +837,68 @@ class Game:
 							self.players[player_idx].pad_x += 1
 							if self.players[player_idx].pad_x  > 16.0:
 								self.players[player_idx].pad_x = 16
+				elif action == "e_key":
+					players = []
+					for player in self.players:
+						if player.gameNumber == self.players[player_idx].gameNumber:
+							players.append(player)
+					if len(players) != 2:
+						continue
+					index = 0
+					if  self.players[player_idx].socket == players[1].socket:
+						index = 1
+					if players[index].gameNumber == 0:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "0", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "0", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
+					elif players[index].gameNumber == 1:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "60" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "-60", "camx" :"80.0", "camy" :"0", "camz" :"0"})
+					elif players[index].gameNumber == 2:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "60" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "-60", "camx" :"160.0", "camy" :"0", "camz" :"0"})
+					elif players[index].gameNumber == 3:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "240", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "240", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
+					elif players[index].gameNumber == 4:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80.0", "camy" :"0", "camz" :"100.0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "40", "camx" :"80.0", "camy" :"0", "camz" :"100.0"})
+					elif players[index].gameNumber == 5:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160.0", "camy" :"0", "camz" :"100.0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "40" , "camx" :"160.0", "camy" :"0", "camz" :"100.0"})
+					elif players[index].gameNumber == 6:
+						if index == 0:
+							self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "260" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
+						else:
+							self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "140" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
+				elif action == "t_key":
+					self.send(player_idx, "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
+				elif action == "r_key":
+					if self.players[player_idx].gameNumber == 0:
+						self.send(player_idx, "setCam", {"x" : "10", "y" : "80", "z" : "0" , "camx" :"0", "camy" :"0", "camz" :"0"})
+					elif self.players[player_idx].gameNumber == 1:
+						self.send(player_idx, "setCam", {"x" : "90", "y" : "80", "z" : "0" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+					elif self.players[player_idx].gameNumber == 2:
+						self.send(player_idx, "setCam", {"x" : "170", "y" : "80", "z" : "0" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+					elif self.players[player_idx].gameNumber == 3:
+						self.send(player_idx, "setCam", {"x" : "250", "y" : "80", "z" : "0" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
+					elif self.players[player_idx].gameNumber == 4:
+						self.send(player_idx, "setCam", {"x" : "90", "y" : "80", "z" : "100" , "camx" :"80.0", "camy" :"0", "camz" :"100.0"})
+					elif self.players[player_idx].gameNumber == 5:
+						self.send(player_idx, "setCam", {"x" : "170", "y" : "80", "z" : "100" , "camx" :"160.0", "camy" :"0", "camz" :"100.0"})
+					elif self.players[player_idx].gameNumber == 6:
+						self.send(player_idx, "setCam", {"x" : "130", "y" : "80", "z" : "200" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
 				elif action == "disconnect":
 					if players[0].socket == self.players[player_idx].socket:
 						self.players[player_idx].score = 0
