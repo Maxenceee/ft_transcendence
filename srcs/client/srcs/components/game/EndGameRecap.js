@@ -103,11 +103,78 @@ class EndGameRecap extends Component {
 	}
 
 	fourPlayers(players) {
-		return createElement('div', {
-			children: [
-
-			]
-		})
+		return [
+			createElement('div', {
+				class: "", children: [
+					createElement('h1', {
+						class: "dg-overlay-vs-title", children: getTypeTitle(type)
+					})
+				]
+			}),
+			createElement('div', {
+				class: "dg-overlay-player-cnt", children: [
+					createElement('div', {
+						class: "dg-overlay-player", children: [
+							createElement('h2', {
+								class: "dg-overlay-player-score",
+							}),
+							createElement('div', {
+								class: "profile-picture", children: createElement('img', {
+									src: players[0].profile_picture
+								}),
+							}),
+							createElement('h1', {
+								children: players[0].nickname || "N/A",
+							}),
+							players[0].id && this.button("Voir le profil", "/user/" + players[0].id) || createElement('div')
+						]
+					}),
+					createElement('div', {
+						class: "dg-overlay-vs", children: [
+							createElement('div', {
+								class: "dg-overlay-vs-scores", children: [
+									createElement('h1', {
+										class: "", children: players[0].score || 0
+									}),
+									createElement('div', {class: "separator"}),
+									createElement('h1', {
+										class: "", children: players[1].score || 0
+									})
+								]
+							}),
+							createElement('div', {
+								class: "", children: [
+									createElement('div', {
+										class: "dg-overlay-button", onclick: () => this.props.newGame(this.props.type), children: [
+											createElement('p', {
+												children: "Rejouer"
+											})
+										]
+									}),
+									this.button("Quitter", "/", true),
+								]
+							}),
+						]
+					}),
+					createElement('div', {
+						class: "dg-overlay-player", children: [
+							createElement('h2', {
+								class: "dg-overlay-player-score",
+							}),
+							createElement('div', {
+								class: "profile-picture", children: createElement('img', {
+									src: players[1].profile_picture
+								}),
+							}),
+							createElement('h1', {
+								children: players[1].nickname || "N/A",
+							}),
+							players[1].id && this.button("Voir le profil", "/user/" + players[1].id) || createElement('div')
+						]
+					}),
+				]
+			})
+		]
 	}
 
 	render() {
