@@ -873,15 +873,15 @@ class Game:
 					elif currentGameId == 3:
 						self.send(self.players.index(players[0]), "setCam", {"x" : "240", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "240", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
-					# elif currentGameId == 4:
-					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
-					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "40", "camx" :"160.0", "camy" :"0", "camz" :"0"})
-					# elif currentGameId == 5:
-					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
-					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "40" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
-					# elif currentGameId == 6:
-					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "180" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
-					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+					elif currentGameId == 4:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80.0", "camy" :"0", "camz" :"100.0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "40", "camx" :"80.0", "camy" :"0", "camz" :"100.0"})
+					elif currentGameId == 5:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160.0", "camy" :"0", "camz" :"100.0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "40" , "camx" :"160.0", "camy" :"0", "camz" :"100.0"})
+					elif currentGameId == 6:
+						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "260" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "140" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
 					is_init[currentGameId] = True
 
 				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
