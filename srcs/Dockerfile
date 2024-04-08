@@ -21,6 +21,8 @@ RUN pip install --upgrade pip
 RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv passlib requests django-cors-headers Twisted[tls,http2] Pillow
 
 # Copiez les fichiers de l'application
+COPY ./server /app/server
+COPY ./client /app/client
 
 # Déplacez-vous vers le répertoire client
 # WORKDIR /app/client
