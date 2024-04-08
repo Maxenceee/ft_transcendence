@@ -633,7 +633,7 @@ class Game:
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
 					self.players[player_idx].score = 0
-					self.send_all("updateScore", {"n": player_idx, "score": self.players[player_idx].score})
+					self.send_all("updateScore", {"n": player_idx, "score": 0})
 					self.send_all("deletePallet", {"n" : player_idx})
 
 
