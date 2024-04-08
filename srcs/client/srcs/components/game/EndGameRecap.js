@@ -1,6 +1,11 @@
 import { Component, createElement, link } from "..";
 
 class EndGameRecap extends Component {
+	constructor(props) {
+		super(props);
+		console.log("endgame constructor~", this);
+	}
+
 	button(text, to, reverse = false) {
 		return createElement('div', {
 			class: "dg-overlay-button"+(reverse ? " invert" : ""), children: [
@@ -46,7 +51,7 @@ class EndGameRecap extends Component {
 							createElement('h1', {
 								children: players[0].nickname || "N/A",
 							}),
-							this.button("Voir le profil", "/user/" + players[0].id)
+							players[0].id && this.button("Voir le profil", "/user/" + players[0].id) || createElement('div')
 						]
 					}),
 					createElement('div', {
@@ -89,7 +94,7 @@ class EndGameRecap extends Component {
 							createElement('h1', {
 								children: players[1].nickname || "N/A",
 							}),
-							this.button("Voir le profil", "/user/" + players[1].id)
+							players[1].id && this.button("Voir le profil", "/user/" + players[1].id) || createElement('div')
 						]
 					}),
 				]

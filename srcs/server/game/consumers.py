@@ -51,6 +51,7 @@ class Tinder: # Matchmaking
 			user.save()
 		else:
 			logging.info("user connection rejected user already in game")
+			socket.send(json.dumps({"type": "connectionRefused", "data": "You are already ingame !"}))
 			socket.close()
 			return
 
@@ -327,7 +328,7 @@ class Game:
 			id = None
 			if isinstance(player, AIPlayer):
 				nickname = "Marvin (AI)"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder"
+				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
 			if isinstance(player, LocalPlayer):
 				nickname = "Invité"
 				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
@@ -341,7 +342,7 @@ class Game:
 				user.is_ingame = False
 				user.save()
 			players.append({"id": id, "nickname": nickname, "profile_picture": profile_picture, "score": player.score})
-		self.send_all("endGame", players)
+		self.send_all("endGame", {"players": players, "type": self.type})
 
 	def end_game(self):
 		logging.info(f"game ended called: {self.id}")
