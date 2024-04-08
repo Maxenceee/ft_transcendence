@@ -3143,18 +3143,21 @@ body:has(.connection-page) {
 	align-items: center;
 	
 	.dg-overlay-cnt {
-		display: flex;
-		justify-content: center;
-		align-items: center;
 		z-index: 4;
 		width: max-content;
 		padding: 40px;
-		gap: 50px;
 		margin: 0 auto;
 		background-color: rgba(42, 46, 64, 0.04);
 		backdrop-filter: blur(6px);
 		-webkit-backdrop-filter: blur(6px);
 		border-radius: 20px;
+	}
+
+	.dg-overlay-player-cnt {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 50px;
 	}
 
 	.dg-overlay-player {
@@ -3193,6 +3196,8 @@ body:has(.connection-page) {
 
 		.dg-overlay-vs-title {
 			font-size: 38px;
+			width: 100%;
+			text-align: center;
 		}
 
 		.dg-overlay-vs-scores {
@@ -3200,7 +3205,7 @@ body:has(.connection-page) {
 			justify-content: center;
 			align-items: center;
 			gap: 20px;
-			height: 60vh;
+			height: 50vh;
 			max-height: 500px;
 
 			.separator {
@@ -3221,6 +3226,7 @@ body:has(.connection-page) {
 		color: #FFF;
 		padding: 10px 20px;
 		font-size: 18px;
+		margin-top: 20px;
 
 		a {
 			width: 100%;
@@ -3229,6 +3235,12 @@ body:has(.connection-page) {
 
 		&:hover {
 			text-decoration: underline
+		}
+
+		&.invert {
+			background-color: transparent;
+			outline: 1px solid var(--primary-action-color);
+			outline-offset: -1px;
 		}
 	}
 }

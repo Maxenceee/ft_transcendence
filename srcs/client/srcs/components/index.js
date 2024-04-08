@@ -12,6 +12,8 @@ export * from './main';
 
 export { default as GameView } from './game/GameView';
 
+export { default as ConnectionPage } from './connection/ConnectionPage'
+
 export { default as link } from './utils/Link';
 export { default as navigate } from './utils/Navigate';
 
