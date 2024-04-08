@@ -22,7 +22,7 @@ class KeyBindsView extends Component {
 							class: "key", children: [
 								"R",
 								createElement('p', {
-									children: "Pong"
+									children: "Vue Pong"
 								})
 							]
 						}),
