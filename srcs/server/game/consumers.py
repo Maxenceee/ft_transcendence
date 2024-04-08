@@ -815,7 +815,7 @@ class Game:
 				if len(players) != 2:
 					continue
 
-				if action == "right":
+				if action == "right_arrow_key":
 					if players[0].socket == self.players[player_idx].socket:
 						if self.players[player_idx].pad_x  < 16.5:
 							self.players[player_idx].pad_x += 1
@@ -826,7 +826,7 @@ class Game:
 							self.players[player_idx].pad_x -= 1
 							if self.players[player_idx].pad_x  < -16.0:
 								self.players[player_idx].pad_x = -16
-				elif action == "left":
+				elif action == "left_arrow_key":
 					if players[0].socket == self.players[player_idx].socket:
 						if self.players[player_idx].pad_x  > -16.5:
 							self.players[player_idx].pad_x -= 1
@@ -837,6 +837,16 @@ class Game:
 							self.players[player_idx].pad_x += 1
 							if self.players[player_idx].pad_x  > 16.0:
 								self.players[player_idx].pad_x = 16
+				elif action == "down_arrow_key":
+					if self.players[player_idx].pad_x  < 16.5:
+						self.players[player_idx].pad_x += 1
+						if self.players[player_idx].pad_x  > 16.0:
+								self.players[player_idx].pad_x = 16
+				elif action == "up_arrow_key":
+					if self.players[player_idx].pad_x  > -16.5:
+						self.players[player_idx].pad_x -= 1
+						if self.players[player_idx].pad_x  < -16.0:
+								self.players[player_idx].pad_x = -16
 				elif action == "e_key":
 					players = []
 					for player in self.players:
@@ -956,6 +966,7 @@ class Game:
 						logging.info(f"player {player.id} won the match {currentGameId}")
 						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "295", "z" : "-139", "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
+						self.send_all("gameState", self.tournament_state())
 						if player.gameNumber == 0 or player.gameNumber == 1:
 							for current in self.players:
 								if player.socket == current.socket:
