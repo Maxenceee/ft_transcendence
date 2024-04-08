@@ -1,6 +1,25 @@
 import { Component, createElement, link } from '..';
 
 class RegisterComp extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {login: "", password: ""};
+		this.formref = {current: null};
+		this.onInput = this.onInput.bind(this);
+	}
+
+	// onInput(e) {
+	// 	this.setState({[e.target.name]: e.target.value});
+	// }
+
+	// componentDidUpdate() {
+	// 	console.log(this.state);
+	// 	if (this.state.inedition && this.ref.current) {
+	// 		this.ref.current.focus();
+	// 		this.ref.current.setSelectionRange(this.ref.current.value.length, this.ref.current.value.length);
+	// 	}
+	// }
+
 	render() {
 		return createElement('div', {
 			class: "auth-form-body", children: [
@@ -8,29 +27,29 @@ class RegisterComp extends Component {
 					children: "Créer un compte"
 				}),
 				createElement('form', {
-					"data-turbo": "false", action: "{{ action_url|default:", login: "", "accept-charset": "UTF-8", method: "post", children: [
+					ref: this.formref, "data-turbo": "false", "accept-charset": "UTF-8", children: [
 						createElement('div', {
 							class: "auth-form-input", children: [
 								createElement('div', {
 									class: "ttpo form-input", children: createElement('label', {
-										class: "f0n8F", children: [
+										class: "f0n8F"+(this.state.login.length ? " FATdn" : ""), children: [
 											createElement('span', {
 												class: "_9nyy2", children: "Nom d'utilisateur"
 											}),
 											createElement('input', {
-												class: "_2hvTZ pexuQ zyHYP", id: "identifierU", autocomplete: "current-username", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "text", "aria-required": "true", name: "login", value: "{{ login|default:"
+												class: "_2hvTZ pexuQ zyHYP", id: "identifierU", autocomplete: "current-username", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "text", "aria-required": "true", name: "login", value: this.state.login, oninput: this.onInput
 											})
 										]
 									})
 								}),
 								createElement('div', {
 									class: "ttpo form-input", children: createElement('label', {
-										class: "f0n8F", children: [
+										class: "f0n8F"+(this.state.password.length ? " FATdn" : ""), children: [
 											createElement('span', {
 												class: "_9nyy2", children: "Mot de passe"
 											}),
 											createElement('input', {
-												class: "_2hvTZ pexuQ zyHYP", id: "identifierP", autocomplete: "current-password", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "password", "aria-required": "true", "aria-label": "password", name: "password", value: ""
+												class: "_2hvTZ pexuQ zyHYP", id: "identifierP", autocomplete: "current-password", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "password", "aria-required": "true", "aria-label": "password", name: "password", value: this.state.password, oninput: this.onInput
 											})
 										]
 									})
