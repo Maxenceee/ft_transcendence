@@ -471,9 +471,6 @@ function displayScore(data) {
 			case 69:
 				socket.send({type : 'keyCode', move : 'e_key'});
 				break;
-			case 84:
-				// Si mode tournoi alors on change de vue en vision bracket
-				break;
 		}
 	}
 
