@@ -632,17 +632,19 @@ class Game:
 						self.send(3, "setCam", {"x" : "-70", "y" : "40", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
-					if player_idx == 3:
-						self.players[2].score = 0
+					if player_idx == 0:
+						self.send_all("updateScore", {"n": 0, "score": 0})
+						self.send_all("deletePallet", {"n" : 0})
+					elif player_idx == 1:
+						self.send_all("updateScore", {"n": 1, "score": 0})
+						self.send_all("deletePallet", {"n" : 1})
 					elif player_idx == 2:
-						self.players[3].score = 0
-					else:
-						self.players[player_idx].score = 0
-					
-					self.send_all("updateScore", {"n": player_idx, "score": self.players[player_idx].score})
-					self.send_all("deletePallet", {"n" : player_idx})
-
-
+						self.send_all("updateScore", {"n": 2, "score": 0})
+						self.send_all("deletePallet", {"n" : 2})
+					elif player_idx == 3:
+						self.send_all("updateScore", {"n": 3, "score": 0})
+						self.send_all("deletePallet", {"n" : 3})
+					self.players[player_idx].score = 0
 
 			t += 1
 			if time.time() - l > 1:
