@@ -4,6 +4,94 @@ import TwoFourGameRender from './render/TwoFourGameRender';
 import TournamentGameRender from './render/TournamentGameRender';
 import EndGameRecap from './EndGameRecap';
 
+class KeyBindsView extends Component {
+	render() {
+		return createElement('div', {
+			class: "game-keyboard", children: [
+				createElement('div', {
+					class: "game-keyboard-shortcut", children: [
+						this.props.type != "local" && createElement('div', {
+							class: "key", children: [
+								"E",
+								createElement('p', {
+									children: "Vue joueur"
+								})
+							]
+						}),
+						this.props.type != "4p" && createElement('div', {
+							class: "key", children: [
+								"R",
+								createElement('p', {
+									children: "Pong"
+								})
+							]
+						}),
+						this.props.type == "tournament" && createElement('div', {
+							class: "key", children: [
+								"T",
+								createElement('p', {
+									children: "Vue globale"
+								})
+							]
+						}),
+					]
+				}),
+				createElement('div', {
+					class: "game-keyboard-moves"+(this.props.type == "4p" ? " nogrid" : this.props.type == "local" ? " col" : ""), children: [
+						this.props.type == "local" && createElement('div', {
+							class: "key", children: [
+								"W",
+								createElement('p', {
+									children: "Haut"
+								})
+							]
+						}),
+						this.props.type != "4p" && createElement('div', {
+							class: "key", children: [
+								"↑",
+								createElement('p', {
+									children: "Haut"
+								})
+							]
+						}),
+						this.props.type == "local" && createElement('div', {
+							class: "key", children: [
+								"S",
+								createElement('p', {
+									children: "Bas"
+								})
+							]
+						}),
+						this.props.type != "local" && createElement('div', {
+							class: "key", children: [
+								"←",
+								createElement('p', {
+									children: "Gauche"
+								})
+							]
+						}),
+						this.props.type != "4p" && createElement('div', {
+							class: "key", children: [
+								"↓",
+								createElement('p', {
+									children: "Bas"
+								})
+							]
+						}),
+						this.props.type != "local" && createElement('div', {
+							class: "key", children: [
+								"→",
+								createElement('p', {
+									children: "Droite"
+								})
+							]
+						})
+					]
+				})
+			]
+		});
+	}
+}
 
 class GameView extends Component {
 	constructor(props) {
@@ -109,90 +197,7 @@ class GameView extends Component {
 							]
 						})
 					}),
-					createElement('div', {
-						class: "game-keyboard", children: [
-							createElement('div', {
-								class: "game-keyboard-shortcut", children: [
-									this.state.type != "local" && createElement('div', {
-										class: "key", children: [
-											"E",
-											createElement('p', {
-												children: "Player View"
-											})
-										]
-									}),
-									this.state.type != "4p" && createElement('div', {
-										class: "key", children: [
-											"R",
-											createElement('p', {
-												children: "Pong View"
-											})
-										]
-									}),
-									this.state.type == "tournament" && createElement('div', {
-										class: "key", children: [
-											"T",
-											createElement('p', {
-												children: "Bracket View"
-											})
-										]
-									}),
-								]
-							}),
-							createElement('div', {
-								class: "game-keyboard-moves", children: [
-									this.state.type != "4p" && createElement('div', {
-										class: "key", children: [
-											"↑",
-											createElement('p', {
-												children: "Move Up"
-											})
-										]
-									}),
-									this.state.type == "local" && createElement('div', {
-										class: "key", children: [
-											"W",
-											createElement('p', {
-												children: "Move Up"
-											})
-										]
-									}),
-									this.state.type != "local" && createElement('div', {
-										class: "key", children: [
-											"←",
-											createElement('p', {
-												children: "Move Left"
-											})
-										]
-									}),
-									this.state.type != "4p" && createElement('div', {
-										class: "key", children: [
-											"↓",
-											createElement('p', {
-												children: "Move Down"
-											})
-										]
-									}),
-									this.state.type == "local" && createElement('div', {
-										class: "key", children: [
-											"S",
-											createElement('p', {
-												children: "Move Up"
-											})
-										]
-									}),
-									this.state.type != "local" && createElement('div', {
-										class: "key", children: [
-											"→",
-											createElement('p', {
-												children: "Move Right"
-											})
-										]
-									})
-								]
-							}),
-						]
-					}),
+					createElement(KeyBindsView, {type: this.state.type}),
 					this.state.game_render && this.state.game_render.render(),
 					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
 					// createElement(EndGameRecap, {type: this.state.type, data: [{id: "maxence", score: 3, nickname: "Max", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=7516293836"}, {id: "2", score: 5, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"}]})

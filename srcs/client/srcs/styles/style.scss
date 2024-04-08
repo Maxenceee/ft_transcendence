@@ -3043,13 +3043,25 @@ body:has(.connection-page) {
 	}
 
 	.game-keyboard-moves {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		grid-template-rows: auto auto;
-
-		.key:first-child {
-			grid-column-end: span 3;
-			grid-column-start: 2;
+		&:not(.nogrid):not(.col) {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr;
+			grid-template-rows: auto auto;
+	
+			.key:first-child {
+				grid-column-end: span 3;
+				grid-column-start: 2;
+			}
+		}
+		&.col {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-template-rows: auto auto;
+		}
+		&.nogrid {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-end;
 		}
 	}
 }
