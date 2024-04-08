@@ -286,7 +286,7 @@ class Game:
 		self.id = makeid(15)
 		self.players = players
 		if game_type == "tournament":
-			self.ball = [Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball(), Ball()]
+			self.ball = [Ball() for _ in range(7)]
 		else:
 			self.ball = Ball()
 		self.type = game_type
@@ -311,11 +311,20 @@ class Game:
 		if self.thread is not None:
 			self.thread.join()
 
-
-	def end_game(self):
-		logging.info(f"game ended called: {self.id}")
+	def send_end_game(self):
+		if self.type == "tournament":
+			for player in self.players:
+				if player.gameNumber == 0 or player.gameNumber == 1 or player.gameNumber == 2 or player.gameNumber == 3:
+					player.score = 1
+				elif player.gameNumber == 4 or player.gameNumber == 5:
+					player.score = 2
+				elif player.gameNumber == 6:
+					player.score = 3
+				elif player.gameNumber == 7:
+					player.score = 4
 		players = []
 		for player in self.players:
+			id = None
 			if isinstance(player, AIPlayer):
 				nickname = "Marvin (AI)"
 				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder"
@@ -324,26 +333,34 @@ class Game:
 				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
 			if isinstance(player, Player):
 				user = User.objects.get(id=player.id)
+				id = player.id
 				nickname = user.nickname
 				profile_picture = user.default_profile_picture
 				if user.profile_picture_image:
 					profile_picture = settings.BASE_URL + "/api" + user.profile_pictulauch_games
 				user.is_ingame = False
 				user.save()
+			players.append({"id": id, "nickname": nickname, "profile_picture": profile_picture, "score": player.score})
+		self.send_all("endGame", players)
+
+	def end_game(self):
+		logging.info(f"game ended called: {self.id}")
+		self.send_end_game()
+		for player in self.players:
 			try:
 				logging.info(f"close socket for player {player.id}")
 				player.socket.close()
 			except:
 				continue
-
 		logging.info(f"game {self.id} ended")
 		scores_all_zero = all(player.score == 0 for player in self.players)
-		if not scores_all_zero and not self.type == "ai" and not self.type == "local":
+		if not scores_all_zero and not self.type == "ai" and not self.type == "local" and not self.type == "tournament":
 			self.save_history()
+		elif self.type == "tournament":
+			self.save_history_tournament()
 
 		logging.info("destroying game " + self.id)
 		matchmaker.delete_game(self.id)
-
 
 	def save_history(self):
 		resume_data = []
@@ -353,6 +370,21 @@ class Game:
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type=self.type, data=resume_data)
 		logging.info("history saved for game " + self.id)
+
+	def save_history_tournament(self):
+		resume_data = []
+		for player in self.players:
+			if player.gameNumber == 0 or player.gameNumber == 1 or player.gameNumber == 2 or player.gameNumber == 3:
+				resume_data.append({"id": player.id, "score": 1})
+			elif player.gameNumber == 4 or player.gameNumber == 5:
+				resume_data.append({"id": player.id, "score": 2})
+			elif player.gameNumber == 6:
+				resume_data.append({"id": player.id, "score": 3})
+			elif player.gameNumber == 7:
+				resume_data.append({"id": player.id, "score": 4})
+		resume_data = str(resume_data)
+		resume_data = resume_data.replace("'", '"')
+		Game_history.objects.create(type=self.type, data=resume_data)
 
 
 	def send_all(self, type, data):
@@ -841,16 +873,15 @@ class Game:
 					elif currentGameId == 3:
 						self.send(self.players.index(players[0]), "setCam", {"x" : "240", "y" : "30", "z" : "60" , "camx" :"240.0", "camy" :"0", "camz" :"0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "240", "y" : "30", "z" : "-60", "camx" :"240.0", "camy" :"0", "camz" :"0"})
-					elif currentGameId == 4:
-						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"320.0", "camy" :"0", "camz" :"0"})
-						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60", "camx" :"320.0", "camy" :"0", "camz" :"0"})
-					elif currentGameId == 5:
-						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
-						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
-					elif currentGameId == 6:
-						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
-						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "-60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
-
+					# elif currentGameId == 4:
+					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "160", "y" : "30", "z" : "160" , "camx" :"160.0", "camy" :"0", "camz" :"0"})
+					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "160", "y" : "30", "z" : "40", "camx" :"160.0", "camy" :"0", "camz" :"0"})
+					# elif currentGameId == 5:
+					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "80", "y" : "30", "z" : "160" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "80", "y" : "30", "z" : "40" , "camx" :"80.0", "camy" :"0", "camz" :"0"})
+					# elif currentGameId == 6:
+					# 	self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "30", "z" : "180" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
+					# 	self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "30", "z" : "60" , "camx" :"120.0", "camy" :"0", "camz" :"0"})
 					is_init[currentGameId] = True
 
 				self.ball[currentGameId].x += self.ball[currentGameId].direction_x * 0.4 * self.ball[currentGameId].speed
@@ -861,6 +892,8 @@ class Game:
 				for player in players:
 					if player.score  > 4 :
 						logging.info(f"player {player.id} won the match {currentGameId}")
+						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
+						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "295", "z" : "-139", "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						if player.gameNumber == 0 or player.gameNumber == 1:
 							for current in self.players:
 								if player.socket == current.socket:
