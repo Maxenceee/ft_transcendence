@@ -642,11 +642,11 @@ class Game:
 						self.players[player_idx].score = 0
 					elif player_idx == 2:
 						self.send_all("updateScore", {"n": 3, "score": 0})
-						self.send_all("deletePallet", {"n" : 3})
+						self.send_all("deletePallet", {"n" : 2})
 						self.players[3].score = 0
 					elif player_idx == 3:
 						self.send_all("updateScore", {"n": 2, "score": 0})
-						self.send_all("deletePallet", {"n" : 2})
+						self.send_all("deletePallet", {"n" : 3})
 						self.players[2].score = 0
 
 			t += 1
