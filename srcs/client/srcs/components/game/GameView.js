@@ -11,28 +11,17 @@ class GameView extends Component {
 		this.setplayers = this.setplayers.bind(this);
 		this.endGame = this.endGame.bind(this);
 		this.finishGame = this.finishGame.bind(this);
+		this.newGame = this.newGame.bind(this);
 	}
 
 	componentDidMount() {
-		console.log("componentDidMount GameView", this);
+		// console.log("componentDidMount GameView", this);
 		let a = useParams("/game/:type") ?? {params: {type: null}},
 			{ type } = a.params;
 		if (!type) {
 			navigate("/");
 		}
-		this.setState({loading: true, game_render: null, type: type});
-		window.onbeforeunload = (e) => {
-			// display a message to the user
-			e.preventDefault();
-			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
-		}
-		let onload = () => this.setState({loading: false});
-
-		if (type == "tournament") {
-			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
-		} else {
-			this.setState({game_render: TwoFourGameRender(type, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
-		}
+		this.newGame(type);
 	}
 
 	componentDidUpdate() {
@@ -67,6 +56,23 @@ class GameView extends Component {
 		this.setState({endGameData: data.players});
 	}
 
+	newGame(type) {
+		this.state.game_render && this.state.game_render.unmount();
+		this.setState({loading: true, game_render: null, type: type, players: null, endGameData: null});
+		window.onbeforeunload = (e) => {
+			// display a message to the user
+			e.preventDefault();
+			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
+		}
+		let onload = () => this.setState({loading: false});
+
+		if (type == "tournament") {
+			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
+		} else {
+			this.setState({game_render: TwoFourGameRender(type, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
+		}
+	}
+
 	render() {
 		// console.log("======================== GameView render ========================", this.state);
 		return (
@@ -75,7 +81,7 @@ class GameView extends Component {
 			:
 			createElement('div', {
 				class: "render-context", children: [
-					createElement('div', {
+					!this.state.endGameData && createElement('div', {
 						class: "back-button", onclick: () => this.endGame(), children: "Quitter"
 					}),
 					this.state.players && this.state.type != "4p" && createElement('div', {
@@ -176,7 +182,7 @@ class GameView extends Component {
 						]
 					}),
 					this.state.game_render && this.state.game_render.render(),
-					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData})
+					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData, newGame: this.newGame, type: this.state.type})
 					// createElement(EndGameRecap, {type: this.state.type, data: [{id: "maxence", score: 3, nickname: "Max", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=7516293836"}, {id: "2", score: 5, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"}]})
 				]
 			})
