@@ -17,7 +17,7 @@ class BadConnection extends Component {
 							]
 						}),
 						createElement('p', {
-							style: "color: #818185; font-size: 20", children: "Unable to connect"
+							style: "color: #818185; font-size: 20", children: "Connexion impossible"
 						})
 					]
 				})

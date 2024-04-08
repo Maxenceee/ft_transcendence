@@ -205,7 +205,7 @@ function displayScore(data) {
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
 
-			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
+			render_data.scores.push(createTextObject(Math.max(data[i].score || 0, 0).toString()));
 			render_data.scores[i].position.y += 6;
 		}
 		render_data.scores[0].rotateY((Math.PI / 2) * 2);
