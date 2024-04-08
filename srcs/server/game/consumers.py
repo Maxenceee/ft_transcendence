@@ -443,7 +443,7 @@ class Game:
 		}
 
 	def send_start_message(self):
-		self.send_text("Players ready!", 5)
+		self.send_text("Prêt !", 5)
 		time.sleep(2)
 		if self.type != "local":
 			self.send(0, "moveCam", {"x" : "0", "y" : "30", "z" : "60", "duration" : "3000"})
@@ -454,7 +454,7 @@ class Game:
 		for i in range(3, 0, -1):
 			self.send_text(str(i))
 			time.sleep(1)
-		self.send_text("GO!", 8)
+		self.send_text("GO !", 8)
 		time.sleep(0.5)
 		self.send_text("")
 

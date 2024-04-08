@@ -311,7 +311,7 @@ function displayScore(data) {
 
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -321,7 +321,7 @@ function displayScore(data) {
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -331,7 +331,7 @@ function displayScore(data) {
 		))
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -341,7 +341,7 @@ function displayScore(data) {
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -463,7 +463,7 @@ function displayScore(data) {
 				render_data.keyCodes["down_arrow_key"] = d;
 				break;
 			case 82:
-				d && (
+				type != "4p" && d && (
 					setcam(0.01, 80, 0),
 					controls.target.set(0, 0, 0)
 				)
