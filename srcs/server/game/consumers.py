@@ -311,9 +311,17 @@ class Game:
 		if self.thread is not None:
 			self.thread.join()
 
-
-	def end_game(self):
-		logging.info(f"game ended called: {self.id}")
+	def send_end_game(self):
+		if self.type == "tournament":
+			for player in self.players:
+				if player.gameNumber == 0 or player.gameNumber == 1 or player.gameNumber == 2 or player.gameNumber == 3:
+					player.score = 1
+				elif player.gameNumber == 4 or player.gameNumber == 5:
+					player.score = 2
+				elif player.gameNumber == 6:
+					player.score = 3
+				elif player.gameNumber == 7:
+					player.score = 4
 		players = []
 		for player in self.players:
 			id = None
@@ -333,12 +341,17 @@ class Game:
 				user.is_ingame = False
 				user.save()
 			players.append({"id": id, "nickname": nickname, "profile_picture": profile_picture, "score": player.score})
+		self.send_all("endGame", players)
+
+	def end_game(self):
+		logging.info(f"game ended called: {self.id}")
+		self.send_end_game()
+		for player in self.players:
 			try:
 				logging.info(f"close socket for player {player.id}")
 				player.socket.close()
 			except:
 				continue
-		self.send_all("endGame", players)
 		logging.info(f"game {self.id} ended")
 		scores_all_zero = all(player.score == 0 for player in self.players)
 		if not scores_all_zero and not self.type == "ai" and not self.type == "local" and not self.type == "tournament":
