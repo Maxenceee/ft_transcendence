@@ -579,6 +579,7 @@ class Game:
 			self.send_all("updateScore", {"n": i, "score": 5})
 		t = 0
 		l = time.time()
+		classement = 1
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
@@ -662,6 +663,9 @@ class Game:
 			self.send_all("updateBall", {"x": round(self.ball.x, 2), "z": round(self.ball.z, 2), "direction_x": round(self.ball.direction_x, 2), "direction_z": round(self.ball.direction_z, 2)})
 			i = 0
 			for player in self.players:
+				if player.score == 0:
+					player.score = -classement
+					classement += 1
 				if player.score < 1:
 					i += 1
 				if i >= 3:
