@@ -671,9 +671,9 @@ class Game:
 					if player not in classement:
 						classement.append(player)
 				if i >= 3:
-					classement[0].score = -3
-					classement[1].score = -2
-					classement[2].score = -1
+					self.players.index(classement[0]).score = -3
+					self.players.index(classement[1]).score = -2
+					self.players.index(classement[2]).score = -1
 					self.end_game()
 					return
 
