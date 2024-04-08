@@ -48,7 +48,7 @@ function createElement(type, props = {}) {
 		Object.keys(props).forEach(key => {
 			if (key === 'children') {
 				const children = props[key];
-				if (!children) return;
+				if (!children && typeof children !== "number") return;
 				if (Array.isArray(children)) {
 					children.forEach(child => jv(child));
 				} else {
