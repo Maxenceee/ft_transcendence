@@ -674,7 +674,6 @@ class Game:
 					classement[0].score = -3
 					classement[1].score = -2
 					classement[2].score = -1
-					classement[3].score = 1
 					self.end_game()
 					return
 
