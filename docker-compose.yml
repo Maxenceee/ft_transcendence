@@ -24,8 +24,7 @@ services:
             - .env
         volumes:
             - shared_data:/var/www/static/
-            - ./srcs/server:/app/server
-            - ./srcs/client:/app/client
+            - images:/app/server/avatar
         networks:
             - transcendence
         depends_on:
