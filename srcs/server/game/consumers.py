@@ -579,7 +579,7 @@ class Game:
 			self.send_all("updateScore", {"n": i, "score": 5})
 		t = 0
 		l = time.time()
-		classement = 1
+		classement = -1
 		while True:
 			while not self.queue.empty():
 				player_idx, action = self.queue.get()
@@ -632,16 +632,8 @@ class Game:
 						self.send(3, "setCam", {"x" : "-70", "y" : "40", "z" : "0"})
 				elif action == "disconnect":
 					logging.info(f"player disconnected : {self.players[player_idx].id} ({player_idx})")
-					if player_idx == 3 :
-						self.players[2].score = 0
-					elif player_idx == 2 :
-						self.players[3].score = 0
-					else:
-						self.players[player_idx].score = 0
-					self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
-					self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
-					self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
-					self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
+					self.players[player_idx].score = 0
+					self.send_all("updateScore", {"n": player_idx, "score": self.players[player_idx].score})
 					self.send_all("deletePallet", {"n" : player_idx})
 
 
@@ -664,8 +656,8 @@ class Game:
 			i = 0
 			for player in self.players:
 				if player.score == 0:
-					player.score = -classement
-					classement += 1
+					player.score = classement
+					classement -= 1
 				if player.score < 1:
 					i += 1
 				if i >= 3:
