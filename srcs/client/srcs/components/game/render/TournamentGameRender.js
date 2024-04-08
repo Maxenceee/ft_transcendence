@@ -105,13 +105,13 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	});
 
     let font,
-		textGeo2 = [0, 0, 0, 0., 0, 0, 0, 0],
+		textGeo2 = new Array(8).fill(0),
 		textMesh = null,
-		textStrings2 = ['', '', '', '', '', '', '', ''],
-		textMesh2 = [null, null, null, null, null, null, null, null];
+		textStrings2 = new Array(8).fill(''),
+		textMesh2 = new Array(8).fill(null);
 
 	const fontLoader = new FontLoader(loaderManager);
-	fontLoader.load('/static/fonts/font.json', function (response) {
+	fontLoader.load('/static/fonts/font.json', function(response) {
 		font = response;
 		createText("En attente d'un joueur...", 2.5);
 	});

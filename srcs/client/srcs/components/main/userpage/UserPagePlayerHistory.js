@@ -20,11 +20,11 @@ class UserPagePlayerHistory extends Component {
 									(
 										p ?
 										createElement('div', {
-											class: "win", children: "Victory"
+											class: "win", children: "Victoire"
 										})
 										:
 										createElement('div', {
-											class: "lost", children: "Defeat"
+											class: "lost", children: "Defaite"
 										})
 									),
 									createElement('div', {
@@ -41,15 +41,15 @@ class UserPagePlayerHistory extends Component {
 									(
 										p ?
 										createElement('div', {
-											class: "win", children: "Victory"
+											class: "win", children: "Victoire"
 										})
 										:
 										createElement('div', {
-											class: "lost", children: "Defeat"
+											class: "lost", children: "Defaite"
 										})
 									),
 									createElement('div', {
-										class: "type", children: "4 Players"
+										class: "type", children: "4 Joueurs"
 									})
 								]
 							})
@@ -57,7 +57,7 @@ class UserPagePlayerHistory extends Component {
 					})
 					:
 					createElement('div', {children:
-						createElement('p', {children: "No game played yet", style: "text-align: center; margin-bottom: 10px;"})
+						createElement('p', {children: "Aucune parties jouées", style: "text-align: center; margin-bottom: 10px;"})
 					})
 				)
 			})

@@ -151,7 +151,7 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	const fontLoader = new FontLoader(loaderManager);
 	fontLoader.load('/static/fonts/font.json', function (response) {
 		font = response;
-		createText("En attente d'un joueur...", 2.5);
+		createText(type == "4p" ? "En attente de joueurs..." : "En attente d'un joueur...", 2.5);
 	});
 
 	const materials = [

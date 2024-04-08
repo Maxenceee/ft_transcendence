@@ -1,4 +1,4 @@
-import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams, AlertBanner } from '../..';
+import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams, AlertBanner, NotFound } from '../..';
 import axios from "axios";
 import { ismax } from '../../proto/Component';
 
@@ -23,7 +23,7 @@ class UserPage extends Component {
 			})
 			.catch(error => {
 				console.error("error", error);
-				this.setState({ loading: false });
+				this.setState({ loading: false, user: null });
 			})
 		}
 	}
@@ -31,6 +31,9 @@ class UserPage extends Component {
 	render() {
 		return this.state.loading ?
 		createElement(Loader)
+		:
+		this.state.user == null ?
+		createElement(NotFound)
 		:
 		createElement('div', {
 			children: createElement('div', {

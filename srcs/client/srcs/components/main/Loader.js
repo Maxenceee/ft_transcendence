@@ -19,7 +19,7 @@ class Loader extends Component {
 				}),
 				createElement('div', {
 					class: "ad-up-box-loader-text", children: createElement('span', {
-						class: "ad-up-box-loader-text", children: "Please be patient, we are working on it..."
+						class: "ad-up-box-loader-text", children: "Bouge pas, ça charge..."
 					})
 				})				
 			]
