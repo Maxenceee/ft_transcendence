@@ -333,89 +333,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 				socket.send({type : 'keyCode', move : 'r_key'});
 				break;
 			case 84:
-				// Si mode tournoi alors on change de vue en vision bracket
 				socket.send({type : 'keyCode', move : 't_key'});
 				break;
 		}
-		// switch (event.which) {
-		// 	case 87:
-		// 		render_data.keyCodes["w_key"] = d;
-		// 		break;
-		// 	case 83:
-		// 		render_data.keyCodes["s_key"] = d;
-		// 		break;
-		// 	case 39:
-		// 		render_data.keyCodes["right_arrow_key"] = d;
-		// 		break;
-		// 	case 38:
-		// 		render_data.keyCodes["up_arrow_key"] = d;
-		// 		break;
-		// 	case 37:
-		// 		render_data.keyCodes["left_arrow_key"] = d;
-		// 		break;
-		// 	case 40:
-		// 		render_data.keyCodes["down_arrow_key"] = d;
-		// 		break;
-		// 	case 82:
-		// 		d && (
-		// 			setcam(10, 80, 0),
-		// 			controls.target.set(0, 0, 0)
-		// 		)
-		// 		break;
-		// 	case 69:
-		// 		socket.send({type : 'keyCode', move : 'e_key'});
-		// 		break;
-		// 	case 84:
-		// 		// Si mode tournoi alors on change de vue en vision bracket
-		// 		break;
-		// }
-		// let keyVar = event.which;
-		// keyCode.right = 0;
-		// keyCode.left = 0;
-		// if (keyVar == 68)
-		// {
-		// 	keyCode.left = 0;
-		// 	keyCode.right = 1;
-		// }
-		// if (keyVar == 65)
-		// {
-		// 	keyCode.left = 1;
-		// 	keyCode.right = 0;
-		// }
-		// if (keyVar == 39)
-		// {
-		// 	keyCode.left = 0;
-		// 	keyCode.right = 1;
-		// }
-		// if (keyVar == 37)
-		// {
-		// 	keyCode.left = 1;
-		// 	keyCode.right = 0;
-		// }
-		// if (keyVar == 69)
-		// {
-		// 	socket.send({type : 'keyCode', move : "e_key"});
-		// }
-		// if (keyVar == 82)
-		// {
-		// 	socket.send({type : 'keyCode', move : "r_key"});
-		// }
-		// if (keyVar == 84)
-		// {
-		// 	socket.send({type : 'keyCode', move : "t_key"});
-		// }
-		// if (keyCode.right == 1 && keyCode.left == 0){
-		// 	console.log("right")
-		// 	socket.send({type : 'keyCode', move : "right"});
-		// }
-		// else if (keyCode.right == 0 && keyCode.left == 1) {
-		// 	console.log("left")
-		// 	socket.send({type : 'keyCode', move : "left"});
-		// }
-		// else if (keyVar == 80){
-		// 	console.log(camera.position.x, camera.position.y, camera.position.z, controls.target.x, controls.target.y, controls.target.z)
-		// }
-		// console.log(keyVar);
 	}
 
     initiateMapTwoPlayer({}, 0, 0, 0);
