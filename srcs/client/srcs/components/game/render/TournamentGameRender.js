@@ -151,10 +151,8 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	}
 
     function createText2(msg, x, z, number) {
-		console.log(number, msg);
 		if (textStrings2[number] == msg)
 			return ;
-		console.log('Setting to ', number, msg);
 
 		if (textMesh2[number]) {
 			textMesh2[number].geometry.dispose();
@@ -374,6 +372,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		else if (keyCode.right == 0 && keyCode.left == 1) {
 			console.log("left")
 			socket.send({type : 'keyCode', move : "left"});
+		}
+		else if (keyVar == 80){
+			console.log(camera.position.x, camera.position.y, camera.position.z, controls.target.x, controls.target.y, controls.target.z)
 		}
 		console.log(keyVar);
 	}
