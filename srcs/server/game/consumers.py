@@ -316,6 +316,7 @@ class Game:
 		logging.info(f"game ended called: {self.id}")
 		players = []
 		for player in self.players:
+			id = None
 			if isinstance(player, AIPlayer):
 				nickname = "Marvin (AI)"
 				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder"
@@ -324,26 +325,29 @@ class Game:
 				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
 			if isinstance(player, Player):
 				user = User.objects.get(id=player.id)
+				id = player.id
 				nickname = user.nickname
 				profile_picture = user.default_profile_picture
 				if user.profile_picture_image:
 					profile_picture = settings.BASE_URL + "/api" + user.profile_pictulauch_games
 				user.is_ingame = False
 				user.save()
+			players.append({"id": id, "nickname": nickname, "profile_picture": profile_picture, "score": player.score})
 			try:
 				logging.info(f"close socket for player {player.id}")
 				player.socket.close()
 			except:
 				continue
-
+		self.send_all("endGame", players)
 		logging.info(f"game {self.id} ended")
 		scores_all_zero = all(player.score == 0 for player in self.players)
-		if not scores_all_zero and not self.type == "ai" and not self.type == "local":
+		if not scores_all_zero and not self.type == "ai" and not self.type == "local" and not self.type == "tournament":
 			self.save_history()
+		elif self.type == "tournament":
+			self.save_history_tournament()
 
 		logging.info("destroying game " + self.id)
 		matchmaker.delete_game(self.id)
-
 
 	def save_history(self):
 		resume_data = []
@@ -353,6 +357,21 @@ class Game:
 		resume_data = resume_data.replace("'", '"')
 		Game_history.objects.create(type=self.type, data=resume_data)
 		logging.info("history saved for game " + self.id)
+
+	def save_history_tournament(self):
+		resume_data = []
+		for player in self.players:
+			if player.gameNumber == 0 or player.gameNumber == 1 or player.gameNumber == 2 or player.gameNumber == 3:
+				resume_data.append({"id": player.id, "score": 1})
+			elif player.gameNumber == 4 or player.gameNumber == 5:
+				resume_data.append({"id": player.id, "score": 2})
+			elif player.gameNumber == 6:
+				resume_data.append({"id": player.id, "score": 3})
+			elif player.gameNumber == 7:
+				resume_data.append({"id": player.id, "score": 4})
+		resume_data = str(resume_data)
+		resume_data = resume_data.replace("'", '"')
+		Game_history.objects.create(type=self.type, data=resume_data)
 
 
 	def send_all(self, type, data):
