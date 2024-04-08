@@ -1,7 +1,6 @@
-import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams } from '../..';
+import { Component, createElement, UserPagePlayerHistory, UserPagePlayerStats, navigate, Loader, useParams, AlertBanner } from '../..';
 import axios from "axios";
 import { ismax } from '../../proto/Component';
-import AlertBanner from '../../../utils/AlertBanner';
 
 class UserPage extends Component {
 	constructor(props) {

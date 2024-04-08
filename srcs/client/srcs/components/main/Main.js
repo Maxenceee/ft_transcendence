@@ -1,5 +1,4 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, ConnectionPage } from '..';
-import { Socket } from '../../utils';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, Socket } from '..';
 import axios from "axios";
 
 class Main extends Component {

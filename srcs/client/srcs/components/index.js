@@ -18,3 +18,5 @@ export { default as link } from './utils/Link';
 export { default as navigate } from './utils/Navigate';
 
 export { default as xhr } from './xhr/XHR';
+
+export * from '../utils';

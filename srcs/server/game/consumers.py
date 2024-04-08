@@ -51,6 +51,7 @@ class Tinder: # Matchmaking
 			user.save()
 		else:
 			logging.info("user connection rejected user already in game")
+			socket.send(json.dumps({"type": "connectionRefused", "data": "You are already ingame !"}))
 			socket.close()
 			return
 

@@ -7,7 +7,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
-import { Socket, LoadManager } from '../../../utils';
+import { Socket, LoadManager, AlertBanner } from '../..';
 
 let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
@@ -36,11 +36,15 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
-			case "endGame": {
+			case "endGame":
 				socket.rmclose(onclose);
 				socket.close();
 				onfinish(msg.data);
-			} break;
+				break;
+			case "connectionRefused":
+				console.log(msg.data);
+				new AlertBanner({ message: msg.data, color: "error" });
+				break;
 			case "initPlayers":
 				setplayers(msg.data);
 				break;
