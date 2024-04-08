@@ -460,7 +460,7 @@ function displayScore(data) {
 				break;
 			case 82:
 				d && (
-					setcam(10, 80, 0),
+					setcam(0.01, 80, 0),
 					controls.target.set(0, 0, 0)
 				)
 				break;
