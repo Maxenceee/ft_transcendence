@@ -26,7 +26,7 @@ class UserPagePlayerHistory extends Component {
 									class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
 								}),
 								createElement('div', {
-									class: "type lined-hover", children: game.type == "2p" ? link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A"}) : link({to: "/user/"+p[0].id, children: p[0].nickname || "N/A", class: ismax(p[0].id)}), title: p[0].nickname || "N/A"
+									class: "type lined-hover", children: game.type == "2p" ? link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A", class: ismax(p[0].id)}) : link({to: "/user/"+p[0].id, children: p[0].nickname || "N/A", class: ismax(p[0].id)}), title: p[0].nickname || "N/A"
 								})
 							]
 						})
