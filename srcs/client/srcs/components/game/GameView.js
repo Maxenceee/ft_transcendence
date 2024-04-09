@@ -3,95 +3,8 @@ import { Component, createElement, Loader, useParams, navigate } from '..';
 import TwoFourGameRender from './render/TwoFourGameRender';
 import TournamentGameRender from './render/TournamentGameRender';
 import EndGameRecap from './EndGameRecap';
-
-class KeyBindsView extends Component {
-	render() {
-		return createElement('div', {
-			class: "game-keyboard", children: [
-				createElement('div', {
-					class: "game-keyboard-shortcut", children: [
-						this.props.type != "local" && createElement('div', {
-							class: "key", children: [
-								"E",
-								createElement('p', {
-									children: "Vue joueur"
-								})
-							]
-						}),
-						this.props.type != "4p" && createElement('div', {
-							class: "key", children: [
-								"R",
-								createElement('p', {
-									children: "Vue Pong"
-								})
-							]
-						}),
-						this.props.type == "tournament" && createElement('div', {
-							class: "key", children: [
-								"T",
-								createElement('p', {
-									children: "Vue globale"
-								})
-							]
-						}),
-					]
-				}),
-				createElement('div', {
-					class: "game-keyboard-moves"+(this.props.type == "4p" ? " nogrid" : this.props.type == "local" ? " col" : ""), children: [
-						this.props.type == "local" && createElement('div', {
-							class: "key", children: [
-								"W",
-								createElement('p', {
-									children: "Haut"
-								})
-							]
-						}),
-						this.props.type != "4p" && createElement('div', {
-							class: "key", children: [
-								"↑",
-								createElement('p', {
-									children: "Haut"
-								})
-							]
-						}),
-						this.props.type == "local" && createElement('div', {
-							class: "key", children: [
-								"S",
-								createElement('p', {
-									children: "Bas"
-								})
-							]
-						}),
-						this.props.type != "local" && createElement('div', {
-							class: "key", children: [
-								"←",
-								createElement('p', {
-									children: "Gauche"
-								})
-							]
-						}),
-						this.props.type != "4p" && createElement('div', {
-							class: "key", children: [
-								"↓",
-								createElement('p', {
-									children: "Bas"
-								})
-							]
-						}),
-						this.props.type != "local" && createElement('div', {
-							class: "key", children: [
-								"→",
-								createElement('p', {
-									children: "Droite"
-								})
-							]
-						})
-					]
-				})
-			]
-		});
-	}
-}
+import GamePlayersOverlay from './GamePlayersOverlay';
+import KeyBindsView from './KeyBindsView';
 
 class GameView extends Component {
 	constructor(props) {
@@ -175,35 +88,7 @@ class GameView extends Component {
 					!this.state.endGameData && createElement('div', {
 						class: "back-button", onclick: () => this.endGame(), children: "Quitter"
 					}),
-					this.state.players && this.state.type != "4p" && createElement('div', {
-						class: "game-player-overlay", children: createElement('div', {
-							class: "game-player-overlay-cnt", children: [
-								createElement('div', {
-									class: "game-player-profile", children: [
-										createElement('h1', {
-											children: this.state.players[0].nickname,
-										}),
-										createElement('img', {
-											src: this.state.players[0].profile_picture
-										}),
-									]
-								}),
-								createElement('div', {
-									class: "game-player-separator", children: "VS"
-								}),
-								createElement('div', {
-									class: "game-player-profile", children: [
-										createElement('img', {
-											src: this.state.players[1].profile_picture
-										}),
-										createElement('h1', {
-											children: this.state.players[1].nickname,
-										}),
-									]
-								})
-							]
-						})
-					}),
+					this.state.players && createElement(GamePlayersOverlay, {players: this.state.players}),
 					createElement(KeyBindsView, {type: this.state.type}),
 					this.state.game_render && this.state.game_render.render(),
 					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData, newGame: this.newGame, type: this.state.type})
