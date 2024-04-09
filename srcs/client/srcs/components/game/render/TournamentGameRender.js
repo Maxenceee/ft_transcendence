@@ -47,17 +47,6 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			case "initPlayers":
 				setplayers(msg.data);
 				break;
-			// case "resetCam":
-			// 	setcam(10, 69, 0);
-			// 	break;
-			// case "setCam":
-			// 	setcam(msg.data.x, msg.data.y, msg.data.z);
-			// 	break;
-			// case "moveCam":
-			// 	startanimation(camera.position, {x: msg.data.x, y: msg.data.y, z: msg.data.z}, msg.data.duration.toString());
-			// 	break;
-			// case "text":
-			// 	createText(msg.data.text, msg.data.size);
             case "setCam":
 				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 				break;
@@ -301,18 +290,6 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	composer.addPass(renderScene);
 	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
-
-    // document.addEventListener("keydown", onDocumentKeyEvent, true);
-	// document.addEventListener("keyup", onDocumentKeyEvent, true);
-	// let keyCode = {
-	// 	left: 0,
-	// 	right: 0,
-	// }
-	// function onDocumentKeyEvent(event) {
-	// 	let keyVar = event.which;
-	// 	console.log(keyVar);
-
-
 
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
