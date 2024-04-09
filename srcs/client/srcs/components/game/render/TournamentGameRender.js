@@ -191,9 +191,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 				new THREE.BoxGeometry( 6, 1, 1 ), 
 				new THREE.MeshStandardMaterial({
 					wireframe:false, 
-						color:0xffffff, 
+						color:0xFD338B, 
 						opacity: 1, 
-						emissive:0xffffff,
+						emissive:0xFD338B,
 						side : THREE.DoubleSide,
 					})
 				);
@@ -201,9 +201,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 				new THREE.BoxGeometry( 6, 1, 1 ), 
 				new THREE.MeshStandardMaterial({
 					wireframe:false, 
-					color:0xffffff, 
+					color:0x8B44EE, 
 					opacity: 1, 
-					emissive:0xffffff,
+					emissive:0x8B44EE,
 					side : THREE.DoubleSide,
 				})
 			);
@@ -240,9 +240,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0xff00ff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0xff00ff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);	
@@ -250,9 +250,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
 			new THREE.MeshStandardMaterial({
 				wireframe:false,
-				color:0x00ffff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0x00ffff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);
@@ -278,23 +278,23 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 		scene.add(wallLeft, wallRight, wallP1, wallP2);
 	}
 
-    // const params = {
-	// 	threshold: 0,
-	// 	strength: 0.35,
-	// 	radius: 0,
-	// 	exposure: 1
-	// };
+    const params = {
+		threshold: 0,
+		strength: 0.35,
+		radius: 0,
+		exposure: 1
+	};
 
     const renderScene = new RenderPass(scene, camera);
 
-	// const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 1.5, 0.4, 0.85);
-	// bloomPass.threshold = params.threshold;
-	// bloomPass.strength = params.strength;
-	// bloomPass.radius = params.radius;
+	const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 1.5, 0.4, 0.85);
+	bloomPass.threshold = params.threshold;
+	bloomPass.strength = params.strength;
+	bloomPass.radius = params.radius;
 	const outputPass = new OutputPass();
 	let composer = new EffectComposer(renderer);
 	composer.addPass(renderScene);
-	// composer.addPass(bloomPass);
+	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
     // document.addEventListener("keydown", onDocumentKeyEvent, true);

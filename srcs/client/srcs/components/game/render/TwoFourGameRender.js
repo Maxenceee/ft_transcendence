@@ -9,6 +9,13 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager, AlertBanner } from '../..';
 
+const colors = [
+	0xFD338B,
+	0x8B44EE,
+	0xFFD35C,
+	0xFD7435,
+];
+
 let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
@@ -226,21 +233,21 @@ function displayScore(data) {
 		render_data.pallet.push(new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
-				wireframe:false, 
-				color:0xff5ca3, 
+				wireframe: false, 
+				color: colors[0], 
 				opacity: 1, 
-				emissive:0xff5ca3,
-				side : THREE.DoubleSide,
+				emissive: colors[0],
+				side: THREE.DoubleSide,
 			})
 		));
 		render_data.pallet.push(new THREE.Mesh(
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
-				wireframe:false, 
-				color:0x9757ef, 
+				wireframe: false, 
+				color: colors[1], 
 				opacity: 1, 
-				emissive:0x9757ef,
-				side : THREE.DoubleSide,
+				emissive: colors[1],
+				side: THREE.DoubleSide,
 			})
 		));
 		let wallLeft = new THREE.Mesh(
@@ -268,21 +275,21 @@ function displayScore(data) {
 		let wallP2 = new THREE.Mesh(
 			new THREE.BoxGeometry(mapWidth - 1, 1, 1),
 			new THREE.MeshStandardMaterial({
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false,
+				color: 0xffffff,
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		);	
 		let wallP1 = new THREE.Mesh(
 			new THREE.BoxGeometry(mapWidth - 1, 1 , 1),
 			new THREE.MeshStandardMaterial({
-				wireframe:false,
-				color:0xffffff, 
+				wireframe: false,
+				color: 0xffffff,
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		);
 		wallP1.position.z += mapLenth / 2
@@ -313,9 +320,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xff5ca3, 
+				color: colors[0], 
 				opacity: 1, 
-				emissive: 0xff5ca3,
+				emissive: colors[0],
 				side: THREE.DoubleSide,
 			})
 		));
@@ -323,9 +330,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0x9757ef, 
+				color: colors[1], 
 				opacity: 1, 
-				emissive: 0x9757ef,
+				emissive: colors[1],
 				side: THREE.DoubleSide,
 			})
 		))
@@ -333,9 +340,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xffd35c, 
+				color: colors[2], 
 				opacity: 1, 
-				emissive: 0xffd35c,
+				emissive: colors[2],
 				side: THREE.DoubleSide,
 			})
 		));
@@ -343,9 +350,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xfd7435, 
+				color: colors[3], 
 				opacity: 1, 
-				emissive: 0xfd7435,
+				emissive: colors[3],
 				side: THREE.DoubleSide,
 			})
 		));
