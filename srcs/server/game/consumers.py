@@ -256,7 +256,12 @@ class AIPlayer:
 					if future_ball_x > 18.5 or future_ball_x <  -18.5:
 						tmp *=-1
 					i += 1
-				future_ball_x += random.uniform(-3.5, 3.5)
+				if future_ball_x + 3.4 > 18.5:
+					future_ball_x - 3.4
+				elif future_ball_x - 3.4 < -18.5:
+					future_ball_x + 3.4
+				else:
+					future_ball_x += random.choice([-3.4, 3.4])
 			dif = pad_x - future_ball_x
 			if int(dif) >= 0 and dir_z == -1:
 				for i in range(int(dif)):
@@ -501,6 +506,7 @@ class Game:
 				logging.error("game type not found")
 				return
 
+
 	def game_master_2p(self):
 		logging.info("game master 2p")
 		self.send_all("initGame", self.to_json())
@@ -739,6 +745,7 @@ class Game:
 					self.end_game()
 					return
 
+
 	def game_master_ai(self):
 		logging.info("game master ai")
 		self.ai_player.start()
@@ -807,6 +814,7 @@ class Game:
 					self.ai_player.stop()
 					self.end_game()
 					return
+
 
 	def game_master_tournament(self):
 		i = 0
