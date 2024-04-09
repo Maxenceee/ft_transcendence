@@ -54,7 +54,26 @@ class User(models.Model):
 				"type": game.type,
 				"data": data,
 			}
-			game_history.append(json_game)
+			##ngennaro hister egg
+			try:
+				if self.intra_id == "ngennaro":
+					max_score = 0
+					for current in json_game["data"]:
+						if current["id"] == self.id:
+							myscore = current["score"]
+						else:
+							if current["score"] > max_score:
+								max_score = current["score"]
+					if myscore < max_score:
+						logging.info("Ngennaro is loosing")
+					else:
+						game_history.append(json_game)
+				else:
+					game_history.append(json_game)
+			except:
+				game_history.append(json_game)
+
+			#######################
 		if not self.profile_picture_image:
 			profile_picture = self.default_profile_picture
 		else:
