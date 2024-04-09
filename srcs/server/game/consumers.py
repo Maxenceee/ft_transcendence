@@ -1081,56 +1081,68 @@ class Game:
 	def wall_collide_four_player(self):
 		if self.ball.x < -29 :
 			if self.players[2].score <= 0:
-				self.ball.direction_x *=-1
+				self.ball.direction_x = 1
 				return
 			self.players[2].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_z = 0
+			self.ball.direction_x = 0
+			while abs(self.ball.direction_x) + abs(self.ball.direction_z) < 0.5 :
+				self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+				self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			if self.players[2].score <= 0:
 				self.send_all("deletePallet", {"n" : 3})
 		elif self.ball.x > 29 :
 			if self.players[3].score <= 0:
-				self.ball.direction_x *= -1
+				self.ball.direction_x = -1
 				return
 			self.players[3].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_z = 0
+			self.ball.direction_x = 0
+			while abs(self.ball.direction_x) + abs(self.ball.direction_z) < 0.5 :
+				self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+				self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			if self.players[3].score <= 0:
 				self.send_all("deletePallet", {"n" : 2})
 		elif self.ball.z < -29:
 			if self.players[1].score <= 0:
-				self.ball.direction_z *= -1
+				self.ball.direction_z = 1
 				return
 			self.players[1].score -= 1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_z = 0
+			self.ball.direction_x = 0
+			while abs(self.ball.direction_x) + abs(self.ball.direction_z) < 0.5 :
+				self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+				self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			if self.players[1].score <= 0:
 				self.send_all("deletePallet", {"n" : 1})
 		elif self.ball.z > 29:
 			if self.players[0].score <= 0:
-				self.ball.direction_z *= -1
+				self.ball.direction_z = -1
 				return
 			self.players[0].score -=1
 			self.ball.x = 0
 			self.ball.z = 0 
 			self.ball.y = 0
-			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+			self.ball.direction_z = 0
+			self.ball.direction_x = 0
+			while abs(self.ball.direction_x) + abs(self.ball.direction_z) < 0.5 :
+				self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
+				self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			if self.players[0].score <= 0:
@@ -1194,10 +1206,11 @@ class Game:
 			if (player_id == 3 and self.players[2].score >= 1) :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = 1
+				self.ball.speed *= 1.2
 			elif player_id == 2 and self.players[3].score >= 1 :
 				self.ball.direction_z = (self.ball.z - self.players[player_id].pad_z)/4.5
 				self.ball.direction_x = -1
-			self.ball.speed *= 1.2
+				self.ball.speed *= 1.2
 		if (self.ball.speed > 5) :
 			self.ball.speed = 5
 
