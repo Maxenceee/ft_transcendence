@@ -131,18 +131,18 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	const Alight = new THREE.AmbientLight({ color: 0xffffff });
 	scene.add(Alight);
 
-	const skyLoader = new THREE.TextureLoader(loaderManager);
-	const sky = skyLoader.load("/static/images/background_sky_box.jpg", () => {
-		const skyboxGeo = new THREE.SphereGeometry(700);
-		const materialSky = new THREE.MeshPhysicalMaterial({
-			wireframe: false,
-			opacity: 1,
-			side: THREE.BackSide,
-			map: sky,
-		});
-		const skybox = new THREE.Mesh(skyboxGeo, materialSky);
-		scene.add(skybox);
-	});
+	// const skyLoader = new THREE.TextureLoader(loaderManager);
+	// const sky = skyLoader.load("/static/images/background_sky_box.jpg", () => {
+	// 	const skyboxGeo = new THREE.SphereGeometry(700);
+	// 	const materialSky = new THREE.MeshPhysicalMaterial({
+	// 		wireframe: false,
+	// 		opacity: 1,
+	// 		side: THREE.BackSide,
+	// 		map: sky,
+	// 	});
+	// 	const skybox = new THREE.Mesh(skyboxGeo, materialSky);
+	// 	scene.add(skybox);
+	// });
 
 	let font,
 		textGeo,
@@ -227,9 +227,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0xffffff, 
+				color:0xff5ca3, 
 				opacity: 1, 
-				emissive:0xffffff,
+				emissive:0xff5ca3,
 				side : THREE.DoubleSide,
 			})
 		));
@@ -237,9 +237,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry(6, 1, 1), 
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0xffffff, 
+				color:0x9757ef, 
 				opacity: 1, 
-				emissive:0xffffff,
+				emissive:0x9757ef,
 				side : THREE.DoubleSide,
 			})
 		));
@@ -269,9 +269,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry(mapWidth - 1, 1, 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false, 
-				color:0xff00ff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0xff00ff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);	
@@ -279,9 +279,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry(mapWidth - 1, 1 , 1),
 			new THREE.MeshStandardMaterial({
 				wireframe:false,
-				color:0x00ffff, 
+				color:0xffffff, 
 				opacity: 1, 
-				emissive:0x00ffff,
+				emissive:0xffffff,
 				side : THREE.DoubleSide,
 			})
 		);
@@ -313,9 +313,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xffffff, 
+				color: 0xff5ca3, 
 				opacity: 1, 
-				emissive: 0xffffff,
+				emissive: 0xff5ca3,
 				side: THREE.DoubleSide,
 			})
 		));
@@ -323,9 +323,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 6, 1, 1 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xffffff, 
+				color: 0x9757ef, 
 				opacity: 1, 
-				emissive: 0xffffff,
+				emissive: 0x9757ef,
 				side: THREE.DoubleSide,
 			})
 		))
@@ -333,9 +333,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xffffff, 
+				color: 0xffd35c, 
 				opacity: 1, 
-				emissive: 0xffffff,
+				emissive: 0xffd35c,
 				side: THREE.DoubleSide,
 			})
 		));
@@ -343,9 +343,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1, 1, 6 ), 
 			new THREE.MeshStandardMaterial({
 				wireframe: false, 
-				color: 0xffffff, 
+				color: 0xfd7435, 
 				opacity: 1, 
-				emissive: 0xffffff,
+				emissive: 0xfd7435,
 				side: THREE.DoubleSide,
 			})
 		));
@@ -353,9 +353,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial( {
 				wireframe: false, 
-				color: 0x00ffff, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive: 0x00ffff,
+				emissive: 0xffffff,
 				side: THREE.DoubleSide,
 			})
 		);
@@ -363,9 +363,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( 1 , 1,  mapLenth + 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe: false, 
-				color: 0x0000ff, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive: 0x0000ff,
+				emissive: 0xffffff,
 				side: THREE.DoubleSide,
 			})
 		);
@@ -375,9 +375,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( mapWidth - 1, 1, 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe: false, 
-				color: 0xff00ff, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive: 0xff00ff,
+				emissive: 0xffffff,
 				side: THREE.DoubleSide,
 			})
 		);	
@@ -385,9 +385,9 @@ function displayScore(data) {
 			new THREE.BoxGeometry( mapWidth - 1, 1 , 1 ),
 			new THREE.MeshStandardMaterial( {
 				wireframe:false,
-				color: new THREE.Color("rgb(255, 0, 0)"), 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive: new THREE.Color("rgb(255, 0, 0)"),		
+				emissive: 0xffffff,		
 				side: THREE.DoubleSide,
 			})
 		);
