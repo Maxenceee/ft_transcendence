@@ -115,7 +115,7 @@ class Ball:
 		self.z = 0
 		self.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 		self.direction_z = 1
-		self.speed = 1.05
+		self.speed = 1.50
 
 
 class Player:
