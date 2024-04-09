@@ -256,21 +256,21 @@ function displayScore(data) {
 		let wallLeft = new THREE.Mesh(
 			new THREE.BoxGeometry(1 , 1, mapLenth + 1),
 			new THREE.MeshStandardMaterial({
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		);
 		let wallRight = new THREE.Mesh(
 			new THREE.BoxGeometry(1 , 1,  mapLenth + 1),
 			new THREE.MeshStandardMaterial({
-				wireframe:false, 
-				color:0xffffff, 
+				wireframe: false, 
+				color: 0xffffff, 
 				opacity: 1, 
-				emissive:0xffffff,
-				side : THREE.DoubleSide,
+				emissive: 0xffffff,
+				side: THREE.DoubleSide,
 			})
 		);
 		wallRight.position.x += mapWidth / 2;
@@ -567,3 +567,5 @@ function displayScore(data) {
 };
 
 export default TwoFourGameRender;
+
+export { colors }

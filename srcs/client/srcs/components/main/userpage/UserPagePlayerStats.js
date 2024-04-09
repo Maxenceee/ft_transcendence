@@ -21,15 +21,15 @@ class UserPagePlayerStats extends Component {
 		return ({
 			normal: {
 				total: n.length,
-				wr: n.length > 0 ? ((n.filter(e => e).length / n.length) * 100).toFixed(0)+"%" : "none",
+				wr: n.length > 0 ? ((n.filter(e => e).length / n.length) * 100).toFixed(0)+"%" : "aucun",
 			},
 			four: {
 				total: f.length,
-				wr: f.length > 0 ? ((f.filter(e => e).length / f.length) * 100).toFixed(0)+"%" : "none",
+				wr: f.length > 0 ? ((f.filter(e => e).length / f.length) * 100).toFixed(0)+"%" : "aucun",
 			},
 			tournament: {
 				total: t.length,
-				wr: t.length > 0 ? ((t.filter(e => e).length / t.length) * 100).toFixed(0)+"%" : "none",
+				wr: t.length > 0 ? ((t.filter(e => e).length / t.length) * 100).toFixed(0)+"%" : "aucun",
 			},
 		})
 	}
@@ -83,7 +83,7 @@ class UserPagePlayerStats extends Component {
 							class: "note", children: "<count>  Jouées".replace("<count>", data.tournament.total)
 						}),
 						createElement('p', {
-							class: "note", children: "WR: <per>".replace("<per>", data.tournament.wr)
+							class: "note", children: "Ratio: <per>".replace("<per>", data.tournament.wr)
 						}),
 						createElement('div', {
 							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.tournament.wr), children: [

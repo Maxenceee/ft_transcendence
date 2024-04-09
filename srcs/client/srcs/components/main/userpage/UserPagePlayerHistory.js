@@ -1,59 +1,35 @@
-import { Component, createElement } from '../..';
+import { Component, createElement, link } from '../..';
+import { ismax } from '../../proto/Component';
 
 class UserPagePlayerHistory extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { user: props.user };
-	}
-
 	render() {
 		return createElement('div', {children: [
 			createElement('div', {
 				class: "history-card-content", children: (
-					(this.state.user.game_history && this.state.user.game_history.length) ?
-					this.state.user.game_history.sort((a, b) => a.date > b.date ? -1 : 1).map(game => {
-						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1)[0].id == this.state.user.id;
-						let s = game.data.sort((_, b) => b.id == this.state.user.id ? 1 : -1);
-						if (game.type === "2p") {
-							return createElement('div', {
-								class: "history-row", children: [
-									(
-										p ?
-										createElement('div', {
-											class: "win", children: "Victoire"
-										})
-										:
-										createElement('div', {
-											class: "lost", children: "Defaite"
-										})
-									),
+					(this.props.data && this.props.data.length) ?
+					this.props.data.sort((a, b) => a.date - b.date).map(game => {
+						let p = game.data.sort((a, b) => b.score - a.score);
+						let s = [...game.data].sort((_, b) => b.id == this.props.user_id ? 1 : -1);
+						return createElement('div', {
+							class: "history-row", children: [
+								(
+									p[0].id == this.props.user_id ?
 									createElement('div', {
-										class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
-									}),
-									createElement('div', {
-										class: "type", children: "Normal"
+										class: "win", children: "Victoire"
 									})
-								]
-							})
-						} else {
-							return createElement('div', {
-								class: "history-row", children: [
-									(
-										p ?
-										createElement('div', {
-											class: "win", children: "Victoire"
-										})
-										:
-										createElement('div', {
-											class: "lost", children: "Defaite"
-										})
-									),
+									:
 									createElement('div', {
-										class: "type", children: "4 Joueurs"
+										class: "lost", children: "Défaite"
 									})
-								]
-							})
-						}
+								),
+								(game.type != "4p" && game.type != "tournament") && createElement('div', {
+									class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
+								}),
+								createElement('div', {
+									class: "type lined-hover", children: game.type == "2p" ? link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A"}) : link({to: "/user/"+p[0].id, children: p[0].nickname || "N/A", class: ismax(p[0].id)}), title: p[0].nickname || "N/A"
+								})
+							]
+						})
 					})
 					:
 					createElement('div', {children:

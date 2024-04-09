@@ -547,6 +547,10 @@ body {
 	font-size: 14px !important;
 }
 
+.max-w {
+	max-width: 2500px !important;
+}
+
 .home {
 	display: grid;
 	grid:
@@ -595,6 +599,12 @@ header {
 		width: 128px;
 		background: var(--nav-background);
 		padding: 15px;
+
+		@media screen and (min-width: 2000px) {
+			border-radius: 30px;
+			width: 160px;
+			padding: 25px;
+		}
 	}
 	.nav-container {
 		color: #fff;
@@ -628,9 +638,19 @@ header {
 			background-color: rgba($color: #ffffff, $alpha: 0.4);
 		}
 
-		a {
-			width: 100%;
-			height: 100%;
+		svg {
+			width: 30px;
+			height: 30px;
+		}
+
+		@media screen and (min-width: 2000px) {
+			width: 90px;
+			height: 90px;
+
+			svg {
+				width: 40px;
+				height: 40px;
+			}
 		}
 	}
 }
@@ -645,6 +665,10 @@ main {
 		height: 100vh;
 		overflow-y: scroll;
 		padding-top: 50px;
+
+		@media screen and (min-width: 2000px) {
+			padding-top: 150px;
+		}
 	}
 
 	.featured-bar {
@@ -2208,7 +2232,6 @@ body:has(.connection-page) {
 			}
 
 			h2 {
-				margin: 2px;
 				line-break: anywhere;
 				font-size: 21px;
 				text-align: center;
@@ -2399,14 +2422,72 @@ body:has(.connection-page) {
 			}
 		}
 
-		.card-upload-form {}
+		@media screen and (min-width: 2000px) {
+			.card-header {
+				h2 {
+					font-size: 31px;
+					height: 51px;
+					line-height: 51px;
+				}
+	
+				h3 {
+					font-size: 24px;
+				}
+
+				.nickname-input {
+					border-radius: 30px;
+
+					input {
+						font-size: 31px;
+						height: 51px;
+					}
+				}
+
+				.nickname-action {
+					bottom: 11px;
+				}
+
+			}
+			.card-profile {
+				max-width: 350px;
+
+				.card-picture-action {
+					width: 48px;
+					height: 48px;
+					margin-left: -68px;
+					padding: 10px;
+				}
+			}
+
+			.dropdown {
+				right: 26px;
+				font-size: 20px;
+
+				.dropdown-item {
+					padding: 0.35rem 0.65rem 0.35rem 0.65rem;
+				}
+			}
+		}
 	}
 }
 
 .player-profile {
 	.card-container {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+		display: flex;
+		gap: 50px;
+		width: 100%;
+		justify-content: center;
+
+		.card-container-col {
+			display: flex;
+			flex-direction: column;
+
+			@media screen and (min-width: 2000px) {
+				flex-direction: row;
+			}
+
+			gap: 50px;
+		}
 	}
 }
 
@@ -2421,7 +2502,18 @@ body:has(.connection-page) {
 
 	.card-title {
 		margin: 0 0 20px 0;
-		font-size: 1.1em;
+		font-size: 18px;
+	}
+
+	@media screen and (min-width: 2000px) {
+		max-width: 400px;
+		min-width: 350px;
+
+		font-size: 20px;
+
+		.card-title {
+			font-size: 22px;
+		}
 	}
 }
 
@@ -2436,7 +2528,7 @@ body:has(.connection-page) {
 		padding: 0 10px;
 
 		.note {
-			font-size: 15px;
+			font-size: 1em;
 			font-weight: 400;
 		}
 
@@ -2446,7 +2538,7 @@ body:has(.connection-page) {
 			line-height: 1.5;
 
 			.progress-bar {
-				margin-top: 15px;
+				margin-top: 1em;
 			}
 		}
 	}
@@ -2454,7 +2546,7 @@ body:has(.connection-page) {
 	.progress-bar {
 		position: relative;
 		width: 100%;
-		height: 15px;
+		height: 1em;
 		border-radius: 20px;
 		overflow: hidden;
 		background-color: var(--progress-bar-color);
@@ -2498,6 +2590,10 @@ body:has(.connection-page) {
 	.type {
 		font-size: 16px;
 		font-weight: 500;
+
+		@media screen and (min-width: 2000px) {
+			font-size: 20px;
+		}
 	}
 	.win {
 		color: var(--green);
@@ -2506,8 +2602,19 @@ body:has(.connection-page) {
 		color: var(--red);
 	}
 
+	.type {
+		max-width: 150px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
 	.score {
-		font-size: 15px;
+		font-size: 16px;
+
+		@media screen and (min-width: 2000px) {
+			font-size: 20px;
+		}
 	}
 }
 

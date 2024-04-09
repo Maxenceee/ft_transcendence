@@ -34,11 +34,25 @@ class User(models.Model):
 	def to_json(self):
 		game_history = []
 		for game in self.game_history.all():
+			new = []
+			data = json.loads(game.data),
+			data = data[0]
+			for current in data:
+				id = current["id"]
+				score = current["score"]
+				user = User.objects.get(id=id)
+				nickname = user.nickname
+				if not self.profile_picture_image:
+					profile_picture = self.default_profile_picture
+				else:
+					profile_picture = settings.BASE_URL + "/api" + self.profile_picture_image.url,
+				new.append({"id": id, "nickname": nickname, "score": score, "profile_picture": profile_picture})
+			data = new
 			json_game = {
 				"id": game.id,
 				"date": int(game.date.timestamp()),
 				"type": game.type,
-				"data": json.loads(game.data),
+				"data": data,
 			}
 			game_history.append(json_game)
 		if not self.profile_picture_image:
