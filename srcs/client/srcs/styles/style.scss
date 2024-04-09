@@ -2602,6 +2602,13 @@ body:has(.connection-page) {
 		color: var(--red);
 	}
 
+	.type {
+		max-width: 150px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
 	.score {
 		font-size: 16px;
 
