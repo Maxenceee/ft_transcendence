@@ -138,18 +138,21 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	const Alight = new THREE.AmbientLight({ color: 0xffffff });
 	scene.add(Alight);
 
-	// const skyLoader = new THREE.TextureLoader(loaderManager);
-	// const sky = skyLoader.load("/static/images/background_sky_box.jpg", () => {
-	// 	const skyboxGeo = new THREE.SphereGeometry(700);
-	// 	const materialSky = new THREE.MeshPhysicalMaterial({
-	// 		wireframe: false,
-	// 		opacity: 1,
-	// 		side: THREE.BackSide,
-	// 		map: sky,
-	// 	});
-	// 	const skybox = new THREE.Mesh(skyboxGeo, materialSky);
-	// 	scene.add(skybox);
-	// });
+	const geometry = new THREE.BufferGeometry();
+	const vertices = [];
+
+	for ( let i = 0; i < 12000; i ++ ) {
+
+		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
+		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
+		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // z
+
+	}
+
+	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+	const particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
+	scene.add( particles );
 
 	let font,
 		textGeo,
