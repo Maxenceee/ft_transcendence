@@ -9,7 +9,7 @@ services:
         networks:
             - transcendence
         ports:
-            - 3000:80
+            - 3000:443
         volumes:
             - shared_data:/var/www/static/
         depends_on:
