@@ -39,13 +39,14 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	socket.onclose(onclose);
 	socket.onmessage((msg) => {
 		switch (msg.type) {
-			case "endGame": {
+			case "endGame":
 				socket.rmclose(onclose);
 				socket.close();
 				onfinish(msg.data);
-			} break;
-			// case "initPlayers":
-			// 	setplayers(msg.data);
+			break;
+			case "initPlayers":
+				setplayers(msg.data);
+				break;
 			// case "resetCam":
 			// 	setcam(10, 69, 0);
 			// 	break;
@@ -59,6 +60,7 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			// 	createText(msg.data.text, msg.data.size);
             case "setCam":
 				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
+				break;
 			default:
 				render_data.queue.push(msg);
 		}

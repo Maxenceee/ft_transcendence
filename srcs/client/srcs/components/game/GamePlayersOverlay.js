@@ -3,6 +3,13 @@ import { Component, createElement, Loader, useParams, navigate } from '..';
 import { colors } from './render/TwoFourGameRender';
 
 class GamePlayersOverlay extends Component {
+	parseColor(color) {
+		if (typeof color === 'number') {
+			color = '#' + ('00000' + (color | 0).toString(16)).substr(-6);
+		}
+		return color;
+	};
+
 	render() {
 		return this.props.players.length == 2 ?
 		createElement('div', {
@@ -42,7 +49,7 @@ class GamePlayersOverlay extends Component {
 						createElement('div', {
 							class: "game-player-profile", children: [
 								createElement('h1', {
-									children: player.nickname, style: `color: ${colors[i]};`
+									children: player.nickname, style: `color: ${this.parseColor(colors[i])};`
 								}),
 							]
 						}),
