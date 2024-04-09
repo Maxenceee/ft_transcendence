@@ -397,13 +397,13 @@ let tmp_user = {
 		{
 			"id": 2, "date": 1712590934, "type": "tournament",
 			"data": [
-				{"id": "max", "score": 1}, {"id": "RK6Ftpougi", "score": 3}, {"id": "3SbkJyRddF", "score": 1}, {"id": "qhIwrQGYTN", "score": 2}, {"id": "max", "score": 1}, {"id": "jrlWksamCf", "score": 4}, {"id": "9Us3UMEOER", "score": 2}, {"id": "6BHmf1HCsb", "score": 1}
+				{"id": "max", "score": 1}, {"id": "maxence", "score": 3, nickname: "max"}, {"id": "3SbkJyRddF", "score": 1}, {"id": "qhIwrQGYTN", "score": 2}, {"id": "max", "score": 1}, {"id": "jrlWksamCf", "score": 4}, {"id": "9Us3UMEOER", "score": 2}, {"id": "6BHmf1HCsb", "score": 1}
 			]
 		},
 		{
 			"id": 2, "date": 1712590934, "type": "4p",
 			"data": [
-				{"id": "max", "score": 1}, {"id": "RK6Ftpougi", "score": 3}, {"id": "3SbkJyRddF", "score": 1}, {"id": "qhIwrQGYTN", "score": 2}
+				{"id": "max", "score": 1}, {"id": "maxence", "score": 3, nickname: "Max"}, {"id": "3SbkJyRddF", "score": 1}, {"id": "qhIwrQGYTN", "score": 2}
 			]
 		},
 		{
