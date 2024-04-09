@@ -29,7 +29,7 @@ class UserPage extends Component {
 	}
 
 	getcards(uid, data) {
-		console.log();
+		console.log(uid);
 		let n = data.length && data.filter(e => e.type === "2p") || [];
 		let f = data.length && data.filter(e => e.type === "4p") || [];
 		let t = data.length && data.filter(e => e.type === "tournament") || [];
