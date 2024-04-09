@@ -27,13 +27,12 @@ class UserPagePlayerHistory extends Component {
 				class: "history-card-content", children: (
 					(this.props.data && this.props.data.length) ?
 					this.props.data.sort((a, b) => a.date > b.date ? -1 : 1).map(game => {
-						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1)[0].id == this.props.user_id;
+						let p = game.data.sort((a, b) => a.score > b.score ? -1 : 1);
 						let s = game.data.sort((_, b) => b.id == this.props.user_id ? 1 : -1);
-						console.log(p, s);
 						return createElement('div', {
 							class: "history-row", children: [
 								(
-									p ?
+									p[0].id == this.props.user_id ?
 									createElement('div', {
 										class: "win", children: "Victoire"
 									})
@@ -46,7 +45,7 @@ class UserPagePlayerHistory extends Component {
 									class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
 								}),
 								createElement('div', {
-									class: "type", children: link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A"}), title: s[1].nickname || "N/A"
+									class: "type lined-hover", children: link({to: "/user/"+p[0].id, children: s[1].nickname || "N/A"}), title: p[0].nickname || "N/A"
 								})
 							]
 						})
