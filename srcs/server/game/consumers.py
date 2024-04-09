@@ -934,6 +934,9 @@ class Game:
 					elif self.players[player_idx].gameNumber == 6:
 						self.send(player_idx, "setCam", {"x" : "130", "y" : "80", "z" : "200" , "camx" :"120.0", "camy" :"0", "camz" :"200.0"})
 				elif action == "disconnect":
+					user = User.objects.get(id=self.players[player_idx].id)
+					user.is_ingame = False
+					user.save()
 					if players[0].socket == self.players[player_idx].socket:
 						self.players[player_idx].score = 0
 						for current in self.players:
