@@ -435,6 +435,14 @@ class Game:
 					"profile_picture": profile_picture,
 				})
 		return players
+	
+	def init_players_tournament(self, terrain):
+		players = []
+		for player in self.players:
+			if player.gameNumber == terrain:
+				players.append(User.objects.get(id=player.id).resume_to_json())
+		return players
+
 
 
 	def to_json(self):
@@ -486,8 +494,8 @@ class Game:
 			self.end_game()
 			return
 
-		self.send_all("initPlayers", self.init_players())
 		if self.type != "tournament":
+			self.send_all("initPlayers", self.init_players())
 			self.send_start_message()
 
 		logging.info("all players ready")
@@ -959,8 +967,10 @@ class Game:
 					continue
 
 				if not is_init[currentGameId]:
-					# set camera
+					self.send(self.players.index(players[0]), "initPlayers", self.init_players_tournament(currentGameId))
+					self.send(self.players.index(players[1]), "initPlayers", self.init_players_tournament(currentGameId))
 					if currentGameId == 0:
+						self.send_all("initPlayers", self.init_players())
 						self.send(self.players.index(players[0]), "setCam", {"x" : "0", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "0", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
 					elif currentGameId == 1:
