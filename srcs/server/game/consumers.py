@@ -343,7 +343,7 @@ class Game:
 				nickname = user.nickname
 				profile_picture = user.default_profile_picture
 				if user.profile_picture_image:
-					profile_picture = settings.BASE_URL + "/api" + user.profile_pictulauch_games
+					profile_picture = settings.BASE_URL + "/api" + user.profile_picture_image.url
 				user.is_ingame = False
 				user.save()
 			players.append({"id": id, "nickname": nickname, "profile_picture": profile_picture, "score": player.score})
