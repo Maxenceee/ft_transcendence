@@ -46,14 +46,14 @@ class UserPage extends Component {
 							createElement(UserPagePlayerStats, {user: this.state.user})
 						]
 					}),
-					createElement('div', {
+					(n.length || (!f.length && !t.length)) && createElement('div', {
 						class: "history-card page-card", children: [
 							createElement('div', {
 								class: "card-title", children: createElement('h2', {
-									children: "Historique"
+									children: "Normale"
 								})
 							}),
-							createElement(UserPagePlayerHistory, {user_id: uid, data: n, title: "Normale"}),
+							createElement(UserPagePlayerHistory, {user_id: uid, data: n}),
 						]
 					}),
 				]
@@ -64,20 +64,20 @@ class UserPage extends Component {
 						class: "history-card page-card", children: [
 							createElement('div', {
 								class: "card-title", children: createElement('h2', {
-									children: "Historique"
+									children: "4 Joueurs"
 								})
 							}),
-							createElement(UserPagePlayerHistory, {user_id: uid, data: f, title: "4 Joueurs"}),
+							createElement(UserPagePlayerHistory, {user_id: uid, data: f}),
 						]
 					}),
 					t.length > 0 && createElement('div', {
 						class: "history-card page-card", children: [
 							createElement('div', {
 								class: "card-title", children: createElement('h2', {
-									children: "Historique"
+									children: "Tournoi"
 								})
 							}),
-							createElement(UserPagePlayerHistory, {user_id: uid, data: t, title: "Tournoi"}),
+							createElement(UserPagePlayerHistory, {user_id: uid, data: t}),
 						]
 					}),
 				]
