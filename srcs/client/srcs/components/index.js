@@ -19,4 +19,6 @@ export { default as navigate } from './utils/Navigate';
 
 export { default as xhr } from './xhr/XHR';
 
+export * from './error_page';
+
 export * from '../utils';
