@@ -1,4 +1,4 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, Socket } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket } from '..';
 import axios from "axios";
 
 class Main extends Component {
@@ -64,6 +64,7 @@ class Main extends Component {
 				router(
 					route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
 					route({path: "/500", element: createElement(ServerError)}),
+					route({path: "/418", element: createElement(TeaPot)}),
 					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 				)
 			})
