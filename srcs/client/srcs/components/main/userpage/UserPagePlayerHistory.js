@@ -7,7 +7,7 @@ class UserPagePlayerHistory extends Component {
 			createElement('div', {
 				class: "history-card-content", children: (
 					(this.props.data && this.props.data.length) ?
-					this.props.data.sort((a, b) => a.date - b.date).map(game => {
+					this.props.data.sort((a, b) => b.date - a.date).map(game => {
 						let p = game.data.sort((a, b) => b.score - a.score);
 						let s = [...game.data].sort((_, b) => b.id == this.props.user_id ? 1 : -1);
 						return createElement('div', {
@@ -26,7 +26,7 @@ class UserPagePlayerHistory extends Component {
 									class: "note score", children: "".concat(s[0].score, " - ", s[1].score)
 								}),
 								createElement('div', {
-									class: "type lined-hover", children: game.type == "2p" ? link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A", class: ismax(p[0].id)}) : link({to: "/user/"+p[0].id, children: p[0].nickname || "N/A", class: ismax(p[0].id)}), title: p[0].nickname || "N/A"
+									class: "type lined-hover", children: game.type == "2p" ? link({to: "/user/"+s[1].id, children: s[1].nickname || "N/A", class: ismax(s[1].id)}) : link({to: "/user/"+p[0].id, children: p[0].nickname || "N/A", class: ismax(p[0].id)})
 								})
 							]
 						})

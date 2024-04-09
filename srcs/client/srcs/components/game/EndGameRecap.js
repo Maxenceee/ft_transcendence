@@ -76,7 +76,11 @@ class EndGameRecap extends Component {
 											})
 										]
 									}),
-									this.button("Quitter", "/", true),
+									createElement('div', {
+										class: "dg-overlay-button invert", onclick: this.props.endGame, children: createElement('p', {
+											children: "Quitter"
+										})
+									})
 								]
 							}),
 						]
@@ -145,7 +149,11 @@ class EndGameRecap extends Component {
 							})
 						]
 					}),
-					this.button("Quitter", "/", true),
+					createElement('div', {
+						class: "dg-overlay-button invert", onclick: this.props.endGame, children: createElement('p', {
+							children: "Quitter"
+						})
+					})
 				]
 			}),
 		]

@@ -48,7 +48,7 @@ class GameView extends Component {
 
 	endGame() {
 		console.log("end game called", this.state.game_render);
-		navigate("/");
+		navigate("/")
 		this.props.reload();
 	}
 
@@ -78,7 +78,6 @@ class GameView extends Component {
 	}
 
 	render() {
-		// console.log("======================== GameView render ========================", this.state);
 		return (
 			this.state.loading ?
 			createElement(Loader)
@@ -86,18 +85,12 @@ class GameView extends Component {
 			createElement('div', {
 				class: "render-context", children: [
 					!this.state.endGameData && createElement('div', {
-						class: "back-button", onclick: () => this.endGame(), children: "Quitter"
+						class: "back-button", onclick: this.endGame, children: "Quitter"
 					}),
 					this.state.players && createElement(GamePlayersOverlay, {players: this.state.players}),
 					createElement(KeyBindsView, {type: this.state.type}),
 					this.state.game_render && this.state.game_render.render(),
-					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData, newGame: this.newGame, type: this.state.type})
-					// createElement(EndGameRecap, {type: this.state.type, data: [
-					// 	{id: "3", score: 0, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"},
-					// 	{id: "maxence", score: 5, nickname: "Max", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=7516293836"},
-					// 	// {id: "2", score: 0, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"},
-					// 	// {id: "4", score: 0, nickname: "Marvin", profile_picture: "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"}
-					// ]})
+					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData, newGame: this.newGame, endGame: this.endGame, type: this.state.type})
 				]
 			})
 		)
