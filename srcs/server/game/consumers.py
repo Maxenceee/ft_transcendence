@@ -941,13 +941,13 @@ class Game:
 						self.players[player_idx].score = 0
 						for current in self.players:
 							if players[1].socket == current.socket:
-								current.score = 5
+								current.score = 3
 								break
 					else:
 						self.players[player_idx].score = 0
 						for current in self.players:
 							if players[0].socket == current.socket:
-								current.score = 5
+								current.score = 3
 								break
 
 			for currentGameId in range(7):
@@ -989,7 +989,7 @@ class Game:
 				self.pad_collision_tournament(currentGameId, 0)
 				self.pad_collision_tournament(currentGameId, 1)
 				for player in players:
-					if player.score  > 4 :
+					if player.score  > 2 :
 						logging.info(f"player {player.id} won the match {currentGameId}")
 						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "295", "z" : "-139", "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
