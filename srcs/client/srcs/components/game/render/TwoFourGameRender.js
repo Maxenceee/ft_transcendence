@@ -476,7 +476,7 @@ function displayScore(data) {
 
 	let animationid = null,
 		ts = Date.now();
-	const animate = async () => {
+	const animate = () => {
 		renderer.render(scene, camera);
 		composer.render();
 		controls.update();
