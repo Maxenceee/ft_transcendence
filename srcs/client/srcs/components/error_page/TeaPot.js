@@ -79,7 +79,7 @@ function createNewTeapot(scene, effectController) {
 		);
 		teapot = new THREE.Mesh( geometry,new THREE.MeshStandardMaterial({
 			wireframe:true, 
-			color:0x00ff00, 
+			color:0xffffff, 
 			opacity: 1, 
 			side : THREE.DoubleSide,
 		}));
