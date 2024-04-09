@@ -9,7 +9,12 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager, AlertBanner } from '../..';
 
-const colors = [0xff5ca4, 0x9857ef, 0xffd970, 0xfd9e72];
+const colors = [
+	0xF21365,
+	0xF22797,
+	0x434D59,
+	0x63D8F2,
+];
 
 let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
@@ -559,3 +564,5 @@ function displayScore(data) {
 };
 
 export default TwoFourGameRender;
+
+export { colors }

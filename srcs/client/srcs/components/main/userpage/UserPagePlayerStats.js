@@ -83,7 +83,7 @@ class UserPagePlayerStats extends Component {
 							class: "note", children: "<count>  Jouées".replace("<count>", data.tournament.total)
 						}),
 						createElement('p', {
-							class: "note", children: "WR: <per>".replace("<per>", data.tournament.wr)
+							class: "note", children: "Ratio: <per>".replace("<per>", data.tournament.wr)
 						}),
 						createElement('div', {
 							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.tournament.wr), children: [

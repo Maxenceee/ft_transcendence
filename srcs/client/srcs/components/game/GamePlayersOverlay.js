@@ -1,5 +1,7 @@
 import { Component, createElement, Loader, useParams, navigate } from '..';
 
+import { colors } from './render/TwoFourGameRender';
+
 class GamePlayersOverlay extends Component {
 	render() {
 		return this.props.players.length == 2 ?
@@ -40,7 +42,7 @@ class GamePlayersOverlay extends Component {
 						createElement('div', {
 							class: "game-player-profile", children: [
 								createElement('h1', {
-									children: player.nickname,
+									children: player.nickname, style: `color: ${colors[i]};`
 								}),
 							]
 						}),

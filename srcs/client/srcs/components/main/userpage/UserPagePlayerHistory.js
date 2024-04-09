@@ -24,7 +24,7 @@ class UserPagePlayerHistory extends Component {
 										})
 										:
 										createElement('div', {
-											class: "lost", children: "Defaite"
+											class: "lost", children: "Défaite"
 										})
 									),
 									createElement('div', {
@@ -45,7 +45,7 @@ class UserPagePlayerHistory extends Component {
 										})
 										:
 										createElement('div', {
-											class: "lost", children: "Defaite"
+											class: "lost", children: "Défaite"
 										})
 									),
 									createElement('div', {
