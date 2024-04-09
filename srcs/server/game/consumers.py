@@ -570,6 +570,7 @@ class Game:
 					self.end_game()
 					return
 
+
 	def game_master_4p(self):
 		logging.info("game master 4p")
 		for player in self.players:
@@ -668,14 +669,19 @@ class Game:
 			for player in self.players:
 				if player.score < 1:
 					i += 1
-					if player not in classement:
+					if player not in classement and player.index != 2 and player.index != 3:
 						classement.append(player)
+					elif player.index == 2 and self.players[3] not in classement:
+						classement.append(self.players[3])
+					elif player.index == 3 and self.players[2] not in classement:
+						classement.append(self.players[2])
 				if i >= 3:
-					self.players.index(classement[0]).score = -3
-					self.players.index(classement[1]).score = -2
-					self.players.index(classement[2]).score = -1
+					classement[0].score = -3
+					classement[1].score = -2
+					classement[2].score = -1
 					self.end_game()
 					return
+
 
 	def game_master_local(self):
 		logging.info("game master local")
