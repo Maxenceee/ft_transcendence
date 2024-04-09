@@ -1047,7 +1047,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z *= -1
 			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 
 		elif self.ball.z > 29:
 			self.players[1].score +=1
@@ -1057,7 +1057,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z *= -1
 			self.ball.direction_x = random.uniform(math.pi * -1 + 1, math.pi - 1)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 		if (self.ball.speed > 5):
 			self.ball.speed = 5
 		if (self.ball.speed > 5):
@@ -1078,7 +1078,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 2, "score": self.players[2].score})
 			if self.players[2].score <= 0:
 				self.send_all("deletePallet", {"n" : 3})
@@ -1092,7 +1092,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 3, "score": self.players[3].score})
 			if self.players[3].score <= 0:
 				self.send_all("deletePallet", {"n" : 2})
@@ -1106,7 +1106,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 1, "score": self.players[1].score})
 			if self.players[1].score <= 0:
 				self.send_all("deletePallet", {"n" : 1})
@@ -1120,7 +1120,7 @@ class Game:
 			self.ball.y = 0
 			self.ball.direction_z = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
 			self.ball.direction_x = random.uniform((math.pi * -1 + 1) * 0.666, (math.pi - 1) * 0.666)
-			self.ball.speed = 1.05
+			self.ball.speed = 1.75
 			self.send_all("updateScore", {"n": 0, "score": self.players[0].score})
 			if self.players[0].score <= 0:
 				self.send_all("deletePallet", {"n" : 0})
