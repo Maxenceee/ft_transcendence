@@ -151,7 +151,7 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	const fontLoader = new FontLoader(loaderManager);
 	fontLoader.load('/static/fonts/font.json', function (response) {
 		font = response;
-		createText("En attente d'un joueur...", 2.5);
+		createText(type == "4p" ? "En attente de joueurs..." : "En attente d'un joueur...", 2.5);
 	});
 
 	const materials = [
@@ -205,7 +205,7 @@ function displayScore(data) {
 		render_data.scores = [];
 		for (let i = 0; i < data.length; i++) {
 
-			render_data.scores.push(createTextObject((data[i].score || 0).toString()));
+			render_data.scores.push(createTextObject(Math.max(data[i].score || 0, 0).toString()));
 			render_data.scores[i].position.y += 6;
 		}
 		render_data.scores[0].rotateY((Math.PI / 2) * 2);
@@ -311,7 +311,7 @@ function displayScore(data) {
 
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -321,7 +321,7 @@ function displayScore(data) {
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 6, 1, 1 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -331,7 +331,7 @@ function displayScore(data) {
 		))
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -341,7 +341,7 @@ function displayScore(data) {
 		));
 		render_data.pallet.push(new THREE.Mesh( 
 			new THREE.BoxGeometry( 1, 1, 6 ), 
-			new THREE.MeshStandardMaterial( {
+			new THREE.MeshStandardMaterial({
 				wireframe: false, 
 				color: 0xffffff, 
 				opacity: 1, 
@@ -463,7 +463,7 @@ function displayScore(data) {
 				render_data.keyCodes["down_arrow_key"] = d;
 				break;
 			case 82:
-				d && (
+				type != "4p" && d && (
 					setcam(0.01, 80, 0),
 					controls.target.set(0, 0, 0)
 				)

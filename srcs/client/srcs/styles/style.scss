@@ -184,6 +184,9 @@ button span {
 	--progress-filled-color-s: 39.4;
 	--progress-filled-color-l: 49.2;
 
+	--green: #0c6c37;
+	--red: #bc2123;
+
 	--href-color: #0969da;
 
 	--friend-bg: #F189C8;
@@ -390,6 +393,11 @@ body {
 	padding-right: 20px !important;
 }
 
+.px-80 {
+	padding-left: 80px !important;
+	padding-right: 80px !important;
+}
+
 .px-f4 {
 	padding-left: 32px !important;
 	padding-right: 32px !important;
@@ -398,6 +406,11 @@ body {
 .px-f5 {
 	padding-left: 64px !important;
 	padding-right: 64px !important;
+}
+
+.px-f6 {
+	padding-left: 128px !important;
+	padding-right: 128px !important;
 }
 
 .pt-0 {
@@ -2452,7 +2465,7 @@ body:has(.connection-page) {
 			left: 0;
 			bottom: 0;
 			width: var(--value);
-			background-color: #0c6c37;
+			background-color: var(--green);
 		}
 		:last-child {
 			position: absolute;
@@ -2460,7 +2473,7 @@ body:has(.connection-page) {
 			bottom: 0;
 			left: var(--value);
 			width: calc(100% - var(--value));
-			background-color: #bc2123;
+			background-color: var(--red);
 		}
 	}
 }
@@ -2487,10 +2500,10 @@ body:has(.connection-page) {
 		font-weight: 500;
 	}
 	.win {
-		color: #0c6c37;
+		color: var(--green);
 	}
 	.lost {
-		color: #bc2123;
+		color: var(--red);
 	}
 
 	.score {
@@ -2881,12 +2894,12 @@ body:has(.connection-page) {
 
 					&.on {
 						&::before {
-							background-color: #0c6c37;
+							background-color: var(--green);
 						}
 					}
 					&.off {
 						&::before {
-							background-color: #bc2123;
+							background-color: var(--red);
 						}
 					}
 				}
@@ -3002,8 +3015,8 @@ body:has(.connection-page) {
 .game-keyboard {
 	--overlay-major: var(--border-active);
 	position: fixed;
-	bottom: 40px;
-	right: 25px;
+	bottom: 100px;
+	right: 40px;
 
 	display: flex;
 	flex-direction: row;
@@ -3011,14 +3024,14 @@ body:has(.connection-page) {
 
 	.game-keyboard-moves,
 	.game-keyboard-shortcut {
-		gap: 25px;
+		gap: 35px;
 
 		.key {
 			position: relative;
-			width: 50px;
-			height: 50px;
+			width: 60px;
+			height: 60px;
 			color: var(--overlay-major);
-			font-size: 30px;
+			font-size: 35px;
 			text-align: center;
 			border-radius: 15px;
 			border: solid 2px var(--border-active);
@@ -3028,10 +3041,10 @@ body:has(.connection-page) {
 
 			& > p {
 				position: absolute;
-				font-size: 10px;
+				font-size: 15px;
 				left: 0;
 				right: 0;
-				top: calc(100% + 5px);
+				top: calc(100% + 10px);
 			}
 		}
 	}
@@ -3151,24 +3164,50 @@ body:has(.connection-page) {
 		backdrop-filter: blur(6px);
 		-webkit-backdrop-filter: blur(6px);
 		border-radius: 20px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
 	}
 
 	.dg-overlay-player-cnt {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		gap: 50px;
+		gap: 80px;
+
+		&.grid {
+			display: grid;
+			grid-template-columns: 1fr 1fr 1fr 1fr;
+			grid-template-areas: "second first . .";
+			align-items: flex-start;
+
+			& > :nth-child(1) {
+				grid-area: first;
+			}
+
+			& > :nth-child(2) {
+				grid-area: second;
+			}
+		}
+
+		&.podium {
+			@for $i from 1 through 4 {
+				& > :nth-child(#{$i}) {
+					margin-top: 50px * ($i - 1);
+				}
+			}
+		}
 	}
 
 	.dg-overlay-player {
 		width: 250px;
-		height: 100%;
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		flex-direction: column;
 		width: 100%;
 		max-width: 300px;
-		gap: 30px;
+		gap: 50px;
 		padding: 0 15px;
 
 		.profile-picture {
@@ -3186,6 +3225,18 @@ body:has(.connection-page) {
 				width: 100%;
 				height: 100%;
 				object-fit: cover;
+			}
+		}
+
+		.dg-overlay-player-score {
+			font-weight: 500;
+			font-size: 25px;
+			color: var(--red);
+		}
+
+		&:first-child {
+			.dg-overlay-player-score {
+				color: var(--green);
 			}
 		}
 	}
@@ -3224,7 +3275,7 @@ body:has(.connection-page) {
 		background-color: var(--primary-action-color);
 		border-radius: 20px;
 		color: #FFF;
-		padding: 10px 20px;
+		padding: 10px 45px;
 		font-size: 18px;
 		margin-top: 20px;
 

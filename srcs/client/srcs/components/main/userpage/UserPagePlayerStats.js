@@ -47,7 +47,7 @@ class UserPagePlayerStats extends Component {
 							class: "note", children: "<count> Jouées".replace("<count>", data.normal.total)
 						}),
 						createElement('p', {
-							class: "note", children: "WR: <per>".replace("<per>", data.normal.wr)
+							class: "note", children: "Ratio: <per>".replace("<per>", data.normal.wr)
 						}),
 						createElement('div', {
 							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.normal.wr), children: [
@@ -65,7 +65,7 @@ class UserPagePlayerStats extends Component {
 							class: "note", children: "<count> Jouées".replace("<count>", data.four.total)
 						}),
 						createElement('p', {
-							class: "note", children: "WR: <per>".replace("<per>", data.four.wr)
+							class: "note", children: "Ratio: <per>".replace("<per>", data.four.wr)
 						}),
 						createElement('div', {
 							class: "progress-bar", style: "--value: <per>;".replace("<per>", data.four.wr), children: [

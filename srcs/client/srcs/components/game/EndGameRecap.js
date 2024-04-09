@@ -70,7 +70,7 @@ class EndGameRecap extends Component {
 							createElement('div', {
 								class: "", children: [
 									createElement('div', {
-										class: "dg-overlay-button", onclick: () => this.props.newGame(this.props.type), children: [
+										class: "dg-overlay-button px-80", onclick: () => this.props.newGame(type), children: [
 											createElement('p', {
 												children: "Rejouer"
 											})
@@ -102,12 +102,53 @@ class EndGameRecap extends Component {
 		]
 	}
 
-	fourPlayers(players) {
-		return createElement('div', {
-			children: [
+	fourPlayers(type, players) {
+		players.sort((a, b) => b.score - a.score);
+		let getGrade = (id) => {
+			return (id == 1 && "1er" || id + "ème");
+		};
 
-			]
-		})
+		return [
+			createElement('div', {
+				class: "mb-10", children: [
+					createElement('h1', {
+						class: "dg-overlay-vs-title", children: "Partie à 4"
+					})
+				]
+			}),
+			createElement('div', {
+				class: "dg-overlay-player-cnt podium grid", children: players.map((e, i) => {
+					return createElement('div', {
+						class: "dg-overlay-player", children: [
+							createElement('h2', {
+								class: "dg-overlay-player-score", children: getGrade(i + 1)
+							}),
+							createElement('div', {
+								class: "profile-picture", children: createElement('img', {
+									src: e.profile_picture
+								}),
+							}),
+							createElement('h1', {
+								children: e.nickname || "N/A",
+							}),
+							e.id && this.button("Voir le profil", "/user/" + e.id) || createElement('div')
+						]
+					})
+				})
+			}),
+			createElement('div', {
+				class: "", style: "display: inline-block;", children: [
+					createElement('div', {
+						class: "dg-overlay-button px-80", onclick: () => this.props.newGame(type), children: [
+							createElement('p', {
+								children: "Rejouer"
+							})
+						]
+					}),
+					this.button("Quitter", "/", true),
+				]
+			}),
+		]
 	}
 
 	render() {
