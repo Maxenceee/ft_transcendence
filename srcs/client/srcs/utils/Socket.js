@@ -168,9 +168,9 @@ s.serverDelayAlert = function(a) {
 		return ;
 	let m;
 	if (a == 1)
-		m = "You have a slow connection, you may experiment some delay.";
+		m = "Votre connexion est lente, vous pouvez rencontrer une certaine latence.";
 	else if (a == 2)
-		m = "You have a very poor connection, you should check your connection.";
+		m = "Vous avez une très mauvaise connexion, vous devriez vérifier votre connexion.";
 	else
 		return ;
 	new AlertBanner({ message: m, delay: 5000 });

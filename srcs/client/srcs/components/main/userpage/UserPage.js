@@ -185,7 +185,7 @@ class UserNicknameField extends Component {
 		})
 		.catch(error => {
 			console.error("error", error);
-			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 		})
 	}
 
@@ -251,7 +251,7 @@ class UserProfilePicture extends Component {
 			this.props.reload(null, false);
 		})
 		.catch(error => {
-			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 		});
 	}
 
@@ -264,7 +264,7 @@ class UserProfilePicture extends Component {
 			this.props.reload(null, false);
 		})
 		.catch(error => {
-			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 			this.setState({ loading: false });
 		});
 	}

@@ -45,7 +45,11 @@ class HomePage extends Component {
 								class: "oa-container", children: [
 									createElement('div', {
 										class: "section-header", children: createElement('h1', {
-											children: ("Bonjour <user>, commençons à jouer !").replace("<user>", this.state.user.nickname), class: ismax(this.state.user.id)
+											children: [
+												"Bonjour ", createElement('span', {
+													children: this.state.user.nickname, class: ismax(this.state.user.id)
+												}), ", commençons à jouer !"
+											]
 										})
 									}),
 									createElement('div', {

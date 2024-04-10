@@ -1,4 +1,4 @@
-import { Component, createElement, link } from '..';
+import { AlertBanner, Component, createElement, link } from '..';
 import axios from "axios";
 import { ismax } from '../proto/Component';
 
@@ -60,7 +60,7 @@ class FriendsPanel extends Component {
 		})
 		.catch(error => {
 			// console.error("error", error);
-			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 		})
 	}
 
@@ -73,7 +73,7 @@ class FriendsPanel extends Component {
 		})
 		.catch(error => {
 			// console.error("error", error);
-			new AlertBanner({ message: error.response.data.error || "An error occured, please try again later.", color: "error"});
+			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 		})
 	}
 

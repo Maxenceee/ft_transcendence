@@ -2670,7 +2670,7 @@ body:has(.connection-page) {
 	bottom: 10px;
 	right: 20px;
 	background-color: #555;
-	padding: 5px 10px;
+	padding: 10px 20px;
 	z-index: 8000;
 	border-radius: 8px;
 	display: flex;
@@ -2703,8 +2703,8 @@ body:has(.connection-page) {
 	}
 
 	p {
-		line-height: 35px;
-		font-size: 15px;
+		// line-height: 30px;
+		font-size: 21px;
 		line-break: anywhere;
 		color: #FFF;
 	}
@@ -2715,7 +2715,7 @@ body:has(.connection-page) {
 		bottom: 0;
 		left: 0;
 		background-color: #FFF;
-		height: 3px;
+		height: 5px;
 	}
 }
 

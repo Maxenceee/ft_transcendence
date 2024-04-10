@@ -1,4 +1,4 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket, AlertBanner } from '..';
 import axios from "axios";
 
 class Main extends Component {
@@ -33,7 +33,7 @@ class Main extends Component {
 		})
 		.catch(error => {
 			// console.error("error", error);
-			this.setState({ loading: false, error: "An error occured, please try again later." });
+			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
 		})
 	}
 
