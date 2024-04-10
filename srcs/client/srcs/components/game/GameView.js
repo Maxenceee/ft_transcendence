@@ -5,16 +5,18 @@ import TournamentGameRender from './render/TournamentGameRender';
 import EndGameRecap from './EndGameRecap';
 import GamePlayersOverlay from './GamePlayersOverlay';
 import KeyBindsView from './KeyBindsView';
+import TournamentBracketOverlay from './TournamentBracketOverlay';
 
 class GameView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { loading: true, game_render: null, type: "", players: null, endGameData: null };
+		this.state = { loading: true, game_render: null, type: "", players: null, bracketData: null, endGameData: null };
 
 		this.setplayers = this.setplayers.bind(this);
 		this.endGame = this.endGame.bind(this);
 		this.finishGame = this.finishGame.bind(this);
 		this.newGame = this.newGame.bind(this);
+		this.updateBracket = this.updateBracket.bind(this);
 	}
 
 	componentDidMount() {
@@ -39,12 +41,14 @@ class GameView extends Component {
 	}
 
 	setplayers(data) {
-		console.log("set player", data);
 		this.setState({players: data});
 	}
 
+	updateBracket(data) {
+		this.setState({bracketData: data});
+	}
+
 	endGame() {
-		console.log("end game called", this.state.game_render);
 		navigate("/")
 		this.props.reload();
 	}
@@ -53,7 +57,6 @@ class GameView extends Component {
 		console.log("finish game", data);
 		this.state.game_render && this.state.game_render.unmount();
 		window.onbeforeunload = null;
-		// console.log(data);
 		this.setState({endGameData: data.players});
 	}
 
@@ -67,7 +70,7 @@ class GameView extends Component {
 		let onload = () => this.setState({loading: false});
 
 		if (type == "tournament") {
-			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
+			this.setState({game_render: TournamentGameRender(null, onload, this.endGame, this.finishGame, this.setplayers, this.updateBracket, {width: window.innerWidth, height: window.innerHeight})});
 		} else {
 			this.setState({game_render: TwoFourGameRender(type, onload, this.endGame, this.finishGame, this.setplayers, {width: window.innerWidth, height: window.innerHeight})});
 		}
@@ -85,6 +88,7 @@ class GameView extends Component {
 					}),
 					this.state.players && createElement(GamePlayersOverlay, {players: this.state.players}),
 					createElement(KeyBindsView, {type: this.state.type}),
+					(this.state.type == "tournament" && this.state.bracketData) && createElement(TournamentBracketOverlay, {data: this.state.bracketData}),
 					this.state.game_render && this.state.game_render.render(),
 					this.state.endGameData && createElement(EndGameRecap, {data: this.state.endGameData, newGame: this.newGame, endGame: this.endGame, type: this.state.type})
 				]

@@ -276,6 +276,26 @@ body {
 	justify-content: center !important;
 }
 
+.gap-10 {
+	gap: 10px !important;
+}
+
+.gap-15 {
+	gap: 15px !important;
+}
+
+.gap-20 {
+	gap: 20px !important;
+}
+
+.gap-25 {
+	gap: 25px !important;
+}
+
+.gap-30 {
+	gap: 30px !important;
+}
+
 .margin-bottom-0 {
 	margin-bottom: 0px !important;
 }
@@ -3429,6 +3449,74 @@ body:has(.connection-page) {
 			background-color: transparent;
 			outline: 1px solid var(--primary-action-color);
 			outline-offset: -1px;
+		}
+	}
+}
+
+.bracket-overlay {
+	position: fixed;
+	bottom: 100px;
+	left: 40px;
+	padding: 20px 25px;
+	background-color: rgba(42, 46, 64, 0.05);
+	backdrop-filter: blur(2px);
+	-webkit-backdrop-filter: blur(2px);
+	border-radius: 20px;
+	color: #fff;
+
+	.bracket-overlay-cnt {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 25px;
+	}
+
+	.bracket-playground {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		align-items: center;
+
+		.playground-separator {
+			height: 3px;
+			width: 3px;
+			margin-top: 5px;
+			background-color: currentColor;
+		}
+
+		.playground-player {
+			line-height: 25px;
+			height: 25px;
+			min-width: 100px;
+			max-width: 150px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			text-align: center;
+		}
+	}
+
+	.bracket-link {
+		position: relative;
+
+		&::before {
+			content: '';
+			position: absolute;
+			top: -17px;
+			left: calc(25% - 10px);
+			right: calc(25% - 10px);
+			height: 3px;
+			background-color: currentColor;
+		}
+
+		&::after {
+			content: '';
+			position: absolute;
+			top: -14px;
+			left: calc(25% - 10px);
+			right: calc(25% - 10px);
+			height: 14px;
+			border-left: solid 3px currentColor;
+			border-right: solid 3px currentColor;
 		}
 	}
 }

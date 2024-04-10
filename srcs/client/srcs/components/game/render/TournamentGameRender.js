@@ -9,7 +9,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 
 import { Socket, LoadManager } from '../..';
 
-let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
+let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers, updateBracket, {width, height} = {width: window.innerWidth, height: window.innerHeight}) {
 	let render_data = {
 		pallet: [],
 		ball: null,
