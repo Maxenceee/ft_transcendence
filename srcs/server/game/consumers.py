@@ -1004,7 +1004,6 @@ class Game:
 						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "295", "z" : "-139", "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send_all("gameState", self.tournament_state())
-						self.send_all("updateBracket", self.update_bracket())
 						if player.gameNumber == 0 or player.gameNumber == 1:
 							for current in self.players:
 								if player.socket == current.socket:
@@ -1012,7 +1011,7 @@ class Game:
 										"id": "X",
 										"nickname": "En attente...",
 									}
-									self.send(self.players.index(current), "initPlayers", message)
+									self.send(self.players.index(current), "initPlayers", [message])
 									current.gameNumber = 4
 									current.score = 0
 									break
@@ -1023,7 +1022,7 @@ class Game:
 										"id": "X",
 										"nickname": "En attente...",
 									}
-									self.send(self.players.index(current), "initPlayers", message)
+									self.send(self.players.index(current), "initPlayers", [message])
 									current.gameNumber = 5
 									current.score = 0
 									break
@@ -1034,7 +1033,7 @@ class Game:
 										"id": "X",
 										"nickname": "En attente...",
 									}
-									self.send(self.players.index(current), "initPlayers", message)
+									self.send(self.players.index(current), "initPlayers", [message])
 									current.gameNumber = 6
 									current.score = 0
 									break
@@ -1045,6 +1044,7 @@ class Game:
 									logging.info(f"player {current.id} won the tournament")
 									self.end_game()
 									return
+						self.send_all("updateBracket", self.update_bracket())
 
 			t += 1
 			if time.time() - l > 1:

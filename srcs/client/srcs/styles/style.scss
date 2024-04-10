@@ -2229,6 +2229,7 @@ body:has(.connection-page) {
 	display: flex;
 	justify-content: center;
 	padding-top: 70px;
+	gap: 100px;
 
 	svg {
 		width: 100%;
@@ -2241,6 +2242,7 @@ body:has(.connection-page) {
 		align-items: center;
 		padding: 0 10px;
 		gap: 30px;
+		width: 350px;
 
 		.card-header {
 			// margin-bottom: 30px;
@@ -2259,6 +2261,7 @@ body:has(.connection-page) {
 				text-align: center;
 				height: 31px;
 				margin: 7px;
+				width: 100%;
 			}
 
 			h3 {
@@ -2288,6 +2291,7 @@ body:has(.connection-page) {
 				padding: 5px 10px;
 				border-radius: 20px;
 				border: solid 2px var(--border-active);
+				// width: 410px;
 
 				input {
 					height: 100%;
@@ -2302,7 +2306,7 @@ body:has(.connection-page) {
 					font-weight: 700;
 					color: inherit;
 					font-family: inherit;
-					// width: 310px;
+					// width: 100%;
 
 					&::placeholder {
 						color: var(--border-active);
@@ -2500,19 +2504,13 @@ body:has(.connection-page) {
 		// width: 100%;
 		// justify-content: center;
 		display: flex;
-		flex: 1 auto;
 		justify-content: center;
 		flex-wrap: wrap;
 
-		.card-container-col {
-			// display: flex;
-			// flex-direction: column;
-
-			// @media screen and (min-width: 2000px) {
-			// 	flex-direction: row;
-			// }
-
-			// gap: 50px;
+		@media screen and (min-width: 2000px) {
+			flex: 1 auto;
+			max-width: max-content;
+			flex-wrap: nowrap;
 		}
 	}
 }
