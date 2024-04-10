@@ -47,5 +47,5 @@ createElement('div', {
         createElement('div', {
             class: "inner", children: "Sign in with Swivel"
         })
-    ]
+    })
 })

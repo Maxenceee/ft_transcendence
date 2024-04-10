@@ -1,10 +1,10 @@
-import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket, AlertBanner } from '..';
+import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket, AlertBanner, ConnectionPage, Cookies } from '..';
 import axios from "axios";
 
-class Main extends Component {
+class MainView extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: null, loading: true, error: null, socket: null};
+		this.state = { loading: true, error: null, socket: null};
 	}
 
 	connectSocket() {
@@ -21,25 +21,8 @@ class Main extends Component {
 		this.setState({socket: socket});
 	}
 
-	loadUser(callBack = null, loading = true) {
-		console.log("load user");
-		if (loading) {
-			this.setState({ loading: true });
-		}
-		axios.get('/api/user/me/get')
-		.then(res => res.data)
-		.then(data => {
-			this.setState({ user: data, loading: false }, callBack);
-		})
-		.catch(error => {
-			// console.error("error", error);
-			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
-		})
-	}
-
 	componentDidMount() {
 		// console.log("==================== Main mounted ====================");
-		this.loadUser();
 		this.connectSocket();
 	}
 
@@ -62,13 +45,61 @@ class Main extends Component {
 			:
 			createElement(BrowserRouter, {children:
 				router(
-					route({path: "/game/:type", element: createElement(GameView, {reload: this.loadUser.bind(this)})}),
+					route({path: "/game/:type", element: createElement(GameView, {reload: this.props.reload})}),
 					route({path: "/500", element: createElement(ServerError)}),
 					route({path: "/418", element: createElement(TeaPot)}),
-					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
+					route({path: "/*", element: createElement(MainRouter, {user: this.props.user, reload: this.props.reload})}),
 				)
 			})
-			// createElement(ConnectionPage)
+		)
+	}
+}
+
+class Main extends Component {
+	constructor(props) {
+		super(props);
+		this.state = { user: null, connected: false };
+
+		this.loadUser = this.loadUser.bind(this);
+	}
+
+	componentDidMount() {
+		if (!Cookies.get('token').length) {
+			return this.setState({ connected: false });
+		}
+		this.loadUser();
+	}
+
+	// componentDidUpdate() {
+	// 	if (!Cookies.get('token').length) {
+	// 		return this.setState({ connected: false });
+	// 	}
+	// }
+
+	loadUser(callBack = null, loading = true) {
+		if (loading) {
+			this.setState({ loading: true });
+		}
+		axios.get('/api/user/me/get')
+		.then(res => res.data)
+		.then(data => {
+			if (data.missingAuth) {
+				return this.setState({ connected: false, loading: false, user: null });
+			}
+			this.setState({ user: data, loading: false, connected: true }, callBack);
+		})
+		.catch(error => {
+			// console.error("error", error);
+			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
+		})
+	}
+
+	render() {
+		return (
+			!this.state.connected ?
+			createElement(ConnectionPage, {reload: this.loadUser})
+			:
+			createElement(MainView, {user: this.state.user, reload: this.loadUser})
 		)
 	}
 }

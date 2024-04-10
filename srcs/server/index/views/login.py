@@ -27,25 +27,29 @@ def login(request):
 			return render(request, 'views/connection.html')
 		elif request.method == "POST":
 			if 'login' not in request.POST or 'password' not in request.POST:
-				return render(request, 'views/connection.html', {"is_invalid": True})
+				# return render(request, 'views/connection.html', {"is_invalid": True})
+				return JsonResponse({'error': 'Bad request', "user": False, "authenticated": False}, status=400)
 			username = request.POST['login']
 			password = request.POST['password']
 			if not username or not password:
-				return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+				# return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
 			
 			if User.objects.filter(username=username).exists():
 				user = User.objects.get(username=username)
 				try :
 					if pbkdf2.verify(password, user.password):
 						token = makeid(100)
-						response = redirect("/")
+						response = JsonResponse(status=200)
 						Token.objects.create(token=token, user=user)
 						response.set_cookie(key='token', value=token, httponly=True, expires=7*24*60*60, samesite='Lax')
 						return response
 				except:
-					return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
-			return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
-		else :
+					# return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+					return JsonResponse({'error': 'Invalid username or password', "user": True, "authenticated": False}, status=200)
+			# return render(request, 'views/connection.html', {"login": username, "is_invalid": True})
+			return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
+		else:
 			return JsonResponse({'error': 'Method not allowed'}, status=405)
 	except:
 		return JsonResponse({'error': 'Bad request'}, status=400)
@@ -57,17 +61,21 @@ def signup(request):
 			return render(request, 'views/connection.html', { "is_signup": True, "action_url": "/signup"})
 		elif request.method == "POST":
 			if 'login' not in request.POST or 'password' not in request.POST:
-				return render(request, 'views/connection.html', {"is_invalid": True, "is_signup": True, "action_url": "/signup"})
+				# return render(request, 'views/connection.html', {"is_invalid": True, "is_signup": True, "action_url": "/signup"})
+				return JsonResponse({'error': 'Bad request', "user": False, "authenticated": False}, status=400)
 			username = request.POST['login']
 			password = request.POST['password']
 			if not username or not password:
-				return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
+				# return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
+				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
 			
 			if len(username) < 3 or len(username) > 20 or len(password) < 3 or len(password) > 20:
-				return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
+				# return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
+				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
 			
 			if User.objects.filter(username=username).exists():
-				return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
+				# return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
+				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False, "exists": True}, status=200)
 
 			password = pbkdf2.hash(password)
 			id = makeid(10)
@@ -84,7 +92,7 @@ def signup(request):
 				nickname = f"{nickname}_{makeid(5)}"		
 
 			user = User.objects.create(id=id, nickname=nickname, username=username, password=password, default_profile_picture=default_profile_picture)
-			response = redirect("/")
+			response =  JsonResponse(status=200)
 
 			token = makeid(100)
 			Token.objects.create(token=token, user=user)
