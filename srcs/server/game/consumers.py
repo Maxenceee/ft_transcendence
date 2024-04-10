@@ -1263,16 +1263,19 @@ class WebsocketClient(WebsocketConsumer):
 		except:
 			self.close()
 			return
-		for i in data:
-			if b'cookie' in i:
-				cookie = i[1].decode('utf-8')
-				cookie = cookie.split(';')
-				for j in cookie:
-					j = j.strip()
-					j = j.split('=')
-					cookies[j[0]] = j[1]
 		
-		logging.info("new player connected")
+		try:
+			for i in data:
+				if b'cookie' in i:
+					cookie = i[1].decode('utf-8')
+					cookie = cookie.split(';')
+					for j in cookie:
+						j = j.strip()
+						j = j.split('=')
+						cookies[j[0]] = j[1]
+		except:
+			self.close()
+			return
 		try:
 			token = cookies['token']
 		except:
