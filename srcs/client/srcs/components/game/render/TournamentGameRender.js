@@ -78,7 +78,7 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 
 	const controls = new OrbitControls(camera, renderer.domElement);
 	const scene = new THREE.Scene();
-	controls.maxDistance = 10000;
+	controls.maxDistance = 500;
 	controls.target.set(0, 0, 0);
 	controls.update();
 
