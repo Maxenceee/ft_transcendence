@@ -34,11 +34,11 @@ class SwivelButton extends Component {
 	redirect = () => window.location.assign(this.authPath);
 
 	componentDidMount() {
-		this.target.addEventListener("click", this.redirect, { passive: true });
+		this.ref.current.addEventListener("click", this.redirect, { passive: true });
 	}
 
 	componentWillUnmount() {
-		this.target.removeEventListener("click", this.redirect, { passive: true });
+		this.ref.current.removeEventListener("click", this.redirect, { passive: true });
 	}
 
 	render() {
