@@ -47,6 +47,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 			case "initPlayers":
 				setplayers(msg.data);
 				break;
+			case "updateBracket":
+				updateBracket(msg.data);
+				break;
             case "setCam":
 				setcamTournament(msg.data.x, msg.data.y, msg.data.z, msg.data.camx, msg.data.camy, msg.data.camz);
 				break;
