@@ -1008,18 +1008,33 @@ class Game:
 						if player.gameNumber == 0 or player.gameNumber == 1:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 4
 									current.score = 0
 									break
 						elif player.gameNumber == 2 or player.gameNumber == 3:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 5
 									current.score = 0
 									break
 						elif player.gameNumber == 4 or player.gameNumber == 5:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 6
 									current.score = 0
 									break
