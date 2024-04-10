@@ -62,7 +62,7 @@ class GameView extends Component {
 
 	newGame(type) {
 		this.state.game_render && this.state.game_render.unmount();
-		this.setState({loading: true, game_render: null, type: type, players: null, endGameData: null});
+		this.setState({loading: true, game_render: null, type: type, players: null, endGameData: null, bracketData: null});
 		window.onbeforeunload = (e) => {
 			e.preventDefault();
 			return "Quitter cette page vous fera perdre cette partie.\nÊtes-vous sûr de vouloir quitter ?";
