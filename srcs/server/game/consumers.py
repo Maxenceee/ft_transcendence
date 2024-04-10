@@ -970,7 +970,6 @@ class Game:
 					self.send(self.players.index(players[0]), "initPlayers", self.init_players_tournament(currentGameId))
 					self.send(self.players.index(players[1]), "initPlayers", self.init_players_tournament(currentGameId))
 					if currentGameId == 0:
-						self.send_all("initPlayers", self.init_players())
 						self.send(self.players.index(players[0]), "setCam", {"x" : "0", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "0", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
 					elif currentGameId == 1:
