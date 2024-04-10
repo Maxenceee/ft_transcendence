@@ -1,45 +1,9 @@
 createElement('div', {
-    children: [
-        createElement('div', {
-            class: ""
-        }),
-        createElement('div', {
-            class: "", children: [
-                createElement('div', {
-                    class: "", children: [
-                        createElement('div', {
-                            class: ""
-                        }),
-                        createElement('div', {
-                            class: "", children: [
-                                createElement('div', {
-                                    class: ""
-                                }),
-                                createElement('div', {
-                                    class: ""
-                                })
-                            ]
-                        })
-                    ]
-                }),
-                createElement('div', {
-                    class: "", children: [
-                        createElement('div', {
-                            class: ""
-                        }),
-                        createElement('div', {
-                            class: "", children: [
-                                createElement('div', {
-                                    class: ""
-                                }),
-                                createElement('div', {
-                                    class: ""
-                                })
-                            ]
-                        })
-                    ]
-                })
-            ]
+    children: createElement('div', {
+        class: "auth-unauthorized", children: createElement('div', {
+            class: "in", children: createElement('div', {
+                "aria-atomic": "true", role: "alert", children: " Ce nom d'utilisateur n'est pas disponible."
+            })
         })
-    ]
+    })
 })
