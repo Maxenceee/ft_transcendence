@@ -2,6 +2,7 @@ import { Component, createElement, navigate } from '..';
 import axios from 'axios';
 import LoginComp from './LoginComp';
 import RegisterComp from './RegisterComp';
+import SwivelButton from '../auth/SwivelButton';
 
 class InputSection extends Component {
 	constructor(props) {
@@ -29,7 +30,9 @@ class InputSection extends Component {
 
 	onSubmit(e) {
 		e.preventDefault();
+		console.log(this.formref.current);
 		let data = new FormData(this.formref.current);
+		console.log(data);
 		this.password_ref.current.value = "";
 		axios.post(this.state.register ? '/signup' : '/login', data)
 		.then(res => res.data)
@@ -119,7 +122,13 @@ class InputSection extends Component {
 														]
 													}),
 													createElement('div', {
-														ref: this.ref, class: "external-connect-btn"
+														ref: this.ref, class: "external-connect-btn", children: createElement(SwivelButton, {
+															client_id: process.env.SWIVEL_CLIENT_ID,
+															redirect_uri: window.location.origin,
+															callback: window.location.origin.concat("/callback/swivel"),
+															scope: "user:profile",
+															disable_colormode: true
+														})
 													})
 												]
 											})

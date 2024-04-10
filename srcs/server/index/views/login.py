@@ -24,7 +24,7 @@ def makeid(length):
 def login(request):
 	try:
 		if request.method == "GET":
-			return render(request, 'views/connection.html')
+			return render(request, 'views/index.html')
 		elif request.method == "POST":
 			if 'login' not in request.POST or 'password' not in request.POST:
 				# return render(request, 'views/connection.html', {"is_invalid": True})
@@ -58,7 +58,7 @@ def login(request):
 def signup(request):
 	try:
 		if request.method == "GET":
-			return render(request, 'views/connection.html', { "is_signup": True, "action_url": "/signup"})
+			return render(request, 'views/index.html')
 		elif request.method == "POST":
 			if 'login' not in request.POST or 'password' not in request.POST:
 				# return render(request, 'views/connection.html', {"is_invalid": True, "is_signup": True, "action_url": "/signup"})
@@ -89,7 +89,7 @@ def signup(request):
 
 			nickname = username
 			while User.objects.filter(nickname=nickname).exists():
-				nickname = f"{nickname}_{makeid(5)}"		
+				nickname = f"{nickname}_{makeid(5)}"
 
 			user = User.objects.create(id=id, nickname=nickname, username=username, password=password, default_profile_picture=default_profile_picture)
 			response =  JsonResponse(status=200)
@@ -160,12 +160,12 @@ def callback_intra(request):
 def callback_swivel(request):
 	try:
 		code = request.GET.get('code', '')
-		SWIVEL_USER = os.environ.get('SWIVEL_USER')
+		SWIVEL_CLIENT_ID = os.environ.get('SWIVEL_CLIENT_ID')
 		SWIVEL_SECRET = os.environ.get('SWIVEL_SECRET')
 		id = None
 
 		data = {
-			'client_id': SWIVEL_USER,
+			'client_id': SWIVEL_CLIENT_ID,
 			'client_secret': SWIVEL_SECRET,
 			'code': code,
 		}

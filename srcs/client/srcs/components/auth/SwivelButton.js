@@ -1,10 +1,11 @@
-import { Component } from "..";
+import { Component, createElement } from "..";
 
 class SwivelButton extends Component {
 	constructor(props) {
 		super(props);
 
 		this.ref = { current: null };
+		this.authPath = "https://auth0.maxencegama.dev/o/auth";
 
 		let state = (function() {
 			let t = {
@@ -19,7 +20,7 @@ class SwivelButton extends Component {
 			}
 			return (n(t));
 		})();
-		this.authPath.concat("?client_id=", props.client_id, "&state=", state, "&response_type=token&redirect_uri=", props.callback, "&scope=", props.scope);
+		this.authPath = this.authPath.concat("?client_id=", props.client_id, "&state=", state, "&response_type=token&redirect_uri=", props.callback, "&scope=", props.scope);
 		if (!props.disable_colormode) {
 			let matchMedia = window.matchMedia("(prefers-color-scheme: dark)");
 			let theme = () => {
