@@ -63,7 +63,12 @@ def api_update_user(request):
 			return JsonResponse({'error': 'Nickname too short'}, status=400)
 		if len(data['nickname']) > 20:
 			return JsonResponse({'error': 'Nickname too long'}, status=400)
-		user.nickname = data['nickname']
+		
+		nickname = data['nickname']
+		if User.objects.filter(nickname=nickname).exists():
+			return JsonResponse({'error': 'Nickname already exist'}, status=400)
+
+		user.nickname = nickname
 		user.save()
 		return JsonResponse({'message': 'Succes'}, status=200)
 	except:

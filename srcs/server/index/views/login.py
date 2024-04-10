@@ -78,7 +78,12 @@ def signup(request):
 			if (default_profile_picture == None):
 				logging.error("Failed to get default profile picture")
 				default_profile_picture = ""
-			user = User.objects.create(id=id, nickname=username, username=username, password=password, default_profile_picture=default_profile_picture)
+
+			nickname = username
+			while User.objects.filter(nickname=nickname).exists():
+				nickname = f"{nickname}_{makeid(5)}"		
+
+			user = User.objects.create(id=id, nickname=nickname, username=username, password=password, default_profile_picture=default_profile_picture)
 			response = redirect("/")
 
 			token = makeid(100)
@@ -125,7 +130,11 @@ def callback_intra(request):
 			while User.objects.filter(id=id).exists():
 				id = makeid(10)
 
-			user = User.objects.create(id=id, nickname=intra_id, intra_id=intra_id, default_profile_picture=default_profile_picture)
+			nickname = intra_id
+			while User.objects.filter(nickname=nickname).exists():
+				nickname = f"{nickname}_{makeid(5)}"
+
+			user = User.objects.create(id=id, nickname=nickname, intra_id=intra_id, default_profile_picture=default_profile_picture)
 		else:
 			user = User.objects.get(intra_id=intra_id)
 
@@ -174,7 +183,11 @@ def callback_swivel(request):
 			while User.objects.filter(id=id).exists():
 				id = makeid(10)
 
-			user = User.objects.create(id=id, nickname=swivel_username, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
+			nickname = swivel_username
+			while User.objects.filter(nickname=nickname).exists():
+				nickname = f"{nickname}_{makeid(5)}"
+
+			user = User.objects.create(id=id, nickname=nickname, swivel_id=swivel_id, default_profile_picture=default_profile_picture)
 		else:
 			user = User.objects.get(swivel_id=swivel_id)
 
