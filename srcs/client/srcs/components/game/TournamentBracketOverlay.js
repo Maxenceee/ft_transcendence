@@ -46,7 +46,7 @@ class TournamentBracketOverlay extends Component {
 							createElement('div', {
 								class: "flex flex-column items-center gap-30", children: [
 									createElement('div', {
-										class: "", children: this.playground(...(data[4] || []))
+										class: "", children: this.playground(...(data[5] || []))
 									}),
 									createElement('div', {
 										class: "flex flex-row gap-30 bracket-link", children: [
@@ -63,7 +63,7 @@ class TournamentBracketOverlay extends Component {
 							createElement('div', {
 								class: "flex flex-column items-center gap-30", children: [
 									createElement('div', {
-										class: "", children: this.playground(...(data[5] || []))
+										class: "", children: this.playground(...(data[4] || []))
 									}),
 									createElement('div', {
 										class: "flex flex-row gap-30 bracket-link", children: [

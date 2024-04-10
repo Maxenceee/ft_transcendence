@@ -145,7 +145,7 @@ app.use('/oui', (req, res) => {
 let tmp_user = {
 	"id": "max",
 	"nickname": "Max",
-	"username": "max",
+	"username": "maxence",
 	"is_online": false,
 	"profile_picture": "https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/2023-03-01-23-34-51.png",
 	"following": [

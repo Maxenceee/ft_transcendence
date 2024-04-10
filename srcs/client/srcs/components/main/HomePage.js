@@ -1,20 +1,15 @@
 import { Component, createElement, link } from '..';
+import { ismax } from '../proto/Component';
 
 class HomePage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { user: props.user, reload: props.reload, scrollTop: 0 };
 		this.ref = {current: null};
-
-		// this.handleScroll = this.handleScroll.bind(this);
 	}
 
 	componentDidMount() {
 		console.log("this.componentDidMount HomePage Page");
-	}
-
-	componentWillUnmount() {
-		// console.log("this.componentWillUnmount HomePage Page");
 	}
 
 	playButton() {
@@ -50,7 +45,7 @@ class HomePage extends Component {
 								class: "oa-container", children: [
 									createElement('div', {
 										class: "section-header", children: createElement('h1', {
-											children: ("Bonjour <user>, commençons à jouer !").replace("<user>", this.state.user.nickname)
+											children: ("Bonjour <user>, commençons à jouer !").replace("<user>", this.state.user.nickname), class: ismax(this.state.user.id)
 										})
 									}),
 									createElement('div', {
