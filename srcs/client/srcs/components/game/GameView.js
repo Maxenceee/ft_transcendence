@@ -18,7 +18,6 @@ class GameView extends Component {
 	}
 
 	componentDidMount() {
-		// console.log("componentDidMount GameView", this);
 		let a = useParams("/game/:type") ?? {params: {type: null}},
 			{ type } = a.params;
 		if (!type) {
@@ -28,7 +27,6 @@ class GameView extends Component {
 	}
 
 	componentDidUpdate() {
-		// console.log("componentDidUpdate GameView", this.state.game_render);
 		if (this.state.game_render) {
 			this.state.game_render.animationid() && cancelAnimationFrame(this.state.game_render.animationid());
 			this.state.game_render.start(this.state);
@@ -38,7 +36,6 @@ class GameView extends Component {
 	componentWillUnmount() {
 		this.state.game_render && this.state.game_render.unmount();
 		window.onbeforeunload = null;
-		// console.log("game view unmounted", this.state.game_render);
 	}
 
 	setplayers(data) {
@@ -64,9 +61,8 @@ class GameView extends Component {
 		this.state.game_render && this.state.game_render.unmount();
 		this.setState({loading: true, game_render: null, type: type, players: null, endGameData: null});
 		window.onbeforeunload = (e) => {
-			// display a message to the user
 			e.preventDefault();
-			return "Quitting this page will stop the game and you will lose the game.\nAre you sure you want to quit?";
+			return "Quitter cette page vous fera perdre cette partie.\nÊtes-vous sûr de vouloir quitter ?";
 		}
 		let onload = () => this.setState({loading: false});
 

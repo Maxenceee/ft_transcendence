@@ -2204,8 +2204,10 @@ body:has(.connection-page) {
 
 .player-container {
 	position: relative;
-	display: grid;
-	grid-template-columns: 1fr 2.5fr;
+	// display: grid;
+	// grid-template-columns: 1fr 2.5fr;
+	display: flex;
+	justify-content: center;
 	padding-top: 70px;
 
 	svg {
@@ -2473,20 +2475,24 @@ body:has(.connection-page) {
 
 .player-profile {
 	.card-container {
-		display: flex;
+		// display: flex;
 		gap: 50px;
-		width: 100%;
+		// width: 100%;
+		// justify-content: center;
+		display: flex;
+		flex: 1 auto;
 		justify-content: center;
+		flex-wrap: wrap;
 
 		.card-container-col {
-			display: flex;
-			flex-direction: column;
+			// display: flex;
+			// flex-direction: column;
 
-			@media screen and (min-width: 2000px) {
-				flex-direction: row;
-			}
+			// @media screen and (min-width: 2000px) {
+			// 	flex-direction: row;
+			// }
 
-			gap: 50px;
+			// gap: 50px;
 		}
 	}
 }
@@ -2495,10 +2501,10 @@ body:has(.connection-page) {
 .history-card {
 	width: 100%;
 	max-width: 300px;
-	margin: 0 auto auto auto;
 	// display: flex;
 	// flex-direction: column;
 	padding: 20px 30px;
+	height: max-content;
 
 	.card-title {
 		margin: 0 0 20px 0;
@@ -3304,6 +3310,19 @@ body:has(.connection-page) {
 				}
 			}
 		}
+
+		$totalChildren: 8;
+
+		@media screen and (max-width: 2000px) {
+			gap: 40px;
+
+			@for $i from 5 through $totalChildren {
+				&:nth-child(#{$i}) {
+					display: none;
+				}
+			}
+		}
+  
 	}
 
 	.dg-overlay-player {
@@ -3315,6 +3334,14 @@ body:has(.connection-page) {
 		max-width: 300px;
 		gap: 50px;
 		padding: 0 15px;
+		
+		@media screen and (max-with: 2000px) {
+			gap: 20px;
+
+			.profile-picture {
+				max-width: 120px;
+			}
+		}
 
 		.profile-picture {
 			display: inline-block;
