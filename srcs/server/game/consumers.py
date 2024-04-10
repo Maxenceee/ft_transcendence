@@ -969,6 +969,7 @@ class Game:
 				if not is_init[currentGameId]:
 					self.send(self.players.index(players[0]), "initPlayers", self.init_players_tournament(currentGameId))
 					self.send(self.players.index(players[1]), "initPlayers", self.init_players_tournament(currentGameId))
+					self.send_all("updateBracket", self.update_bracket())
 					if currentGameId == 0:
 						self.send(self.players.index(players[0]), "setCam", {"x" : "0", "y" : "30", "z" : "60" , "camx" :"0", "camy" :"0", "camz" :"0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "0", "y" : "30", "z" : "-60", "camx" :"0", "camy" :"0", "camz" :"0"})
@@ -1003,21 +1004,37 @@ class Game:
 						self.send(self.players.index(players[0]), "setCam", {"x" : "120", "y" : "295", "z" : "-139" , "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send(self.players.index(players[1]), "setCam", {"x" : "120", "y" : "295", "z" : "-139", "camx" :"120.0", "camy" :"213.0", "camz" :"-82.0"})
 						self.send_all("gameState", self.tournament_state())
+						self.send_all("updateBracket", self.update_bracket())
 						if player.gameNumber == 0 or player.gameNumber == 1:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 4
 									current.score = 0
 									break
 						elif player.gameNumber == 2 or player.gameNumber == 3:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 5
 									current.score = 0
 									break
 						elif player.gameNumber == 4 or player.gameNumber == 5:
 							for current in self.players:
 								if player.socket == current.socket:
+									message = {
+										"id": "X",
+										"nickname": "En attente...",
+									}
+									self.send(self.players.index(current), "initPlayers", message)
 									current.gameNumber = 6
 									current.score = 0
 									break
@@ -1054,6 +1071,14 @@ class Game:
 		}
 		return response
 	
+
+	def update_bracket(self):
+		players = []
+		for player in self.players:
+			user = User.objects.get(id=player.id)
+			players.append({"nickname": user.nickname, "gameNumber" : player.gameNumber})
+		return players
+
 	def wall_collide_two_player(self):
 		if self.ball.x < -18.5 :
 			self.ball.direction_x *= -1
