@@ -1,4 +1,4 @@
-import Component from "../proto/Component";
+import { Component } from "..";
 
 class SwivelButton extends Component {
 	constructor(props) {
