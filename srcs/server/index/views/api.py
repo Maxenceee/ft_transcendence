@@ -87,6 +87,12 @@ def api_update_picture(request):
 		if content_type not in ['image/jpeg', 'image/png']:
 			return JsonResponse({'error': 'Format de fichier non supporté. Seuls les fichiers JPEG et PNG sont acceptés.'}, status=400)
 
+		try:
+			tmp = Image.open(profile_picture)
+			tmp.verify()
+		except:
+			return JsonResponse({'error': 'Image invalide'}, status=400)
+
 		user.profile_picture_image = profile_picture
 		user.save()
 		return JsonResponse({'message': 'Photo de profil mise à jour avec succès.'})
