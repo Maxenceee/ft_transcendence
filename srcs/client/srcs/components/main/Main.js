@@ -1,7 +1,7 @@
 import { Component, createElement, BrowserRouter, MainRouter, GameView, router, route, Loader, BadConnection, ServerError, TeaPot, Socket, AlertBanner, ConnectionPage, Cookies } from '..';
 import axios from "axios";
 
-class MainView extends Component {
+class Main extends Component {
 	constructor(props) {
 		super(props);
 		this.state = { loading: true, error: null, socket: null};
