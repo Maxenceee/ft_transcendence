@@ -118,7 +118,13 @@ def callback_intra(request):
 			intra_data = intra_data.json()
 			intra_id = intra_data['login']
 
-			if "image" in intra_data and "versions" in intra_data['image'] and "medium" in intra_data['image']['versions']:
+			if intra_id == "mbrement":
+				default_profile_picture = "/static/images/teapot.gif"
+			elif intra_id == "elamadon":
+				default_profile_picture = "/static/images/bh_elisa.gif"
+			elif intra_id == "ngennaro":
+				default_profile_picture = "/static/images/tkt_matrix.gif"
+			elif "image" in intra_data and "versions" in intra_data['image'] and "medium" in intra_data['image']['versions']:
 				default_profile_picture = intra_data['image']['versions']['medium']
 			else:
 				default_profile_picture = get_new_default_profile_picture()

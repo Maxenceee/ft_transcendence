@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 import logging
 import base64
 
-
 class User(models.Model):
 	index = models.AutoField(primary_key=True)
 	id = models.CharField(max_length=10)
