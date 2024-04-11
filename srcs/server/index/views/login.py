@@ -122,6 +122,9 @@ def callback_intra(request):
 				default_profile_picture = intra_data['image']['versions']['medium']
 			else:
 				default_profile_picture = get_new_default_profile_picture()
+				if (default_profile_picture == None):
+					logging.error("Failed to get default profile picture")
+					default_profile_picture = ""
 		except:
 			return redirect("/login")
 
@@ -174,6 +177,11 @@ def callback_swivel(request):
 				id = "maxence"
 			swivel_username = swivel_data['username']
 			default_profile_picture = swivel_data['profile_picture']
+			if default_profile_picture == None:
+				default_profile_picture = get_new_default_profile_picture()
+				if (default_profile_picture == None):
+					logging.error("Failed to get default profile picture")
+					default_profile_picture = ""
 		except:
 			return redirect("/login")
 
