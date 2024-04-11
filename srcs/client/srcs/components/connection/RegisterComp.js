@@ -37,7 +37,7 @@ class RegisterComp extends Component {
 												class: "_9nyy2", children: "Nom d'utilisateur"
 											}),
 											createElement('input', {
-												class: "_2hvTZ pexuQ zyHYP", id: "identifierU", autocomplete: "current-username", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "text", "aria-required": "true", name: "login", value: this.state.login, oninput: this.onInput
+												class: "_2hvTZ pexuQ zyHYP", id: "identifierU", autocomplete: "current-username", minlength: "3", maxlength: "10", autocorrect: "off", autocapitalize: "off", required: "", type: "text", "aria-required": "true", name: "login", value: this.state.login, oninput: this.onInput
 											})
 										]
 									})
@@ -49,7 +49,7 @@ class RegisterComp extends Component {
 												class: "_9nyy2", children: "Mot de passe"
 											}),
 											createElement('input', {
-												class: "_2hvTZ pexuQ zyHYP", id: "identifierP", autocomplete: "current-password", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", required: "", type: "password", "aria-required": "true", "aria-label": "password", name: "password", value: this.state.password, oninput: this.onInput
+												class: "_2hvTZ pexuQ zyHYP", id: "identifierP", autocomplete: "current-password", minlength: "3", maxlength: "10", autocorrect: "off", autocapitalize: "off", required: "", type: "password", "aria-required": "true", "aria-label": "password", name: "password", value: this.state.password, oninput: this.onInput
 											})
 										]
 									})

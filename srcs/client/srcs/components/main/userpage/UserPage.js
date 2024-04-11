@@ -190,7 +190,7 @@ class UserNicknameField extends Component {
 	}
 
 	validinput() {
-		return this.state.nickname.length >= 3 && this.state.nickname.length <= 20;
+		return this.state.nickname.length >= 3 && this.state.nickname.length <= 10;
 	}
 
 	render() {
@@ -201,7 +201,7 @@ class UserNicknameField extends Component {
 					[
 						createElement('div', {
 							class: "nickname-input", children: createElement('input', {
-								ref: this.ref, value: this.state.nickname, placeholder: "Surnom", oninput: e => this.setState({nickname: e.target.value}), autocomplete:"off", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", type:"text"
+								ref: this.ref, value: this.state.nickname, placeholder: "Surnom", oninput: e => this.setState({nickname: e.target.value}), autocomplete:"off", minlength: "3", maxlength: "10", autocorrect: "off", autocapitalize: "off", type:"text"
 							})
 						}),
 						this.validinput() && createElement('div', {

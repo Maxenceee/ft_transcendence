@@ -61,7 +61,7 @@ def api_update_user(request):
 			return JsonResponse({'error': 'Missing nickname'}, status=400)
 		if len(data['nickname']) < 3:
 			return JsonResponse({'error': 'Nickname too short'}, status=400)
-		if len(data['nickname']) > 20:
+		if len(data['nickname']) > 10:
 			return JsonResponse({'error': 'Nickname too long'}, status=400)
 		
 		nickname = data['nickname']
