@@ -10,18 +10,9 @@ class Router extends Component {
 		R.register(this);
 	}
 
-	componentDidMount() {
-		// console.log("====== Router Mounted ======", this);
-	}
-
-	componentDidUpdate() {
-		// console.log("====== Router Updated ======", this);
-	}
-
 	componentWillUnmount() {
 		R.pop(this);
 		this.props.children.forEach(child => child.propagateUnmount());
-		// console.log("====== Router Unmounted ======", this);
 	}
 
 	evalRoute(route) {

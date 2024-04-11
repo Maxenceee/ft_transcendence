@@ -52,7 +52,7 @@ def api_update_user(request):
 		id = request.COOKIES.get('token')
 		user = Token.objects.get(token=id).user
 
-		try :
+		try:
 			data = json.loads(request.body)
 		except:
 			return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -61,7 +61,7 @@ def api_update_user(request):
 			return JsonResponse({'error': 'Missing nickname'}, status=400)
 		if len(data['nickname']) < 3:
 			return JsonResponse({'error': 'Nickname too short'}, status=400)
-		if len(data['nickname']) > 20:
+		if len(data['nickname']) > 10:
 			return JsonResponse({'error': 'Nickname too long'}, status=400)
 		
 		nickname = data['nickname']
@@ -86,6 +86,12 @@ def api_update_picture(request):
 
 		if content_type not in ['image/jpeg', 'image/png']:
 			return JsonResponse({'error': 'Format de fichier non supporté. Seuls les fichiers JPEG et PNG sont acceptés.'}, status=400)
+
+		try:
+			tmp = Image.open(profile_picture)
+			tmp.verify()
+		except:
+			return JsonResponse({'error': 'Image invalide'}, status=400)
 
 		user.profile_picture_image = profile_picture
 		user.save()
@@ -124,12 +130,20 @@ def api_avatar(request, id):
 		return JsonResponse({'error': 'Bad request'}, status=400)
 
 @login_required
-def api_search_user(request, id):
+def api_search_user(request):
 	try:
-		if request.method != 'GET':
+		if request.method != 'POST':
 			return JsonResponse({'error': 'Method not allowed'}, status=405)
 		consumer = Token.objects.get(token=request.COOKIES.get('token')).user
-		users = User.objects.filter(nickname__contains=id)
+
+		try:
+			data = json.loads(request.body)
+		except:
+			return JsonResponse({'error': 'Invalid JSON'}, status=400)
+		if 'search' not in data:
+			return JsonResponse({'error': 'Missing search field'}, status=400)
+
+		users = User.objects.filter(nickname__contains=data['search'])
 		response = []
 		for user in users:
 			if user.id != consumer.id:

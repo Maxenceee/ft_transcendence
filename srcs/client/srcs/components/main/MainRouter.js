@@ -1,14 +1,6 @@
 import { Component, createElement, HomePage, UserPage, NotFound, FriendsPanel, router, route, link, ServerError } from '..';
 
 class MainRouter extends Component {
-	componentDidMount() {
-		// console.log("componentDidMount MainRouter", this);
-	}
-
-	componentDidUpdate() {
-		console.log("componentDidUpdate MainRouter", this);
-	}
-
 	render() {
 		return createElement('div', {
 			class: "home", children: [

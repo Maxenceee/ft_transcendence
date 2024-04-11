@@ -16,7 +16,7 @@ urlpatterns = [
 
 	path('api/user/<str:id>/get', api_get_user, name='get_user'),
 	path('api/user/<str:id>/following', api_get_user_following, name='get_user_following'),
-	path('api/user/<str:id>/search', api_search_user, name='search_user'),
+	path('api/user/search', api_search_user, name='search_user'),
 	path('api/avatar/<str:id>', api_avatar, name='avatar'),
 	path('api/user/update/nickname', api_update_user, name='update_user'),
 	path('api/user/update/picture', api_update_picture, name='update_picture'),

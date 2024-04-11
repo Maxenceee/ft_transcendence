@@ -17,7 +17,6 @@ class Route extends Component {
 	}
 
 	propagateUnmount() {
-		// console.log("propagateUnmount from route", this);
 		this.active = false;
 		this._data && this._data._unmountComponent();
 	}

@@ -89,11 +89,9 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	const vertices = [];
 
 	for ( let i = 0; i < 12000; i ++ ) {
-
 		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
 		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
 		vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // z
-
 	}
 
 	geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );

@@ -21,17 +21,27 @@ class MainView extends Component {
 		this.setState({socket: socket});
 	}
 
+	loadUser(callBack = null, loading = true) {
+		console.log("load user");
+		if (loading) {
+			this.setState({ loading: true });
+		}
+		axios.get('/api/user/me/get')
+		.then(res => res.data)
+		.then(data => {
+			this.setState({ user: data, loading: false }, callBack);
+		})
+		.catch(error => {
+			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
+		})
+	}
+
 	componentDidMount() {
-		// console.log("==================== Main mounted ====================");
+		this.loadUser();
 		this.connectSocket();
 	}
 
-	componentDidUpdate() {
-		// console.log("==================== Main updated ====================");
-	}
-
 	componentWillUnmount() {
-		// console.log("==================== Main unmounted ====================");
 		this.state.socket.close();
 	}
 
@@ -51,55 +61,6 @@ class MainView extends Component {
 					route({path: "/*", element: createElement(MainRouter, {user: this.props.user, reload: this.props.reload})}),
 				)
 			})
-		)
-	}
-}
-
-class Main extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { user: null, connected: false };
-
-		this.loadUser = this.loadUser.bind(this);
-	}
-
-	componentDidMount() {
-		if (!Cookies.get('token').length) {
-			return this.setState({ connected: false });
-		}
-		this.loadUser();
-	}
-
-	// componentDidUpdate() {
-	// 	if (!Cookies.get('token').length) {
-	// 		return this.setState({ connected: false });
-	// 	}
-	// }
-
-	loadUser(callBack = null, loading = true) {
-		if (loading) {
-			this.setState({ loading: true });
-		}
-		axios.get('/api/user/me/get')
-		.then(res => res.data)
-		.then(data => {
-			if (data.missingAuth) {
-				return this.setState({ connected: false, loading: false, user: null });
-			}
-			this.setState({ user: data, loading: false, connected: true }, callBack);
-		})
-		.catch(error => {
-			// console.error("error", error);
-			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
-		})
-	}
-
-	render() {
-		return (
-			!this.state.connected ?
-			createElement(ConnectionPage, {reload: this.loadUser})
-			:
-			createElement(MainView, {user: this.state.user, reload: this.loadUser})
 		)
 	}
 }

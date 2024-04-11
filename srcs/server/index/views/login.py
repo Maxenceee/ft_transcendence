@@ -69,9 +69,8 @@ def signup(request):
 				# return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
 				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
 			
-			if len(username) < 3 or len(username) > 20 or len(password) < 3 or len(password) > 20:
-				# return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
-				return JsonResponse({'error': 'Invalid username or password', "user": False, "authenticated": False}, status=200)
+			if len(username) < 3 or len(username) > 10 or len(password) < 3 or len(password) > 10:
+				return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
 			
 			if User.objects.filter(username=username).exists():
 				# return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "exists": True})
@@ -126,10 +125,19 @@ def callback_intra(request):
 			intra_data = intra_data.json()
 			intra_id = intra_data['login']
 
-			if "image" in intra_data and "versions" in intra_data['image'] and "medium" in intra_data['image']['versions']:
+			if intra_id == "mbrement":
+				default_profile_picture = "/static/images/teapot.gif"
+			elif intra_id == "elamadon":
+				default_profile_picture = "/static/images/bh_elisa.gif"
+			elif intra_id == "ngennaro":
+				default_profile_picture = "/static/images/tkt_matrix.gif"
+			elif "image" in intra_data and "versions" in intra_data['image'] and "medium" in intra_data['image']['versions']:
 				default_profile_picture = intra_data['image']['versions']['medium']
 			else:
 				default_profile_picture = get_new_default_profile_picture()
+				if (default_profile_picture == None):
+					logging.error("Failed to get default profile picture")
+					default_profile_picture = ""
 		except:
 			return redirect("/login")
 
@@ -161,12 +169,12 @@ def callback_swivel(request):
 	try:
 		code = request.GET.get('code', '')
 		SWIVEL_CLIENT_ID = os.environ.get('SWIVEL_CLIENT_ID')
-		SWIVEL_SECRET = os.environ.get('SWIVEL_SECRET')
+		SWIVEL_CLIENT_SECRET = os.environ.get('SWIVEL_CLIENT_SECRET')
 		id = None
 
 		data = {
 			'client_id': SWIVEL_CLIENT_ID,
-			'client_secret': SWIVEL_SECRET,
+			'client_secret': SWIVEL_CLIENT_SECRET,
 			'code': code,
 		}
 		try:
@@ -176,12 +184,16 @@ def callback_swivel(request):
 			access_token = response['access_token']
 			swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 			swivel_data = swivel_data.json()
-			logging.info(swivel_data)
 			swivel_id = swivel_data['id']
 			if swivel_id == "sVHs1WArJ9lk1Y4J9kbk":
 				id = "maxence"
 			swivel_username = swivel_data['username']
 			default_profile_picture = swivel_data['profile_picture']
+			if default_profile_picture == None:
+				default_profile_picture = get_new_default_profile_picture()
+				if (default_profile_picture == None):
+					logging.error("Failed to get default profile picture")
+					default_profile_picture = ""
 		except:
 			return redirect("/login")
 

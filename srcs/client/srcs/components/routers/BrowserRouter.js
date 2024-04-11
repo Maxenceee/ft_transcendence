@@ -19,16 +19,13 @@ class BrowserRouter extends Component {
 
 	componentDidMount() {
 		window.addEventListener('popstate', this.event);
-		// console.log("====== BrowserRouter Mounted ======", this);
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener('popstate', this.event);
-		// console.log("====== BrowserRouter Unmounted ======", this);
 	}
 
 	render() {
-		// console.log("in render BrowserRouter", this);
 		return this.props.children;
 	}
 }

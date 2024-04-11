@@ -34,30 +34,6 @@ class UserPage extends Component {
 		let f = data.length && data.filter(e => e.type === "4p") || [];
 		let t = data.length && data.filter(e => e.type === "tournament") || [];
 		return [
-			// createElement('div', {
-			// 	class: "card-container-col", children: [
-			// 		createElement('div', {
-			// 			class: "stat-card page-card", children: [
-			// 				createElement('div', {
-			// 					class: "card-title", children: createElement('h2', {
-			// 						children: "Statistiques"
-			// 					})
-			// 				}),
-			// 				createElement(UserPagePlayerStats, {user: this.state.user})
-			// 			]
-			// 		}),
-			// 		(n.length || (!f.length && !t.length)) && createElement('div', {
-			// 			class: "history-card page-card", children: [
-			// 				createElement('div', {
-			// 					class: "card-title", children: createElement('h2', {
-			// 						children: "Normale"
-			// 					})
-			// 				}),
-			// 				createElement(UserPagePlayerHistory, {user_id: uid, data: n}),
-			// 			]
-			// 		}),
-			// 	]
-			// }),
 			createElement('div', {
 				class: "stat-card page-card", children: [
 					createElement('div', {
@@ -98,30 +74,6 @@ class UserPage extends Component {
 					createElement(UserPagePlayerHistory, {user_id: uid, data: t}),
 				]
 			}),
-			// createElement('div', {
-			// 	class: "card-container-col", children: [
-			// 		f.length > 0 && createElement('div', {
-			// 			class: "history-card page-card", children: [
-			// 				createElement('div', {
-			// 					class: "card-title", children: createElement('h2', {
-			// 						children: "4 Joueurs"
-			// 					})
-			// 				}),
-			// 				createElement(UserPagePlayerHistory, {user_id: uid, data: f}),
-			// 			]
-			// 		}),
-			// 		t.length > 0 && createElement('div', {
-			// 			class: "history-card page-card", children: [
-			// 				createElement('div', {
-			// 					class: "card-title", children: createElement('h2', {
-			// 						children: "Tournoi"
-			// 					})
-			// 				}),
-			// 				createElement(UserPagePlayerHistory, {user_id: uid, data: t}),
-			// 			]
-			// 		}),
-			// 	]
-			// }),
 		]
 	}
 
@@ -190,7 +142,7 @@ class UserNicknameField extends Component {
 	}
 
 	validinput() {
-		return this.state.nickname.length >= 3 && this.state.nickname.length <= 20;
+		return this.state.nickname.length >= 3 && this.state.nickname.length <= 10;
 	}
 
 	render() {
@@ -201,7 +153,7 @@ class UserNicknameField extends Component {
 					[
 						createElement('div', {
 							class: "nickname-input", children: createElement('input', {
-								ref: this.ref, value: this.state.nickname, placeholder: "Surnom", oninput: e => this.setState({nickname: e.target.value}), autocomplete:"off", minlength: "3", maxlength: "20", autocorrect: "off", autocapitalize: "off", type:"text"
+								ref: this.ref, value: this.state.nickname, placeholder: "Surnom", oninput: e => this.setState({nickname: e.target.value}), autocomplete:"off", minlength: "3", maxlength: "10", autocorrect: "off", autocapitalize: "off", type:"text"
 							})
 						}),
 						this.validinput() && createElement('div', {
