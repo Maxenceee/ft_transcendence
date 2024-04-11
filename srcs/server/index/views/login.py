@@ -161,13 +161,13 @@ def callback_intra(request):
 def callback_swivel(request):
 	try:
 		code = request.GET.get('code', '')
-		SWIVEL_USER = os.environ.get('SWIVEL_USER')
-		SWIVEL_SECRET = os.environ.get('SWIVEL_SECRET')
+		SWIVEL_CLIENT_ID = os.environ.get('SWIVEL_CLIENT_ID')
+		SWIVEL_CLIENT_SECRET = os.environ.get('SWIVEL_CLIENT_SECRET')
 		id = None
 
 		data = {
-			'client_id': SWIVEL_USER,
-			'client_secret': SWIVEL_SECRET,
+			'client_id': SWIVEL_CLIENT_ID,
+			'client_secret': SWIVEL_CLIENT_SECRET,
 			'code': code,
 		}
 		try:
@@ -177,7 +177,6 @@ def callback_swivel(request):
 			access_token = response['access_token']
 			swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 			swivel_data = swivel_data.json()
-			logging.info(swivel_data)
 			swivel_id = swivel_data['id']
 			if swivel_id == "sVHs1WArJ9lk1Y4J9kbk":
 				id = "maxence"
