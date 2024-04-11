@@ -52,7 +52,7 @@ def api_update_user(request):
 		id = request.COOKIES.get('token')
 		user = Token.objects.get(token=id).user
 
-		try :
+		try:
 			data = json.loads(request.body)
 		except:
 			return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -130,12 +130,20 @@ def api_avatar(request, id):
 		return JsonResponse({'error': 'Bad request'}, status=400)
 
 @login_required
-def api_search_user(request, id):
+def api_search_user(request):
 	try:
-		if request.method != 'GET':
+		if request.method != 'POST':
 			return JsonResponse({'error': 'Method not allowed'}, status=405)
 		consumer = Token.objects.get(token=request.COOKIES.get('token')).user
-		users = User.objects.filter(nickname__contains=id)
+
+		try:
+			data = json.loads(request.body)
+		except:
+			return JsonResponse({'error': 'Invalid JSON'}, status=400)
+		if 'search' not in data:
+			return JsonResponse({'error': 'Missing search field'}, status=400)
+
+		users = User.objects.filter(nickname__contains=data['search'])
 		response = []
 		for user in users:
 			if user.id != consumer.id:

@@ -6,7 +6,6 @@ import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';	
 
 let teapot
-const teapotSize = 300;	
 let tess = - 1;	// force initialization
 
 let bBottom;
@@ -16,27 +15,7 @@ let bFitLid;
 let bNonBlinn;
 let shading;
 
-function setupGui(effectController, render) {
-
-	effectController = {
-		newTess: 15,
-		bottom: true,
-		lid: true,
-		body: true,
-		fitLid: false,
-		nonblinn: false,
-		newShading: 'glossy'
-	};
-	const gui = new GUI();
-	gui.add( effectController, 'newTess', [ 2, 3, 4, 5, 6, 8, 10, 15, 20, 30, 40, 50 ] ).name( 'Tessellation Level' ).onChange( render );
-	gui.add( effectController, 'lid' ).name( 'display lid' ).onChange( render );
-	gui.add( effectController, 'body' ).name( 'display body' ).onChange( render );
-	gui.add( effectController, 'bottom' ).name( 'display bottom' ).onChange( render );
-	gui.add( effectController, 'fitLid' ).name( 'snug lid' ).onChange( render );
-	gui.add( effectController, 'nonblinn' ).name( 'original scale' ).onChange( render );
-	gui.add( effectController, 'newShading', [ 'wireframe', 'flat', 'smooth', 'glossy', 'textured', 'reflective' ] ).name( 'Shading' ).onChange( render );
-}
-function createEffectController(effectController, scene, textureCube){
+function createEffectController(effectController, scene, textureCube) {
 
 	if ( effectController.newTess !== tess ||
 		effectController.bottom !== bBottom ||
@@ -46,21 +25,21 @@ function createEffectController(effectController, scene, textureCube){
 		effectController.nonblinn !== bNonBlinn ||
 		effectController.newShading !== shading ) {
 
-			tess = effectController.newTess;
-			bBottom = effectController.bottom;
-			bLid = effectController.lid;
-			bBody = effectController.body;
-			bFitLid = effectController.fitLid;
-			bNonBlinn = effectController.nonblinn;
-			shading = effectController.newShading
+		tess = effectController.newTess;
+		bBottom = effectController.bottom;
+		bLid = effectController.lid;
+		bBody = effectController.body;
+		bFitLid = effectController.fitLid;
+		bNonBlinn = effectController.nonblinn;
+		shading = effectController.newShading
 
-			if ( shading === 'reflective' ) {
-				scene.background = textureCube;
-			} else {
-				
-				scene.background = null;
-				}
-			}
+		if ( shading === 'reflective' ) {
+			scene.background = textureCube;
+		} else {
+			
+			scene.background = null;
+		}
+	}
 }
 function createNewTeapot(scene, effectController) {
 
@@ -76,14 +55,14 @@ function createNewTeapot(scene, effectController) {
 		effectController.body,
 		effectController.fitLid,
 		!effectController.nonblinn
-		);
-		teapot = new THREE.Mesh( geometry,new THREE.MeshStandardMaterial({
-			wireframe:true, 
-			color:0xffffff, 
-			opacity: 1, 
-			side : THREE.DoubleSide,
-		}));
-		scene.add( teapot );
+	);
+	teapot = new THREE.Mesh( geometry,new THREE.MeshStandardMaterial({
+		wireframe:true, 
+		color:0xffffff, 
+		opacity: 1, 
+		side : THREE.DoubleSide,
+	}));
+	scene.add( teapot );
 
 }
 let render_teapot = function({width, height} = {width: window.innerWidth, height: window.innerHeight}) {
@@ -96,7 +75,6 @@ let render_teapot = function({width, height} = {width: window.innerWidth, height
 	let cameraControls;
 	let ambientLight, light;
 	let textureCube;
-	// const materials = {};
 
 	camera = new THREE.PerspectiveCamera( 45, width / height, 1, 80000 );
 	camera.position.set( - 600, 550, 2000 );
@@ -130,11 +108,9 @@ let render_teapot = function({width, height} = {width: window.innerWidth, height
 	scene.add( ambientLight );
 	scene.add( light );
 	createEffectController(effectController, scene, textureCube);
-	// setupGui(effectController, renderer);	
 	createNewTeapot(scene, effectController) ;
 
-	let animationid = null,
-	ts = Date.now();
+	let animationid = null;
 	const animate = () => {
 		renderer.render(scene, camera);
 		cameraControls.update();
@@ -150,9 +126,6 @@ let render_teapot = function({width, height} = {width: window.innerWidth, height
 		}
 	});
 }
-
-
-
 
 class TeaPot extends Component {
 	constructor(props) {

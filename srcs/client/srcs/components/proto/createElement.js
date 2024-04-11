@@ -30,7 +30,6 @@ function createElement(type, props = {}) {
 		return new type(props);
 	} else {
 		type = type.toLowerCase();
-		// TODO: find a better way to handle svg elements using NS not list
 		let element = (["svg", "path", "circle", "text", "line", "g", "polygon"].includes(type) ? document.createElementNS(Is(type), type) : document.createElement(type));
 		let jv = function(c) {
 			if (typeof c === "function" && !(c instanceof Component))

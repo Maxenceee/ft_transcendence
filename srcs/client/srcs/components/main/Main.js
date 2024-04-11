@@ -32,23 +32,16 @@ class Main extends Component {
 			this.setState({ user: data, loading: false }, callBack);
 		})
 		.catch(error => {
-			// console.error("error", error);
 			this.setState({ loading: false, error: "Une erreur s'est produite, veuillez réessayer plus tard." });
 		})
 	}
 
 	componentDidMount() {
-		// console.log("==================== Main mounted ====================");
 		this.loadUser();
 		this.connectSocket();
 	}
 
-	componentDidUpdate() {
-		// console.log("==================== Main updated ====================");
-	}
-
 	componentWillUnmount() {
-		// console.log("==================== Main unmounted ====================");
 		this.state.socket.close();
 	}
 
@@ -68,7 +61,6 @@ class Main extends Component {
 					route({path: "/*", element: createElement(MainRouter, {user: this.state.user, reload: this.loadUser.bind(this)})}),
 				)
 			})
-			// createElement(ConnectionPage)
 		)
 	}
 }

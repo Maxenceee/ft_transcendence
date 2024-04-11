@@ -47,7 +47,6 @@ class Component {
 		let newElement = this.render();
 		this._data = newElement;
 		this._element = newElement._renderComponent()
-		// console.log("reload element", this, newElement, newElement.element, oldElement, oldElementData);
 		if ((node = (this._parent || (oldElementData && oldElementData.parentNode)))) {
 			if (newElement && oldElementData) {
 				node.replaceChild(newElement.element, oldElementData);
@@ -70,7 +69,6 @@ class Component {
 	_unmountComponent() {
 		if (!this._mounted) return;
 		this._mounted = false;
-		// console.log("component will unmount", this);
 		this.componentWillUnmount();
 		this._data && typeof this._data._unmountComponent === "function" && this._data._unmountComponent();
 		this._data = null;

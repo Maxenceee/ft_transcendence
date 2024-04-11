@@ -98,9 +98,6 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 		animation.time = dur;
 		animation.completion = 0;
 		animation.started = true;
-		// console.log('====================================');
-		// console.log('start animation', animation);
-		// console.log('====================================');
 	}
 
 	let getanimationframe = () => {
@@ -111,9 +108,7 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 		if (animation.completion > 1) {
 			animation.completion = 1;
 			animation.started = false;
-			// console.log('====================================, ended at', now, animation.start_time, elapsed);
 		}
-		// console.log(elapsed, animation.completion);
 
 		// on utilise une fonction de easing pour rendre l'animation fluide (lerp, interpolation linéaire en bon français)
 		let x = animation.start_point.x + (animation.end_point.x - animation.start_point.x) * animation.completion;

@@ -8,18 +8,6 @@ class RegisterComp extends Component {
 		this.onInput = this.onInput.bind(this);
 	}
 
-	// onInput(e) {
-	// 	this.setState({[e.target.name]: e.target.value});
-	// }
-
-	// componentDidUpdate() {
-	// 	console.log(this.state);
-	// 	if (this.state.inedition && this.ref.current) {
-	// 		this.ref.current.focus();
-	// 		this.ref.current.setSelectionRange(this.ref.current.value.length, this.ref.current.value.length);
-	// 	}
-	// }
-
 	render() {
 		return createElement('div', {
 			class: "auth-form-body", children: [

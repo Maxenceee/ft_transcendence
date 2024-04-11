@@ -167,57 +167,7 @@ class HomePage extends Component {
 								]
 							})
 						]
-					}),
-					// createElement('section', {
-					// 	children: createElement('div', {
-					// 		class: "gr-container", children: [
-					// 			createElement('div', {
-					// 				class: "home-view-container", children: createElement('div', {
-					// 					class: "home-image-card", children: [
-					// 						createElement('h2', {
-					// 							children: "Some view"
-					// 						}),
-					// 						createElement('img', {
-					// 							src: "", alt: ""
-					// 						})
-					// 					]
-					// 				})
-					// 			}),
-					// 			createElement('div', {
-					// 				class: "home-view-container", children: [
-					// 					createElement('div', {
-					// 						class: "home-view-card", children: [
-					// 							createElement('div', {
-					// 								class: "card-title", children: createElement('h2', {
-					// 									children: "Some data"
-					// 								})
-					// 							}),
-					// 							createElement('div', {
-					// 								class: "card-progress-view", children: createElement('progress', {
-					// 									value: "0", max: "100", style: "--value: 70; --max: 100;"
-					// 								})
-					// 							})
-					// 						]
-					// 					}),
-					// 					createElement('div', {
-					// 						class: "home-view-card", children: [
-					// 							createElement('div', {
-					// 								class: "card-title", children: createElement('h2', {
-					// 									children: "Some other data"
-					// 								})
-					// 							}),
-					// 							createElement('div', {
-					// 								class: "card-progress-view", children: createElement('progress', {
-					// 									value: "0", max: "100", style: "--value: 50; --max: 100;"
-					// 								})
-					// 							})
-					// 						]
-					// 					})
-					// 				]
-					// 			})
-					// 		]
-					// 	})
-					// })
+					})
 				]
 			})
 		});
