@@ -1335,7 +1335,10 @@ class WebsocketClient(WebsocketConsumer):
 
 
 	def receive(self, text_data=None):
-		receive_package = json.loads(text_data)
+		try:
+			receive_package = json.loads(text_data)
+		except:
+			return
 
 		if "PING" in receive_package:
 			self.send(json.dumps({"PING": "PONG"}))

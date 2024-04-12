@@ -140,6 +140,7 @@ def api_search_user(request):
 			data = json.loads(request.body)
 		except:
 			return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
 		if 'search' not in data:
 			return JsonResponse({'error': 'Missing search field'}, status=400)
 
