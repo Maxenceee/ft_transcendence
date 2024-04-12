@@ -63,7 +63,7 @@ def signup(request):
 			if not username or not password:
 				return render(request, 'views/connection.html', {"login": username, "is_invalid": True, "is_signup": True, "action_url": "/signup"})
 			
-			if len(username) < 3 or len(username) > 10 or len(password) < 3 or len(password) > 10:
+			if len(username) < 3 or len(username) > 10 or len(password) < 3 or len(password) > 20:
 				return render(request, 'views/connection.html', {"login": username, "is_signup": True, "action_url": "/signup", "is_invalid": True})
 			
 			if User.objects.filter(username=username).exists():
