@@ -34,7 +34,7 @@ class User(models.Model):
 		game_history = []
 		for game in self.game_history.all():
 			new = []
-			data = json.loads(game.data)
+			data = json.loads(game.data),
 			data = data[0]
 			for current in data:
 				id = current["id"]
