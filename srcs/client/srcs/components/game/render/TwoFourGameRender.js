@@ -444,6 +444,13 @@ function displayScore(data) {
 	composer.addPass(bloomPass);
 	composer.addPass(outputPass);
 
+	let onWindowResize = () => {
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+	}
+
+	document.addEventListener('resize', onWindowResize, false);
 	document.addEventListener("keydown", onDocumentKeyEvent, true);
 	document.addEventListener("keyup", onDocumentKeyEvent, true);
 	function onDocumentKeyEvent(event) {
@@ -557,6 +564,7 @@ function displayScore(data) {
 			socket.close();
 			document.removeEventListener("keydown", onDocumentKeyEvent, true);
 			document.removeEventListener("keyup", onDocumentKeyEvent, true);
+			document.removeEventListener('resize', onWindowResize, false);
 		}
 	};
 };
