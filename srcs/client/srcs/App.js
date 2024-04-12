@@ -11,7 +11,6 @@ renderer.prototype.render = function(elem) {
 	if (this._internalRoot === null) throw Error('Unable to find root node');
 	let element = this._children._renderComponent();
 	if (element == undefined) throw new Error('Cannot mount invalid element');
-	console.log("root element", element, this);
 	if (/Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
         document.body.classList.add('chrome');
     }

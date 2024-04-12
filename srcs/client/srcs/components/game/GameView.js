@@ -54,7 +54,6 @@ class GameView extends Component {
 	}
 
 	finishGame(data) {
-		console.log("finish game", data);
 		this.state.game_render && this.state.game_render.unmount();
 		window.onbeforeunload = null;
 		this.setState({endGameData: data.players});

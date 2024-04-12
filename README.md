@@ -1,11 +1,10 @@
-# ft_transcendence
+# Tracendance
 
 ## Modules
 
 ### Web
 
 - Framework backend (M)
-- Framework frontend (m)
 - Base de données (m)
 
 ### Gestion d'utilisateur
@@ -16,32 +15,23 @@
 ### Gameplay
 
 - Joueurs à distance (M)
-- Multijoueur (2+)
-- Personnalisation (m)
+- Multijoueur (M)
 
 ### IA-Algo
 
-- Dashboard (m)
-
-### Cyber 
-
-- 2FA (M)
+- Adversaire contrôlé par IA (M)
 
 ### Graphiques
 
 - 3D (M)
 
+### Orienté objet
+
+- Pong coté serveur (M)
+
 ### Accessibilité
 
 - Multiples navigateurs (m)
-- Multiples langues (m)
 
 ### Total: 9
 
-# Utils
-
-To get random profile picture (new each time)
-https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder
-
-To get new profile picture link (to be used to get the same image each time)
-https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/new

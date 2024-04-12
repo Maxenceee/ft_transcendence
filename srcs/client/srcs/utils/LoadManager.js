@@ -9,7 +9,6 @@ LoadManager.prototype = {
 	total: 0,
 	onload: function() {},
 	add: function(func, proto) {
-		console.log(func, proto, typeof func, typeof proto);
 		if (typeof func !== "object" && typeof func !== "function") {
 			throw new Error("LoadManager.add() expects a function as argument");
 		}

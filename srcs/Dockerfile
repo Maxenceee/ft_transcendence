@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y curl
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
+# Copie du package.json et installation des dépendances du client
 COPY ./client/package.json /app/client/package.json
 WORKDIR /app/client
 RUN npm install
@@ -23,12 +24,6 @@ RUN pip install django==4.0.0 channels==3.0.4 psycopg2-binary python-dotenv pass
 # Copiez les fichiers de l'application
 COPY ./server /app/server
 COPY ./client /app/client
-
-# Déplacez-vous vers le répertoire client
-# WORKDIR /app/client
-
-# Installez les dépendances Node.js et compilez l'application client avec Webpack
-# RUN npm run pack
 
 # Revenez au répertoire principal de l'application
 WORKDIR /app/server

@@ -1,4 +1,4 @@
 User-Agent: Googlebot
 Allow: *
 
-Sitemap: http://example.com
+Sitemap: https://tracendance.tech

@@ -18,14 +18,11 @@ class InputSection extends Component {
 
 	onSubmit(e) {
 		e.preventDefault();
-		console.log(this.formref.current);
 		let data = new FormData(this.formref.current);
-		console.log(data);
 		this.password_ref.current.value = "";
 		axios.post(this.state.register ? '/signup' : '/login', data)
 		.then(res => res.data)
 		.then(data => {
-			console.log(data);
 			if (data.user && data.authenticated) {
 				return navigate('/');
 			}
@@ -36,7 +33,6 @@ class InputSection extends Component {
 			}
 		})
 		.catch(error => {
-			console.error(error);
 			this.setState({error: "Une erreur est survenue. Veuillez réessayer plus tard.", invalid: false, exists: false});
 		})
 	}

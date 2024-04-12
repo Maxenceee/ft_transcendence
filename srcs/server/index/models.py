@@ -161,9 +161,7 @@ class Game_history(models.Model):
 				except:
 					pass
 
-
-#starting code
-
+# reset des états des utilisateur dans la db lors du lancement du server
 try:
 	for user in User.objects.all():
 		user.is_online = False

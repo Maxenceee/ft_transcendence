@@ -49,7 +49,6 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 				onfinish(msg.data);
 				break;
 			case "connectionRefused":
-				console.log(msg.data);
 				new AlertBanner({ message: msg.data, color: "error" });
 				break;
 			case "initPlayers":
@@ -78,7 +77,6 @@ let TwoFourGameRender = function(type, onload, onclose, onfinish, setplayers, {w
 	manager.add(socket, "onconnection");
 	manager.add(loaderManager, "onLoad");
 	manager.onload = () => {
-		console.info("game ready");
 		socket.send({type : "ready"});
 		onload();
 		if (type == "4p") {

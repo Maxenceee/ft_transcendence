@@ -45,16 +45,13 @@ class FriendsPanel extends Component {
 		.then(data => {
 			this.setState({ seachresult: data });
 		})
-		.catch(error => {
-			console.error("error", error);
-		})
+		.catch(_ => {});
 	}
 
 	followPlayer(id) {
 		axios.post('/api/follow/'+id)
 		.then(res => res.data)
 		.then(data => {
-			console.log("data", data);
 			this.setState({ following: data.following });
 		})
 		.catch(error => {
@@ -66,7 +63,6 @@ class FriendsPanel extends Component {
 		axios.post('/api/unfollow/'+id)
 		.then(res => res.data)
 		.then(data => {
-			console.log("data", data);
 			this.setState({ following: data.following });
 		})
 		.catch(error => {

@@ -1,6 +1,5 @@
 from django.urls import re_path, path
 from channels.generic.websocket import WebsocketConsumer
-
 from . import consumers
 
 class DenyConsumer(WebsocketConsumer):

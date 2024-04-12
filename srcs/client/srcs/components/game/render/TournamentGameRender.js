@@ -64,7 +64,6 @@ let TournamentGameRender = function(type, onload, onclose, onfinish, setplayers,
 	manager.add(socket, "onconnection");
 	manager.add(loaderManager, "onLoad");
 	manager.onload = () => {
-		console.info("game ready");
 		socket.send({type : "ready"});
 		onload();
 	};

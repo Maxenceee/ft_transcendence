@@ -4,7 +4,7 @@ import axios from "axios";
 class Main extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { user: null, loading: true, error: null, socket: null};
+		this.state = { user: null, loading: true, error: null, socket: null };
 	}
 
 	connectSocket() {
@@ -15,14 +15,10 @@ class Main extends Component {
 		socket.onclose(() => {
 			console.info("Connection closed");
 		});
-		socket.onmessage((msg) => {
-			console.log(msg);
-		});
 		this.setState({socket: socket});
 	}
 
 	loadUser(callBack = null, loading = true) {
-		console.log("load user");
 		if (loading) {
 			this.setState({ loading: true });
 		}

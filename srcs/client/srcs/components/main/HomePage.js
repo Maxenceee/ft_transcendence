@@ -8,10 +8,6 @@ class HomePage extends Component {
 		this.ref = {current: null};
 	}
 
-	componentDidMount() {
-		console.log("this.componentDidMount HomePage Page");
-	}
-
 	playButton() {
 		return createElement('div', {
 			class: "bc-price-btn", children: createElement('ul', {

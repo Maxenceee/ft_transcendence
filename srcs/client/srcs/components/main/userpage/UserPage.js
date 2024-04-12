@@ -22,14 +22,12 @@ class UserPage extends Component {
 				this.setState({ user: data, loading: false });
 			})
 			.catch(error => {
-				console.error("error", error);
 				this.setState({ loading: false, user: null });
 			})
 		}
 	}
 
 	getcards(uid, data) {
-		console.log(uid);
 		let n = data.length && data.filter(e => e.type === "2p") || [];
 		let f = data.length && data.filter(e => e.type === "4p") || [];
 		let t = data.length && data.filter(e => e.type === "tournament") || [];
@@ -136,7 +134,6 @@ class UserNicknameField extends Component {
 			this.props.reload(null, false);
 		})
 		.catch(error => {
-			console.error("error", error);
 			new AlertBanner({ message: error.response.data.error || "Une erreur s'est produite, veuillez réessayer plus tard.", color: "error"});
 		})
 	}
