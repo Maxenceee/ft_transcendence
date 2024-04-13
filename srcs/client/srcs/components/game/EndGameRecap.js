@@ -1,4 +1,5 @@
 import { Component, createElement, link } from "..";
+import { ismax } from "../proto/Component";
 
 class EndGameRecap extends Component {
 	button(text, to, reverse = false) {
@@ -44,7 +45,7 @@ class EndGameRecap extends Component {
 								}),
 							}),
 							createElement('h1', {
-								children: players[0].nickname || "N/A",
+								children: players[0].nickname || "N/A", class: ismax(players[0].id, true)
 							}),
 							players[0].id && this.button("Voir le profil", "/user/" + players[0].id) || createElement('div')
 						]
@@ -91,7 +92,7 @@ class EndGameRecap extends Component {
 								}),
 							}),
 							createElement('h1', {
-								children: players[1].nickname || "N/A",
+								children: players[1].nickname || "N/A", class: ismax(players[1].id, true)
 							}),
 							players[1].id && this.button("Voir le profil", "/user/" + players[1].id) || createElement('div')
 						]
@@ -128,7 +129,7 @@ class EndGameRecap extends Component {
 								}),
 							}),
 							createElement('h1', {
-								children: e.nickname || "N/A",
+								children: e.nickname || "N/A", class: ismax(e.id, true)
 							}),
 							e.id && this.button("Voir le profil", "/user/" + e.id) || createElement('div')
 						]

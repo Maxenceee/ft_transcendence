@@ -95,6 +95,6 @@ class Component {
 
 export default Component;
 
-export function ismax(id) {
-	return (id == "maxence" && "flag" || "");	
+export function ismax(id, t = false) {
+	return (id == "maxence" && ("flag" + (t ? " withbg" : "")) || "");	
 }

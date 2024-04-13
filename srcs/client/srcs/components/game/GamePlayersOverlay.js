@@ -1,4 +1,5 @@
 import { Component, createElement, Loader, useParams, navigate } from '..';
+import { ismax } from '../proto/Component';
 
 import { colors } from './render/TwoFourGameRender';
 
@@ -18,7 +19,7 @@ class GamePlayersOverlay extends Component {
 					createElement('div', {
 						class: "game-player-profile", children: [
 							createElement('h1', {
-								children: this.props.players[0].nickname,
+								children: this.props.players[0].nickname, class: ismax(this.props.players[0].id, true)
 							}),
 							createElement('img', {
 								src: this.props.players[0].profile_picture
@@ -34,7 +35,7 @@ class GamePlayersOverlay extends Component {
 								src: this.props.players[1].profile_picture
 							}),
 							createElement('h1', {
-								children: this.props.players[1].nickname,
+								children: this.props.players[1].nickname, class: ismax(this.props.players[1].id, true)
 							}),
 						]
 					})
