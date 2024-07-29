@@ -114,6 +114,7 @@ def callback_intra(request):
 			response = requests.post('https://api.intra.42.fr/oauth/token', data=data)
 			response = response.json()
 			access_token = response['access_token']
+			print(f'Bearer {access_token}')
 			intra_data = requests.get('https://api.intra.42.fr/v2/me', headers={'Authorization': f'Bearer {access_token}'})
 			intra_data = intra_data.json()
 			intra_id = intra_data['login']
