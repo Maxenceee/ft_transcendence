@@ -333,10 +333,10 @@ class Game:
 			id = None
 			if isinstance(player, AIPlayer):
 				nickname = "Marvin (AI)"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
+				profile_picture = "https://cdn.mgama.me/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
 			if isinstance(player, LocalPlayer):
 				nickname = "Invité"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+				profile_picture = "https://cdn.mgama.me/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
 			if isinstance(player, Player):
 				user = User.objects.get(id=player.id)
 				id = player.id
@@ -415,7 +415,7 @@ class Game:
 			if isinstance(player, AIPlayer):
 				id = player.id
 				nickname = "Marvin (AI)"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
+				profile_picture = "https://cdn.mgama.me/placeholder/u/pl/random/sorry/placeholder?seed=1564823102"
 				players.append({
 					"id": id,
 					"nickname": nickname,
@@ -426,7 +426,7 @@ class Game:
 			if isinstance(player, LocalPlayer):
 				id = player.id
 				nickname = "Invité"
-				profile_picture = "https://cdn.maxencegama.dev/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
+				profile_picture = "https://cdn.mgama.me/placeholder/u/pl/random/profile/placeholder?seed=9856120325"
 				players.append({
 					"id": id,
 					"nickname": nickname,

@@ -11,7 +11,7 @@ import urllib.parse
 
 def get_new_default_profile_picture():
 	try:
-		response = requests.get("https://cdn.maxencegama.dev/placeholder/u/pl/static/profile/new")
+		response = requests.get("https://cdn.mgama.me/placeholder/u/pl/static/profile/new")
 		response = response.json()
 		return response['content']
 	except:
@@ -173,10 +173,10 @@ def callback_swivel(request):
 		}
 		try:
 			query_string = urllib.parse.urlencode(data)
-			response = requests.post(f"https://auth0.maxencegama.dev/o/auth/access_token?{query_string}")
+			response = requests.post(f"https://auth0.mgama.me/o/auth/access_token?{query_string}")
 			response = response.json()
 			access_token = response['access_token']
-			swivel_data = requests.get('https://api.maxencegama.dev/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
+			swivel_data = requests.get('https://api.mgama.me/user/user.profile', headers={'Authorization': f'Bearer {access_token}'})
 			swivel_data = swivel_data.json()
 			swivel_id = swivel_data['id']
 			if swivel_id == "sVHs1WArJ9lk1Y4J9kbk":
