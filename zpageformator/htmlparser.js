@@ -21,7 +21,7 @@
 /**!
  *   @license © Copyright 2024, All rights reserved.
  *   @author Maxence Gama, @maxencegama
- *   @contact contact@mgama.me
+ *   @contact contact@maxencegama.dev
  */
 
 const fs = require('fs');

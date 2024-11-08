@@ -19,7 +19,7 @@ class ServerError extends Component {
                 createElement('div', {
                     class: "screen", children: [
                         createElement('div', {
-                            class: "main-image", style: "background-image: url(https://cdn.mgama.me/placeholder/u/pl/random/sorry/placeholder);"
+                            class: "main-image", style: "background-image: url(https://cdn.maxencegama.dev/placeholder/u/pl/random/sorry/placeholder);"
                         }),
                         createElement('img', {
                             src: "/static/images/macbook.png", alt: ""

@@ -5,7 +5,7 @@ class SwivelButton extends Component {
 		super(props);
 
 		this.ref = { current: null };
-		this.authPath = "https://auth0.mgama.me/o/auth";
+		this.authPath = "https://auth0.maxencegama.dev/o/auth";
 
 		let state = (function() {
 			let t = {

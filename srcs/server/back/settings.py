@@ -34,14 +34,14 @@ ALLOWED_HOSTS = [
 	BASE_URL,
 	"localhost",
 	"website",
-	"trace.mgama.me",
+	"trace.maxencegama.dev",
 	"tracendance.tech",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
 	BASE_URL,
 	"http://website:3000",
-	"https://trace.mgama.me",
+	"https://trace.maxencegama.dev",
 	"https://tracendance.tech"
 ]
 
